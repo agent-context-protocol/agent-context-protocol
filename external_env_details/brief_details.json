@@ -1,0 +1,22 @@
+{
+    "Perplexity": {
+      "Input": "A simple query that requires searching the web.",
+      "Output": "A compiled answer based on web search results.",
+      "Use": "As a search engine to retrieve and synthesize information from multiple sources into a single, concise response."
+    },
+    "PlotAgent": {
+      "Input": "A query along with relevant response from Perplexity.",
+      "Output": "If plots are generated, it returns the location where plots are saved and a plot explanation string; otherwise, it returns 'Fail.'",
+      "Use": "For queries that can be visualized through graphs or charts. If initial information is insufficient, it triggers a Perplexity search for more data. It can skip plotting if it determines that plotting does not make sense."
+    },
+    "TextToImage": {
+      "Input": "A prompt describing an image.",
+      "Output": "A location where the image generated based on the input prompt, is saved.",
+      "Use": "For generating visually compelling illustrations or images that enhance and complement the response, especially when plots are not appropriate."
+    },
+    "Open-Meteo": {
+        "Input": "1. latitude (mandatory): The latitude of the location (in float).\n2. longitude (mandatory): The longitude of the location (in float).\n3. hourly or daily (optional): Specify the weather variables you want for hourly or daily forecasts.",
+        "Output": "A JSON object containing weather data such as temperature, wind speed, humidity, etc., for the specified time periods and coordinates.",
+        "Use": "Provides a 7-day weather forecast with various weather variables (e.g., temperature, wind speed) for given geographical coordinates."
+    }
+}
