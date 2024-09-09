@@ -125,54 +125,35 @@ class MainTranslatorNode(BaseNode):
     # ALL THE CREATING INPUT FOR LLM FUNCTIONS WILL BE HERE
     
     # create input string
-    def create_first_input_data(self, query, panels_list, available_apis):
+    def create_first_input_data(self, query, panels_list):
         """
         Creates structured input data based on the query, panels, and available APIs.
         Returns both a data structure and a formatted string.
         """
-        input_data = {
-            "query": query,
-            "panels": [],
-            "available_apis": []
-        }
-
         # Create the string format
         formatted_string = f"**Query:** \"{query}\"\n\n**Interpreter's Panel Requests:**\n"
         
         # Adding panel requests
-        for panel_id, panel_description in enumerate(panels_list, start=1):
-            panel_request = {
-                "panel_id": panel_id,
-                "panel_description": panel_description
-            }
-            input_data["panels"].append(panel_request)
-            formatted_string += f"{panel_id}. Panel {panel_id}: {panel_description}\n"
+        for panel in panels_list:
+            formatted_string += f"{panel['instance_id']}. Panel {panel['instance_id']}: {panel['request']['description']}\n"
         
-        formatted_string += "\n**List of Available APIs:**\n"
+            formatted_string += "\n**List of Available APIs:**\n"
 
         # Adding available APIs with their input, output, and use
-        for api_id, (api_name, api_details) in enumerate(available_apis.items(), start=1):
-            api_data = {
-                "api_name": api_name,
-                "input": api_details.get("input", "N/A"),
-                "output": api_details.get("output", "N/A"),
-                "use": api_details.get("use", "N/A")
-            }
-            input_data["available_apis"].append(api_data)
-            
-            formatted_string += (
-                f"{api_id}. {api_name}\n"
-                f"   - **Input:** {api_details.get('input', 'N/A')}\n"
-                f"   - **Output:** {api_details.get('output', 'N/A')}\n"
-                f"   - **Use:** {api_details.get('use', 'N/A')}\n\n"
-            )
+            for api_id, api in enumerate(panel['request']['relevant_apis'], start=1):
+                formatted_string += (
+                    f"{api_id}. {api['api_name']}\n"
+                    f"   - **Input:** {api.get('Input', 'N/A')}\n"
+                    f"   - **Output:** {api.get('Output', 'N/A')}\n"
+                    f"   - **Use:** {api.get('Use', 'N/A')}\n\n"
+                )
 
-        return input_data, formatted_string
+        return formatted_string
 
-    def setup(self, query, panels_list, available_apis):
+    def setup(self, query, panels_list):
         # Logic to create workflow and initialize local translator instances
         # We can use self.chat_history to provide context
-        input_data, formatted_string = self.create_first_input_data(query, panels_list, available_apis)
+        formatted_string = self.create_first_input_data(query, panels_list)
 
         # generating the workflow from the LLM
         self.chat_history.append({"role": "system", "content": self.workflow_creation_prompt}) # system prompt for workflow_creation
@@ -193,6 +174,7 @@ class MainTranslatorNode(BaseNode):
         if not run_success:
             print("counter : ",counter)
             print(cause_error)
-
+        # print(llm_response_workflow)
         print("\nworkflows:\n")
         print(workflow_dict)
+        return workflow_dict

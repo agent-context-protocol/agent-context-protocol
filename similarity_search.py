@@ -5,14 +5,14 @@ import torch
 from transformers import AutoTokenizer, AutoModel
 
 # Load the JSON file
-with open('api_json_file.json', 'r') as file:
+with open('external_env_details/brief_details.json', 'r') as file:
     api_data = json.load(file)
 
 # Extract the descriptions
 descriptions = [api_data[key]['Use'] for key in api_data]
 
 # Load pre-trained model and tokenizer
-model_name = 'distilbert-base-uncased'  # Using DistilBERT model
+model_name = 'sentence-transformers/all-MiniLM-L6-v2'  # Using DistilBERT model
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModel.from_pretrained(model_name)
 print('Model loaded successfully.')

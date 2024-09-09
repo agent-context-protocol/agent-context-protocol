@@ -6,7 +6,7 @@ import faiss
 import torch
 from transformers import AutoTokenizer, AutoModel
 
-def update_interpreter_with_similar_apis(interpreter_message, faiss_index_path='faiss_index.index', model_name='sentence-transformers/all-MiniLM-L6-v2', api_json_path='api_json_file.json', k=5):
+def update_interpreter_with_similar_apis(interpreter_message, faiss_index_path='faiss_index.index', model_name='sentence-transformers/all-MiniLM-L6-v2', api_json_path='external_env_details/brief_details.json', k=5):
     # Load the FAISS index
     index = faiss.read_index(faiss_index_path)
 
@@ -34,9 +34,9 @@ def update_interpreter_with_similar_apis(interpreter_message, faiss_index_path='
     for i, idx in enumerate(indices[0]):
         if idx < len(api_keys):  # Ensure index is within bounds
             api_key = api_keys[idx]
-            similar_apis.append({
-                api_key: api_data[api_key]  # Include all details for the API
-            })
+            temp_dict = api_data[api_key]
+            temp_dict['api_name'] = api_key
+            similar_apis.append(temp_dict)
 
     # Update the interpreter message dictionary
     if 'request' not in interpreter_message:

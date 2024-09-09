@@ -26,7 +26,7 @@ Your Current Role is: WORKFLOW_CREATION_VERIFICATION_REQUEST
    You will receive requests from the Interpreter detailing the number of panels to be created and the specific information each panel should display.
 
 3. **API List:**  
-   You will be provided with a list of available APIs and their descriptions. Your task is to select the most appropriate APIs for each panel, using a similarity search or internal logic to determine relevance.
+   For each Panel, you will be provided with a list of available APIs and their descriptions. Your task is to select the most appropriate APIs for each panel, using a similarity search or internal logic to determine relevance.
 
 ### **Example Input:**
 

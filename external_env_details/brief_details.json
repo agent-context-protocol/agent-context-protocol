@@ -15,8 +15,33 @@
       "Use": "For generating visually compelling illustrations or images that enhance and complement the response, especially when plots are not appropriate."
     },
     "Open-Meteo": {
-        "Input": "1. latitude (mandatory): The latitude of the location (in float).\n2. longitude (mandatory): The longitude of the location (in float).\n3. hourly or daily (optional): Specify the weather variables you want for hourly or daily forecasts.",
-        "Output": "A JSON object containing weather data such as temperature, wind speed, humidity, etc., for the specified time periods and coordinates.",
-        "Use": "Provides a 7-day weather forecast with various weather variables (e.g., temperature, wind speed) for given geographical coordinates."
-    }
+      "Input": "The API takes the following input parameters: latitude and longitude (required), hourly and daily weather variables (optional), current_weather (optional), temperature_unit (optional), wind_speed_unit (optional), timeformat (optional), timezone (optional), and past_days (optional).",
+      "Output": "The API provides a weather forecast with hourly and daily data. The output includes weather variables such as temperature, humidity, precipitation, wind speed, and more, along with timestamps in the specified format. For current weather conditions, it includes attributes like temperature, wind speed, wind direction, and weather code.",
+      "Use": "This API is used to retrieve weather forecasts for a specific location given by latitude and longitude coordinates. It is suitable for applications needing weather data for planning events, monitoring conditions, or integrating weather information into services."
+    },
+    "NEWS_API": {
+      "Input": "To use this API, you need to provide a search query and can optionally include a start and end date for the articles you're interested in. You can also specify how you want the results sorted, the language of the articles, and particular domains to include or exclude. You can choose how many results you want per page and which page of results you want to see. An API key is required for access.",
+      "Output": "The API gives you back a list of news articles in JSON format. Each article includes details like the title, author, source, URL, publication date, and a brief summary.",
+      "Use": "This API helps you find and analyze news articles from a wide range of sources published in the last 5 years. It’s useful for discovering news on various topics and conducting detailed news analysis."
+    },
+    "NEWS_API_TOP_HEADLINES": {
+      "Input": "To use this API, you need to provide your API key. You can optionally specify a country to get headlines from, filter by news category (like business, sports, or technology), choose specific news sources, and include keywords to refine your search. You can also decide how many headlines you want to see per page and which page of results to view.",
+      "Output": "The API provides a list of breaking news headlines in JSON format. Each headline includes details such as the source of the news, author, title, a brief description, the article's URL, an image URL, publication date, and the full content of the article.",
+      "Use": "This API is used to get the latest breaking news headlines from various sources. It’s useful for staying updated with current events, filtering news by category or source, and getting specific headlines based on keywords."
+    },
+      "Stack_Exchange_Questions": {
+        "Input": "Parameters for querying questions include 'fromdate', 'todate', 'min', 'max', 'tagged', 'order', 'sort', 'page', 'pagesize', and 'site'.",
+        "Output": "Returns a list of questions from the Stack Exchange site matching the specified query parameters. The response includes details about each question such as the title, body, creation date, and other metadata.",
+        "Use": "Retrieve and filter questions from the Stack Exchange site based on various criteria such as date range, tags, sorting options, and pagination. Useful for displaying or analyzing questions related to specific topics or time periods."
+      },
+      "Stack_Exchange_Answers": {
+        "Input": "Parameters for querying answers include 'ids', 'filter', and 'site'.",
+        "Output": "Returns details about specific answers from the Stack Exchange site. The response includes information such as the answer's content, creation date, and author.",
+        "Use": "Retrieve details about specific answers to questions, which can be useful for examining responses to particular queries or analyzing the quality of answers."
+      },
+      "Stack_Exchange_Users": {
+        "Input": "Parameters for querying user details include 'ids', 'filter', and 'site'.",
+        "Output": "Returns information about users on the Stack Exchange site, including their reputation, user type, and associated questions and answers.",
+        "Use": "Obtain details about users on the Stack Exchange site, which can be useful for user analysis, profile lookups, or understanding user contributions to the site."
+      }        
 }

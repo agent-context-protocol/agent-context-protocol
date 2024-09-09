@@ -3,27 +3,33 @@ import json
 from base import BaseNode
 
 class InterpreterNode(BaseNode):
-    def __init__(self, node_name, user_query = None, system_prompt = None, personal_json = None):
+    def __init__(self, node_name, user_query = None, system_prompt = None, personal_json = 'personal_info.json'):
         super().__init__(node_name, system_prompt)
         self.user_query = user_query
-        self.personal_json = personal_json
+        with open(personal_json, 'r') as file:
+            data = json.load(file)
+        self.personal_json = data
 
     def setup(self):
         if self.user_query:
             initial_message = fetch_user_data(self.personal_json, self.user_query)
+            print('User Context: ',initial_message)
             self.chat_history.append({"role": "user", "content": initial_message})
-            self.modify_message(self.generate())
+            output = self.generate()
+            print(output)
+            output = self.modify_message(output)
+            return output
 
     def modify_message(self, message):
         # Define the JSON-like strings
-        json_strings = message
-        panels_dict = {}
+        json_strings = message.split('---Done---')[:-1]
+        panels_list = []
         for json_string in json_strings:
             panel = json.loads(json_string)
             instance_id = panel["instance_id"]
-            panels_dict[instance_id] = update_interpreter_with_similar_apis(panel)
+            panels_list.append(update_interpreter_with_similar_apis(panel))
 
-        return panels_dict
+        return panels_list
     
 '''
 Still Need to implement how the communication between interpreter and the translator will be handled after the initial setup.
