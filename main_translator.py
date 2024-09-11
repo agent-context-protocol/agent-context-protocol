@@ -141,13 +141,13 @@ class MainTranslatorNode(BaseNode):
             formatted_string += "\n**List of Available APIs:**\n"
 
         # Adding available APIs with their input, output, and use
-            for api_id, api in enumerate(panel['request']['relevant_apis'], start=1):
-                formatted_string += (
-                    f"{api_id}. {api['api_name']}\n"
-                    f"   - **Input:** {api.get('Input', 'N/A')}\n"
-                    f"   - **Output:** {api.get('Output', 'N/A')}\n"
-                    f"   - **Use:** {api.get('Use', 'N/A')}\n\n"
-                )
+        for api_id, api in enumerate(panel['request']['relevant_apis'], start=1):
+            formatted_string += (
+                f"{api_id}. {api['api_name']}\n"
+                f"   - **Input:** {api.get('Input', 'N/A')}\n"
+                f"   - **Output:** {api.get('Output', 'N/A')}\n"
+                f"   - **Use:** {api.get('Use', 'N/A')}\n\n"
+            )
 
         return formatted_string
 

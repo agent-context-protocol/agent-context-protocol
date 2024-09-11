@@ -1,36 +1,62 @@
 import yaml
 
-def convert_yml_to_text(yml_file, output_txt_file):
+def convert_yml_to_string_fully(yml_file):
     # Open and load the YAML file
     with open(yml_file, 'r') as file:
         yml_data = yaml.safe_load(file)
 
-    # Create and write to the text file
-    with open(output_txt_file, 'w') as file:
-        for key, value in yml_data.items():
-            file.write(f"{key}:\n")
-            if isinstance(value, dict):
-                write_dict_to_file(value, file, indent=2)
-            else:
-                file.write(f"  {value}\n")
+    # Create and return a formatted string
+    return dict_to_string(yml_data)
 
-def write_dict_to_file(data_dict, file, indent=0):
-    # Recursive function to handle nested dictionaries and lists
-    for key, value in data_dict.items():
-        file.write(f"{' ' * indent}{key}:\n")
-        if isinstance(value, dict):
-            write_dict_to_file(value, file, indent + 2)
-        elif isinstance(value, list):
-            for item in value:
-                if isinstance(item, dict):
-                    write_dict_to_file(item, file, indent + 2)
+def convert_yml_to_string(yml_file, api_path):
+    # Open and load the YAML file
+    with open(yml_file, 'r') as file:
+        yml_data = yaml.safe_load(file)
+
+    # Parse general info from YAML
+    result = ""
+    result += dict_to_string(yml_data, ["openapi", "servers", "info", "tags"])  # Common parts
+    result += "\n"
+
+    # Check if the API path exists in the YAML
+    if api_path in yml_data["paths"]:
+        # Extract path-specific data
+        result += f"paths:\n"
+        result += dict_to_string({api_path: yml_data["paths"][api_path]})
+    else:
+        result += f"Path {api_path} not found in the YAML file.\n"
+    
+    # Append components section (common for all paths)
+    result += "\ncomponents:\n"
+    result += dict_to_string(yml_data["components"])
+
+    return result
+
+def dict_to_string(data_dict, keys_to_include=None, indent=0):
+    result = ""
+    if isinstance(data_dict, dict):
+        for key, value in data_dict.items():
+            if keys_to_include is None or key in keys_to_include:
+                result += f"{' ' * indent}{key}:\n"
+                if isinstance(value, dict):
+                    result += dict_to_string(value, None, indent + 2)
+                elif isinstance(value, list):
+                    for item in value:
+                        if isinstance(item, dict):
+                            result += dict_to_string(item, None, indent + 2)
+                        else:
+                            result += f"{' ' * (indent + 2)}- {item}\n"
                 else:
-                    file.write(f"{' ' * (indent + 2)}- {item}\n")
-        else:
-            file.write(f"{' ' * (indent + 2)}{value}\n")
+                    result += f"{' ' * (indent + 2)}{value}\n"
+    return result
 
-# Usage
-yml_file = "weather_api.yml"  # Your YAML file path
-output_txt_file = "formatted_open_meteo.txt"  # Output text file path
+# Example Usage
+# print(convert_yml_to_string("/available_apis/openapi_format/stackexchange.yaml", "/questions"))
+# print(convert_yml_to_string_fully("weather_api.yml"))
 
-convert_yml_to_text(yml_file, output_txt_file)
+OPEN_APIS_DICT = {
+    "Open-Meteo": convert_yml_to_string_fully("/Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator/available_apis/openapi_format/weather_api.yml"),
+    "Stack_Exchange_Questions": convert_yml_to_string("/Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator/available_apis/openapi_format/stackexchange.yaml", "/questions"),
+    "Stack_Exchange_Answers": convert_yml_to_string("/Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator/available_apis/openapi_format/stackexchange.yaml", "/answers"),
+    "Stack_Exchange_Users": convert_yml_to_string("/Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator/available_apis/openapi_format/stackexchange.yaml", "/users")
+}
