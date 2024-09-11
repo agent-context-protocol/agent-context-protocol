@@ -1,5 +1,6 @@
 from base import BaseNode
 import re
+import json
 
 class MainTranslatorNode(BaseNode):
     def __init__(self, node_name, system_prompt = None):
@@ -174,7 +175,12 @@ class MainTranslatorNode(BaseNode):
         if not run_success:
             print("counter : ",counter)
             print(cause_error)
-        # print(llm_response_workflow)
-        print("\nworkflows:\n")
-        print(workflow_dict)
+            
+        print("\llm_response_workflow:\n")
+        print(llm_response_workflow)
+        # print("\nworkflows:\n")
+        # print(workflow_dict)
+        # Write to a JSON file
+        with open("workflow.json", "w") as json_file:
+            json.dump(workflow_dict, json_file, indent=4)
         return workflow_dict

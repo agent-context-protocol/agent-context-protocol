@@ -68,7 +68,8 @@ def fetch_user_data(personal_info, original_query):
 * Location: {personal_info['location']}
 * Professional Background: {personal_info['professional_background']}
     '''
-    search_history_list = fetch_search_history("/Users/db/Library/Application Support/Google/Chrome/Default/History")
+    # search_history_list = fetch_search_history("/Users/db/Library/Application Support/Google/Chrome/Default/History")
+    search_history_list = []
     search_history = '\n2. Search History:\n'
     for entry in search_history_list:
         search_history += f'''* {entry}\n'''
@@ -83,7 +84,8 @@ def fetch_user_data(personal_info, original_query):
             prompt += f'''\n3. Current Location:\n* {location_name}\n'''
 
     # Extract bookmarks
-    bookmarks_list = extract_bookmarks("/Users/db/Library/Application Support/Google/Chrome/Default/Bookmarks")
+    # bookmarks_list = extract_bookmarks("/Users/db/Library/Application Support/Google/Chrome/Default/Bookmarks")
+    bookmarks_list = []
     bookmarks = '\n4. Bookmarks:\n'
     for bookmark in bookmarks_list[:5]:
         bookmarks += f'''* {bookmark['name']}\n'''

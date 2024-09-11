@@ -1,0 +1,130 @@
+{
+    "1": {
+        "1": {
+            "panel_description": "Display a selection of appropriate vacation destinations within India and globally that align with the user's age group and location. Each recommendation should detail the destination's main attractions and the best times to go. This panel might also show travel advisories or restrictions that could affect the user's trip.",
+            "steps": [
+                {
+                    "step": "1",
+                    "api": "Perplexity",
+                    "handles": "Extracting vacation destination recommendations based on user profile.",
+                    "input_vars": "user_query",
+                    "input_desc": "the original user query",
+                    "output_vars": "destination_list",
+                    "output_desc": "a list of recommended destinations",
+                    "dependencies": null
+                },
+                {
+                    "step": "2",
+                    "api": "Open-Meteo",
+                    "handles": "Retrieving weather information for recommended destinations",
+                    "input_vars": "lat_lng_list",
+                    "input_desc": "the latitudes and longitudes of the recommended destinations",
+                    "output_vars": "weather_data",
+                    "output_desc": "weather information including best travel times for the destinations",
+                    "dependencies": [
+                        {
+                            "panel": "1",
+                            "step": "1"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "2": {
+        "2": {
+            "panel_description": "Present an interactive vacation planning tool which will allow the user to input their chosen destination, the duration of their vacation, and their preferences in terms of activities or experiences. The tool should then generate a proposed itinerary that includes recommended activities and attractions, places to eat, and accommodation options. The itinerary should also consider the user's professional background and suggest local places related to technology and AI that he could visit.",
+            "steps": [
+                {
+                    "step": "1",
+                    "api": "Perplexity",
+                    "handles": "Fetching itinerary information based on user input.",
+                    "input_vars": "user_input",
+                    "input_desc": "user's chosen destination, duration of vacation, and preferences",
+                    "output_vars": "itinerary_data",
+                    "output_desc": "proposed itinerary based on user input",
+                    "dependencies": null
+                },
+                {
+                    "step": "2",
+                    "api": "PlotAgent",
+                    "handles": "Visualization of proposed itinerary.",
+                    "input_vars": "itinerary_data",
+                    "input_desc": "the proposed itinerary data from Step 1",
+                    "output_vars": "itinerary_visual",
+                    "output_desc": "a visual illustration of the itinerary",
+                    "dependencies": [
+                        {
+                            "panel": "2",
+                            "step": "1"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "3": {
+        "3": {
+            "panel_description": "Provide an interactive panel to schedule future reminders or alerts for the planning and booking of vacations around the user's calendar events. The alerts should consider not only the user's planned daily standups but also any other meetings or tasks which have not been mentionned yet.",
+            "steps": [
+                {
+                    "step": "1",
+                    "api": "Perplexity",
+                    "handles": "Mapping user schedule to potential vacation plans.",
+                    "input_vars": "user_schedule",
+                    "input_desc": "user's schedule including standups and meetings",
+                    "output_vars": "vacation_alerts",
+                    "output_desc": "Mapping of potential vacation plans to user's calendar",
+                    "dependencies": null
+                },
+                {
+                    "step": "2",
+                    "api": "PlotAgent",
+                    "handles": "Visualization of reminders or alerts for vacation planning.",
+                    "input_vars": "vacation_alerts",
+                    "input_desc": "reminders and user schedule",
+                    "output_vars": "alert_visual",
+                    "output_desc": "a visual representation of reminders on user's calendar",
+                    "dependencies": [
+                        {
+                            "panel": "3",
+                            "step": "1"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "4": {
+        "4": {
+            "panel_description": "Based on the user's bookmarks and recent search history, select relevant reading materials, articles, or learning resources related to AI and coding, which the user may wish to engage with during his vacation. This also could include relevant resources to the user's location, or to the chosen destination.",
+            "steps": [
+                {
+                    "step": "1",
+                    "api": "Perplexity",
+                    "handles": "Identifying learning resources based on user's bookmarks and recent search history.",
+                    "input_vars": "user_data",
+                    "input_desc": "user's bookmarks and recent search history",
+                    "output_vars": "learning_resources_list",
+                    "output_desc": "a list of recommended learning resources",
+                    "dependencies": null
+                },
+                {
+                    "step": "2",
+                    "api": "TextToImage",
+                    "handles": "Generating suggestive images for identified learning resources.",
+                    "input_vars": "learning_resources_list",
+                    "input_desc": "list of recommended learning resources identified by Perplexity",
+                    "output_vars": "learning_resources_images",
+                    "output_desc": "Images for the recommended learning resources",
+                    "dependencies": [
+                        {
+                            "panel": "4",
+                            "step": "1"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

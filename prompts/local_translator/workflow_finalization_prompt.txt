@@ -1,0 +1,86 @@
+**Your Current Role:** WORKFLOW_EXECUTION_FINALIZATION
+
+**Your Input:**
+
+API Details:
+
+"api": "Perplexity",
+"handles": "Extracting vacation destination recommendations based on user profile.",
+"input_vars": "user_query",
+"input_desc": "the original user query",
+"output_vars": "destination_list",
+"output_desc": "a list of recommended destinations",
+"dependencies": null
+
+API Documentation:
+
+BASE URL: https://api.perplexity.ai/chat/completions
+
+**Endpoint Documentation:**  
+The `/chat/completions` endpoint generates chat completions using Perplexity AI. Authorization via Bearer token is required.
+
+- **Authorization:** Header (Required)  
+  Your API key: 'Bearer YOUR_API_KEY'
+
+- **Parameters:**
+  - **model:** String (Required) – Specifies the model name (e.g., `llama-3.1-sonar-small-128k-online`).
+  - **messages:** Object[] (Required) – Contains conversation history (role and content).
+  - **max_tokens:** Integer (Optional) – Maximum number of tokens to generate.
+  - **temperature:** Float (Optional) – Controls response randomness.
+  - **return_citations:** Boolean (Optional) – Whether to return citations in the response.
+
+**Example Request:**
+
+POST https://api.perplexity.ai/chat/completions  
+Headers:  
+{
+  "Authorization": "Bearer YOUR_API_KEY",
+  "Content-Type": "application/json"
+}
+
+Body:  
+{
+  "model": "llama-3.1-sonar-small-128k-online",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are an artificial intelligence assistant and you need to engage in a helpful, detailed, polite conversation with a user."
+    },
+    {
+      "role": "user",
+      "content": "How many stars are there in our galaxy?"
+    }
+  ]
+}
+
+**Note on Variable Usage:**
+
+In the body of your API request, if a parameter does **not** have quotation marks, you must reference the external variable by its name (e.g., `user_query`). This indicates that the value should be taken from the stored variable. However, if the parameter is in quotation marks (e.g., `"value1"`), it is treated as a string literal and used as is.
+
+
+**Your Output Format for API Request Finalization:**
+
+1. API Endpoint
+
+[POST] https://api.perplexity.ai/chat/completions
+
+2. Headers
+
+Authorization: Bearer YOUR_API_KEY
+Content-Type: application/json
+
+3. Body
+
+{
+    "model": "llama-3.1-sonar-small-128k-online"
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are an artificial intelligence assistant and you need to engage in a helpful, detailed, polite conversation with a user."
+        },
+        {
+            "role": "user",
+            "content": user_query
+        }
+    ]
+}

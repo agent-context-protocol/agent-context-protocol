@@ -34,27 +34,13 @@ Body:
   "messages": [
     {
       "role": "system",
-      "content": "Be precise and concise."
+      "content": "You are an artificial intelligence assistant and you need to engage in a helpful, detailed, polite conversation with a user."
     },
     {
       "role": "user",
       "content": "How many stars are there in our galaxy?"
     }
-  ],
-  "max_tokens": "Optional",
-  "temperature": 0.2,
-  "top_p": 0.9,
-  "return_citations": true,
-  "search_domain_filter": [
-    "perplexity.ai"
-  ],
-  "return_images": false,
-  "return_related_questions": false,
-  "search_recency_filter": "month",
-  "top_k": 0,
-  "stream": false,
-  "presence_penalty": 0,
-  "frequency_penalty": 1
+  ]
 }
 
 Example Response:
