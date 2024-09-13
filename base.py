@@ -1,7 +1,7 @@
 from openai import OpenAI
 import os
 
-os.environ["OPENAI_API_KEY"] = "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"
+os.environ["OPENAI_API_KEY"] = "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"
 client = OpenAI()
 
 
@@ -16,7 +16,8 @@ class BaseNode:
     def generate(self):
         completion = client.chat.completions.create(
             model="gpt-4",
-            messages=self.chat_history
+            messages=self.chat_history,
+            temperature = 0
         )
         output = completion.choices[0].message.content
         self.chat_history.append({"role": "assistant", "content": output})

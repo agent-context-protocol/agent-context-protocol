@@ -55,8 +55,8 @@ def dict_to_string(data_dict, keys_to_include=None, indent=0):
 # print(convert_yml_to_string_fully("weather_api.yml"))
 
 OPEN_APIS_DICT = {
-    "Open-Meteo": convert_yml_to_string_fully("/Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator/available_apis/openapi_format/weather_api.yml"),
-    "Stack_Exchange_Questions": convert_yml_to_string("/Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator/available_apis/openapi_format/stackexchange.yaml", "/questions"),
-    "Stack_Exchange_Answers": convert_yml_to_string("/Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator/available_apis/openapi_format/stackexchange.yaml", "/answers"),
-    "Stack_Exchange_Users": convert_yml_to_string("/Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator/available_apis/openapi_format/stackexchange.yaml", "/users")
+    "Open-Meteo": convert_yml_to_string_fully("./available_apis/openapi_format/weather_api.yml"),
+    "Stack_Exchange_Questions": convert_yml_to_string("./available_apis/openapi_format/stackexchange.yaml", "/questions"),
+    "Stack_Exchange_Answers": convert_yml_to_string("./available_apis/openapi_format/stackexchange.yaml", "/answers"),
+    "Stack_Exchange_Users": convert_yml_to_string("./available_apis/openapi_format/stackexchange.yaml", "/users")
 }

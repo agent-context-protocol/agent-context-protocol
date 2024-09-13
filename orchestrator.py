@@ -59,31 +59,35 @@ class MainOrchestrator:
         # Send user query to interpreter
         self.interpreter.user_query = user_query
 
-        Get initial setup from interpreter and send to main translator
+        # Get initial setup from interpreter and send to main translator
         panels_list = self.interpreter.setup()
+        print(panels_list)
         
-        self.local_translators_1 = LocalTranslatorNode(0, message["1"]["1"]["panel_description"], system_prompt = self.local_translator_system_prompt)
-        self.local_translators_1.workflow = message["1"]["1"]["steps"]
-        self.local_translators_1.build_verify()
+        message = self.main_translator.setup(user_query, panels_list) 
+        # with open("workflow.json", "r") as json_file:
+        #     message = json.load(json_file)
+        # self.local_translators_1 = LocalTranslatorNode(0, message["1"]["1"]["panel_description"], system_prompt = self.local_translator_system_prompt)
+        # self.local_translators_1.workflow = message["1"]["1"]["steps"]
+        # self.local_translators_1.build_verify()
 
-        communication_manager = Manager(workflow)
-        setup_message = group_data_structure.setup()
-        confirmation = self.main_translator.communicate(setup_message)
-        # group_data_structure.recieve_confirmation = 
+        # communication_manager = Manager(workflow)
+        # setup_message = group_data_structure.setup()
+        # confirmation = self.main_translator.communicate(setup_message)
+        # # group_data_structure.recieve_confirmation = 
 
-        # Main loop
-        while True:
-            # Process messages between nodes
-            group_data_structure.run()
+        # # Main loop
+        # while True:
+        #     # Process messages between nodes
+        #     group_data_structure.run()
 
-            # Check if all work is complete
-            if self.is_work_complete():
-                break
+        #     # Check if all work is complete
+        #     if self.is_work_complete():
+        #         break
 
-        # After completion, we might want to save or analyze the chat histories
+        # # After completion, we might want to save or analyze the chat histories
 
 if __name__ == "__main__":
     from google_auth_oauthlib.flow import InstalledAppFlow
 
     orchestrator = MainOrchestrator()
-    orchestrator.run("Vacation")
+    orchestrator.run("best vacation spots in the world in summer?")
