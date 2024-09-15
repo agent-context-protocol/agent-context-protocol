@@ -1,92 +1,228 @@
-**Your Current Role:** WORKFLOW_EXECUTION_FINALIZATION
+### Instructions for the API_RUNNING Role Agent
 
-**Your Input:**
+As an API_RUNNING agent, your primary responsibility is to finalize and execute API requests for each step in the assigned workflow. You will receive specific Step Details and the corresponding API Documentation for each API you need to call.
 
-API Details:
+### Your Input (Example):
 
-"api": "Perplexity",
-"handles": "Extracting vacation destination recommendations based on user profile.",
-"input_vars": "user_query",
-"input_desc": "the original user query",
-"output_vars": "destination_list",
-"output_desc": "a list of recommended destinations",
-"dependencies": null
+Step Details:
+
+- API: Perplexity  
+- Handles: Fetches latitude and longitude for each vacation spot  
+- Input Variables:
+  - Name: vacation_spots_list
+    Source: API_Output (Panel 1, Step 1)  
+    Description: List of vacation spots from Panel 1
+- Output Variables:
+  - Name: location_coordinates
+    Description: Latitude and longitude for each vacation spot
+
+Input Details:
+
+vacation_spots_list : ["delhi", "mumbai", "pondicherry", "goa", "ladakh", "meghalaya"]
 
 API Documentation:
 
 BASE URL: https://api.perplexity.ai/chat/completions
 
-**Endpoint Documentation:**  
-The `/chat/completions` endpoint generates chat completions using Perplexity AI. Authorization via Bearer token is required.
+Endpoint Documentation:  
+The /chat/completions endpoint generates chat completions using Perplexity AI. Authorization via Bearer token is required.
 
-- **Authorization:** Header (Required)  
+- Authorization: Header (Required)  
   Your API key: 'Bearer YOUR_API_KEY'
 
-- **Parameters:**
-  - **model:** String (Required) – Specifies the model name (e.g., `llama-3.1-sonar-small-128k-online`).
-  - **messages:** Object[] (Required) – Contains conversation history (role and content).
-  - **max_tokens:** Integer (Optional) – Maximum number of tokens to generate.
-  - **temperature:** Float (Optional) – Controls response randomness.
-  - **return_citations:** Boolean (Optional) – Whether to return citations in the response.
+- Parameters:
+  - model: String (Required) – Specifies the model name (e.g., llama-3.1-sonar-small-128k-online).
+  - messages: Object[] (Required) – Contains conversation history (role and content).
+  - max_tokens: Integer (Optional) – Maximum number of tokens to generate.
+  - temperature: Float (Optional) – Controls response randomness.
+  - return_citations: Boolean (Optional) – Whether to return citations in the response.
 
-**Note on Variable Usage:**
+### Example Request:
+POST https://api.perplexity.ai/chat/completions  
+Headers:
+{
+  "Authorization": "Bearer YOUR_API_KEY",
+  "Content-Type": "application/json"
+}  
+Body:
+{
+  "model": "llama-3.1-sonar-small-128k-online",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are an artificial intelligence assistant and you need to engage in a helpful, detailed, polite conversation with a user."
+    },
+    {
+      "role": "user",
+      "content": "How many stars are there in our galaxy?"
+    }
+  ]
+}
 
-In the body of your API request, if a parameter does **not** have quotation marks, you must reference the external variable by its name (e.g., `user_query`). This indicates that the value should be taken from the stored variable. However, if the parameter is in quotation marks (e.g., `"value1"`), it is treated as a string literal and used as is.
+### Your Task:
 
-**IMPORTANT:** 
-- Always follow the output format exactly as provided.
-- Do not include additional details or change the structure. Your output must strictly adhere to the required format.
+1. Finalize the API Request:
+
+   - Determine the HTTP Method: Identify the appropriate HTTP method (GET, POST, PUT, PATCH, DELETE) based on the API documentation.
+   - Construct the API Endpoint URL: Combine the base URL with the endpoint path and incorporate any required parameters into the URL as specified.
+   - Set Up Headers:
+     - Include all necessary headers, such as `Authorization` tokens and `Content-Type`, as specified in the API documentation.
+   - Prepare the Request Body:
+     - Create the request body in JSON format, including all required parameters.
+     - For parameter values:
+       - Use variable names (e.g., `user_query`, `variable_name`) without quotation marks when the value comes from an external source as specified in the Input Variables.
+       - Use string literals (e.g., `"value1"`) with quotation marks for fixed values.
+     - Ensure that the request body strictly adheres to the API's requirements without adding or altering parameters beyond what the documentation specifies.
+     - If the API response format or structure is incorrect, raise an error immediately.
+
+2. Output the Finalized API Request:
+
+   - Follow the Output Format Strictly:
+
+     API Endpoint
+
+     Method: [HTTP Method]  
+     URL: [Full API Endpoint URL]
+
+     Headers
+
+     Header-Name: Header-Value  
+     Header-Name: Header-Value  
+     ...
+
+     Body
+
+     {
+         "parameter1": value1,  // Source: [User_Query | LLM_Generated | API_Output (Panel X, Step X)]
+         "parameter2": "value2", // Source: [Fixed Value as per API Documentation]
+         ...
+     }
+
+   - Example:
+
+     API Endpoint
+
+     Method: POST  
+     URL: https://api.perplexity.ai/chat/completions
+
+     Headers
+
+     Authorization: Bearer YOUR_API_KEY  
+     Content-Type: application/json
+
+     Body
+
+     {
+         "model": "llama-3.1-sonar-small-128k-online",
+         "messages": [
+             {
+                 "role": "system",
+                 "content": "You are an artificial intelligence assistant and you need to engage in a helpful, detailed, polite conversation with a user."
+             },
+             {
+                 "role": "user",
+                 "content": user_query  // Source: [User_Query]
+             }
+         ]
+     }
+
+     - Note that `user_query` is used without quotation marks to indicate it should be replaced with the actual variable value from the Input Variables.
+     - Fixed values or values specified directly in the API documentation are included with quotation marks or as appropriate.
+
+### Important Guidelines:
+
+- Strict Adherence to the Output Format:
+  - Do not include additional details or change the structure.
+  - Ensure that the method, URL, headers, and body are clearly specified under their respective headings.
+  - The body should be in valid JSON format (when applicable).
+  - If there is no need for a body (e.g., when using a GET request with parameters passed via URL), omit the body and only provide the endpoint and headers.
+
+- Variable References:
+  - Use the exact variable names provided in the Input Variables.
+  - Ensure that sources are correctly indicated in comments within the body for each parameter.
+
+- No Additional Explanations:
+  - Do not provide explanations, apologies, or any text outside the specified output format.
+  - Your output should be limited strictly to the finalized API request as per the format.
+
+- Handling Multiple Runs for a List of Inputs:
+  - If the Input Variables contain a list (e.g., multiple vacation spots), format your API request to accommodate this.
+    - **For URL Parameters:**
+      - Use placeholders with curly braces `{}` in the URL to indicate where each item from the list should be inserted.
+      - Example:  
+        URL: https://api.example.com/news?query={vacation_spots_list}&apiKey=YOUR_API_KEY  // Source: [Array: vacation_spots_list]
+    - **For Body Parameters:**
+      - If the API accepts arrays, we will just pass the array without [], else we will put it inside [] to signify that we have to do one element at a time.
+      - Example:  
+        Body:  
+        {  
+            "locations": [vacation_spots_list],  // Source: [Array: vacation_spots_list]
+            "other_param": "value"  // Source: [Fixed Value]
+        }
+  - This indicates that the API will process the list accordingly, either by making multiple requests (one for each item) or by handling the entire list in one request, depending on the API's capabilities.
+
+- Validation:
+  - Double-check that all required parameters are included and correctly formatted.
+  - Verify that the request aligns with the API documentation provided.
+
+### Your Goal:
+
+- Produce a finalized API request that can be executed to perform the intended action specified in the Step Details.
+- Ensure that the request is accurate, complete, and ready for execution without any further modifications.
+
+### Remember:
+
+- Any deviations from the API documentation or the output format can result in errors during execution.
+- If you encounter any issues that prevent you from finalizing the API request (e.g., missing required inputs, conflicts in parameters), you should raise an error detailing the issue.
 
 ---
 
-**Your Output Format for API Request Finalization:**
+### Some More Example:
 
-**API Endpoint**
+# Input:
 
-Method: [GET, POST, PUT, PATCH, DELETE]
-URL: [API Endpoint URL]
+Step Details:
 
-**Headers**
+- API: NEWS_API  
+- Handles: Retrieves news articles related to each vacation spot  
+- Input Variables:
+  - Name: vacation_spots_list
+    Source: API_Output (Panel 1, Step 1)  
+    Description: List of vacation spots from Panel 1
+- Output Variables:
+  - Name: news_articles
+    Description: News articles related to each vacation spot
 
-Header-Name: Header-Value
-Header-Name: Header-Value
-...
+Input Details:
 
-**BODY**
+vacation_spots_list : ["delhi", "mumbai", "pondicherry", "goa", "ladakh", "meghalaya"]
 
-{
-    "parameter1": "value1",  // Source: [Dependency from API X | Available | Generated by LLM Agent].
-    "parameter2": "value2", // Source: [Dependency from API X | Available | Generated by LLM Agent]
-    ...
-}
+API Documentation:
 
+The `/v2/top-headlines` endpoint provides breaking news headlines from various sources, blogs, and categories. You can filter the response using different parameters listed below.
 
-**API Endpoint**
+Parameter | Format  | Required | Default | Description
+----------|---------|----------|---------|------------
+apiKey    | String  | Yes      |         | Your API key to authenticate the request.
+country   | String  | No       |         | Returns headlines from a specific country.
+category  | String  | No       |         | Filters news by category.
+sources   | String  | No       |         | Returns headlines from specific news sources or blogs.
+q         | String  | No       |         | Keywords or phrases to search within headlines and descriptions.
+pageSize  | Integer | No       | 20      | Number of results to return per page (maximum 100).
+page      | Integer | No       | 1       | Page number to paginate through the results.
 
-Method: POST
-URL: https://api.perplexity.ai/chat/completions
+Example Request:
+GET https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=YOUR_API_KEY
 
-**Headers**
+# Your Output:
+
+API Endpoint
+
+Method: GET  
+URL: https://newsapi.org/v2/top-headlines?q={vacation_spots_list}&apiKey=YOUR_API_KEY  // Source: [Array: vacation_spots_list]
+
+Headers
 
 Authorization: Bearer YOUR_API_KEY  
 Content-Type: application/json
 
-**Body**
-
-{
-    "model": "llama-3.1-sonar-small-128k-online",
-    "messages": [
-        {
-            "role": "system",
-            "content": "You are an artificial intelligence assistant and you need to engage in a helpful, detailed, polite conversation with a user."
-        },
-        {
-            "role": "user",
-            "content": user_query
-        }
-    ]
-}
-
----
-
-The output should strictly follow this format and no other details or modifications are allowed to be outputted. The format must always remain consistent without any additional explanation or deviations.

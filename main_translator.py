@@ -18,19 +18,15 @@ class MainTranslatorNode(BaseNode):
 
     def parse_main_translator_workflow(self, text):
         # First, split the text into CHAIN_OF_THOUGHT and WORKFLOW sections
-        sections = re.split(r"\s*WORKFLOW\s*", text)
+        sections = re.split(r"\$\$WORKFLOW\$\$", text)
         if len(sections) != 2:
             raise ValueError("The text does not contain exactly one CHAIN_OF_THOUGHT and one WORKFLOW section.")
 
-        chain_of_thought_text = sections[0].strip()
+        chain_of_thought_text = sections[0].replace("$$CHAIN_OF_THOUGHT$$", "").strip()
         workflow_text = sections[1].strip()
 
         # Extract the CHAIN_OF_THOUGHT
-        match = re.search(r"CHAIN_OF_THOUGHT\s*(.*)", chain_of_thought_text, re.DOTALL)
-        if match:
-            chain_of_thought = match.group(1).strip()
-        else:
-            raise ValueError("CHAIN_OF_THOUGHT section not found or improperly formatted.")
+        chain_of_thought = chain_of_thought_text
 
         # Helper function to skip empty lines
         def skip_empty_lines(lines, index):
@@ -144,39 +140,58 @@ class MainTranslatorNode(BaseNode):
                                         line = group_lines[j].strip()
                                         if line.startswith("- Output Variables:") or line.startswith("Step") or line.startswith("Workflow for Panel") or line.startswith("Group"):
                                             break
-                                        if line.startswith("- Name:") or line.startswith("  - Name:"):
+                                        if line.startswith("- Name:"):
                                             input_var = {}
                                             # Name
                                             input_var['name'] = line.split("Name:")[1].strip()
                                             j += 1
 
-                                            # Skip empty lines
-                                            j = skip_empty_lines(group_lines, j)
-                                            if j >= len(group_lines):
-                                                raise ValueError(f"Unexpected end of input while parsing input variable in Panel {panel_id}, Step {step_counter}")
-
-                                            # Source
+                                            # Parse Parameter
                                             line = group_lines[j].strip()
-                                            if line.startswith("Source:"):
+                                            if line.startswith("- Parameter:"):
+                                                input_var['parameter'] = line.split("Parameter:")[1].strip()
+                                                j += 1
+                                            else:
+                                                raise ValueError(f"Missing 'Parameter' for input variable in Panel {panel_id}, Step {step_counter}")
+
+                                            # Parse Type
+                                            line = group_lines[j].strip()
+                                            if line.startswith("- Type:"):
+                                                input_var['type'] = line.split("Type:")[1].strip()
+                                                j += 1
+                                            else:
+                                                raise ValueError(f"Missing 'Type' for input variable in Panel {panel_id}, Step {step_counter}")
+
+                                            # Parse Source
+                                            line = group_lines[j].strip()
+                                            if line.startswith("- Source:"):
                                                 input_var['source'] = line.split("Source:")[1].strip()
                                                 j += 1
                                             else:
                                                 raise ValueError(f"Missing 'Source' for input variable in Panel {panel_id}, Step {step_counter}")
 
-                                            # Skip empty lines
-                                            j = skip_empty_lines(group_lines, j)
-                                            if j >= len(group_lines):
-                                                raise ValueError(f"Unexpected end of input while parsing input variable in Panel {panel_id}, Step {step_counter}")
-
-                                            # Description
+                                            # Parse Description
                                             line = group_lines[j].strip()
-                                            if line.startswith("Description:"):
+                                            if line.startswith("- Description:"):
                                                 input_var['description'] = line.split("Description:")[1].strip()
                                                 j += 1
                                             else:
                                                 raise ValueError(f"Missing 'Description' for input variable in Panel {panel_id}, Step {step_counter}")
 
-                                            # Handle dependencies
+                                            # Parse Value
+                                            line = group_lines[j].strip()
+                                            if line.startswith("- Value:"):
+                                                input_var['value'] = input_var['value'] = line.split("Value:")[1].strip().strip('"')
+                                                # Check for the correct value based on Source
+                                                if input_var['source'] == "LLM_Generated" and input_var['value'] == "None":
+                                                    raise ValueError(f"Value should not be 'None' for LLM_Generated source in Panel {panel_id}, Step {step_counter}")
+                                                elif input_var['source'] == "API_Output" and input_var['value'] != "None":
+                                                    raise ValueError(f"Value should be 'None' for API_Output source in Panel {panel_id}, Step {step_counter}")
+                                                j += 1
+                                            else:
+                                                raise ValueError(f"Missing 'Value' for input variable in Panel {panel_id}, Step {step_counter}")
+
+                                            # Handle dependencies for API_Output
                                             input_var['dependencies'] = []
                                             if "API_Output" in input_var['source']:
                                                 match = re.search(r"Panel (\d+), Step (\d+)", input_var['source'])
@@ -193,6 +208,7 @@ class MainTranslatorNode(BaseNode):
                                                         if dependent_step in workflows[current_group][dependent_panel]["steps"]:
                                                             used_step = workflows[current_group][dependent_panel]["steps"][dependent_step]
                                                             # Find the relevant output variable in the dependent step
+                                                            used_by_check_bool = False
                                                             for output_var in used_step["output_vars"]:
                                                                 if output_var["name"] == input_var['name']:
                                                                     if 'used_by' not in output_var:
@@ -201,6 +217,9 @@ class MainTranslatorNode(BaseNode):
                                                                         "panel": panel_id,
                                                                         "step": step_counter
                                                                     })
+                                                                    used_by_check_bool = True
+                                                            if not used_by_check_bool:
+                                                                raise ValueError(f"In Step {dependent_step} Panel {dependent_panel}, dependent input variable has a different name")
                                                         else:
                                                             raise ValueError(f"Step {dependent_step} not found in Panel {dependent_panel}")
                                                     else:
@@ -220,7 +239,7 @@ class MainTranslatorNode(BaseNode):
                                         line = group_lines[j].strip()
                                         if line.startswith("Step") or line.startswith("Workflow for Panel") or line.startswith("Group"):
                                             break
-                                        if line.startswith("- Name:") or line.startswith("  - Name:"):
+                                        if line.startswith("- Name:"):
                                             output_var = {}
                                             # Name
                                             output_var['name'] = line.split("Name:")[1].strip()
@@ -233,7 +252,7 @@ class MainTranslatorNode(BaseNode):
 
                                             # Description
                                             line = group_lines[j].strip()
-                                            if line.startswith("Description:"):
+                                            if line.startswith("- Description:"):
                                                 output_var['description'] = line.split("Description:")[1].strip()
                                                 if 'used_by' not in output_var:
                                                     output_var['used_by'] = []
@@ -261,6 +280,7 @@ class MainTranslatorNode(BaseNode):
 
         # Return the chain_of_thought and workflows
         return chain_of_thought, workflows
+
 
 
 

@@ -30,7 +30,7 @@ Headers:
 }
 Body:
 {
-  "model": "llama-3.1-sonar-small-128k-online",
+  "model": "llama-3.1-sonar-large-128k-online",
   "messages": [
     {
       "role": "system",
@@ -46,7 +46,7 @@ Body:
 Example Response:
 {
   "id": "3c90c3cc-0d44-4b50-8888-8dd25736052a",
-  "model": "llama-3.1-sonar-small-128k-online",
+  "model": "llama-3.1-sonar-large-128k-online,
   "object": "chat.completion",
   "created": 1724369245,
   "choices": [

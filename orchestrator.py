@@ -61,8 +61,8 @@ class MainOrchestrator:
 
         # Get initial setup from interpreter and send to main translator
         panels_list = self.interpreter.setup()
-        print(panels_list)
-        
+        print("panels_list : ",panels_list)
+        # panels_list = []
         message = self.main_translator.setup(user_query, panels_list) 
         # with open("workflow.json", "r") as json_file:
         #     message = json.load(json_file)
@@ -90,4 +90,4 @@ if __name__ == "__main__":
     from google_auth_oauthlib.flow import InstalledAppFlow
 
     orchestrator = MainOrchestrator()
-    orchestrator.run("best vacation spots in the world in summer?")
+    orchestrator.run("what is segmentation fault in c++?")

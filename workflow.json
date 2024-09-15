@@ -1,97 +1,64 @@
 {
     "1": {
         "1": {
-            "panel_description": "Display the top summer vacation spots in the world.",
+            "panel_description": "Provide an understanding of segmentation faults in C++.",
             "steps": {
                 "1": {
                     "api": "Perplexity",
-                    "handles": "Retrieves a list of top summer vacation spots in the world",
+                    "handles": "Retrieves an explanation of segmentation faults in C++",
                     "input_vars": [
                         {
-                            "name": "user_query",
-                            "source": "User_Query",
-                            "description": "The user's original search query",
+                            "name": "query_segmentation_fault",
+                            "parameter": "query",
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand segmentation faults in C++",
+                            "value": "What is segmentation fault in C++?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "vacation_spots_list",
-                            "description": "List of top summer vacation spots in the world",
-                            "used_by": [
-                                {
-                                    "panel": 1,
-                                    "step": 2
-                                },
-                                {
-                                    "panel": 2,
-                                    "step": 1
-                                },
-                                {
-                                    "panel": 3,
-                                    "step": 1
-                                },
-                                {
-                                    "panel": 3,
-                                    "step": 2
-                                },
-                                {
-                                    "panel": 4,
-                                    "step": 1
-                                }
-                            ]
-                        }
-                    ]
-                },
-                "2": {
-                    "api": "TextToImage",
-                    "handles": "Generates images for each vacation spot",
-                    "input_vars": [
-                        {
-                            "name": "vacation_spots_list",
-                            "source": "API_Output (Panel 1, Step 1)",
-                            "description": "List of vacation spots from Step 1",
-                            "dependencies": [
-                                {
-                                    "panel": 1,
-                                    "step": 1
-                                }
-                            ]
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "vacation_spots_images",
-                            "description": "Images for each vacation spot",
+                            "name": "segmentation_fault_explanation",
+                            "description": "Explanation of segmentation faults in C++",
                             "used_by": []
                         }
                     ]
                 }
             }
-        },
+        }
+    },
+    "2": {
         "2": {
-            "panel_description": "Display the weather forecast for each vacation spot.",
+            "panel_description": "Display recent discussions on segmentation faults in C++.",
             "steps": {
                 "1": {
-                    "api": "Perplexity",
-                    "handles": "Fetches latitude and longitude for each vacation spot",
+                    "api": "Stack_Exchange_Questions",
+                    "handles": "Fetches recent questions about segmentation faults in C++",
                     "input_vars": [
                         {
-                            "name": "vacation_spots_list",
-                            "source": "API_Output (Panel 1, Step 1)",
-                            "description": "List of vacation spots from Panel 1",
-                            "dependencies": [
-                                {
-                                    "panel": 1,
-                                    "step": 1
-                                }
-                            ]
+                            "name": "site_stackoverflow",
+                            "parameter": "site",
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Stack Exchange site to query",
+                            "value": "stackoverflow",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "tags_segmentation_fault",
+                            "parameter": "tagged",
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Tags to filter questions",
+                            "value": "segmentation-fault;c++",
+                            "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "location_coordinates",
-                            "description": "Latitude and longitude for each vacation spot",
+                            "name": "question_ids",
+                            "description": "List of question IDs related to segmentation faults in C++",
                             "used_by": [
                                 {
                                     "panel": 2,
@@ -102,13 +69,25 @@
                     ]
                 },
                 "2": {
-                    "api": "Open-Meteo",
-                    "handles": "Retrieves weather forecast data for each location",
+                    "api": "Stack_Exchange_Answers",
+                    "handles": "Fetches answers for the questions retrieved in Step 1",
                     "input_vars": [
                         {
-                            "name": "location_coordinates",
+                            "name": "site_stackoverflow",
+                            "parameter": "site",
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Stack Exchange site to query",
+                            "value": "stackoverflow",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "question_ids",
+                            "parameter": "question_id",
+                            "type": "integer",
                             "source": "API_Output (Panel 2, Step 1)",
-                            "description": "Latitude and Longitude of the vacation spots",
+                            "description": "ID of the question to fetch answers for",
+                            "value": "None",
                             "dependencies": [
                                 {
                                     "panel": 2,
@@ -119,90 +98,37 @@
                     ],
                     "output_vars": [
                         {
-                            "name": "weather_forecast_data",
-                            "description": "Weather forecast data for each vacation spot",
+                            "name": "answers_list",
+                            "description": "List of answers for the questions related to segmentation faults",
                             "used_by": []
                         }
                     ]
                 }
             }
-        },
+        }
+    },
+    "3": {
         "3": {
-            "panel_description": "Display news and events at each vacation spot.",
+            "panel_description": "Provide a visual guide to debugging segmentation faults.",
             "steps": {
                 "1": {
-                    "api": "NEWS_API",
-                    "handles": "Retrieves news articles related to each vacation spot",
+                    "api": "TextToImage",
+                    "handles": "Generates an image illustrating a guide to debugging segmentation faults",
                     "input_vars": [
                         {
-                            "name": "vacation_spots_list",
-                            "source": "API_Output (Panel 1, Step 1)",
-                            "description": "List of vacation spots from Panel 1",
-                            "dependencies": [
-                                {
-                                    "panel": 1,
-                                    "step": 1
-                                }
-                            ]
+                            "name": "prompt_debugging_guide",
+                            "parameter": "prompt",
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Prompt to generate a visual guide for debugging segmentation faults",
+                            "value": "Visual guide to debugging segmentation faults in C++",
+                            "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "news_articles",
-                            "description": "News articles related to each vacation spot",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "2": {
-                    "api": "NEWS_API_TOP_HEADLINES",
-                    "handles": "Retrieves top news headlines related to each vacation spot",
-                    "input_vars": [
-                        {
-                            "name": "vacation_spots_list",
-                            "source": "API_Output (Panel 1, Step 1)",
-                            "description": "List of vacation spots from Panel 1",
-                            "dependencies": [
-                                {
-                                    "panel": 1,
-                                    "step": 1
-                                }
-                            ]
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "top_news_headlines",
-                            "description": "Top news headlines related to each vacation spot",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        },
-        "4": {
-            "panel_description": "Display travel tips and recommendations for each vacation spot.",
-            "steps": {
-                "1": {
-                    "api": "Perplexity",
-                    "handles": "Searches for travel tips and recommendations for each vacation spot",
-                    "input_vars": [
-                        {
-                            "name": "vacation_spots_list",
-                            "source": "API_Output (Panel 1, Step 1)",
-                            "description": "List of vacation spots from Panel 1",
-                            "dependencies": [
-                                {
-                                    "panel": 1,
-                                    "step": 1
-                                }
-                            ]
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "travel_tips_and_recommendations",
-                            "description": "Travel tips and recommendations for each vacation spot",
+                            "name": "debugging_guide_image",
+                            "description": "Image illustrating a guide to debugging segmentation faults in C++",
                             "used_by": []
                         }
                     ]
