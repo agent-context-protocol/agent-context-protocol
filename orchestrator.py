@@ -56,20 +56,20 @@ class MainOrchestrator:
             self.local_translator_system_prompt = file.read()
 
     def run(self, user_query):
-        # Send user query to interpreter
-        self.interpreter.user_query = user_query
+        # # Send user query to interpreter
+        # self.interpreter.user_query = user_query
 
-        # Get initial setup from interpreter and send to main translator
-        panels_list = self.interpreter.setup()
-        print("panels_list : ",panels_list)
-        # panels_list = []
-        message = self.main_translator.setup(user_query, panels_list) 
-        # with open("workflow.json", "r") as json_file:
-        #     message = json.load(json_file)
-        # print("message : ",message)
-        # self.local_translators_1 = LocalTranslatorNode(0, message["1"]["1"]["panel_description"], system_prompt = self.local_translator_system_prompt)
-        # self.local_translators_1.workflow = message["1"]["1"]["steps"]
-        # self.local_translators_1.build_verify()
+        # # Get initial setup from interpreter and send to main translator
+        # panels_list = self.interpreter.setup()
+        # print("panels_list : ",panels_list)
+        # # panels_list = []
+        # message = self.main_translator.setup(user_query, panels_list) 
+        with open("workflow.json", "r") as json_file:
+            message = json.load(json_file)
+        print("message : ",message)
+        self.local_translators_1 = LocalTranslatorNode(0, message["1"]["1"]["panel_description"], system_prompt = self.local_translator_system_prompt)
+        self.local_translators_1.workflow = message["1"]["1"]["steps"]
+        self.local_translators_1.build_verify()
 
         # communication_manager = Manager(workflow)
         # setup_message = group_data_structure.setup()
@@ -91,4 +91,4 @@ if __name__ == "__main__":
     from google_auth_oauthlib.flow import InstalledAppFlow
 
     orchestrator = MainOrchestrator()
-    orchestrator.run("what is the weather in patna, india?")
+    orchestrator.run("what is the news in denver, usa?")

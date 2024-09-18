@@ -1,91 +1,84 @@
 {
     "1": {
         "1": {
-            "panel_description": "Display the current weather forecast for Patna, India.",
+            "panel_description": "Retrieve the latest news in Denver, USA.",
             "steps": {
                 "1": {
-                    "api": "Perplexity",
-                    "handles": "Retrieves latitude and longitude for Patna, India",
+                    "api": "NEWS_API_TOP_HEADLINES",
+                    "handles": "Retrieves top news headlines related to Denver",
                     "input_vars": [
                         {
-                            "name": "query_coordinates",
-                            "parameter": "query",
+                            "name": "apiKey_top_headlines",
+                            "parameter": "apiKey",
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to get the latitude and longitude of Patna, India",
-                            "value": "What are the latitude and longitude of Patna, India?",
+                            "description": "API key for authentication",
+                            "value": "YOUR_API_KEY",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "query_top_headlines",
+                            "parameter": "q",
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Keywords to search for news in Denver",
+                            "value": "Denver",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "country_top_headlines",
+                            "parameter": "country",
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Country code to filter news from the USA",
+                            "value": "us",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "latitude",
-                            "description": "Latitude of Patna, India",
-                            "used_by": [
-                                {
-                                    "panel": 1,
-                                    "step": 2
-                                }
-                            ]
-                        },
-                        {
-                            "name": "longitude",
-                            "description": "Longitude of Patna, India",
-                            "used_by": [
-                                {
-                                    "panel": 1,
-                                    "step": 2
-                                }
-                            ]
+                            "name": "top_headlines_articles",
+                            "description": "List of top news headlines related to Denver",
+                            "used_by": []
                         }
                     ]
                 },
                 "2": {
-                    "api": "Open-Meteo",
-                    "handles": "Retrieves current weather data for Patna, India",
+                    "api": "NEWS_API",
+                    "handles": "Searches for detailed news articles about Denver",
                     "input_vars": [
                         {
-                            "name": "latitude",
-                            "parameter": "latitude",
-                            "type": "float",
-                            "source": "API_Output (Panel 1, Step 1)",
-                            "description": "Latitude of Patna, India",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 1,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "longitude",
-                            "parameter": "longitude",
-                            "type": "float",
-                            "source": "API_Output (Panel 1, Step 1)",
-                            "description": "Longitude of Patna, India",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 1,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "current_weather_flag",
-                            "parameter": "current_weather",
-                            "type": "boolean",
+                            "name": "apiKey_news_api",
+                            "parameter": "apiKey",
+                            "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Flag to include current weather data",
-                            "value": "true",
+                            "description": "API key for authentication",
+                            "value": "YOUR_API_KEY",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "query_news_api",
+                            "parameter": "q",
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Search query for news articles in Denver",
+                            "value": "Denver",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "language_news_api",
+                            "parameter": "language",
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Language of the articles",
+                            "value": "en",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "current_weather_data",
-                            "description": "Current weather conditions in Patna, India",
+                            "name": "detailed_news_articles",
+                            "description": "List of detailed news articles related to Denver",
                             "used_by": []
                         }
                     ]
