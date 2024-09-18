@@ -194,7 +194,8 @@ class MainTranslatorNode(BaseNode):
                                             # Handle dependencies for API_Output
                                             input_var['dependencies'] = []
                                             if "API_Output" in input_var['source']:
-                                                match = re.search(r"Panel (\d+), Step (\d+)", input_var['source'])
+                                                # match = re.search(r"Panel (\d+), Step (\d+)", input_var['source'])
+                                                match = re.fullmatch(r"API_Output\s*\(Panel\s+(\d+),\s*Step\s+(\d+)\)", input_var['source'])
                                                 if match:
                                                     interdependencies_found = True
                                                     dependent_panel = int(match.group(1))

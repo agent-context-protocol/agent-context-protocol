@@ -1,67 +1,39 @@
 {
     "1": {
         "1": {
-            "panel_description": "Provide an understanding of segmentation faults in C++.",
+            "panel_description": "Display the current weather forecast for Patna, India.",
             "steps": {
                 "1": {
                     "api": "Perplexity",
-                    "handles": "Retrieves an explanation of segmentation faults in C++",
+                    "handles": "Retrieves latitude and longitude for Patna, India",
                     "input_vars": [
                         {
-                            "name": "query_segmentation_fault",
+                            "name": "query_coordinates",
                             "parameter": "query",
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to understand segmentation faults in C++",
-                            "value": "What is segmentation fault in C++?",
+                            "description": "Query to get the latitude and longitude of Patna, India",
+                            "value": "What are the latitude and longitude of Patna, India?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "segmentation_fault_explanation",
-                            "description": "Explanation of segmentation faults in C++",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        }
-    },
-    "2": {
-        "2": {
-            "panel_description": "Display recent discussions on segmentation faults in C++.",
-            "steps": {
-                "1": {
-                    "api": "Stack_Exchange_Questions",
-                    "handles": "Fetches recent questions about segmentation faults in C++",
-                    "input_vars": [
-                        {
-                            "name": "site_stackoverflow",
-                            "parameter": "site",
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Stack Exchange site to query",
-                            "value": "stackoverflow",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "tags_segmentation_fault",
-                            "parameter": "tagged",
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Tags to filter questions",
-                            "value": "segmentation-fault;c++",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "question_ids",
-                            "description": "List of question IDs related to segmentation faults in C++",
+                            "name": "latitude",
+                            "description": "Latitude of Patna, India",
                             "used_by": [
                                 {
-                                    "panel": 2,
+                                    "panel": 1,
+                                    "step": 2
+                                }
+                            ]
+                        },
+                        {
+                            "name": "longitude",
+                            "description": "Longitude of Patna, India",
+                            "used_by": [
+                                {
+                                    "panel": 1,
                                     "step": 2
                                 }
                             ]
@@ -69,66 +41,51 @@
                     ]
                 },
                 "2": {
-                    "api": "Stack_Exchange_Answers",
-                    "handles": "Fetches answers for the questions retrieved in Step 1",
+                    "api": "Open-Meteo",
+                    "handles": "Retrieves current weather data for Patna, India",
                     "input_vars": [
                         {
-                            "name": "site_stackoverflow",
-                            "parameter": "site",
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Stack Exchange site to query",
-                            "value": "stackoverflow",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "question_ids",
-                            "parameter": "question_id",
-                            "type": "integer",
-                            "source": "API_Output (Panel 2, Step 1)",
-                            "description": "ID of the question to fetch answers for",
+                            "name": "latitude",
+                            "parameter": "latitude",
+                            "type": "float",
+                            "source": "API_Output (Panel 1, Step 1)",
+                            "description": "Latitude of Patna, India",
                             "value": "None",
                             "dependencies": [
                                 {
-                                    "panel": 2,
+                                    "panel": 1,
                                     "step": 1
                                 }
                             ]
-                        }
-                    ],
-                    "output_vars": [
+                        },
                         {
-                            "name": "answers_list",
-                            "description": "List of answers for the questions related to segmentation faults",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        }
-    },
-    "3": {
-        "3": {
-            "panel_description": "Provide a visual guide to debugging segmentation faults.",
-            "steps": {
-                "1": {
-                    "api": "TextToImage",
-                    "handles": "Generates an image illustrating a guide to debugging segmentation faults",
-                    "input_vars": [
+                            "name": "longitude",
+                            "parameter": "longitude",
+                            "type": "float",
+                            "source": "API_Output (Panel 1, Step 1)",
+                            "description": "Longitude of Patna, India",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "panel": 1,
+                                    "step": 1
+                                }
+                            ]
+                        },
                         {
-                            "name": "prompt_debugging_guide",
-                            "parameter": "prompt",
-                            "type": "string",
+                            "name": "current_weather_flag",
+                            "parameter": "current_weather",
+                            "type": "boolean",
                             "source": "LLM_Generated",
-                            "description": "Prompt to generate a visual guide for debugging segmentation faults",
-                            "value": "Visual guide to debugging segmentation faults in C++",
+                            "description": "Flag to include current weather data",
+                            "value": "true",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "debugging_guide_image",
-                            "description": "Image illustrating a guide to debugging segmentation faults in C++",
+                            "name": "current_weather_data",
+                            "description": "Current weather conditions in Patna, India",
                             "used_by": []
                         }
                     ]

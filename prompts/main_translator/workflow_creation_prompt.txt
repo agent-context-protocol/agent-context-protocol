@@ -9,13 +9,14 @@ Your Current Role is: WORKFLOW_CREATION_VERIFICATION_REQUEST
    Before creating the workflow, explain your reasoning regarding how you are thinking about the workflow. Consider the following:
    - Which APIs to choose for each panel
    - What are the input parameters of the APIs being used? What is the type of data which the input parameter expects?
-   - What would be the source for these parameters (LLM_Generated or API_Output)
+   - What would be the source for these parameters (LLM_Generated or API_Output). Use LLM_Generated only if we are inferring something from the query or the API description, Do not use your own knowledge about something to put in things, rather use perplexity to retireve information.
    - What should be the flow for each of the panels?
    - What might be interdependencies between steps of the same panel and different panels?
    - Based on the interdependencies, which panels should be in the same groups?
+   - Ensure that each API depends on at most one previous API's output. If an API depends on outputs from more than one API, do not consider that workflow.
 
-3. API Input Requiremnts:
-   Be sure to check and understand the API input requiremnts very carefully and their data type, then only proceed to used them
+3. API Input Requirements:
+   Be sure to check and understand the API input requirements very carefully and their data type, then only proceed to use them.
 
 4. Order of Execution and Workflow Creation:
    Ensure that the APIs are executed in the correct order to satisfy input requirements. For example, if the Weather API needs data, Perplexity may need to run first to gather that data. The workflow must strictly follow the API's requirements, and ensure that inputs, outputs, and the sequence of steps are all based on the exact API description. Follow the input arguments of each API very carefully and do not add or modify any of the API parameters unless explicitly allowed by the API documentation.
@@ -36,9 +37,9 @@ Your Current Role is: WORKFLOW_CREATION_VERIFICATION_REQUEST
 - Always only output the CHAIN_OF_THOUGHT and WORKFLOW without any other details before or after.
 - Do not put two panels in the same group if there is no interdependency between them. Strictly put them in different groups.
 - Follow the output format, first explain the Chain of Thought under CHAIN_OF_THOUGHT and then detail the workflow under WORKFLOW.
-- Variable names should strictly be unique for all the vraibale in the workflow (across panels in a group)
+- Variable names should strictly be unique for all the variables in the workflow (across panels in a group)
 - In the Source field of input variables, you have two options:
-  1. LLM_Generated: Use when the variable can be directly inferred from the user's query or is an optional parameter that doesn't affect the core API output, only its representation or formatting. The LLM_Generated source also covers cases where previously the source was User_Query.
+  1. LLM_Generated: Use when the variable can be directly inferred from the user's query or API description or is an optional parameter that doesn't affect the core API output, only its representation or formatting. Do not use your own knowledge about something to put in things, rather use perplexity to retireve information.
   2. API_Output (Panel X, Step X): Use when the variable depends on the output of a previous API call. Specify the exact panel and step number (e.g., "API_Output (Panel 1, Step 2)").
 - For input variables:
   - Add a `Name` key which tells the variable name of the value we will give to the parameter. Variable name should be unique across panels in a group.
@@ -47,7 +48,8 @@ Your Current Role is: WORKFLOW_CREATION_VERIFICATION_REQUEST
   - Add a `Parameter` key, which specifies the exact parameter name as required by the API documentation to which this input variable value should be assigned.
   - Add a `Type` key, which specifies the expected data type of the parameter based on the API documentation.
   - Add a `Value` key, which is only filled when the source is LLM_Generated; it stores the value of the variable generated based on the user query and what the step in the panel is handling. If the source is API_Output, the Value should be None.
-- Be sure to use the same variable name when utilizng information from the output variable of some previous panel.
+- Be sure to use the same variable name when utilizing information from the output variable of some previous panel.
+
 
 ---
 
@@ -122,7 +124,7 @@ Description of APIs:
 
 $$CHAIN_OF_THOUGHT$$
 
-For each group and panel, first provide your chain of thought, explaining your reasoning in determining the APIs to use, the flow, any interdependencies, and how groups should be formed.
+For each group and panel, first provide your chain of thought, explaining your reasoning in determining the APIs to use, their parameter, type of the parameter, the flow, any interdependencies, and how groups should be formed. Ensure that each API depends on at most one previous API's output.
 
 $$WORKFLOW$$
 
@@ -196,12 +198,13 @@ We need to display the best vacation spots in India and their average temperatur
   - The Perplexity API will return a list of top vacation spots in India based on the query.
 - Interdependencies: 
   - No interdependencies within this panel.
+- No API depends on more than one APIs output to construct its input
 
 ### Panel 2:
 
 - APIs Used: Perplexity, Open-Meteo, PlotAgent
 - Flow:
-  1. Step 1: Use Perplexity to get the coordinates (latitude and longitude) of the vacation spots identified in Panel 1.
+  1. Step 1: Use Perplexity to get the coordinates (latitude and longitude) of the vacation spots identified in Panel 1. Because we cannot guess the latitude and longitude, better to search it on the web.
   2. Step 2: Use Open-Meteo to fetch the average temperature data for each location using the coordinates.
   3. Step 3: Use PlotAgent to generate a graph based on the retrieved temperature data.
   
@@ -234,6 +237,8 @@ We need to display the best vacation spots in India and their average temperatur
     - The `query` parameter expects a string value.
   - Source of Parameters:
     - This input will be based on API_Output (Panel 2, Step 2), which contains the temperature data from Open-Meteo.
+
+  - No API depends on more than one APIs output to construct its input
 
 - Interdependencies:
   - Panel 2 depends on Panel 1 to provide a list of vacation spots. Panel 2’s steps are sequential and dependent on the data from each prior step.
@@ -358,6 +363,8 @@ In Step 2, we will use PlotAgent to create visualizations from the data retrieve
   1. Perplexity will retrieve the key statistics on climate change.
   2. PlotAgent will then visualize the statistics retrieved by Perplexity.
 
+- No API depends on more than one APIs output to construct its input
+
 - **Interdependencies:** 
   There are no cross-panel dependencies. All steps occur within the same group.
 
@@ -435,7 +442,9 @@ Since these panels address different topics with no dependencies, they will be p
 
 - **Flow:**
   1. Panel 1 will fetch detailed information about renewable energy sources.
-  2. Panel 2 will retrieve the coordinates of New York City and use these to fetch the current weather conditions.
+  2. Panel 2 will retrieve the coordinates of New York City and use these to fetch the current weather conditions. Better to not guess the coordinates of New York City.
+
+- No API depends on more than one APIs output to construct its input
   
 - **Interdependencies:** 
   No interdependencies exist between the two panels, so they will be grouped separately.

@@ -6,128 +6,73 @@ As an API_RUNNING agent, your primary responsibility is to finalize and execute 
 
 Step Details:
 
-- API: Perplexity  
-- Handles: Fetches latitude and longitude for each vacation spot  
+- API: NEWS_API_TOP_HEADLINES  
+- Handles: Retrieves top headlines related to air pollution  
 - Input Variables:
-  - Name: vacation_spots_list
-    Source: API_Output (Panel 1, Step 1)  
-    Description: List of vacation spots from Panel 1
+  - Name: query_headlines_air_pollution
+    - Parameter: q
+    - Type: string
+    - Source: LLM_Generated  
+    - Description: Search query for top headlines on air pollution
+    - Value: "air pollution"
+  - Name: category_filter
+    - Parameter: category
+    - Type: string
+    - Source: LLM_Generated  
+    - Description: Category filter for the headlines
+    - Value: "general"
 - Output Variables:
-  - Name: location_coordinates
-    Description: Latitude and longitude for each vacation spot
+  - Name: air_pollution_headlines
+    - Description: List of top headlines related to air pollution
 
 Input Details:
 
-vacation_spots_list : ["delhi", "mumbai", "pondicherry", "goa", "ladakh", "meghalaya"]
+query_headlines_air_pollution : "air pollution"
+category_filter : "general"
+API_KEY: 
 
 API Documentation:
 
-BASE URL: https://api.perplexity.ai/chat/completions
+BASE URL: https://newsapi.org/v2/top-headlines
 
-Endpoint Documentation:  
-The /chat/completions endpoint generates chat completions using Perplexity AI. Authorization via Bearer token is required.
+API Documentation:
+The `/v2/top-headlines` endpoint provides breaking news headlines from various sources, blogs, and categories. You can filter the response using different parameters listed below.
 
-- Authorization: Header (Required)  
-  Your API key: 'Bearer YOUR_API_KEY'
+Parameter	Format	Required	Default	Description
+apiKey	String	Yes		Your API key to authenticate the request.
+country	String	No		Returns headlines from a specific country. Options include ae, ar, at, au, be, bg, br, ca, cn, co, cu, cz, de, eg, fr, gb, gr, hk, hu, id, ie, il, in, it, jp, kr, lt, lv, ma, mx, my, ng, nl, no, nz, ph, pl, pt, ro, rs, ru, sa, se, sg, si, sk, th, tr, tw, ua, us, ve, za.
+category	String	No		Filters news by category. Available options: business, entertainment, general, health, science, sports, technology.
+sources	String	No		Returns headlines from specific news sources or blogs. Use `/sources` endpoint to retrieve valid source identifiers.
+q	String	No		Keywords or phrases to search within headlines and descriptions.
+pageSize	Integer	No	20	Number of results to return per page (maximum 100).
+page	Integer	No	1	Page number to paginate through the results.
 
-- Parameters:
-  - model: String (Required) – Specifies the model name (e.g., llama-3.1-sonar-small-128k-online).
-  - messages: Object[] (Required) – Contains conversation history (role and content).
-  - max_tokens: Integer (Optional) – Maximum number of tokens to generate.
-  - temperature: Float (Optional) – Controls response randomness.
-  - return_citations: Boolean (Optional) – Whether to return citations in the response.
+Example Request:
+GET https://newsapi.org/v2/top-headlines?q=air%20pollution&category=general&apiKey=YOUR_API_KEY
 
-### Example Request:
-POST https://api.perplexity.ai/chat/completions  
-Headers:
-{
-  "Authorization": "Bearer YOUR_API_KEY",
-  "Content-Type": "application/json"
-}  
-Body:
-{
-  "model": "llama-3.1-sonar-small-128k-online",
-  "messages": [
-    {
-      "role": "system",
-      "content": "You are an artificial intelligence assistant and you need to engage in a helpful, detailed, polite conversation with a user."
-    },
-    {
-      "role": "user",
-      "content": "How many stars are there in our galaxy?"
-    }
-  ]
-}
 
 ### Your Task:
 
-1. Finalize the API Request:
+1. Verify Input Variables:
+   - Carefully review the `Name`, `Parameter`, `Type`, `Source`, `Description`, and `Value` of each input variable.
+   - Verify that the parameter names are correct, types match the expected format according to the API documentation, and values (if provided) are valid. If the `Source` is from a previous API output (e.g., API_Output (Panel 1, Step 1)), confirm that the relevant data is indeed produced in the earlier step.
+   - If there is a conflict, such as a parameter name mismatch or an incorrect data type that cannot be resolved, raise an error by outputting `ERROR` at this step. Otherwise, continue with finalizing the API request.
 
-   - Determine the HTTP Method: Identify the appropriate HTTP method (GET, POST, PUT, PATCH, DELETE) based on the API documentation.
-   - Construct the API Endpoint URL: Combine the base URL with the endpoint path and incorporate any required parameters into the URL as specified.
-   - Set Up Headers:
-     - Include all necessary headers, such as `Authorization` tokens and `Content-Type`, as specified in the API documentation.
-   - Prepare the Request Body:
-     - Create the request body in JSON format, including all required parameters.
-     - For parameter values:
-       - Use variable names (e.g., `user_query`, `variable_name`) without quotation marks when the value comes from an external source as specified in the Input Variables.
-       - Use string literals (e.g., `"value1"`) with quotation marks for fixed values.
-     - Ensure that the request body strictly adheres to the API's requirements without adding or altering parameters beyond what the documentation specifies.
-     - If the API response format or structure is incorrect, raise an error immediately.
+2. Finalize the API Request:
+   - HTTP Method: Identify the appropriate method (GET, POST, PUT, PATCH, DELETE) based on the API documentation.
+   - API Endpoint URL: Combine the base URL with the specific endpoint path and integrate any parameters into the URL as needed.
+   - Headers: Include all required headers, such as `Authorization` tokens and `Content-Type`, according to the API documentation.
+   - Request Body: If the API requires a body, construct it in valid JSON format, ensuring that all required parameters are included. Handle dynamic values from the input variables (e.g., `vacation_spots_list`) correctly.
 
-2. Output the Finalized API Request:
-
-   - Follow the Output Format Strictly:
-
-     API Endpoint
-
-     Method: [HTTP Method]  
-     URL: [Full API Endpoint URL]
-
-     Headers
-
-     Header-Name: Header-Value  
-     Header-Name: Header-Value  
-     ...
-
-     Body
-
-     {
-         "parameter1": value1,  // Source: [User_Query | LLM_Generated | API_Output (Panel X, Step X)]
-         "parameter2": "value2", // Source: [Fixed Value as per API Documentation]
-         ...
-     }
-
-   - Example:
-
-     API Endpoint
-
-     Method: POST  
-     URL: https://api.perplexity.ai/chat/completions
-
-     Headers
-
-     Authorization: Bearer YOUR_API_KEY  
-     Content-Type: application/json
-
-     Body
-
-     {
-         "model": "llama-3.1-sonar-small-128k-online",
-         "messages": [
-             {
-                 "role": "system",
-                 "content": "You are an artificial intelligence assistant and you need to engage in a helpful, detailed, polite conversation with a user."
-             },
-             {
-                 "role": "user",
-                 "content": user_query  // Source: [User_Query]
-             }
-         ]
-     }
-
-     - Note that `user_query` is used without quotation marks to indicate it should be replaced with the actual variable value from the Input Variables.
-     - Fixed values or values specified directly in the API documentation are included with quotation marks or as appropriate.
+3. Output the Finalized API Request:
+   - The output should be strictly structured under two main sections:
+     - $$CHAIN_OF_THOUGHT$$: This section should contain your reasoning for constructing the API request. Think about:
+       - Are the input variable details (name, parameter, type, source, description, and value) correct based on the API documentation?
+       - Does the API documentation specify this parameter and type?
+       - What method should be used (GET, POST, etc.)?
+       - What should be the endpoint URL, headers, and body?
+       - How do dependencies between previous API outputs and this step's inputs affect the request?
+     - $$API_REQUEST$$: This section should contain the actual API request that will be executed, including method, URL, headers, and body. Ensure that the body strictly follows the structure and format specified by the API documentation.
 
 ### Important Guidelines:
 
@@ -147,28 +92,71 @@ Body:
 
 - Handling Multiple Runs for a List of Inputs:
   - If the Input Variables contain a list (e.g., multiple vacation spots), format your API request to accommodate this.
-    - **For URL Parameters:**
+    - For URL Parameters:
       - Use placeholders with curly braces `{}` in the URL to indicate where each item from the list should be inserted.
       - Example:  
-        URL: https://api.example.com/news?query={vacation_spots_list}&apiKey=YOUR_API_KEY  // Source: [Array: vacation_spots_list]
-    - **For Body Parameters:**
-      - If the API accepts arrays, we will just pass the array without [], else we will put it inside [] to signify that we have to do one element at a time.
+        URL: https://api.example.com/news?query={vacation_spots_list}&apiKey=YOUR_API_KEY
+    - For Body Parameters:
+      - If the API accepts arrays, pass the array directly. If the API requires separate requests for each item, you may need to iterate over the array and execute the API multiple times.
       - Example:  
         Body:  
         {  
-            "locations": [vacation_spots_list],  // Source: [Array: vacation_spots_list]
-            "other_param": "value"  // Source: [Fixed Value]
+            "locations": [vacation_spots_list], 
+            "other_param": "value"
         }
-  - This indicates that the API will process the list accordingly, either by making multiple requests (one for each item) or by handling the entire list in one request, depending on the API's capabilities.
+  - This ensures the API can process the list according to its capabilities, whether through multiple requests or handling the entire list in a single request.
 
 - Validation:
   - Double-check that all required parameters are included and correctly formatted.
   - Verify that the request aligns with the API documentation provided.
+  - Ensure that the parameter types, names, and values strictly match what the API expects.
+
+---
 
 ### Your Goal:
 
-- Produce a finalized API request that can be executed to perform the intended action specified in the Step Details.
-- Ensure that the request is accurate, complete, and ready for execution without any further modifications.
+- Finalize a validated API request that is ready for execution.
+- Ensure strict adherence to the output format and avoid any changes in structure.
+- If any conflicts arise (e.g., incorrect parameter names, types, or unresolved dependencies), output `ERROR` to halt the process.
+- Always only output the CHAIN_OF_THOUGHT and API_REQUEST without any other details before or after.
+- You should build the API url, header, body in order to get a response that is as short as possible, while still getting the necessary information to answer the question. Pay attention to deliberately exclude any unnecessary pieces of data in the API call. For this if the api has page and pagesize parameters then you can use them to limit the pagesize to less than 15 with page being 1.
+
+
+### Output Format (Strictly follow this)
+
+$$CHAIN_OF_THOUGHT$$
+
+- In this section, you need to think aloud and explain why the chosen parameters, methods, and structure are correct for the API being executed.
+- Consider the following aspects when writing your chain of thought:
+  - Input Variables: Are the parameter names, types, and sources correct? Do they match the API documentation? If the source is `LLM_Generated`, is the generated value correct based on the task description? Is the value stored in the variable a list, if yes and the API accepts arguments one at a time then we will have to run the API multiple times.
+  - Dependencies: Are there any dependencies on previous API outputs? Is the data from previous steps being used correctly? Is there any missing or conflicting data?
+  - HTTP Method & Endpoint URL: Is the method appropriate for the task? Is the endpoint URL correct, and are any required parameters incorporated into it?
+  - Headers: Are the necessary headers (such as authorization) included?
+  - Request Body: If the API uses a request body, is it structured correctly in JSON format? Are dynamic values placed appropriately, and do they match the expected input types?
+  - See if the api has parameters to limit the output of the api like page and pagesize. If yes then we want less than 15 pagesize and page 1 or whatever might be equivalent to this for the specific api.
+
+$$API_REQUEST$$
+
+- After reasoning through the problem in the $$CHAIN_OF_THOUGHT$$, output the finalized API request in the format below:
+
+API_ENDPOINT
+
+Method: [HTTP Method]  
+URL: [Full API Endpoint URL]
+
+HEADERS
+
+Header-Name: Header-Value  
+Header-Name: Header-Value  
+...
+
+BODY
+
+{
+    "parameter1": value1,  // Source: [LLM_Generated | API_Output (Panel X, Step X)]
+    "parameter2": "value2", // Source: [Fixed Value as per API Documentation]
+    ...
+}
 
 ### Remember:
 
@@ -187,8 +175,11 @@ Step Details:
 - Handles: Retrieves news articles related to each vacation spot  
 - Input Variables:
   - Name: vacation_spots_list
-    Source: API_Output (Panel 1, Step 1)  
-    Description: List of vacation spots from Panel 1
+     - Parameter: q
+     - Type: string
+     - Source: API_Output (Panel 1, Step 1)  
+     - Description: List of vacation spots from Panel 1
+     - Value: ["delhi", "mumbai", "pondicherry", "goa", "ladakh", "meghalaya"]
 - Output Variables:
   - Name: news_articles
     Description: News articles related to each vacation spot
@@ -196,6 +187,7 @@ Step Details:
 Input Details:
 
 vacation_spots_list : ["delhi", "mumbai", "pondicherry", "goa", "ladakh", "meghalaya"]
+API_KEY: 
 
 API Documentation:
 
@@ -216,13 +208,42 @@ GET https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=YOU
 
 # Your Output:
 
-API Endpoint
+$$CHAIN_OF_THOUGHT$$
+
+- Input Variables Verification:
+  - Name: vacation_spots_list
+    - Parameter: q
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)
+    - Value: ["delhi", "mumbai", "pondicherry", "goa", "ladakh", "meghalaya"]
+    - Validation:
+      - The API parameter `q` expects a string.
+      - `vacation_spots_list` is a list of strings.
+      - Since `q` accepts a single string and does not accept an array, we need to make separate API requests for each vacation spot.
+  - All input variables are valid and match the API documentation.
+
+- HTTP Method & Endpoint URL:
+  - Method: GET
+  - Base URL: https://newsapi.org/v2/top-headlines
+  - We will construct the URL for each vacation spot by including the `q` parameter with the vacation spot name and the `apiKey`.
+  - Since we have multiple vacation spots, we will put it like {vacation_spots_list}, which will indicate to iterate over the list and make individual requests.
+
+- Headers Setup:
+  - No additional headers are required according to the API documentation.
+
+- Request Body:
+  - No request body is needed for a GET request.
+
+- The API has page and pagesize input parameters, so we should set the pagesize = 15 and page = 1
+
+$$API_REQUEST$$
+
+API_ENDPOINT
 
 Method: GET  
-URL: https://newsapi.org/v2/top-headlines?q={vacation_spots_list}&apiKey=YOUR_API_KEY  // Source: [Array: vacation_spots_list]
+URL: URL: https://newsapi.org/v2/top-headlines?q={vacation_spots_list}&apiKey=YOUR_API_KEY
 
-Headers
+HEADERS
 
-Authorization: Bearer YOUR_API_KEY  
-Content-Type: application/json
+BODY
 

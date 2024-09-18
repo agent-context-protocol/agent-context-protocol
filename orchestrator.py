@@ -66,6 +66,7 @@ class MainOrchestrator:
         message = self.main_translator.setup(user_query, panels_list) 
         # with open("workflow.json", "r") as json_file:
         #     message = json.load(json_file)
+        # print("message : ",message)
         # self.local_translators_1 = LocalTranslatorNode(0, message["1"]["1"]["panel_description"], system_prompt = self.local_translator_system_prompt)
         # self.local_translators_1.workflow = message["1"]["1"]["steps"]
         # self.local_translators_1.build_verify()
@@ -90,4 +91,4 @@ if __name__ == "__main__":
     from google_auth_oauthlib.flow import InstalledAppFlow
 
     orchestrator = MainOrchestrator()
-    orchestrator.run("what is segmentation fault in c++?")
+    orchestrator.run("what is the weather in patna, india?")
