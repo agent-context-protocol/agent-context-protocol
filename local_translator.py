@@ -230,6 +230,125 @@ class LocalTranslatorNode(BaseNode):
             'api_requests': api_requests  # List of dictionaries, one for each API request
         }
 
+
+    def parse_and_store_api_response(self, api_response_text, panel_no, step_no):
+        # Split the text into CHAIN_OF_THOUGHT and API_RESPONSE sections
+        sections = re.split(r"\$\$API_RESPONSE\$\$", api_response_text)
+        if len(sections) != 2:
+            raise ValueError("The text does not contain exactly one CHAIN_OF_THOUGHT and one API_RESPONSE section.")
+
+        # Extract CHAIN_OF_THOUGHT section
+        chain_of_thought_text = sections[0].strip()
+        if not re.search(r"\$\$CHAIN_OF_THOUGHT\$\$", chain_of_thought_text):
+            raise ValueError("CHAIN_OF_THOUGHT section not found or improperly formatted.")
+
+        # Extract API_RESPONSE section
+        api_response_text = sections[1].strip()
+
+        # Parse the status code and status text
+        match_status = re.search(r"Status_Code\s*\n\s*(\d+)\s*(.*)", api_response_text)
+        if not match_status:
+            raise ValueError("Status_Code section not found or improperly formatted.")
+        
+        status_code = int(match_status.group(1).strip())
+        status_text = match_status.group(2).strip()
+
+        current_panel_data = self.group_workflow[str(panel_no)]
+        current_step_data = current_panel_data['steps'][str(step_no)]
+
+        if status_code == 200 and status_text in ["OK", "Success"]:
+            # Parse and validate the Output_Variables section
+            match_output_vars = re.search(r"Output_Variables\s*(.*?)(?=\nDependent_Input_Variables|\nAPI Response|$)", api_response_text, re.DOTALL)
+            if not match_output_vars:
+                raise ValueError("Output_Variables section not found or improperly formatted.")
+            
+            output_vars_section = match_output_vars.group(1).strip()
+
+            # Parse each output variable and store it in the current step's output variables
+            output_vars = re.findall(r"- Variable Name: ([\w_]+)\s*- Content: (.*)", output_vars_section)
+            if not output_vars:
+                raise ValueError("No output variables found in the Output_Variables section.")
+
+            # Store output variables and track the ones we've filled
+            stored_output_vars = set()
+            used_by_list = []
+
+            for var_name, var_value in output_vars:
+                found = False
+                for output_var in current_step_data['output_vars']:
+                    if output_var['name'] == var_name:
+                        output_var['value'] = var_value  # Store the output variable value
+                        stored_output_vars.add(var_name)  # Track which variables have been filled
+                        used_by_list.extend(output_var['used_by'])  # Collect dependent panel/step info
+                        found = True
+                        break
+
+                if not found:
+                    raise ValueError(f"Output variable {var_name} is not expected in Panel {panel_no}, Step {step_no}.")
+
+            # Ensure all output variables for the current step are filled
+            expected_output_vars = {var['name'] for var in current_step_data['output_vars']}
+            if stored_output_vars != expected_output_vars:
+                missing_vars = expected_output_vars - stored_output_vars
+                raise ValueError(f"Missing output variables for Panel {panel_no}, Step {step_no}: {', '.join(missing_vars)}")
+
+            # Now process Dependent_Input_Variables
+            match_dependent_vars = re.search(r"Dependent_Input_Variables\s*(.*?)(?=\nAPI Response|$)", api_response_text, re.DOTALL)
+            if match_dependent_vars:
+                dependent_vars_section = match_dependent_vars.group(1).strip()
+
+                # Parse each dependent variable
+                dependent_vars = re.findall(r"- Variable Name: ([\w_]+)\s*- Panel: (\d+)\s*- Step: (\d+)\s*- Type: (\w+)\s*- Content: (.*)", dependent_vars_section)
+                if not dependent_vars:
+                    raise ValueError("No dependent input variables found in the Dependent_Input_Variables section.")
+
+                # Ensure each dependent variable is saved
+                visited_dependencies = set()
+
+                for dep_var_name, dep_panel_no, dep_step_no, dep_type, dep_content in dependent_vars:
+                    dep_panel_no = str(dep_panel_no)
+                    dep_step_no = str(dep_step_no)
+
+                    # Check if the panel and step exist in the workflow dict
+                    if dep_panel_no in self.group_workflow and dep_step_no in self.group_workflow[dep_panel_no]['steps']:
+                        for input_var in self.group_workflow[dep_panel_no]['steps'][dep_step_no]['input_vars']:
+                            if input_var['name'] == dep_var_name:
+                                # Check if the type matches
+                                if input_var['type'] != dep_type:
+                                    raise ValueError(f"Type mismatch for {dep_var_name} in Panel {dep_panel_no}, Step {dep_step_no}. Expected {input_var['type']}, got {dep_type}.")
+                                # Store the value
+                                input_var['value'] = dep_content
+                                visited_dependencies.add((dep_panel_no, dep_step_no, dep_var_name))
+                    else:
+                        raise ValueError(f"Dependent variable {dep_var_name} not found in Panel {dep_panel_no}, Step {dep_step_no}.")
+
+                # Ensure all expected dependent input variables have been assigned
+                print("used_by_list : ",used_by_list)
+                for use_idx in range(len(used_by_list)):
+                    panel = used_by_list[use_idx]['panel']
+                    step = used_by_list[use_idx]['step']
+                    print("panel : ",panel)
+                    print("step : ",step)
+                    step_data = self.group_workflow[str(panel)]['steps'][str(step)]
+                    for input_var in step_data['input_vars']:
+                        if {"panel": panel_no, "step": step_no} in input_var['dependencies'] and input_var['value'] == "None":
+                            raise ValueError(f"Input variable {input_var['name']} in Panel {panel}, Step {step} has not been assigned a value.")
+
+        else:
+            # Handle error cases
+            match_error = re.search(r"Error_Explanation\s*\n\s*(.*)", api_response_text, re.DOTALL)
+            if not match_error:
+                raise ValueError("Error_Explanation section not found for error response.")
+            
+            error_explanation = match_error.group(1).strip()
+            return {
+                'status_code': status_code,
+                'status_text': status_text,
+                'error_explanation': error_explanation
+            }
+        
+        return self.group_workflow
+
     
     ###################################################################
     # based on the api request we call process the api endpoints here
@@ -352,6 +471,14 @@ class LocalTranslatorNode(BaseNode):
             self.chat_history.append({"role": "user", "content": api_output_llm_input })
             api_output_llm_output = self.generate()
             print("\napi_output_llm_output : ",api_output_llm_output)
+
+
+            api_parsed_output = self.parse_and_store_api_response(api_output_llm_output, self.panel_no, step_no)
+
+            print("api_parsed_output : ",api_parsed_output)
+
+            with open("workflow_updated.json", "w") as json_file:
+                json.dump(api_parsed_output, json_file, indent=4)
 
             
             break

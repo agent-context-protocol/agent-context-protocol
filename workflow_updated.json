@@ -1,0 +1,206 @@
+{
+    "1": {
+        "panel_description": "Display the current weather in Denver, Austin, and Delhi.",
+        "steps": {
+            "1": {
+                "api": "Perplexity",
+                "handles": "Retrieves latitude and longitude for Denver, Austin, and Delhi",
+                "input_vars": [
+                    {
+                        "name": "query_coordinates",
+                        "parameter": "query",
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Query to get the coordinates of Denver, Austin, and Delhi",
+                        "value": "What are the latitude and longitude of Denver, USA; Austin, USA; and Delhi, India?",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "latitude_denver",
+                        "description": "Latitude for Denver",
+                        "used_by": [
+                            {
+                                "panel": 1,
+                                "step": 2
+                            }
+                        ],
+                        "value": "39.742043"
+                    },
+                    {
+                        "name": "longitude_denver",
+                        "description": "Longitude for Denver",
+                        "used_by": [
+                            {
+                                "panel": 1,
+                                "step": 2
+                            }
+                        ],
+                        "value": "-104.991531"
+                    },
+                    {
+                        "name": "latitude_austin",
+                        "description": "Latitude for Austin",
+                        "used_by": [
+                            {
+                                "panel": 1,
+                                "step": 2
+                            }
+                        ],
+                        "value": "30.267153"
+                    },
+                    {
+                        "name": "longitude_austin",
+                        "description": "Longitude for Austin",
+                        "used_by": [
+                            {
+                                "panel": 1,
+                                "step": 2
+                            }
+                        ],
+                        "value": "-97.743061"
+                    },
+                    {
+                        "name": "latitude_delhi",
+                        "description": "Latitude for Delhi",
+                        "used_by": [
+                            {
+                                "panel": 1,
+                                "step": 2
+                            }
+                        ],
+                        "value": "28.704060"
+                    },
+                    {
+                        "name": "longitude_delhi",
+                        "description": "Longitude for Delhi",
+                        "used_by": [
+                            {
+                                "panel": 1,
+                                "step": 2
+                            }
+                        ],
+                        "value": "77.102493"
+                    }
+                ]
+            },
+            "2": {
+                "api": "Open-Meteo",
+                "handles": "Retrieves current weather data for Denver, Austin, and Delhi",
+                "input_vars": [
+                    {
+                        "name": "latitude_denver",
+                        "parameter": "latitude",
+                        "type": "float",
+                        "source": "API_Output (Panel 1, Step 1)",
+                        "description": "Latitude of Denver",
+                        "value": "39.742043",
+                        "dependencies": [
+                            {
+                                "panel": 1,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "longitude_denver",
+                        "parameter": "longitude",
+                        "type": "float",
+                        "source": "API_Output (Panel 1, Step 1)",
+                        "description": "Longitude of Denver",
+                        "value": "-104.991531",
+                        "dependencies": [
+                            {
+                                "panel": 1,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "latitude_austin",
+                        "parameter": "latitude",
+                        "type": "float",
+                        "source": "API_Output (Panel 1, Step 1)",
+                        "description": "Latitude of Austin",
+                        "value": "30.267153",
+                        "dependencies": [
+                            {
+                                "panel": 1,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "longitude_austin",
+                        "parameter": "longitude",
+                        "type": "float",
+                        "source": "API_Output (Panel 1, Step 1)",
+                        "description": "Longitude of Austin",
+                        "value": "-97.743061",
+                        "dependencies": [
+                            {
+                                "panel": 1,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "latitude_delhi",
+                        "parameter": "latitude",
+                        "type": "float",
+                        "source": "API_Output (Panel 1, Step 1)",
+                        "description": "Latitude of Delhi",
+                        "value": "28.704060",
+                        "dependencies": [
+                            {
+                                "panel": 1,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "longitude_delhi",
+                        "parameter": "longitude",
+                        "type": "float",
+                        "source": "API_Output (Panel 1, Step 1)",
+                        "description": "Longitude of Delhi",
+                        "value": "77.102493",
+                        "dependencies": [
+                            {
+                                "panel": 1,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "current_weather_flag",
+                        "parameter": "current_weather",
+                        "type": "boolean",
+                        "source": "LLM_Generated",
+                        "description": "Flag to include current weather data",
+                        "value": "true",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "current_weather_denver",
+                        "description": "Current weather conditions in Denver",
+                        "used_by": []
+                    },
+                    {
+                        "name": "current_weather_austin",
+                        "description": "Current weather conditions in Austin",
+                        "used_by": []
+                    },
+                    {
+                        "name": "current_weather_delhi",
+                        "description": "Current weather conditions in Delhi",
+                        "used_by": []
+                    }
+                ]
+            }
+        }
+    }
+}
