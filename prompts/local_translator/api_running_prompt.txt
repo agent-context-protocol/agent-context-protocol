@@ -29,7 +29,7 @@ Input Details:
 
 query_headlines_air_pollution : "air pollution"
 category_filter : "general"
-API_KEY: 
+API_KEY: YOUR_API_KEY
 
 API Documentation:
 
@@ -91,20 +91,14 @@ GET https://newsapi.org/v2/top-headlines?q=air%20pollution&category=general&apiK
   - Your output should be limited strictly to the finalized API request as per the format.
 
 - Handling Multiple Runs for a List of Inputs:
-  - If the Input Variables contain a list (e.g., multiple vacation spots), format your API request to accommodate this.
+  - If the Input Variables contain a list (e.g., multiple vacation spots), execute the API request separately for each item in the list.
     - For URL Parameters:
-      - Use placeholders with curly braces `{}` in the URL to indicate where each item from the list should be inserted.
+      - Execute separate requests for each item in the list.
       - Example:  
-        URL: https://api.example.com/news?query={vacation_spots_list}&apiKey=YOUR_API_KEY
+        If the input contains multiple vacation spots like ["delhi", "mumbai", "goa"], execute the API request for each vacation spot individually.
     - For Body Parameters:
-      - If the API accepts arrays, pass the array directly. If the API requires separate requests for each item, you may need to iterate over the array and execute the API multiple times.
-      - Example:  
-        Body:  
-        {  
-            "locations": [vacation_spots_list], 
-            "other_param": "value"
-        }
-  - This ensures the API can process the list according to its capabilities, whether through multiple requests or handling the entire list in a single request.
+      - If the API requires separate requests for each item, construct a separate API_REQUEST with the updated body for each and execute them one after the other.
+    - This ensures the API can process each item individually, and each request will have its own $$API_REQUEST$$ output.
 
 - Validation:
   - Double-check that all required parameters are included and correctly formatted.
@@ -137,7 +131,7 @@ $$CHAIN_OF_THOUGHT$$
 
 $$API_REQUEST$$
 
-- After reasoning through the problem in the $$CHAIN_OF_THOUGHT$$, output the finalized API request in the format below:
+- After reasoning through the problem in the $$CHAIN_OF_THOUGHT$$, output the finalized API request in the format below. Remember that we can have multiple API_REQUEST:
 
 API_ENDPOINT
 
@@ -146,9 +140,11 @@ URL: [Full API Endpoint URL]
 
 HEADERS
 
+{
 Header-Name: Header-Value  
 Header-Name: Header-Value  
 ...
+}
 
 BODY
 
@@ -163,7 +159,6 @@ BODY
 - Any deviations from the API documentation or the output format can result in errors during execution.
 - If you encounter any issues that prevent you from finalizing the API request (e.g., missing required inputs, conflicts in parameters), you should raise an error detailing the issue.
 
----
 
 ### Some More Example:
 
@@ -187,7 +182,7 @@ Step Details:
 Input Details:
 
 vacation_spots_list : ["delhi", "mumbai", "pondicherry", "goa", "ladakh", "meghalaya"]
-API_KEY: 
+API_KEY: YOUR_API_KEY
 
 API Documentation:
 
@@ -218,15 +213,12 @@ $$CHAIN_OF_THOUGHT$$
     - Value: ["delhi", "mumbai", "pondicherry", "goa", "ladakh", "meghalaya"]
     - Validation:
       - The API parameter `q` expects a string.
-      - `vacation_spots_list` is a list of strings.
-      - Since `q` accepts a single string and does not accept an array, we need to make separate API requests for each vacation spot.
-  - All input variables are valid and match the API documentation.
+      - Since `vacation_spots_list` is a list of strings, each vacation spot will require a separate API request.
 
 - HTTP Method & Endpoint URL:
   - Method: GET
   - Base URL: https://newsapi.org/v2/top-headlines
-  - We will construct the URL for each vacation spot by including the `q` parameter with the vacation spot name and the `apiKey`.
-  - Since we have multiple vacation spots, we will put it like {vacation_spots_list}, which will indicate to iterate over the list and make individual requests.
+  - We will construct separate URLs for each vacation spot by including the `q` parameter with the vacation spot name and the `apiKey`.
 
 - Headers Setup:
   - No additional headers are required according to the API documentation.
@@ -234,16 +226,70 @@ $$CHAIN_OF_THOUGHT$$
 - Request Body:
   - No request body is needed for a GET request.
 
-- The API has page and pagesize input parameters, so we should set the pagesize = 15 and page = 1
+- Since we have multiple vacation spots, each will be processed in a separate API request with page and pagesize set to 1 and 15 respectively.
 
 $$API_REQUEST$$
 
 API_ENDPOINT
 
 Method: GET  
-URL: URL: https://newsapi.org/v2/top-headlines?q={vacation_spots_list}&apiKey=YOUR_API_KEY
+URL: https://newsapi.org/v2/top-headlines?q=delhi&apiKey=YOUR_API_KEY
 
 HEADERS
 
 BODY
 
+$$API_REQUEST$$
+
+API_ENDPOINT
+
+Method: GET  
+URL: https://newsapi.org/v2/top-headlines?q=mumbai&apiKey=YOUR_API_KEY
+
+HEADERS
+
+BODY
+
+$$API_REQUEST$$
+
+API_ENDPOINT
+
+Method: GET  
+URL: https://newsapi.org/v2/top-headlines?q=pondicherry&apiKey=YOUR_API_KEY
+
+HEADERS
+
+BODY
+
+$$API_REQUEST$$
+
+API_ENDPOINT
+
+Method: GET  
+URL: https://newsapi.org/v2/top-headlines?q=goa&apiKey=YOUR_API_KEY
+
+HEADERS
+
+BODY
+
+$$API_REQUEST$$
+
+API_ENDPOINT
+
+Method: GET  
+URL: https://newsapi.org/v2/top-headlines?q=ladakh&apiKey=YOUR_API_KEY
+
+HEADERS
+
+BODY
+
+$$API_REQUEST$$
+
+API_ENDPOINT
+
+Method: GET  
+URL: https://newsapi.org/v2/top-headlines?q=meghalaya&apiKey=YOUR_API_KEY
+
+HEADERS
+
+BODY
