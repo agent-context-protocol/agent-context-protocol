@@ -1,95 +1,87 @@
 import asyncio
+import json
 from interpreter import InterpreterNode
 from main_translator import MainTranslatorNode
 from local_translator import LocalTranslatorNode
-import json
 
-# class Manager:
-#     def __init__(self, workflow, main_translator):
-#         # self.queue = asyncio.Queue()
-#         # self.lock = asyncio.Lock()
-#         self.groups = {}
-#         self.translator_list = []
-#         for group_id in sorted(workflow.keys()):
-#             self.groups[group_id] = {}
-#             for instance_id in sorted(workflow[group_id].keys()):
-#                 self.groups[group_id][instance_id] = LocalTranslatorNode(instance_id, workflow[group_id][instance_id])
-#                 self.translator_list.append(self.groups[group_id][instance_id])
-#         self.main_translator = main_translator
-
-#     async def setup_individually(self, local_translator):
-#         setup_message = await local_translator.setup()
-#         response = await self.query_main_translator(setup_message)
-#         return response
-
-#     async def setup(self):
-#         await asyncio.gather(*(self.setup_individually(local_translator) for local_translator in self.translator_list))
-
-#     async def query_main_translator(self, query):
-#         async with self.main_translator.lock
-#             response = await self.main_translator.query(query)
-#             return response
-
-#     async def run_group_sequentially(self, group): 
-#         for translator in group:
-#             await self.run_translator(translator)
-
+class Manager:
+    def __init__(self, workflow, main_translator, local_translator_system_prompt):
+        self.main_translator = main_translator
+        self.groups = {}
+        self.local_translators = {}
+        
+        for group_id, group_data in workflow.items():
+            group_translators = []
+            for translator_id, translator_data in group_data.items():
+                translator = LocalTranslatorNode(
+                    int(translator_id),
+                    translator_data["panel_description"],
+                    system_prompt=local_translator_system_prompt
+                )
+                translator.group_workflow = group_data
+                translator.panel_workflow = translator_data["steps"]
+                self.local_translators[translator_id] = translator
+                group_translators.append(translator)
+            self.groups[group_id] = group_translators
+    async def run(self):
+        # Run groups asynchronously (in parallel)
+        await asyncio.gather(*(self.run_group_sequentially(self.groups[group_id]) for group_id in self.groups.keys()))
+    async def run_group_sequentially(self, group):
+        # Run tasks in the group sequentially by awaiting each task
+        for translator in group:
+            await translator.run_in_thread()
 
 class MainOrchestrator:
     def __init__(self):
         self.get_system_prompts()
-        self.interpreter = InterpreterNode('interpreter', system_prompt = self.interpreter_system_prompt)
+        self.interpreter = InterpreterNode('interpreter', system_prompt=self.interpreter_system_prompt)
         self.main_translator = MainTranslatorNode('main_translator', self.main_translator_system_prompt)
-        self.local_translators = {}
 
     def get_system_prompts(self):
-        # Interpreter system prompt
         with open('prompts/interpreter_system_prompt.txt', 'r') as file:
             self.interpreter_system_prompt = file.read()
 
-        # Main Translator System Prompt
         with open('prompts/main_translator/main_translator_system_prompt.txt', 'r') as file:
             self.main_translator_system_prompt = file.read()
         
-        # Local Translator System Prompt
         with open('prompts/local_translator/local_translator_system_prompt.txt', 'r') as file:
             self.local_translator_system_prompt = file.read()
 
-    def run(self, user_query):
-        # # # Send user query to interpreter
+    async def run(self, user_query):
+        # Get initial setup from interpreter and send to main translator
         # self.interpreter.user_query = user_query
-
-        # # Get initial setup from interpreter and send to main translator
         # panels_list = self.interpreter.setup()
-        # print("panels_list : ",panels_list)
-        # # panels_list = []
-        # message = self.main_translator.setup(user_query, panels_list) 
+        # workflow = self.main_translator.setup(user_query, panels_list)
+        
+        # For now, we're loading the workflow from a file
         with open("workflow.json", "r") as json_file:
-            message = json.load(json_file)
-        print("message : ",message)
-        self.local_translators_1 = LocalTranslatorNode(1, message["1"]["1"]["panel_description"], system_prompt = self.local_translator_system_prompt)
-        self.local_translators_1.group_workflow = message["1"] #["1"]["steps"]
-        self.local_translators_1.panel_workflow = message["1"]["1"]["steps"]
-        self.local_translators_1.build_verify()
+            workflow = json.load(json_file)
 
-        communication_manager = Manager(workflow)
-        setup_message = group_data_structure.setup()
-        confirmation = self.main_translator.communicate(setup_message)
-        # group_data_structure.recieve_confirmation = 
+        print("Workflow:", workflow)
+
+        communication_manager = Manager(workflow, self.main_translator, self.local_translator_system_prompt)
+        await communication_manager.run()
 
         # Main loop
         while True:
             # Process messages between nodes
-            group_data_structure.run()
+            # You might want to implement a method in Manager to handle this
+            await communication_manager.process_messages()
 
             # Check if all work is complete
-            if self.is_work_complete():
+            if await self.is_work_complete():
                 break
 
         # After completion, we might want to save or analyze the chat histories
 
-if __name__ == "__main__":
-    from google_auth_oauthlib.flow import InstalledAppFlow
+    async def is_work_complete(self):
+        # Implement logic to check if all work is complete
+        # This might involve checking the state of all translators
+        return False  # Placeholder
 
+async def main():
     orchestrator = MainOrchestrator()
-    orchestrator.run("what is the weather currently in denver, usa; austin, usa; and delhi, india?")
+    await orchestrator.run("india")
+
+if __name__ == "__main__":
+    asyncio.run(main())

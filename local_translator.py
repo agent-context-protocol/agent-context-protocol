@@ -5,6 +5,7 @@ from available_apis.function_format.perplexity_function import perplexity_api_re
 import json
 import requests
 import re
+import asyncio
 
 class LocalTranslatorNode(BaseNode):
     def __init__(self, panel_no, panel_description, system_prompt=None):
@@ -323,12 +324,12 @@ class LocalTranslatorNode(BaseNode):
                         raise ValueError(f"Dependent variable {dep_var_name} not found in Panel {dep_panel_no}, Step {dep_step_no}.")
 
                 # Ensure all expected dependent input variables have been assigned
-                print("used_by_list : ",used_by_list)
+                # print("used_by_list : ",used_by_list)
                 for use_idx in range(len(used_by_list)):
                     panel = used_by_list[use_idx]['panel']
                     step = used_by_list[use_idx]['step']
-                    print("panel : ",panel)
-                    print("step : ",step)
+                    # print("panel : ",panel)
+                    # print("step : ",step)
                     step_data = self.group_workflow[str(panel)]['steps'][str(step)]
                     for input_var in step_data['input_vars']:
                         if {"panel": panel_no, "step": step_no} in input_var['dependencies'] and input_var['value'] == "None":
@@ -389,6 +390,7 @@ class LocalTranslatorNode(BaseNode):
         Args:
             api_descriptions (dict): Dictionary where the key is the API name and the value is the API description.
         """
+        print('Started workflow for panel ', self.panel_no)
         if not self.group_workflow:
             raise ValueError("No group workflow found for this panel.")
         if not self.panel_workflow:
@@ -403,7 +405,7 @@ class LocalTranslatorNode(BaseNode):
             step_no = s_i+1
             step = self.panel_workflow[str(step_no)]
             api_outputs_list = []
-            print(f"Processing Step {step_no} for API: {step['api']}")
+            # print(f"Processing Step {step_no} for API: {step['api']}")
             # if api is perplexity/plot agent/text to image then we will use hardcoded
             if step['api'] in ["Perplexity", "PlotAgent", "TextToImage"]:
                 if step['api'] == "Perplexity":
@@ -426,7 +428,7 @@ class LocalTranslatorNode(BaseNode):
                 input_data_list.append(input_data)
                 # print(f"Prepared input for step {step['step']}: {input_data}")
 
-                print("input_data : ",input_data)
+                # print("input_data : ",input_data)
 
                 # generating the api request from the LLM
                 self.chat_history.append({"role": "system", "content": self.api_running_prompt}) # system prompt for workflow_creation
@@ -438,15 +440,15 @@ class LocalTranslatorNode(BaseNode):
                 while not run_success and counter < 5:
                     try:
                         api_request_llm = self.generate()
-                        print("api_request_llm : ",api_request_llm)
+                        # print("api_request_llm : ",api_request_llm)
                         # print(cause_error)
                         parsed_api_request = self.parse_api_request(api_request_llm)
-                        print("parsed_api_request : ",parsed_api_request)
+                        # print("parsed_api_request : ",parsed_api_request)
                         run_success = True
                     except Exception as e:
                         error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT and API_REQUEST without any other details before or after.:\n {str(e)}' 
                         self.chat_history.append({"role": "user", "content": error_message})
-                        print("error_message : ",error_message)
+                        # print("error_message : ",error_message)
                     
                     counter += 1
 
@@ -460,12 +462,12 @@ class LocalTranslatorNode(BaseNode):
                 
             ###########
             # API_OUTPUT, API_OUTPUT_DEPENDENCY Part with Error Handling
-            print("api_output : ",api_output)
+            # print("api_output : ",api_output)
 
             # give the api_output to LLM and ask it to first verify if it seems plausile for our expectations from the api, then save the relevant part in the right format
             # additionally the LLM Agent will check if the api output has enough information such that we can fulfil the input variable requirement for future steps which depend on its output, and retrieve the relevant information and save it in the right format
             api_output_llm_input = self.prepare_input_for_api_output(api_outputs_list[0], self.panel_no, step_no)
-            print("\napi_output_llm_input : ",api_output_llm_input)
+            # print("\napi_output_llm_input : ",api_output_llm_input)
             # generating the api response format from the LLM
             self.chat_history.append({"role": "system", "content": self.api_output_prompt}) # system prompt for workflow_creation
             self.chat_history.append({"role": "user", "content": api_output_llm_input })
@@ -475,11 +477,17 @@ class LocalTranslatorNode(BaseNode):
 
             api_parsed_output = self.parse_and_store_api_response(api_output_llm_output, self.panel_no, step_no)
 
-            print("api_parsed_output : ",api_parsed_output)
+            # print("api_parsed_output : ",api_parsed_output)
 
-            with open("workflow_updated.json", "w") as json_file:
+            with open(f"workflow_updated_{self.panel_no}.json", "w") as json_file:
                 json.dump(api_parsed_output, json_file, indent=4)
 
+        print('Completed workflow for panel ', self.panel_no)
+        self.save_chat_history(f"chat_history_{self.panel_no}.txt")
+
             
-            break
+            # break 
             
+    async def run_in_thread(self):
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(None, self.build_verify)
