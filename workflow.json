@@ -1,26 +1,26 @@
 {
     "1": {
         "1": {
-            "panel_description": "Display the current weather and a 7-day forecast for Denver, USA.",
+            "panel_description": "Display the current weather in Seattle, USA.",
             "steps": {
                 "1": {
                     "api": "Perplexity",
-                    "handles": "Retrieves the latitude and longitude of Denver, USA",
+                    "handles": "Retrieves latitude and longitude of Seattle, USA",
                     "input_vars": [
                         {
-                            "name": "query_denver_coordinates",
+                            "name": "query_seattle_coordinates",
                             "parameter": "query",
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to get the coordinates of Denver, USA",
-                            "value": "What are the latitude and longitude of Denver, USA?",
+                            "description": "Query to get the coordinates of Seattle, USA",
+                            "value": "What are the latitude and longitude of Seattle, USA?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "latitude_denver",
-                            "description": "Latitude of Denver, USA",
+                            "name": "latitude_seattle",
+                            "description": "Latitude of Seattle, USA",
                             "used_by": [
                                 {
                                     "panel": 1,
@@ -29,8 +29,8 @@
                             ]
                         },
                         {
-                            "name": "longitude_denver",
-                            "description": "Longitude of Denver, USA",
+                            "name": "longitude_seattle",
+                            "description": "Longitude of Seattle, USA",
                             "used_by": [
                                 {
                                     "panel": 1,
@@ -42,14 +42,14 @@
                 },
                 "2": {
                     "api": "Open-Meteo",
-                    "handles": "Retrieves current weather and a 7-day forecast for Denver, USA",
+                    "handles": "Retrieves current weather data for Seattle, USA",
                     "input_vars": [
                         {
-                            "name": "latitude_denver",
+                            "name": "latitude_seattle",
                             "parameter": "latitude",
                             "type": "float",
                             "source": "API_Output (Panel 1, Step 1)",
-                            "description": "Latitude of Denver, USA",
+                            "description": "Latitude of Seattle, USA",
                             "value": "None",
                             "dependencies": [
                                 {
@@ -59,11 +59,11 @@
                             ]
                         },
                         {
-                            "name": "longitude_denver",
+                            "name": "longitude_seattle",
                             "parameter": "longitude",
                             "type": "float",
                             "source": "API_Output (Panel 1, Step 1)",
-                            "description": "Longitude of Denver, USA",
+                            "description": "Longitude of Seattle, USA",
                             "value": "None",
                             "dependencies": [
                                 {
@@ -84,55 +84,8 @@
                     ],
                     "output_vars": [
                         {
-                            "name": "weather_forecast_denver",
-                            "description": "Current weather and 7-day forecast for Denver, USA",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        }
-    },
-    "2": {
-        "2": {
-            "panel_description": "Display the latest news headlines in Denver, USA.",
-            "steps": {
-                "1": {
-                    "api": "NEWS_API_TOP_HEADLINES",
-                    "handles": "Retrieves the latest news headlines in Denver, USA",
-                    "input_vars": [
-                        {
-                            "name": "api_key",
-                            "parameter": "apiKey",
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "API key for authentication",
-                            "value": "YOUR_API_KEY",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "query_news_denver",
-                            "parameter": "q",
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Keywords to search within headlines",
-                            "value": "Denver",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "country_code",
-                            "parameter": "country",
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Country code for the news",
-                            "value": "us",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "news_headlines_denver",
-                            "description": "Latest news headlines in Denver, USA",
+                            "name": "current_weather_seattle",
+                            "description": "Current weather conditions in Seattle, USA",
                             "used_by": []
                         }
                     ]

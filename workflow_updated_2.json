@@ -1,45 +1,27 @@
 {
     "2": {
-        "panel_description": "Display the latest news headlines in Denver, USA.",
+        "panel_description": "Display the top attractions to visit in Seattle, USA.",
         "steps": {
             "1": {
-                "api": "NEWS_API_TOP_HEADLINES",
-                "handles": "Retrieves the latest news headlines in Denver, USA",
+                "api": "Perplexity",
+                "handles": "Searches for the best spots to visit in Seattle, USA",
                 "input_vars": [
                     {
-                        "name": "api_key",
-                        "parameter": "apiKey",
+                        "name": "query_seattle_attractions",
+                        "parameter": "query",
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "API key for authentication",
-                        "value": "YOUR_API_KEY",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "query_news_denver",
-                        "parameter": "q",
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Keywords to search within headlines",
-                        "value": "Denver",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "country_code",
-                        "parameter": "country",
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Country code for the news",
-                        "value": "us",
+                        "description": "Query to find the best spots to visit in Seattle, USA",
+                        "value": "What are the best spots to visit in Seattle, USA?",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "news_headlines_denver",
-                        "description": "Latest news headlines in Denver, USA",
+                        "name": "seattle_attractions",
+                        "description": "List of top attractions in Seattle, USA",
                         "used_by": [],
-                        "value": "[]"
+                        "value": "\"Seattle, known for its vibrant culture, stunning natural beauty, and rich history, offers a wide range of attractions that cater to various interests. Here are some of the best spots to visit in Seattle:\n    - Pike Place Market: This historic market, established in 1907, is a must-visit for its lively atmosphere, fresh produce, seafood, and local crafts. It's a great place to explore, shop, and dine.\n    - Space Needle: Built for the 1962 World Fair, the Space Needle is an iconic landmark and a great spot for panoramic views of the city. You can also dine at the top for a unique experience.\n    - Seattle Center: Located around the Space Needle, the Seattle Center is a hub for several attractions, including the Pacific Science Center, which offers interactive science exhibits, and Chihuly Garden and Glass, showcasing the stunning glass artwork of Dale Chihuly.\n    - Museum of Pop Culture (MoPop): Designed by architect Frank Gehry, MoPop is a unique building that houses a variety of exhibits on music, science fiction, pop culture, and more. It's a great place to explore different themes and interests.\n    - Museum of Flight: For aviation enthusiasts, the Museum of Flight is a treasure trove of historical aircraft and space technology. It includes exhibits like the Red Barn, the birthplace of Boeing, and a space shuttle trainer.\n    - Downtown Waterfront: The waterfront area features several attractions, including the Seattle Great Wheel, a 175-foot tall Ferris wheel with enclosed gondola cabins offering great views of Elliot Bay and the city skyline. You can also visit the Seattle Aquarium and take a harbor cruise with Argosy Cruises.\n    - Museum of History & Industry (MOHAI): MOHAI is dedicated to preserving and teaching the history of Seattle and the Puget Sound region. It includes the Center for Wooden Boats and offers free vintage-boat rides on Sundays.\n    - Seattle Art Museum: Located in downtown Seattle, this museum features a diverse collection of art, including European master paintings, ancient Asian artwork, and contemporary sculptures. Admission is free on the first Thursday of each month.\n    - Olympic Sculpture Park: This waterfront park is home to a collection of large-scale sculptures and offers beautiful views of the Olympic Mountains and Puget Sound. It's a great place for a leisurely walk or picnic.\n    - Washington State Ferries: Taking a ferry ride is a quintessential Seattle experience, offering stunning views of the city skyline, Puget Sound, and the surrounding islands.\n    - Underground Walking Tour: For a unique historical perspective, the Underground Walking Tour takes you through the hidden underground tunnels and spaces of Seattle's historic district.\n    These attractions provide a well-rounded experience of Seattle's culture, history, and natural beauty, ensuring there's something for everyone to enjoy.\""
                     }
                 ]
             }

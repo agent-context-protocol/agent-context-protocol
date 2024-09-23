@@ -57,7 +57,7 @@ API Response:
 2. Process and Extract Data for the Current Step:
    - Extract the relevant information from the API response to create the Output Variables for the current step.
    - Format the data according to the expected data type (e.g., JSON, Array, String).
-   - Ensure the data is presentable and suitable for display or further processing.
+   - Ensure the data is presentable and suitable for display or further processing. Include important information like unit of things if availableor additional context based on API Documentation, such that it is easy to understand.
 
 3. Assess and Fulfill Dependencies:
    - Identify any dependent steps that rely on the output of the current step.
@@ -65,8 +65,8 @@ API Response:
    - Extract and format the necessary data for each dependent step's Input Variables, matching the expected data types and formats.
 
 4. Handle Errors Appropriately:
-   - 601 INCOMPLETE_INFORMATION: Raise this error if the API response is not plausible, relevant, or complete for the current step.
-   - 602 DEPENDENCY_INCOMPLETE_INFORMATION: Raise this error if the API response lacks sufficient information to fulfill the dependencies for future steps.
+   - 603 INCOMPLETE_INFORMATION: Raise this error if the API response is not plausible, relevant, or complete for the current step.
+   - 604 DEPENDENCY_INCOMPLETE_INFORMATION: Raise this error if the API response lacks sufficient information to fulfill the dependencies for future steps.
    - Only raise errors in extreme cases, not for minor issues or partial data availability.
 
 5. Output the Processed Data:
@@ -90,8 +90,8 @@ API Response:
   - Extract and format the required data for each dependent step's Input Variables.
 
 - Error Handling:
-  - Raise 601 INCOMPLETE_INFORMATION if the API response is insufficient for the current step.
-  - Raise 602 DEPENDENCY_INCOMPLETE_INFORMATION if the API response is insufficient for dependent steps.
+  - Raise 603 INCOMPLETE_INFORMATION if the API response is insufficient for the current step.
+  - Raise 604 DEPENDENCY_INCOMPLETE_INFORMATION if the API response is insufficient for dependent steps.
   - Provide a clear explanation in the Error_Explanation section.
   - Only raise errors in extreme cases, not for minor or partial data issues.
 
@@ -110,6 +110,7 @@ API Response:
 - Strictly adhere to the output format and guidelines.
 - Provide clear and concise information without additional explanations.
 - Raise errors appropriately and provide clear explanations when necessary.
+- Include important information like unit of things if availableor additional context based on API Documentation, such that it is easy to understand.
 
 ### Output Format (Strictly follow this):
 
@@ -472,7 +473,7 @@ $$API_RESPONSE$$
 
 Status_Code
 
-601 INCOMPLETE_INFORMATION
+604 INCOMPLETE_INFORMATION
 
 Error_Explanation
 

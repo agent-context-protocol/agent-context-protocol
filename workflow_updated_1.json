@@ -1,57 +1,57 @@
 {
     "1": {
-        "panel_description": "Display the current weather and a 7-day forecast for Denver, USA.",
+        "panel_description": "Display the current weather in Seattle, USA.",
         "steps": {
             "1": {
                 "api": "Perplexity",
-                "handles": "Retrieves the latitude and longitude of Denver, USA",
+                "handles": "Retrieves latitude and longitude of Seattle, USA",
                 "input_vars": [
                     {
-                        "name": "query_denver_coordinates",
+                        "name": "query_seattle_coordinates",
                         "parameter": "query",
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Query to get the coordinates of Denver, USA",
-                        "value": "What are the latitude and longitude of Denver, USA?",
+                        "description": "Query to get the coordinates of Seattle, USA",
+                        "value": "What are the latitude and longitude of Seattle, USA?",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "latitude_denver",
-                        "description": "Latitude of Denver, USA",
+                        "name": "latitude_seattle",
+                        "description": "Latitude of Seattle, USA",
                         "used_by": [
                             {
                                 "panel": 1,
                                 "step": 2
                             }
                         ],
-                        "value": "39.740065"
+                        "value": "47.607"
                     },
                     {
-                        "name": "longitude_denver",
-                        "description": "Longitude of Denver, USA",
+                        "name": "longitude_seattle",
+                        "description": "Longitude of Seattle, USA",
                         "used_by": [
                             {
                                 "panel": 1,
                                 "step": 2
                             }
                         ],
-                        "value": "-104.990352"
+                        "value": "-122.333"
                     }
                 ]
             },
             "2": {
                 "api": "Open-Meteo",
-                "handles": "Retrieves current weather and a 7-day forecast for Denver, USA",
+                "handles": "Retrieves current weather data for Seattle, USA",
                 "input_vars": [
                     {
-                        "name": "latitude_denver",
+                        "name": "latitude_seattle",
                         "parameter": "latitude",
                         "type": "float",
                         "source": "API_Output (Panel 1, Step 1)",
-                        "description": "Latitude of Denver, USA",
-                        "value": "39.740065",
+                        "description": "Latitude of Seattle, USA",
+                        "value": "47.607",
                         "dependencies": [
                             {
                                 "panel": 1,
@@ -60,12 +60,12 @@
                         ]
                     },
                     {
-                        "name": "longitude_denver",
+                        "name": "longitude_seattle",
                         "parameter": "longitude",
                         "type": "float",
                         "source": "API_Output (Panel 1, Step 1)",
-                        "description": "Longitude of Denver, USA",
-                        "value": "-104.990352",
+                        "description": "Longitude of Seattle, USA",
+                        "value": "-122.333",
                         "dependencies": [
                             {
                                 "panel": 1,
@@ -85,10 +85,10 @@
                 ],
                 "output_vars": [
                     {
-                        "name": "weather_forecast_denver",
-                        "description": "Current weather and 7-day forecast for Denver, USA",
+                        "name": "current_weather_seattle",
+                        "description": "Current weather conditions in Seattle, USA",
                         "used_by": [],
-                        "value": "{\n      \"current_weather\": {\n        \"time\": \"2024-09-22T21:30\",\n        \"temperature\": 10.9,\n        \"windspeed\": 5.9,\n        \"winddirection\": 317,\n        \"weathercode\": 0\n      },\n      \"daily_forecast\": [\n        {\n          \"date\": \"2024-09-22\",\n          \"temperature_max\": 17.3,\n          \"temperature_min\": 8.1,\n          \"precipitation_sum\": 12.7,\n          \"weather_code\": 63,\n          \"sunrise\": \"2024-09-22T06:48\",\n          \"sunset\": \"2024-09-22T18:56\"\n        },\n        {\n          \"date\": \"2024-09-23\",\n          \"temperature_max\": 26.2,\n          \"temperature_min\": 6.7,\n          \"precipitation_sum\": 0.0,\n          \"weather_code\": 3,\n          \"sunrise\": \"2024-09-23T06:49\",\n          \"sunset\": \"2024-09-23T18:54\"\n        },\n        {\n          \"date\": \"2024-09-24\",\n          \"temperature_max\": 25.0,\n          \"temperature_min\": 9.5,\n          \"precipitation_sum\": 0.0,\n          \"weather_code\": 3,\n          \"sunrise\": \"2024-09-24T06:50\",\n          \"sunset\": \"2024-09-24T18:52\"\n        },\n        {\n          \"date\": \"2024-09-25\",\n          \"temperature_max\": 29.4,\n          \"temperature_min\": 16.2,\n          \"precipitation_sum\": 0.0,\n          \"weather_code\": 0,\n          \"sunrise\": \"2024-09-25T06:51\",\n          \"sunset\": \"2024-09-25T18:51\"\n        },\n        {\n          \"date\": \"2024-09-26\",\n          \"temperature_max\": 31.3,\n          \"temperature_min\": 18.7,\n          \"precipitation_sum\": 0.0,\n          \"weather_code\": 0,\n          \"sunrise\": \"2024-09-26T06:52\",\n          \"sunset\": \"2024-09-26T18:49\"\n        },\n        {\n          \"date\": \"2024-09-27\",\n          \"temperature_max\": 30.2,\n          \"temperature_min\": 20.3,\n          \"precipitation_sum\": 0.0,\n          \"weather_code\": 3,\n          \"sunrise\": \"2024-09-27T06:53\",\n          \"sunset\": \"2024-09-27T18:48\"\n        },\n        {\n          \"date\": \"2024-09-28\",\n          \"temperature_max\": 30.2,\n          \"temperature_min\": 19.8,\n          \"precipitation_sum\": 0.0,\n          \"weather_code\": 0,\n          \"sunrise\": \"2024-09-28T06:54\",\n          \"sunset\": \"2024-09-28T18:46\"\n        }\n      ]\n    }"
+                        "value": "{\n      \"temperature\": 16.5,\n      \"windspeed\": 7.2,\n      \"winddirection\": 186,\n      \"weathercode\": 3,\n      \"time\": \"2024-09-23T16:30\"\n    }"
                     }
                 ]
             }

@@ -6,24 +6,24 @@ As an API_RUNNING agent, your primary responsibility is to finalize and execute 
 
 Step Details:
 
-- API: NEWS_API_TOP_HEADLINES  
-- Handles: Retrieves top headlines related to air pollution  
+- API: NEWS_API  
+- Handles: Retrieves news articles related to air pollution  
 - Input Variables:
   - Name: query_headlines_air_pollution
     - Parameter: q
     - Type: string
     - Source: LLM_Generated  
-    - Description: Search query for top headlines on air pollution
+    - Description: Search query for news articles on air pollution
     - Value: "air pollution"
   - Name: category_filter
     - Parameter: category
     - Type: string
     - Source: LLM_Generated  
-    - Description: Category filter for the headlines
+    - Description: Category filter for the news articles
     - Value: "general"
 - Output Variables:
   - Name: air_pollution_headlines
-    - Description: List of top headlines related to air pollution
+    - Description: List of news articles related to air pollution
 
 Input Details:
 
@@ -33,22 +33,32 @@ API_KEY: YOUR_API_KEY
 
 API Documentation:
 
-BASE URL: https://newsapi.org/v2/top-headlines
+BASE URL: https://newsapi.org/v2/everything
 
-API Documentation:
-The `/v2/top-headlines` endpoint provides breaking news headlines from various sources, blogs, and categories. You can filter the response using different parameters listed below.
+API Documentation
+The `/v2/everything` endpoint allows searching for articles that have been published by over 150,000 news sources within the past 5 years. This endpoint is ideal for detailed news analysis or discovery across a wide range of topics. URL parameters for this endpoint are as follows:
 
-Parameter	Format	Required	Default	Description
-apiKey	String	Yes		Your API key to authenticate the request.
-country	String	No		Returns headlines from a specific country. Options include ae, ar, at, au, be, bg, br, ca, cn, co, cu, cz, de, eg, fr, gb, gr, hk, hu, id, ie, il, in, it, jp, kr, lt, lv, ma, mx, my, ng, nl, no, nz, ph, pl, pt, ro, rs, ru, sa, se, sg, si, sk, th, tr, tw, ua, us, ve, za.
-category	String	No		Filters news by category. Available options: business, entertainment, general, health, science, sports, technology.
-sources	String	No		Returns headlines from specific news sources or blogs. Use `/sources` endpoint to retrieve valid source identifiers.
-q	String	No		Keywords or phrases to search within headlines and descriptions.
-pageSize	Integer	No	20	Number of results to return per page (maximum 100).
-page	Integer	No	1	Page number to paginate through the results.
+Parameter       Type        Required    Default Description
+q               String      Yes         None    The search query or keywords. You can also use operators like AND, OR, NOT.
+from            Date        No          None    The start date for the results. Articles older than this date will not be returned.
+to              Date        No          None    The end date for the results. Articles published after this date will not be returned.
+sortBy          String      No          publishedAt  The sorting order for the results. Options include relevancy, popularity, and publishedAt.
+language        String      No          en      The language of the articles returned. Supported options include en, es, de, fr, and more.
+domains         String      No          None    Restrict articles to specific domains (e.g., techcrunch.com, engadget.com).
+excludeDomains  String      No          None    Exclude articles from specific domains.
+pageSize        Integer     No          20      The number of results per page. Maximum is 100.
+page            Integer     No          1       Use this to paginate through results.
+
+Authentication:
+You need an API key to use the NewsAPI endpoints. Authentication is done via the `X-Api-Key` header, which is sent with every request. Get your API key by signing up on the website.
+
+Response Format:
+The API returns results in JSON format. Each result includes the article’s title, author, source, URL, publication date, and a snippet of content.
 
 Example Request:
-GET https://newsapi.org/v2/top-headlines?q=air%20pollution&category=general&apiKey=YOUR_API_KEY
+GET https://newsapi.org/v2/everything?q=Apple&from=2022-01-01&sortBy=popularity&apiKey=YOUR_API_KEY
+
+For more details, visit: https://newsapi.org/docs/endpoints/everything
 
 
 ### Your Task:
@@ -73,6 +83,11 @@ GET https://newsapi.org/v2/top-headlines?q=air%20pollution&category=general&apiK
        - What should be the endpoint URL, headers, and body?
        - How do dependencies between previous API outputs and this step's inputs affect the request?
      - $$API_REQUEST$$: This section should contain the actual API request that will be executed, including method, URL, headers, and body. Ensure that the body strictly follows the structure and format specified by the API documentation.
+
+4. Handle Errors Appropriately:
+   - 601 MISSING_REQUIRED_PARAMETERS: One or more than one required parameters are missing in the workflow step details.
+   - 602 WRONG_STEP_DETAILS: Raise this error if the API step details are incomplete or incorrect, such as when invalid parameters are provided, or if the input variable values are in an incorrect format or data type, preventing the API request from being properly constructed.
+   - Errors should only be raised in critical cases that cannot be resolved automatically. Minor issues, such as correctable formatting problems or missing optional data, should be handled internally without raising an error.
 
 ### Important Guidelines:
 
@@ -104,6 +119,12 @@ GET https://newsapi.org/v2/top-headlines?q=air%20pollution&category=general&apiK
   - Double-check that all required parameters are included and correctly formatted.
   - Verify that the request aligns with the API documentation provided.
   - Ensure that the parameter types, names, and values strictly match what the API expects.
+
+- Error Handling:
+  - 601 MISSING_REQUIRED_PARAMETERS: One or more than one required parameters are missing in the workflow step details.
+  - 602 WRONG_STEP_DETAILS: Raise this error if the API step details are incorrect or incomplete, such as invalid parameters or wrong input formats.
+  - Only raise errors for critical issues; minor problems should be handled internally.
+  - Provide a clear explanation in the Error_Explanation section.
 
 ---
 
@@ -154,6 +175,22 @@ BODY
     ...
 }
 
+In Case of Error:
+
+$$CHAIN_OF_THOUGHT$$
+
+- Explain your reasoning leading to the error.
+
+$$API_REQUEST$$
+
+Status_Code
+
+[Status Code] [Status Text]
+
+Error_Explanation
+
+- Provide a brief explanation of why the error was raised.
+
 ### Remember:
 
 - Any deviations from the API documentation or the output format can result in errors during execution.
@@ -161,6 +198,8 @@ BODY
 
 
 ### Some More Example:
+
+#### Example 1:
 
 # Input:
 
@@ -186,20 +225,32 @@ API_KEY: YOUR_API_KEY
 
 API Documentation:
 
-The `/v2/top-headlines` endpoint provides breaking news headlines from various sources, blogs, and categories. You can filter the response using different parameters listed below.
+BASE URL: https://newsapi.org/v2/everything
 
-Parameter | Format  | Required | Default | Description
-----------|---------|----------|---------|------------
-apiKey    | String  | Yes      |         | Your API key to authenticate the request.
-country   | String  | No       |         | Returns headlines from a specific country.
-category  | String  | No       |         | Filters news by category.
-sources   | String  | No       |         | Returns headlines from specific news sources or blogs.
-q         | String  | No       |         | Keywords or phrases to search within headlines and descriptions.
-pageSize  | Integer | No       | 20      | Number of results to return per page (maximum 100).
-page      | Integer | No       | 1       | Page number to paginate through the results.
+API Documentation
+The `/v2/everything` endpoint allows searching for articles that have been published by over 150,000 news sources within the past 5 years. This endpoint is ideal for detailed news analysis or discovery across a wide range of topics. URL parameters for this endpoint are as follows:
+
+Parameter       Type        Required    Default Description
+q               String      Yes         None    The search query or keywords. You can also use operators like AND, OR, NOT.
+from            Date        No          None    The start date for the results. Articles older than this date will not be returned.
+to              Date        No          None    The end date for the results. Articles published after this date will not be returned.
+sortBy          String      No          publishedAt  The sorting order for the results. Options include relevancy, popularity, and publishedAt.
+language        String      No          en      The language of the articles returned. Supported options include en, es, de, fr, and more.
+domains         String      No          None    Restrict articles to specific domains (e.g., techcrunch.com, engadget.com).
+excludeDomains  String      No          None    Exclude articles from specific domains.
+pageSize        Integer     No          20      The number of results per page. Maximum is 100.
+page            Integer     No          1       Use this to paginate through results.
+
+Authentication:
+You need an API key to use the NewsAPI endpoints. Authentication is done via the `X-Api-Key` header, which is sent with every request. Get your API key by signing up on the website.
+
+Response Format:
+The API returns results in JSON format. Each result includes the article’s title, author, source, URL, publication date, and a snippet of content.
 
 Example Request:
-GET https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=YOUR_API_KEY
+GET https://newsapi.org/v2/everything?q=Apple&from=2022-01-01&sortBy=popularity&apiKey=YOUR_API_KEY
+
+For more details, visit: https://newsapi.org/docs/endpoints/everything
 
 # Your Output:
 
@@ -217,7 +268,7 @@ $$CHAIN_OF_THOUGHT$$
 
 - HTTP Method & Endpoint URL:
   - Method: GET
-  - Base URL: https://newsapi.org/v2/top-headlines
+  - Base URL: https://newsapi.org/v2/everything
   - We will construct separate URLs for each vacation spot by including the `q` parameter with the vacation spot name and the `apiKey`.
 
 - Headers Setup:
@@ -226,14 +277,14 @@ $$CHAIN_OF_THOUGHT$$
 - Request Body:
   - No request body is needed for a GET request.
 
-- Since we have multiple vacation spots, each will be processed in a separate API request with page and pagesize set to 1 and 15 respectively.
+- Since we have multiple vacation spots, each will be processed in a separate API request with page and pageSize set to 1 and 15, respectively.
 
 $$API_REQUEST$$
 
 API_ENDPOINT
 
 Method: GET  
-URL: https://newsapi.org/v2/top-headlines?q=delhi&apiKey=YOUR_API_KEY
+URL: https://newsapi.org/v2/everything?q=delhi&pageSize=15&page=1&apiKey=YOUR_API_KEY
 
 HEADERS
 
@@ -244,7 +295,7 @@ $$API_REQUEST$$
 API_ENDPOINT
 
 Method: GET  
-URL: https://newsapi.org/v2/top-headlines?q=mumbai&apiKey=YOUR_API_KEY
+URL: https://newsapi.org/v2/everything?q=mumbai&pageSize=15&page=1&apiKey=YOUR_API_KEY
 
 HEADERS
 
@@ -255,7 +306,7 @@ $$API_REQUEST$$
 API_ENDPOINT
 
 Method: GET  
-URL: https://newsapi.org/v2/top-headlines?q=pondicherry&apiKey=YOUR_API_KEY
+URL: https://newsapi.org/v2/everything?q=pondicherry&pageSize=15&page=1&apiKey=YOUR_API_KEY
 
 HEADERS
 
@@ -266,7 +317,7 @@ $$API_REQUEST$$
 API_ENDPOINT
 
 Method: GET  
-URL: https://newsapi.org/v2/top-headlines?q=goa&apiKey=YOUR_API_KEY
+URL: https://newsapi.org/v2/everything?q=goa&pageSize=15&page=1&apiKey=YOUR_API_KEY
 
 HEADERS
 
@@ -277,7 +328,7 @@ $$API_REQUEST$$
 API_ENDPOINT
 
 Method: GET  
-URL: https://newsapi.org/v2/top-headlines?q=ladakh&apiKey=YOUR_API_KEY
+URL: https://newsapi.org/v2/everything?q=ladakh&pageSize=15&page=1&apiKey=YOUR_API_KEY
 
 HEADERS
 
@@ -288,8 +339,212 @@ $$API_REQUEST$$
 API_ENDPOINT
 
 Method: GET  
-URL: https://newsapi.org/v2/top-headlines?q=meghalaya&apiKey=YOUR_API_KEY
+URL: https://newsapi.org/v2/everything?q=meghalaya&pageSize=15&page=1&apiKey=YOUR_API_KEY
 
 HEADERS
 
 BODY
+
+#### Example 2:
+
+# Input:
+
+Step Details:
+
+- API: Stack_Exchange_Questions
+- Handles: Retrieves specific C++ questions from Stack Exchange
+- Input Variables:
+  - Name: tagged
+    - Parameter: tagged
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Filter questions by the C++ tag
+    - Value: "c++"
+- Output Variables:
+  - Name: cpp_questions_list
+    - Description: List of C++ questions from Stack Exchange
+
+API Documentation:
+
+openapi: 3.0.0
+servers:
+  - url: 'https://api.stackexchange.com/2.2'
+info:
+  description: Stack Exchange API
+  version: '2.2'
+  title: Stack Exchange API
+  termsOfService: 'https://stackoverflow.com/legal/api-terms-of-use'
+  contact:
+    url: https://api.stackexchange.com/
+tags:
+  - name: Answers
+  - name: Questions
+  - name: Users
+    description: 'All user methods that take an {ids} parameter have a /me equivalent method that takes an access_token instead. These methods are provided for developer convenience, with the exception of plain /me, which is actually necessary for discovering which user authenticated to an application.'
+paths:
+  /questions:
+    get:
+      tags:
+        - Questions
+      description: |-
+        Gets all the questions on the site.
+        This method allows you make fairly flexible queries across the entire corpus of questions on a site.
+      operationId: listQuestions
+      parameters:
+        - name: fromdate
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: todate
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: min
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: max
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: tagged
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - desc
+              - asc
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - activity
+              - votes
+              - creation
+              - hot
+              - week
+              - month
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: pagesize
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: site
+          in: query
+          required: true
+          schema:
+            type: string
+            default: stackoverflow
+      responses:
+        default:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionsResponse'
+      summary: List Questions
+
+# Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+- Input Variables Verification:
+  - Name: cpp_tag
+    - Parameter: tagged
+    - Type: string
+    - Source: LLM_Generated
+    - Value: "c++"
+    - Validation:
+      - The API parameter `tagged` expects a string and accepts a list of tags. The value "c++" is valid and correctly formatted.
+
+- HTTP Method & Endpoint URL:
+  - Method: GET
+  - Base URL: https://api.stackexchange.com/2.2/questions
+  - We noticed that the required parameter `site` is not provided in the input variables. However, since we know that this request pertains to Stack Overflow, we will add the `site=stackoverflow` parameter ourselves instead of raising error 601 MISSING_REQUIRED_PARAMETERS.
+  - The URL will include the `tagged` parameter with the value "c++", the `site` parameter with the value "stackoverflow", and the `key` parameter for authentication.
+
+- Headers Setup:
+  - No additional headers are required according to the API documentation.
+
+- Request Body:
+  - No request body is needed for a GET request.
+
+- To limit the output, we will use the `pagesize=15` and `page=1` parameters to ensure a concise response.
+
+$$API_REQUEST$$
+
+API_ENDPOINT
+
+Method: GET  
+URL: https://api.stackexchange.com/2.2/questions?site=stackoverflow&tagged=c%2B%2B&pagesize=15&page=1
+
+HEADERS
+
+BODY
+
+#### Example 3:
+
+# Input:
+
+Step Details:
+
+- API: Open-Meteo
+- Handles: Retrieves weather forecast data for Denver, USA
+- Input Variables:
+  - Name: longitude_denver
+    - Parameter: longitude
+    - Type: float
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: Longitude of Denver, USA
+    - Value: "-104.991531"
+  - Name: current_weather_flag
+    - Parameter: current_weather
+    - Type: boolean
+    - Source: LLM_Generated
+    - Description: Flag to include current weather data
+    - Value: "true"
+- Output Variables:
+  - Name: denver_weather_forecast
+    - Description: Weather forecast data for Denver, USA including current weather conditions
+
+API Documentation:
+
+"Input": "The API requires the following input parameters:- latitude (float, required): WGS84 latitude coordinate of the location.- longitude (float, required): WGS84 longitude coordinate of the location.Optional parameters that may require your input:- hourly (array of strings, optional): Specify hourly weather variables to include in the response (e.g., `temperature_2m`, `wind_speed_10m`).- daily (array of strings, optional): Specify daily weather variables to include in the response (e.g., `temperature_2m_max`, `precipitation_sum`).- current_weather (boolean, optional): Set to `true` to include current weather data.",
+"Output": "The API returns a JSON object containing weather forecast data for the specified location. The output includes:- latitude (float): Latitude of the weather grid cell used.- longitude (float): Longitude of the weather grid cell used.- elevation (float): Elevation in meters of the selected weather grid cell.- hourly (object, if requested): Contains arrays of hourly data for each requested weather variable.  - time (array of strings): Timestamps corresponding to hourly data points.  - [weather variables]: Arrays of values for each requested hourly variable.- daily (object, if requested): Contains arrays of daily data for each requested weather variable.  - time (array of strings): Dates corresponding to daily data points.  - [weather variables]: Arrays of values for each requested daily variable.- current_weather (object, if requested): Current weather conditions including:  - time (string): Timestamp of the current weather data.  - temperature (float): Current temperature.  - wind_speed (float): Current wind speed.  - wind_direction (float): Current wind direction.  - weather_code (integer): Code representing the current weather condition.",
+"Use": "This API is used to retrieve a 7-day weather forecast for any location worldwide, specified by latitude and longitude coordinates. Users can customize the response by selecting specific hourly and daily weather variables or include current weather data. The API is suitable for applications that require weather information for forecasting, event planning, environmental monitoring, or integrating weather data into services."
+
+# Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+- The API response for Open-Meteo requires both the latitude and longitude to retrieve weather data for Denver, USA. However, in the provided input variables, only the longitude (`-104.991531`) is given, and the latitude is missing.
+- The `latitude` parameter is mandatory according to the API documentation, and without it, the weather forecast request cannot be completed.
+- Additionally, the `current_weather_flag` is correctly set to "true", indicating that current weather data should be included in the response.
+- Since the required parameter `latitude` is not provided, the request cannot be properly constructed. This results in raising the error 601 MISSING_REQUIRED_PARAMETERS to highlight the absence of this crucial input.
+
+$$API_REQUEST$$
+
+Status_Code
+
+601 MISSING_REQUIRED_PARAMETERS
+
+Error_Explanation
+
+The latitude of the location we want weather of is missing. We cannot get the weather from Open Meteo without both longitude and latitude of the 

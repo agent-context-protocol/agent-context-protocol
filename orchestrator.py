@@ -81,7 +81,8 @@ class MainOrchestrator:
 
 async def main():
     orchestrator = MainOrchestrator()
-    await orchestrator.run("weather and news in denver, usa")
+    await orchestrator.run("what is the weather in seattle, usa")
+    # await orchestrator.run("what is the weather in seattle, usa. Also what are the best spots to visit in seattle?")
 
 if __name__ == "__main__":
     asyncio.run(main())
