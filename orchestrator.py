@@ -49,9 +49,9 @@ class MainOrchestrator:
 
     async def run(self, user_query):
         # Get initial setup from interpreter and send to main translator
-        # self.interpreter.user_query = user_query
-        # panels_list = self.interpreter.setup()
-        # workflow = self.main_translator.setup(user_query, panels_list)
+        self.interpreter.user_query = user_query
+        panels_list = self.interpreter.setup()
+        workflow = self.main_translator.setup(user_query, panels_list)
         
         # For now, we're loading the workflow from a file
         with open("workflow.json", "r") as json_file:
@@ -81,7 +81,7 @@ class MainOrchestrator:
 
 async def main():
     orchestrator = MainOrchestrator()
-    await orchestrator.run("india")
+    await orchestrator.run("weather and news in denver, usa")
 
 if __name__ == "__main__":
     asyncio.run(main())

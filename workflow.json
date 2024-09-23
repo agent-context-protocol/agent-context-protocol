@@ -1,26 +1,26 @@
 {
     "1": {
         "1": {
-            "panel_description": "Display the current weather in Denver, Austin, and Delhi.",
+            "panel_description": "Display the current weather and a 7-day forecast for Denver, USA.",
             "steps": {
                 "1": {
                     "api": "Perplexity",
-                    "handles": "Retrieves latitude and longitude for Denver, Austin, and Delhi",
+                    "handles": "Retrieves the latitude and longitude of Denver, USA",
                     "input_vars": [
                         {
-                            "name": "query_coordinates",
+                            "name": "query_denver_coordinates",
                             "parameter": "query",
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to get the coordinates of Denver, Austin, and Delhi",
-                            "value": "What are the latitude and longitude of Denver, USA; Austin, USA; and Delhi, India?",
+                            "description": "Query to get the coordinates of Denver, USA",
+                            "value": "What are the latitude and longitude of Denver, USA?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
                             "name": "latitude_denver",
-                            "description": "Latitude for Denver",
+                            "description": "Latitude of Denver, USA",
                             "used_by": [
                                 {
                                     "panel": 1,
@@ -30,47 +30,7 @@
                         },
                         {
                             "name": "longitude_denver",
-                            "description": "Longitude for Denver",
-                            "used_by": [
-                                {
-                                    "panel": 1,
-                                    "step": 2
-                                }
-                            ]
-                        },
-                        {
-                            "name": "latitude_austin",
-                            "description": "Latitude for Austin",
-                            "used_by": [
-                                {
-                                    "panel": 1,
-                                    "step": 2
-                                }
-                            ]
-                        },
-                        {
-                            "name": "longitude_austin",
-                            "description": "Longitude for Austin",
-                            "used_by": [
-                                {
-                                    "panel": 1,
-                                    "step": 2
-                                }
-                            ]
-                        },
-                        {
-                            "name": "latitude_delhi",
-                            "description": "Latitude for Delhi",
-                            "used_by": [
-                                {
-                                    "panel": 1,
-                                    "step": 2
-                                }
-                            ]
-                        },
-                        {
-                            "name": "longitude_delhi",
-                            "description": "Longitude for Delhi",
+                            "description": "Longitude of Denver, USA",
                             "used_by": [
                                 {
                                     "panel": 1,
@@ -82,14 +42,14 @@
                 },
                 "2": {
                     "api": "Open-Meteo",
-                    "handles": "Retrieves current weather data for Denver, Austin, and Delhi",
+                    "handles": "Retrieves current weather and a 7-day forecast for Denver, USA",
                     "input_vars": [
                         {
                             "name": "latitude_denver",
                             "parameter": "latitude",
                             "type": "float",
                             "source": "API_Output (Panel 1, Step 1)",
-                            "description": "Latitude of Denver",
+                            "description": "Latitude of Denver, USA",
                             "value": "None",
                             "dependencies": [
                                 {
@@ -103,63 +63,7 @@
                             "parameter": "longitude",
                             "type": "float",
                             "source": "API_Output (Panel 1, Step 1)",
-                            "description": "Longitude of Denver",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 1,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "latitude_austin",
-                            "parameter": "latitude",
-                            "type": "float",
-                            "source": "API_Output (Panel 1, Step 1)",
-                            "description": "Latitude of Austin",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 1,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "longitude_austin",
-                            "parameter": "longitude",
-                            "type": "float",
-                            "source": "API_Output (Panel 1, Step 1)",
-                            "description": "Longitude of Austin",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 1,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "latitude_delhi",
-                            "parameter": "latitude",
-                            "type": "float",
-                            "source": "API_Output (Panel 1, Step 1)",
-                            "description": "Latitude of Delhi",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 1,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "longitude_delhi",
-                            "parameter": "longitude",
-                            "type": "float",
-                            "source": "API_Output (Panel 1, Step 1)",
-                            "description": "Longitude of Delhi",
+                            "description": "Longitude of Denver, USA",
                             "value": "None",
                             "dependencies": [
                                 {
@@ -180,18 +84,55 @@
                     ],
                     "output_vars": [
                         {
-                            "name": "current_weather_denver",
-                            "description": "Current weather conditions in Denver",
+                            "name": "weather_forecast_denver",
+                            "description": "Current weather and 7-day forecast for Denver, USA",
                             "used_by": []
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "2": {
+        "2": {
+            "panel_description": "Display the latest news headlines in Denver, USA.",
+            "steps": {
+                "1": {
+                    "api": "NEWS_API_TOP_HEADLINES",
+                    "handles": "Retrieves the latest news headlines in Denver, USA",
+                    "input_vars": [
+                        {
+                            "name": "api_key",
+                            "parameter": "apiKey",
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "API key for authentication",
+                            "value": "YOUR_API_KEY",
+                            "dependencies": []
                         },
                         {
-                            "name": "current_weather_austin",
-                            "description": "Current weather conditions in Austin",
-                            "used_by": []
+                            "name": "query_news_denver",
+                            "parameter": "q",
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Keywords to search within headlines",
+                            "value": "Denver",
+                            "dependencies": []
                         },
                         {
-                            "name": "current_weather_delhi",
-                            "description": "Current weather conditions in Delhi",
+                            "name": "country_code",
+                            "parameter": "country",
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Country code for the news",
+                            "value": "us",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "news_headlines_denver",
+                            "description": "Latest news headlines in Denver, USA",
                             "used_by": []
                         }
                     ]

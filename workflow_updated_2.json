@@ -1,0 +1,48 @@
+{
+    "2": {
+        "panel_description": "Display the latest news headlines in Denver, USA.",
+        "steps": {
+            "1": {
+                "api": "NEWS_API_TOP_HEADLINES",
+                "handles": "Retrieves the latest news headlines in Denver, USA",
+                "input_vars": [
+                    {
+                        "name": "api_key",
+                        "parameter": "apiKey",
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "API key for authentication",
+                        "value": "YOUR_API_KEY",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "query_news_denver",
+                        "parameter": "q",
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Keywords to search within headlines",
+                        "value": "Denver",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "country_code",
+                        "parameter": "country",
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Country code for the news",
+                        "value": "us",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "news_headlines_denver",
+                        "description": "Latest news headlines in Denver, USA",
+                        "used_by": [],
+                        "value": "[]"
+                    }
+                ]
+            }
+        }
+    }
+}

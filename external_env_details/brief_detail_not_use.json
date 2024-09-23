@@ -1,0 +1,17 @@
+{
+    "PlotAgent": {
+      "Input": "A query (string, required) which also includes the relevant response from Perplexity.",
+      "Output": "If plots are generated, it returns the location where plots are saved and a plot explanation string; otherwise, it returns 'Fail.'",
+      "Use": "For queries that can be visualized through graphs or charts. If initial information is insufficient, it triggers a Perplexity search for more data. It can skip plotting if it determines that plotting does not make sense."
+    },
+    "TextToImage": {
+      "Input": "A prompt (string, required) describing an image.",
+      "Output": "A location where the image generated based on the input prompt, is saved.",
+      "Use": "For generating visually compelling illustrations or images that enhance and complement the response, especially when plots are not appropriate."
+    },
+    "NEWS_API_TOP_HEADLINES": {
+    "Input": "The API requires the following input parameters:- apiKey (string, required): Your API key to authenticate the request.Optional parameters that may require your input:- country (string, optional): Returns headlines from a specific country (e.g., 'us', 'gb', 'fr').- category (string, optional): Filters news by category. Available options: 'business', 'entertainment', 'general', 'health', 'science', 'sports', 'technology'.- sources (string, optional): Returns headlines from specific news sources or blogs. Use the '/sources' endpoint to retrieve valid source identifiers.- q (string, optional): Keywords or phrases to search within headlines and descriptions.- pageSize (integer, optional): The number of results per page. Maximum is 100.- page (integer, optional): Use this to paginate through results.",
+    "Output": "The API returns a JSON object containing the top news headlines. The output includes:- status (string): 'ok' if the request was successful.- totalResults (integer): The total number of results available for your request.- articles (array): A list of article objects. Each article includes:  - source (object): The identifier and name of the news source.    - id (string): The unique identifier of the news source.    - name (string): The name of the news source.  - author (string): The author of the article.  - title (string): The headline or title of the article.  - description (string): A short description or summary of the article.  - url (string): The direct URL to the full article.  - urlToImage (string): The URL to a relevant image for the article.  - publishedAt (string): The date and time the article was published in ISO 8601 format.  - content (string): The content of the article, truncated to 200 characters.",
+    "Use": "This API endpoint is used to retrieve the latest breaking news headlines from various sources, blogs, and categories. It's ideal for applications that need to display current news, monitor events, or provide users with up-to-date information on specific topics, categories, or regions."
+    },
+}

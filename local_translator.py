@@ -185,10 +185,11 @@ class LocalTranslatorNode(BaseNode):
                 api_request_text,
                 re.DOTALL
             )
+            
             if match_api_request:
                 method = match_api_request.group(1).strip()
                 url = match_api_request.group(2).strip()
-                headers = match_api_request.group(3).strip()
+                headers = match_api_request.group(3).strip() if match_api_request.group(3) else ""
                 body = match_api_request.group(5) if match_api_request.group(5) else "{}"
             else:
                 raise ValueError("API_REQUEST section not found or improperly formatted.")
@@ -198,17 +199,17 @@ class LocalTranslatorNode(BaseNode):
             if method not in valid_methods:
                 raise ValueError(f"Invalid method: {method}. Allowed methods are {valid_methods}.")
 
-            # Parse Headers as a single dictionary
+            # Parse Headers as a single dictionary, handle missing headers
             headers_dict = {}
             if headers:
-                # Remove extra quotes and parse headers into a dictionary
+                # Allow handling empty headers or valid JSON headers
                 header_blocks = re.findall(r'(["\']?)(.*?)(["\']?):\s*(["\']?)(.*?)(["\']?)$', headers, re.MULTILINE)
                 for header in header_blocks:
                     key = header[1].strip().strip('"').strip("'")
                     value = header[4].strip().strip('"').strip("'")
                     headers_dict[key] = value
 
-            # Parse the Body (if present and non-empty)
+            # Parse the Body (if present and non-empty), handle missing or empty bodies
             body_dict = {}
             if body and body.strip() != "{}":
                 try:
@@ -265,8 +266,8 @@ class LocalTranslatorNode(BaseNode):
             
             output_vars_section = match_output_vars.group(1).strip()
 
-            # Parse each output variable and store it in the current step's output variables
-            output_vars = re.findall(r"- Variable Name: ([\w_]+)\s*- Content: (.*)", output_vars_section)
+            # Capture multiline content until the next variable or section
+            output_vars = re.findall(r"- Variable Name: ([\w_]+)\s*- Content:\s*(.*?)(?=\n- Variable Name:|\nDependent_Input_Variables|\nAPI Response|$)", output_vars_section, re.DOTALL)
             if not output_vars:
                 raise ValueError("No output variables found in the Output_Variables section.")
 
@@ -276,9 +277,11 @@ class LocalTranslatorNode(BaseNode):
 
             for var_name, var_value in output_vars:
                 found = False
+                var_value = var_value.strip()  # Strip any trailing spaces or newlines
+
                 for output_var in current_step_data['output_vars']:
                     if output_var['name'] == var_name:
-                        output_var['value'] = var_value  # Store the output variable value
+                        output_var['value'] = var_value  # Store the output variable value exactly as is
                         stored_output_vars.add(var_name)  # Track which variables have been filled
                         used_by_list.extend(output_var['used_by'])  # Collect dependent panel/step info
                         found = True
@@ -295,11 +298,11 @@ class LocalTranslatorNode(BaseNode):
 
             # Now process Dependent_Input_Variables
             match_dependent_vars = re.search(r"Dependent_Input_Variables\s*(.*?)(?=\nAPI Response|$)", api_response_text, re.DOTALL)
-            if match_dependent_vars:
+            if match_dependent_vars and len(used_by_list) > 0:
                 dependent_vars_section = match_dependent_vars.group(1).strip()
 
-                # Parse each dependent variable
-                dependent_vars = re.findall(r"- Variable Name: ([\w_]+)\s*- Panel: (\d+)\s*- Step: (\d+)\s*- Type: (\w+)\s*- Content: (.*)", dependent_vars_section)
+                # Capture multiline content until the next variable or section
+                dependent_vars = re.findall(r"- Variable Name: ([\w_]+)\s*- Panel: (\d+)\s*- Step: (\d+)\s*- Type: (\w+)\s*- Content:\s*(.*?)(?=\n- Variable Name:|\nAPI Response|$)", dependent_vars_section, re.DOTALL)
                 if not dependent_vars:
                     raise ValueError("No dependent input variables found in the Dependent_Input_Variables section.")
 
@@ -317,37 +320,35 @@ class LocalTranslatorNode(BaseNode):
                                 # Check if the type matches
                                 if input_var['type'] != dep_type:
                                     raise ValueError(f"Type mismatch for {dep_var_name} in Panel {dep_panel_no}, Step {dep_step_no}. Expected {input_var['type']}, got {dep_type}.")
-                                # Store the value
-                                input_var['value'] = dep_content
+                                # Store the value exactly as is
+                                input_var['value'] = dep_content.strip()
                                 visited_dependencies.add((dep_panel_no, dep_step_no, dep_var_name))
                     else:
                         raise ValueError(f"Dependent variable {dep_var_name} not found in Panel {dep_panel_no}, Step {dep_step_no}.")
 
                 # Ensure all expected dependent input variables have been assigned
-                # print("used_by_list : ",used_by_list)
                 for use_idx in range(len(used_by_list)):
                     panel = used_by_list[use_idx]['panel']
                     step = used_by_list[use_idx]['step']
-                    # print("panel : ",panel)
-                    # print("step : ",step)
                     step_data = self.group_workflow[str(panel)]['steps'][str(step)]
                     for input_var in step_data['input_vars']:
                         if {"panel": panel_no, "step": step_no} in input_var['dependencies'] and input_var['value'] == "None":
                             raise ValueError(f"Input variable {input_var['name']} in Panel {panel}, Step {step} has not been assigned a value.")
-
+            elif len(used_by_list) > 0:
+                raise ValueError(f"Missing Dependent_Input_Variables for {panel_no}, Step {step_no}")
         else:
             # Handle error cases
             match_error = re.search(r"Error_Explanation\s*\n\s*(.*)", api_response_text, re.DOTALL)
             if not match_error:
                 raise ValueError("Error_Explanation section not found for error response.")
-            
+
             error_explanation = match_error.group(1).strip()
             return {
                 'status_code': status_code,
                 'status_text': status_text,
                 'error_explanation': error_explanation
             }
-        
+
         return self.group_workflow
 
     
@@ -390,7 +391,6 @@ class LocalTranslatorNode(BaseNode):
         Args:
             api_descriptions (dict): Dictionary where the key is the API name and the value is the API description.
         """
-        print('Started workflow for panel ', self.panel_no)
         if not self.group_workflow:
             raise ValueError("No group workflow found for this panel.")
         if not self.panel_workflow:
@@ -405,7 +405,7 @@ class LocalTranslatorNode(BaseNode):
             step_no = s_i+1
             step = self.panel_workflow[str(step_no)]
             api_outputs_list = []
-            # print(f"Processing Step {step_no} for API: {step['api']}")
+            print(f"Processing Step {step_no} for API: {step['api']}")
             # if api is perplexity/plot agent/text to image then we will use hardcoded
             if step['api'] in ["Perplexity", "PlotAgent", "TextToImage"]:
                 if step['api'] == "Perplexity":
@@ -413,6 +413,8 @@ class LocalTranslatorNode(BaseNode):
                         raise ValueError("With perplexity api we ony expected a single input variable.")
                     api_output = perplexity_api_response(step['input_vars'][0]['value'])
                     api_outputs_list.append(api_output)
+                else:
+                    break
             else:
                 ###########
                 # API_RUNNING Part with Error Handling
@@ -428,7 +430,7 @@ class LocalTranslatorNode(BaseNode):
                 input_data_list.append(input_data)
                 # print(f"Prepared input for step {step['step']}: {input_data}")
 
-                # print("input_data : ",input_data)
+                print("input_data : ",input_data)
 
                 # generating the api request from the LLM
                 self.chat_history.append({"role": "system", "content": self.api_running_prompt}) # system prompt for workflow_creation
@@ -440,15 +442,15 @@ class LocalTranslatorNode(BaseNode):
                 while not run_success and counter < 5:
                     try:
                         api_request_llm = self.generate()
-                        # print("api_request_llm : ",api_request_llm)
+                        print("api_request_llm : ",api_request_llm)
                         # print(cause_error)
                         parsed_api_request = self.parse_api_request(api_request_llm)
-                        # print("parsed_api_request : ",parsed_api_request)
+                        print("parsed_api_request : ",parsed_api_request)
                         run_success = True
                     except Exception as e:
                         error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT and API_REQUEST without any other details before or after.:\n {str(e)}' 
                         self.chat_history.append({"role": "user", "content": error_message})
-                        # print("error_message : ",error_message)
+                        print("error_message : ",error_message)
                     
                     counter += 1
 
@@ -456,37 +458,48 @@ class LocalTranslatorNode(BaseNode):
                     api_success_bool, api_output = self.requests_func(parsed_api_request['api_requests'][api_req_i]['method'], parsed_api_request['api_requests'][api_req_i]['url'], parsed_api_request['api_requests'][api_req_i]['headers'], parsed_api_request['api_requests'][api_req_i]['body'])
                     if not api_success_bool:
                         # error handling part here
+                        print("\napi_output : ",api_output)
                         raise NotImplementedError
 
                     api_outputs_list.append(api_output)
                 
             ###########
             # API_OUTPUT, API_OUTPUT_DEPENDENCY Part with Error Handling
-            # print("api_output : ",api_output)
+            print("api_output : ",api_output)
 
             # give the api_output to LLM and ask it to first verify if it seems plausile for our expectations from the api, then save the relevant part in the right format
             # additionally the LLM Agent will check if the api output has enough information such that we can fulfil the input variable requirement for future steps which depend on its output, and retrieve the relevant information and save it in the right format
-            api_output_llm_input = self.prepare_input_for_api_output(api_outputs_list[0], self.panel_no, step_no)
-            # print("\napi_output_llm_input : ",api_output_llm_input)
+            # api_output_llm_input = self.prepare_input_for_api_output(api_outputs_list[0], self.panel_no, step_no)
+            api_output_llm_input = self.prepare_input_for_api_output(api_outputs_list, self.panel_no, step_no)
+            print("\napi_output_llm_input : ",api_output_llm_input)
             # generating the api response format from the LLM
             self.chat_history.append({"role": "system", "content": self.api_output_prompt}) # system prompt for workflow_creation
             self.chat_history.append({"role": "user", "content": api_output_llm_input })
-            api_output_llm_output = self.generate()
-            print("\napi_output_llm_output : ",api_output_llm_output)
 
 
-            api_parsed_output = self.parse_and_store_api_response(api_output_llm_output, self.panel_no, step_no)
-
-            # print("api_parsed_output : ",api_parsed_output)
+            run_success = False
+            counter = 0
+            while not run_success and counter < 5:
+                try:
+                    api_output_llm_output = self.generate()
+                    print("\napi_output_llm_output : ",api_output_llm_output)
+                    api_parsed_output = self.parse_and_store_api_response(api_output_llm_output, self.panel_no, step_no)
+                    print("api_parsed_output : ",api_parsed_output)
+                    run_success = True
+                except Exception as e:
+                    error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT and API_RESPONSE without any other details before or after.:\n {str(e)}' 
+                    self.chat_history.append({"role": "user", "content": error_message})
+                    print("error_message : ",error_message)
 
             with open(f"workflow_updated_{self.panel_no}.json", "w") as json_file:
                 json.dump(api_parsed_output, json_file, indent=4)
 
+            
+            # break
+
         print('Completed workflow for panel ', self.panel_no)
         self.save_chat_history(f"chat_history_{self.panel_no}.txt")
 
-            
-            # break 
             
     async def run_in_thread(self):
         loop = asyncio.get_event_loop()
