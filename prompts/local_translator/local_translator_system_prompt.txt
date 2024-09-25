@@ -19,7 +19,7 @@ As a Local Translator Agent, your primary responsibility is to execute and final
 
 ---
 
-#### 2. API_OUTPUT:
+#### 2. API_OUTPUT_AND_DEPENDENCY:
 
    - Retrieve and Process Output:
      - Retrieve relevant output data from each API call, ensuring it is formatted correctly and contains all necessary information for the next steps or for the final panel output.
@@ -30,10 +30,6 @@ As a Local Translator Agent, your primary responsibility is to execute and final
      - Save API outputs for use in subsequent API calls or for display on the panel.
      - Ensure the output is ready for further API calls within the same workflow or for final user display.
 
----
-
-#### 3. API_OUTPUT_DEPENDENCY:
-
    - Handle Dependencies Between APIs:
      - Ensure that the output of one API call, if required by another API or panel, is correctly formatted and available for use.
      - If a dependency is missing or incomplete, raise an error to halt the process until the issue is resolved.
@@ -43,7 +39,6 @@ As a Local Translator Agent, your primary responsibility is to execute and final
 #### 4. API_ERRORS:
 
    - Error Logging and Handling:
-     - Log all API errors encountered during execution, including details of the request (e.g., parameters, headers, request body).
      - Manage retries for API calls if appropriate based on error types (e.g., timeout, rate limits, or temporary server unavailability).
      - Types of Errors:
        - Client Errors (4xx): Invalid requests due to incorrect inputs or parameters.

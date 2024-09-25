@@ -1,27 +1,132 @@
 {
-    "2": {
-        "panel_description": "Display the top attractions to visit in Seattle, USA.",
+    "1": {
+        "panel_description": "Display the top 5 vacation spots in Europe.",
         "steps": {
             "1": {
                 "api": "Perplexity",
-                "handles": "Searches for the best spots to visit in Seattle, USA",
+                "handles": "Retrieves a list of top 5 vacation destinations in Europe",
                 "input_vars": [
                     {
-                        "name": "query_seattle_attractions",
+                        "name": "query_vacation_spots",
                         "parameter": "query",
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Query to find the best spots to visit in Seattle, USA",
-                        "value": "What are the best spots to visit in Seattle, USA?",
+                        "description": "Query to get the top 5 vacation spots in Europe",
+                        "value": "What are the top 5 vacation spots in Europe?",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "seattle_attractions",
-                        "description": "List of top attractions in Seattle, USA",
+                        "name": "vacation_spots_list",
+                        "description": "List of top 5 recommended vacation spots in Europe",
+                        "used_by": [
+                            {
+                                "panel": 2,
+                                "step": 1
+                            }
+                        ],
+                        "value": "\"When considering the top vacation spots in Europe, several destinations consistently stand out for their historical significance, cultural richness, and overall tourist appeal. Here are five of the most highly recommended places:\n            Rome, Italy: Rome is often cited as a must-visit destination in Europe. It is home to ancient treasures such as the Colosseum, the Pantheon, the Roman Forum, and the Vatican, including the Sistine Chapel and St. Peter's Basilica. The city offers a blend of ancient history, art, and modern Italian culture, making it a comprehensive and enriching experience.\n            Paris, France: Known as the City of Light, Paris is famous for its iconic landmarks like the Eiffel Tower, Arc de Triomphe, and Notre Dame Cathedral. The city is also renowned for its art museums, including the Louvre and Mus\u00e9e d'Orsay. The charming streets, cafes, and romantic atmosphere make Paris a favorite among tourists.\n            Prague, Czech Republic: Prague is celebrated for its well-preserved medieval architecture, including the Charles Bridge, the Old Town Square with its Astronomical Clock, and the vast Prague Castle complex. The city offers a rich cultural experience with its historic sites, vibrant beer culture, and affordable prices.\n            Barcelona, Spain: Barcelona is a popular destination known for its rich culture, beautiful beaches, and stunning architecture by Antoni Gaud\u00ed, such as the Sagrada Fam\u00edlia and Park G\u00fcell. The city's vibrant nightlife, delicious Catalan cuisine, and historic sites like La Rambla and the Gothic Quarter make it an attractive choice for travelers.\n            Venice, Italy: Venice is a unique and magical city built on water, famous for its canals, ornate bridges, and stunning St. Mark's Square. Visitors can explore the Doge's Palace, take a gondola ride, and admire the city's intricate architecture and art collections at the Gallerie dell'Accademia and the Peggy Guggenheim Collection. The city's romantic atmosphere and historical significance make it a top destination.\""
+                    }
+                ]
+            }
+        }
+    },
+    "2": {
+        "panel_description": "Display the current weather in the top 5 European vacation spots.",
+        "steps": {
+            "1": {
+                "api": "Perplexity",
+                "handles": "Fetches latitude and longitude for each vacation spot",
+                "input_vars": [
+                    {
+                        "name": "vacation_spots_list",
+                        "parameter": "query",
+                        "type": "string",
+                        "source": "API_Output (Panel 1, Step 1)",
+                        "description": "List of vacation spots from Panel 1",
+                        "value": "[\"Rome, Italy\", \"Paris, France\", \"Prague, Czech Republic\", \"Barcelona, Spain\", \"Venice, Italy\"]",
+                        "dependencies": [
+                            {
+                                "panel": 1,
+                                "step": 1
+                            }
+                        ]
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "latitude",
+                        "description": "Latitude for each vacation spot",
+                        "used_by": [
+                            {
+                                "panel": 2,
+                                "step": 2
+                            }
+                        ],
+                        "value": "{\"Rome, Italy\": 41.902782, \"Paris, France\": 48.8567, \"Prague, Czech Republic\": 50.0755, \"Barcelona, Spain\": 41.390205, \"Venice, Italy\": 45.437877}"
+                    },
+                    {
+                        "name": "longitude",
+                        "description": "Longitude for each vacation spot",
+                        "used_by": [
+                            {
+                                "panel": 2,
+                                "step": 2
+                            }
+                        ],
+                        "value": "{\"Rome, Italy\": 12.496366, \"Paris, France\": 2.3510, \"Prague, Czech Republic\": 14.4378, \"Barcelona, Spain\": 2.154007, \"Venice, Italy\": 12.332748}"
+                    }
+                ]
+            },
+            "2": {
+                "api": "Open-Meteo",
+                "handles": "Retrieves current weather data for each location",
+                "input_vars": [
+                    {
+                        "name": "latitude",
+                        "parameter": "latitude",
+                        "type": "float",
+                        "source": "API_Output (Panel 2, Step 1)",
+                        "description": "Latitude of the vacation spot",
+                        "value": "{\"Rome, Italy\": 41.902782, \"Paris, France\": 48.8567, \"Prague, Czech Republic\": 50.0755, \"Barcelona, Spain\": 41.390205, \"Venice, Italy\": 45.437877}",
+                        "dependencies": [
+                            {
+                                "panel": 2,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "longitude",
+                        "parameter": "longitude",
+                        "type": "float",
+                        "source": "API_Output (Panel 2, Step 1)",
+                        "description": "Longitude of the vacation spot",
+                        "value": "{\"Rome, Italy\": 12.496366, \"Paris, France\": 2.3510, \"Prague, Czech Republic\": 14.4378, \"Barcelona, Spain\": 2.154007, \"Venice, Italy\": 12.332748}",
+                        "dependencies": [
+                            {
+                                "panel": 2,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "current_weather_flag",
+                        "parameter": "current_weather",
+                        "type": "boolean",
+                        "source": "LLM_Generated",
+                        "description": "Flag to include current weather data",
+                        "value": "true",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "current_weather_data",
+                        "description": "Current weather conditions for each vacation spot",
                         "used_by": [],
-                        "value": "\"Seattle, known for its vibrant culture, stunning natural beauty, and rich history, offers a wide range of attractions that cater to various interests. Here are some of the best spots to visit in Seattle:\n    - Pike Place Market: This historic market, established in 1907, is a must-visit for its lively atmosphere, fresh produce, seafood, and local crafts. It's a great place to explore, shop, and dine.\n    - Space Needle: Built for the 1962 World Fair, the Space Needle is an iconic landmark and a great spot for panoramic views of the city. You can also dine at the top for a unique experience.\n    - Seattle Center: Located around the Space Needle, the Seattle Center is a hub for several attractions, including the Pacific Science Center, which offers interactive science exhibits, and Chihuly Garden and Glass, showcasing the stunning glass artwork of Dale Chihuly.\n    - Museum of Pop Culture (MoPop): Designed by architect Frank Gehry, MoPop is a unique building that houses a variety of exhibits on music, science fiction, pop culture, and more. It's a great place to explore different themes and interests.\n    - Museum of Flight: For aviation enthusiasts, the Museum of Flight is a treasure trove of historical aircraft and space technology. It includes exhibits like the Red Barn, the birthplace of Boeing, and a space shuttle trainer.\n    - Downtown Waterfront: The waterfront area features several attractions, including the Seattle Great Wheel, a 175-foot tall Ferris wheel with enclosed gondola cabins offering great views of Elliot Bay and the city skyline. You can also visit the Seattle Aquarium and take a harbor cruise with Argosy Cruises.\n    - Museum of History & Industry (MOHAI): MOHAI is dedicated to preserving and teaching the history of Seattle and the Puget Sound region. It includes the Center for Wooden Boats and offers free vintage-boat rides on Sundays.\n    - Seattle Art Museum: Located in downtown Seattle, this museum features a diverse collection of art, including European master paintings, ancient Asian artwork, and contemporary sculptures. Admission is free on the first Thursday of each month.\n    - Olympic Sculpture Park: This waterfront park is home to a collection of large-scale sculptures and offers beautiful views of the Olympic Mountains and Puget Sound. It's a great place for a leisurely walk or picnic.\n    - Washington State Ferries: Taking a ferry ride is a quintessential Seattle experience, offering stunning views of the city skyline, Puget Sound, and the surrounding islands.\n    - Underground Walking Tour: For a unique historical perspective, the Underground Walking Tour takes you through the hidden underground tunnels and spaces of Seattle's historic district.\n    These attractions provide a well-rounded experience of Seattle's culture, history, and natural beauty, ensuring there's something for everyone to enjoy.\""
+                        "value": "{\n      \"Rome, Italy\": {\"temperature\": 18.5, \"windspeed\": 3.3, \"winddirection\": 41, \"weathercode\": 80},\n      \"Paris, France\": {\"temperature\": 13.7, \"windspeed\": 9.4, \"winddirection\": 198, \"weathercode\": 3},\n      \"Prague, Czech Republic\": {\"temperature\": 14.4, \"windspeed\": 7.2, \"winddirection\": 186, \"weathercode\": 2},\n      \"Barcelona, Spain\": {\"temperature\": 17.4, \"windspeed\": 4.4, \"winddirection\": 325, \"weathercode\": 2},\n      \"Venice, Italy\": {\"temperature\": 14.5, \"windspeed\": 5.4, \"winddirection\": 360, \"weathercode\": 45}\n    }"
                     }
                 ]
             }

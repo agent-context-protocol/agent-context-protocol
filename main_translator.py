@@ -1,12 +1,15 @@
 from base import BaseNode
 import re
 import json
+import asyncio
 
 class MainTranslatorNode(BaseNode):
     def __init__(self, node_name, system_prompt = None):
         super().__init__(node_name, system_prompt)
         self.get_system_prompts()
         self.clusters = {}
+        self.lock = asyncio.Lock()
+        self.queue = asyncio.Queue()
 
     def get_system_prompts(self):
         # workflow_creation_prompt
@@ -371,3 +374,26 @@ class MainTranslatorNode(BaseNode):
         with open("workflow.json", "w") as json_file:
             json.dump(workflow_dict, json_file, indent=4)
         return workflow_dict
+    
+    async def communicate(self, update, local_translator_id):
+        await self.queue.put((update, local_translator_id))
+        
+    async def process_queue(self):
+        while True:
+            async with self.lock:
+                if self.queue.empty():
+                    await asyncio.sleep(0.1)
+                    continue
+                update, local_translator_id = await self.queue.get()
+                
+                # Process the update here
+                # This is where you'd put the logic to handle the communication
+                print(f"Processing update from Local Translator {local_translator_id}")
+                
+                # Simulate some processing time
+                await asyncio.sleep(1)
+                
+                print(f"Finished processing update from Local Translator {local_translator_id}")
+            
+            # Release the lock and allow a short time for other tasks to acquire it
+            await asyncio.sleep(0)

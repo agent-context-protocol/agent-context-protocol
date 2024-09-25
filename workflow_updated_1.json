@@ -1,74 +1,110 @@
 {
     "1": {
-        "panel_description": "Display the current weather in Seattle, USA.",
+        "panel_description": "Display the top 5 vacation spots in Europe.",
         "steps": {
             "1": {
                 "api": "Perplexity",
-                "handles": "Retrieves latitude and longitude of Seattle, USA",
+                "handles": "Retrieves a list of top 5 vacation destinations in Europe",
                 "input_vars": [
                     {
-                        "name": "query_seattle_coordinates",
+                        "name": "query_vacation_spots",
                         "parameter": "query",
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Query to get the coordinates of Seattle, USA",
-                        "value": "What are the latitude and longitude of Seattle, USA?",
+                        "description": "Query to get the top 5 vacation spots in Europe",
+                        "value": "What are the top 5 vacation spots in Europe?",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "latitude_seattle",
-                        "description": "Latitude of Seattle, USA",
+                        "name": "vacation_spots_list",
+                        "description": "List of top 5 recommended vacation spots in Europe",
                         "used_by": [
                             {
-                                "panel": 1,
-                                "step": 2
+                                "panel": 2,
+                                "step": 1
                             }
                         ],
-                        "value": "47.607"
-                    },
-                    {
-                        "name": "longitude_seattle",
-                        "description": "Longitude of Seattle, USA",
-                        "used_by": [
-                            {
-                                "panel": 1,
-                                "step": 2
-                            }
-                        ],
-                        "value": "-122.333"
+                        "value": "\"When considering the top vacation spots in Europe, several destinations consistently stand out for their historical significance, cultural richness, and overall tourist appeal. Here are five of the most highly recommended places:\n            Rome, Italy: Rome is often cited as a must-visit destination in Europe. It is home to ancient treasures such as the Colosseum, the Pantheon, the Roman Forum, and the Vatican, including the Sistine Chapel and St. Peter's Basilica. The city offers a blend of ancient history, art, and modern Italian culture, making it a comprehensive and enriching experience.\n            Paris, France: Known as the City of Light, Paris is famous for its iconic landmarks like the Eiffel Tower, Arc de Triomphe, and Notre Dame Cathedral. The city is also renowned for its art museums, including the Louvre and Mus\u00e9e d'Orsay. The charming streets, cafes, and romantic atmosphere make Paris a favorite among tourists.\n            Prague, Czech Republic: Prague is celebrated for its well-preserved medieval architecture, including the Charles Bridge, the Old Town Square with its Astronomical Clock, and the vast Prague Castle complex. The city offers a rich cultural experience with its historic sites, vibrant beer culture, and affordable prices.\n            Barcelona, Spain: Barcelona is a popular destination known for its rich culture, beautiful beaches, and stunning architecture by Antoni Gaud\u00ed, such as the Sagrada Fam\u00edlia and Park G\u00fcell. The city's vibrant nightlife, delicious Catalan cuisine, and historic sites like La Rambla and the Gothic Quarter make it an attractive choice for travelers.\n            Venice, Italy: Venice is a unique and magical city built on water, famous for its canals, ornate bridges, and stunning St. Mark's Square. Visitors can explore the Doge's Palace, take a gondola ride, and admire the city's intricate architecture and art collections at the Gallerie dell'Accademia and the Peggy Guggenheim Collection. The city's romantic atmosphere and historical significance make it a top destination.\""
                     }
                 ]
-            },
-            "2": {
-                "api": "Open-Meteo",
-                "handles": "Retrieves current weather data for Seattle, USA",
+            }
+        }
+    },
+    "2": {
+        "panel_description": "Display the current weather in the top 5 European vacation spots.",
+        "steps": {
+            "1": {
+                "api": "Perplexity",
+                "handles": "Fetches latitude and longitude for each vacation spot",
                 "input_vars": [
                     {
-                        "name": "latitude_seattle",
-                        "parameter": "latitude",
-                        "type": "float",
+                        "name": "vacation_spots_list",
+                        "parameter": "query",
+                        "type": "string",
                         "source": "API_Output (Panel 1, Step 1)",
-                        "description": "Latitude of Seattle, USA",
-                        "value": "47.607",
+                        "description": "List of vacation spots from Panel 1",
+                        "value": "[\"Rome, Italy\", \"Paris, France\", \"Prague, Czech Republic\", \"Barcelona, Spain\", \"Venice, Italy\"]",
                         "dependencies": [
                             {
                                 "panel": 1,
                                 "step": 1
                             }
                         ]
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "latitude",
+                        "description": "Latitude for each vacation spot",
+                        "used_by": [
+                            {
+                                "panel": 2,
+                                "step": 2
+                            }
+                        ]
                     },
                     {
-                        "name": "longitude_seattle",
-                        "parameter": "longitude",
+                        "name": "longitude",
+                        "description": "Longitude for each vacation spot",
+                        "used_by": [
+                            {
+                                "panel": 2,
+                                "step": 2
+                            }
+                        ]
+                    }
+                ]
+            },
+            "2": {
+                "api": "Open-Meteo",
+                "handles": "Retrieves current weather data for each location",
+                "input_vars": [
+                    {
+                        "name": "latitude",
+                        "parameter": "latitude",
                         "type": "float",
-                        "source": "API_Output (Panel 1, Step 1)",
-                        "description": "Longitude of Seattle, USA",
-                        "value": "-122.333",
+                        "source": "API_Output (Panel 2, Step 1)",
+                        "description": "Latitude of the vacation spot",
+                        "value": "None",
                         "dependencies": [
                             {
-                                "panel": 1,
+                                "panel": 2,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "longitude",
+                        "parameter": "longitude",
+                        "type": "float",
+                        "source": "API_Output (Panel 2, Step 1)",
+                        "description": "Longitude of the vacation spot",
+                        "value": "None",
+                        "dependencies": [
+                            {
+                                "panel": 2,
                                 "step": 1
                             }
                         ]
@@ -85,10 +121,9 @@
                 ],
                 "output_vars": [
                     {
-                        "name": "current_weather_seattle",
-                        "description": "Current weather conditions in Seattle, USA",
-                        "used_by": [],
-                        "value": "{\n      \"temperature\": 16.5,\n      \"windspeed\": 7.2,\n      \"winddirection\": 186,\n      \"weathercode\": 3,\n      \"time\": \"2024-09-23T16:30\"\n    }"
+                        "name": "current_weather_data",
+                        "description": "Current weather conditions for each vacation spot",
+                        "used_by": []
                     }
                 ]
             }
