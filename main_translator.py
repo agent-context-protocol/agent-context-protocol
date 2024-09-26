@@ -11,10 +11,16 @@ class MainTranslatorNode(BaseNode):
         self.lock = asyncio.Lock()
         self.queue = asyncio.Queue()
 
+        self.unique_apis = {}
+
     def get_system_prompts(self):
         # workflow_creation_prompt
         with open('prompts/main_translator/workflow_creation_prompt.txt', 'r') as file:
             self.workflow_creation_prompt = file.read()
+
+        # workflow_creation_prompt
+        with open('prompts/main_translator/status_assistance_prompt.txt', 'r') as file:
+            self.status_assistance_prompt = file.read()
 
     ########################
     # ALL THE PARSING FUNCTIONS WILL BE HERE
@@ -284,6 +290,49 @@ class MainTranslatorNode(BaseNode):
 
         # Return the chain_of_thought and workflows
         return chain_of_thought, workflows
+    
+    def parse_status_assistance_output(self, updated_workflow):
+        # Initialize the result dictionary
+        result = {
+            'chain_of_thought': '',
+            'chosen_action': '',
+            'workflow': None  # This will only be filled if the chosen action is MODIFY
+        }
+
+        # Split the input string into sections using regular expressions
+        sections = re.split(r'\$\$CHAIN_OF_THOUGHT\$\$|\$\$CHOSEN_ACTION\$\$|\$\$WORKFLOW\$\$', updated_workflow)
+
+        # Check that at least $$CHAIN_OF_THOUGHT$$ and $$CHOSEN_ACTION$$ exist
+        if len(sections) < 3:
+            raise ValueError("The output must contain $$CHAIN_OF_THOUGHT$$ and $$CHOSEN_ACTION$$ sections.")
+
+        # Parse the chain of thought section
+        result['chain_of_thought'] = sections[1].strip()
+
+        # Parse the chosen action section
+        chosen_action_text = sections[2].strip()
+        if "MODIFY" in chosen_action_text:
+            result['chosen_action'] = 'MODIFY'
+        elif "DROP_PANEL" in chosen_action_text:
+            result['chosen_action'] = 'DROP_PANEL'
+        else:
+            raise ValueError("The $$CHOSEN_ACTION$$ section must specify either MODIFY or DROP_PANEL.")
+
+        # If the action is MODIFY, we should also parse the workflow section
+        if result['chosen_action'] == 'MODIFY':
+            if len(sections) < 4:
+                raise ValueError("The output must contain a $$WORKFLOW$$ section if MODIFY is chosen.")
+            workflow_text = sections[3].strip()
+
+            # Parse the workflow section by passing it to the existing workflow parser
+            dummy_chain_of_thought = "$$CHAIN_OF_THOUGHT$$\nFiller space"
+            full_workflow_text = f"{dummy_chain_of_thought}\n$$WORKFLOW$$\n{workflow_text}"
+
+            # Call the existing workflow parser and save the parsed workflow
+            _, result['workflow'] = self.parse_main_translator_workflow(full_workflow_text)
+
+        return result
+
 
 
 
@@ -324,6 +373,8 @@ class MainTranslatorNode(BaseNode):
                     }
             formatted_string += "\n"  # Add a newline after each panel
 
+        self.unique_apis = unique_apis
+
         # Now add the full details of each unique API at the end
         formatted_string += "**Description of APIs:**\n"
         api_id = 1
@@ -337,7 +388,68 @@ class MainTranslatorNode(BaseNode):
             api_id += 1
 
         return formatted_string
+    
+    def make_input_status_update(self, group_workflow_dict, status_update_dict):
+        result = []
 
+        # Add Group Workflow header
+        result.append("Group Workflow:\n")
+
+        # Process each panel's workflow
+        for panel_no, panel_data in group_workflow_dict.items():
+            result.append(f"Workflow for Panel {panel_no}:\n")
+            result.append(f"Panel Description: {panel_data['panel_description']}\n")
+            result.append("\nWorkflow Steps:\n")
+
+            # Process each step in the panel
+            for step_no, step_data in panel_data['steps'].items():
+                result.append(f"Step {step_no}")
+                result.append(f"- API: {step_data['api']}")
+                result.append(f"- Handles: {step_data['handles']}")
+                
+                # Input Variables
+                result.append("- Input Variables:")
+                for input_var in step_data['input_vars']:
+                    result.append(f"  - Name: {input_var['name']}")
+                    result.append(f"    - Parameter: {input_var['parameter']}")
+                    result.append(f"    - Type: {input_var['type']}")
+                    result.append(f"    - Source: {input_var['source']}")
+                    result.append(f"    - Description: {input_var['description']}")
+                    result.append(f"    - Value: {input_var.get('value', 'None')}")
+
+                # Output Variables
+                result.append("- Output Variables:")
+                for output_var in step_data['output_vars']:
+                    result.append(f"  - Name: {output_var['name']}")
+                    result.append(f"    - Description: {output_var['description']}")
+
+            result.append("\n")  # Add spacing between workflows
+
+        # Add Available API Descriptions section
+        if hasattr(self, 'unique_apis'):
+            result.append("Available API Descriptions:\n")
+            api_id = 1
+            for api_name, api_details in self.unique_apis.items():
+                result.append(f"{api_id}. {api_name}")
+                result.append(f"   - **Input:** {api_details['Input']}")
+                result.append(f"   - **Output:** {api_details['Output']}")
+                result.append(f"   - **Use:** {api_details['Use']}\n")
+                api_id += 1
+            result.append("\n")  # Add spacing
+
+        # Add Status Update section
+        result.append("Status Update:\n")
+        result.append(status_update_dict['status_update']['string'])
+
+        # Add Assistance Request section if present
+        if status_update_dict.get('assistance_request') and status_update_dict['assistance_request'].get('string'):
+            result.append("\nAssistance Request:\n")
+            result.append(status_update_dict['assistance_request']['string'])
+
+        # Return the final formatted string
+        return "\n".join(result)
+
+    ########################
     def setup(self, query, panels_list):
         # Logic to create workflow and initialize local translator instances
         # We can use self.chat_history to provide context
@@ -363,8 +475,7 @@ class MainTranslatorNode(BaseNode):
             counter += 1
         
         if not run_success:
-            print("counter : ",counter)
-            print(cause_error)
+            raise ValueError("SOmething is wrong with the LLM or the parsing main translator workflow. An error is not expected here")
             
         print("\llm_response_workflow:\n")
         print(llm_response_workflow)
@@ -375,8 +486,8 @@ class MainTranslatorNode(BaseNode):
             json.dump(workflow_dict, json_file, indent=4)
         return workflow_dict
     
-    async def communicate(self, update, local_translator_id):
-        await self.queue.put((update, local_translator_id))
+    async def communicate(self, update, local_translator_id, local_translator_object):
+        await self.queue.put((update, local_translator_id, local_translator_object))
         
     async def process_queue(self):
         while True:
@@ -384,14 +495,44 @@ class MainTranslatorNode(BaseNode):
                 if self.queue.empty():
                     await asyncio.sleep(0.1)
                     continue
-                update, local_translator_id = await self.queue.get()
+                status_update_dict, local_translator_id, local_translator_object = await self.queue.get()
                 
                 # Process the update here
                 # This is where you'd put the logic to handle the communication
                 print(f"Processing update from Local Translator {local_translator_id}")
-                
+
                 # Simulate some processing time
                 await asyncio.sleep(1)
+
+                # status_assistance_llm_input = self.make_input_status_update(local_translator_object.group_workflow, status_update_dict)
+
+                # # generating the workflow from the LLM
+                # self.chat_history.append({"role": "system", "content": self.status_assistance_prompt}) # system prompt for workflow_creation
+                # self.chat_history.append({"role": "user", "content": status_assistance_llm_input})
+
+                # run_success = False
+                # counter = 0
+                # while not run_success and counter < 5:
+                #     counter += 1
+                #     try:
+                #         updated_workflow = self.generate()
+                #         print("\updated_workflow : ",updated_workflow)
+                #         parsed_updated_workflow = self.parse_status_assistance_output(updated_workflow)
+                #         print("\parsed_updated_workflow : ", parsed_updated_workflow)
+                #     except Exception as e:
+                #         error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT, CHOSEN_ACTION and/or WORKFLOW without any other details before or after.:\n {str(e)}' 
+                #         self.chat_history.append({"role": "user", "content": error_message})
+                #         print("error_message : ",error_message)
+
+                # if not run_success:
+                #     raise ValueError("Something is wrong with the LLM or the parsing status_assistance in main translator. An error is not expected here")
+
+                # if parsed_updated_workflow['chosen_action'] == "DROP_PANEL":
+                #     raise NotImplemented
+                # elif parsed_updated_workflow['chosen_action'] == "MODIFY":
+                #     local_translator_object.group_workflow = 
+                # else:
+                #     raise ValueError("The chosen_action key must specify either MODIFY or DROP_PANEL.")
                 
                 print(f"Finished processing update from Local Translator {local_translator_id}")
             

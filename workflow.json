@@ -1,76 +1,39 @@
 {
     "1": {
         "1": {
-            "panel_description": "Display the top 5 vacation spots in Europe.",
+            "panel_description": "Display the current weather forecast for Seattle, USA.",
             "steps": {
                 "1": {
                     "api": "Perplexity",
-                    "handles": "Retrieves a list of top 5 vacation destinations in Europe",
+                    "handles": "Retrieves latitude and longitude for Seattle, USA",
                     "input_vars": [
                         {
-                            "name": "query_vacation_spots",
+                            "name": "query_seattle_coordinates",
                             "parameter": "query",
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to get the top 5 vacation spots in Europe",
-                            "value": "What are the top 5 vacation spots in Europe?",
+                            "description": "Query to get the coordinates of Seattle, USA",
+                            "value": "What are the latitude and longitude of Seattle, USA?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "vacation_spots_list",
-                            "description": "List of top 5 recommended vacation spots in Europe",
+                            "name": "latitude_seattle",
+                            "description": "Latitude of Seattle, USA",
                             "used_by": [
-                                {
-                                    "panel": 2,
-                                    "step": 1
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        },
-        "2": {
-            "panel_description": "Display the current weather in the top 5 European vacation spots.",
-            "steps": {
-                "1": {
-                    "api": "Perplexity",
-                    "handles": "Fetches latitude and longitude for each vacation spot",
-                    "input_vars": [
-                        {
-                            "name": "vacation_spots_list",
-                            "parameter": "query",
-                            "type": "string",
-                            "source": "API_Output (Panel 1, Step 1)",
-                            "description": "List of vacation spots from Panel 1",
-                            "value": "None",
-                            "dependencies": [
                                 {
                                     "panel": 1,
-                                    "step": 1
-                                }
-                            ]
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "latitude",
-                            "description": "Latitude for each vacation spot",
-                            "used_by": [
-                                {
-                                    "panel": 2,
                                     "step": 2
                                 }
                             ]
                         },
                         {
-                            "name": "longitude",
-                            "description": "Longitude for each vacation spot",
+                            "name": "longitude_seattle",
+                            "description": "Longitude of Seattle, USA",
                             "used_by": [
                                 {
-                                    "panel": 2,
+                                    "panel": 1,
                                     "step": 2
                                 }
                             ]
@@ -79,32 +42,32 @@
                 },
                 "2": {
                     "api": "Open-Meteo",
-                    "handles": "Retrieves current weather data for each location",
+                    "handles": "Retrieves current weather data for Seattle, USA",
                     "input_vars": [
                         {
-                            "name": "latitude",
+                            "name": "latitude_seattle",
                             "parameter": "latitude",
                             "type": "float",
-                            "source": "API_Output (Panel 2, Step 1)",
-                            "description": "Latitude of the vacation spot",
+                            "source": "API_Output (Panel 1, Step 1)",
+                            "description": "Latitude of Seattle, USA",
                             "value": "None",
                             "dependencies": [
                                 {
-                                    "panel": 2,
+                                    "panel": 1,
                                     "step": 1
                                 }
                             ]
                         },
                         {
-                            "name": "longitude",
+                            "name": "longitude_seattle",
                             "parameter": "longitude",
                             "type": "float",
-                            "source": "API_Output (Panel 2, Step 1)",
-                            "description": "Longitude of the vacation spot",
+                            "source": "API_Output (Panel 1, Step 1)",
+                            "description": "Longitude of Seattle, USA",
                             "value": "None",
                             "dependencies": [
                                 {
-                                    "panel": 2,
+                                    "panel": 1,
                                     "step": 1
                                 }
                             ]
@@ -121,8 +84,8 @@
                     ],
                     "output_vars": [
                         {
-                            "name": "current_weather_data",
-                            "description": "Current weather conditions for each vacation spot",
+                            "name": "current_weather_seattle",
+                            "description": "Current weather conditions in Seattle, USA",
                             "used_by": []
                         }
                     ]

@@ -17,6 +17,7 @@ def perplexity_api_response(dict_body):
 
     response_dict = {}
 
+    # if True or "query" not in dict_body and "preplexity_ai_key" not in dict_body:
     if "query" not in dict_body and "preplexity_ai_key" not in dict_body:
         response_dict["status_code"] = 400
         response_dict["text"] = "Missing required parameters query and preplexity_ai_key"

@@ -99,10 +99,10 @@ class MainOrchestrator:
 
 async def main():
     orchestrator = MainOrchestrator()
-    # await orchestrator.run("what is the weather in seattle, usa")
+    await orchestrator.run("what is the weather in seattle, usa")
     # await orchestrator.run("what is the weather in seattle, usa. Also what are the best spots to visit in seattle?")
-    await orchestrator.run("tell me top 5 vacation spots in europe and current weather there")
-    # await orchestrator.run("how to cook cheese burger?")
+    # await orchestrator.run("tell me top 30 vacation spots in europe and current weather there no illustrations")
+    # await orchestrator.run("What are the top 5 most deadly war areas in the world? Please retrieve news for them each of them as well please.")
 
 if __name__ == "__main__":
     asyncio.run(main())
