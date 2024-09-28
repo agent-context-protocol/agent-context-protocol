@@ -10,6 +10,7 @@ class MainTranslatorNode(BaseNode):
         self.clusters = {}
         self.lock = asyncio.Lock()
         self.queue = asyncio.Queue()
+        self.workflow = None
 
         self.unique_apis = {}
 
@@ -484,6 +485,7 @@ class MainTranslatorNode(BaseNode):
         # Write to a JSON file
         with open("workflow.json", "w") as json_file:
             json.dump(workflow_dict, json_file, indent=4)
+        self.workflow = workflow_dict
         return workflow_dict
     
     async def communicate(self, update, local_translator_id, local_translator_object):

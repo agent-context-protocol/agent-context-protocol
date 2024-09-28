@@ -123,3 +123,4 @@ IMPORTANT:
 2. You can create any no. of panels as you want. But, Do not create unnecessary panels, the panels should be relevant the user's original query. 
 3. Only you have access to the user's data hence do not refer to the personal info in the description of the panels as variables. Do not reference user-specific data directly in the panel descriptions, even though you are using that data to customize the content. For example, instead of saying, "recommend locations around the user's home," specify the name of the city itself as the home location in the description of the panel. Another example is instead of mentioning "The articles should be sorted by relevance to the user's query" mentionining the user's query, mention the exact query itself 
 4. Always provide Perplexity as an option.
+5. Do not include ```json in your output.

@@ -1,6 +1,10 @@
 from openai import OpenAI
 from openai import AzureOpenAI
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # client = OpenAI()
 client = AzureOpenAI()
@@ -18,7 +22,7 @@ class BaseNode:
         completion = client.chat.completions.create(
             model="gpt-4o-2024-08-06",
             messages=self.chat_history,
-            # temperature = 0
+            temperature = 0
         )
         output = completion.choices[0].message.content
         self.chat_history.append({"role": "assistant", "content": output})

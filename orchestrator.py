@@ -27,14 +27,12 @@ class Manager:
                 group_translators.append(translator)
             self.groups[group_id] = group_translators
     async def run(self):
-        # Start the main translator's queue processing
         main_translator_task = asyncio.create_task(self.main_translator.process_queue())
 
-        # Run groups asynchronously (in parallel)
-        group_tasks = [self.run_group_sequentially(self.groups[group_id]) for group_id in self.groups.keys()]
-        await asyncio.gather(*group_tasks)
-        
-        # Cancel the main translator's queue processing when all groups are done
+        for group_id, group in self.groups.items():
+            group_results = await self.run_group_sequentially(group)
+            yield group_id, group_results
+
         main_translator_task.cancel()
         try:
             await main_translator_task
@@ -42,9 +40,13 @@ class Manager:
             pass
 
     async def run_group_sequentially(self, group):
+        group_results = {}
         for translator in group:
             # Run the non-async build_verify method in a separate thread
             await asyncio.get_event_loop().run_in_executor(self.thread_pool, translator.build_verify)
+            # Collect results from the translator
+            group_results[translator.panel_no] = translator.get_results()  # You need to implement get_results() in LocalTranslatorNode
+        return group_results
 
     def __del__(self):
         self.thread_pool.shutdown(wait=True)
@@ -78,24 +80,12 @@ class MainOrchestrator:
         print("Workflow:", workflow)
 
         communication_manager = Manager(workflow, self.main_translator, self.local_translator_system_prompt)
-        await communication_manager.run()
+        
+        # Modify the Manager to yield results as groups complete
+        async for group_id, group_results in communication_manager.run():
+            yield group_id, group_results
 
-        # Main loop
-        while True:
-            # Process messages between nodes
-            # You might want to implement a method in Manager to handle this
-            await communication_manager.process_messages()
 
-            # Check if all work is complete
-            if await self.is_work_complete():
-                break
-
-        # After completion, we might want to save or analyze the chat histories
-
-    async def is_work_complete(self):
-        # Implement logic to check if all work is complete
-        # This might involve checking the state of all translators
-        return False  # Placeholder
 
 async def main():
     orchestrator = MainOrchestrator()

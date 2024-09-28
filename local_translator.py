@@ -35,6 +35,9 @@ class LocalTranslatorNode(BaseNode):
         with open('prompts/local_translator/status_assistance_prompt.txt', 'r') as file:
             self.status_assistance_prompt = file.read()
 
+        with open('prompts/local_translator/user_readable_output_prompt.txt', 'r') as file:
+            self.user_readable_output_prompt = file.read()
+
     def get_api_keys(self):
         with open("./external_env_details/api_keys.json", "r") as json_file:
             self.api_keys = json.load(json_file)
@@ -542,6 +545,8 @@ class LocalTranslatorNode(BaseNode):
 
 
 
+
+    
     ###################################################################
     # based on the api request we call process the api endpoints here
     def requests_func(self, method, api_endpoint, header=None, body=None):
@@ -799,7 +804,6 @@ class LocalTranslatorNode(BaseNode):
                         print("\nstatus_update : ",status_update)
                         parsed_status_update = self.parse_status_assistance_input(status_update)
                         print("\parsed_status_update : ",parsed_status_update)
-                        run_success = True
                     except:
                         error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT, STATUS_UPDATE and ASSISTANCE_REQUEST without any other details before or after.:\n {str(e)}' 
                         self.chat_history.append({"role": "user", "content": error_message})
@@ -816,9 +820,14 @@ class LocalTranslatorNode(BaseNode):
 
         if not overall_success_bool:
             raise ValueError(f"Overall the workflow failed for {self.panel_no}")
-
-        # print('Completed workflow for panel ', self.panel_no)
-        # self.save_chat_history(f"chat_history_{self.panel_no}.txt")
+        
+    def get_results(self):
+        self.chat_history.append({"role": "user", "content": self.user_readable_output_prompt})
+        output = self.generate()
+        return {
+            'panel_description' : self.panel_description,
+            'output' : output.split('$$FORMATTED_OUTPUT$$')[-1]
+        }
 
             
     async def run_in_thread(self):
