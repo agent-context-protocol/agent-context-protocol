@@ -158,7 +158,6 @@ Step [Step Number]
   - Name: [VARIABLE_NAME]
     - Description: [Description of the expected output]
 
-
 ### Example Outputs:
 
 Example 1:

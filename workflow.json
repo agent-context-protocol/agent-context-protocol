@@ -1,26 +1,26 @@
 {
     "1": {
         "1": {
-            "panel_description": "Display the current weather forecast for Seattle, USA.",
+            "panel_description": "Display the current weather in Seattle.",
             "steps": {
                 "1": {
                     "api": "Perplexity",
-                    "handles": "Retrieves latitude and longitude for Seattle, USA",
+                    "handles": "Retrieves coordinates of Seattle",
                     "input_vars": [
                         {
                             "name": "query_seattle_coordinates",
                             "parameter": "query",
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to get the coordinates of Seattle, USA",
+                            "description": "Query to find the latitude and longitude of Seattle",
                             "value": "What are the latitude and longitude of Seattle, USA?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "latitude_seattle",
-                            "description": "Latitude of Seattle, USA",
+                            "name": "seattle_latitude",
+                            "description": "Latitude of Seattle",
                             "used_by": [
                                 {
                                     "panel": 1,
@@ -29,8 +29,8 @@
                             ]
                         },
                         {
-                            "name": "longitude_seattle",
-                            "description": "Longitude of Seattle, USA",
+                            "name": "seattle_longitude",
+                            "description": "Longitude of Seattle",
                             "used_by": [
                                 {
                                     "panel": 1,
@@ -42,14 +42,14 @@
                 },
                 "2": {
                     "api": "Open-Meteo",
-                    "handles": "Retrieves current weather data for Seattle, USA",
+                    "handles": "Retrieves current weather data for Seattle",
                     "input_vars": [
                         {
-                            "name": "latitude_seattle",
+                            "name": "seattle_latitude",
                             "parameter": "latitude",
                             "type": "float",
                             "source": "API_Output (Panel 1, Step 1)",
-                            "description": "Latitude of Seattle, USA",
+                            "description": "Latitude of Seattle",
                             "value": "None",
                             "dependencies": [
                                 {
@@ -59,11 +59,11 @@
                             ]
                         },
                         {
-                            "name": "longitude_seattle",
+                            "name": "seattle_longitude",
                             "parameter": "longitude",
                             "type": "float",
                             "source": "API_Output (Panel 1, Step 1)",
-                            "description": "Longitude of Seattle, USA",
+                            "description": "Longitude of Seattle",
                             "value": "None",
                             "dependencies": [
                                 {
@@ -73,11 +73,11 @@
                             ]
                         },
                         {
-                            "name": "current_weather_flag",
+                            "name": "current_weather_flag_seattle",
                             "parameter": "current_weather",
                             "type": "boolean",
                             "source": "LLM_Generated",
-                            "description": "Flag to include current weather data",
+                            "description": "Flag to get current weather data",
                             "value": "true",
                             "dependencies": []
                         }
@@ -85,7 +85,7 @@
                     "output_vars": [
                         {
                             "name": "current_weather_seattle",
-                            "description": "Current weather conditions in Seattle, USA",
+                            "description": "Current weather conditions in Seattle",
                             "used_by": []
                         }
                     ]

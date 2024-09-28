@@ -1,129 +1,94 @@
 {
     "1": {
-        "panel_description": "Display the top 30 vacation spots in Europe.",
+        "panel_description": "Display the current weather in Seattle.",
         "steps": {
             "1": {
                 "api": "Perplexity",
-                "handles": "Retrieves a list of top 30 vacation destinations in Europe",
+                "handles": "Retrieves coordinates of Seattle",
                 "input_vars": [
                     {
-                        "name": "query_vacation_spots",
+                        "name": "query_seattle_coordinates",
                         "parameter": "query",
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Query to get the top 30 vacation spots in Europe",
-                        "value": "What are the top 30 vacation spots in Europe?",
+                        "description": "Query to find the latitude and longitude of Seattle",
+                        "value": "What are the latitude and longitude of Seattle, USA?",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "vacation_spots_list",
-                        "description": "List of top 30 vacation spots in Europe",
+                        "name": "seattle_latitude",
+                        "description": "Latitude of Seattle",
                         "used_by": [
                             {
-                                "panel": 2,
-                                "step": 1
+                                "panel": 1,
+                                "step": 2
                             }
                         ],
-                        "value": "[\n      \"Venice, Italy\",\n      \"Paris, France\",\n      \"Rome, Italy\",\n      \"Lisbon, Portugal\",\n      \"Vienna, Austria\",\n      \"Santorini, Greece\",\n      \"Dubrovnik, Croatia\",\n      \"Greek Islands, Greece\",\n      \"Algarve, Portugal\",\n      \"French Riviera, France\",\n      \"Plitvice Lakes, Croatia\",\n      \"Iceland\",\n      \"Faroe Islands\",\n      \"Zermatt, Switzerland\",\n      \"Bay of Kotor, Montenegro\",\n      \"Amsterdam, Netherlands\",\n      \"Barcelona, Spain\",\n      \"Prague, Czech Republic\",\n      \"Florence, Italy\",\n      \"Budapest, Hungary\",\n      \"Positano, Italy\",\n      \"Annecy, France\",\n      \"Bruges, Belgium\",\n      \"Cesky Krumlov, Czech Republic\",\n      \"Verona, Italy\",\n      \"London, England\",\n      \"Swiss Alps, Switzerland\",\n      \"Bavaria, Germany\",\n      \"Cotswolds, England\",\n      \"Lapland, Finland\"\n    ]"
+                        "value": "47.608013"
+                    },
+                    {
+                        "name": "seattle_longitude",
+                        "description": "Longitude of Seattle",
+                        "used_by": [
+                            {
+                                "panel": 1,
+                                "step": 2
+                            }
+                        ],
+                        "value": "-122.335167"
                     }
                 ]
-            }
-        }
-    },
-    "2": {
-        "panel_description": "Display the current weather in the top European vacation spots.",
-        "steps": {
-            "1": {
-                "api": "Perplexity",
-                "handles": "Fetches latitude and longitude for each vacation spot",
+            },
+            "2": {
+                "api": "Open-Meteo",
+                "handles": "Retrieves current weather data for Seattle",
                 "input_vars": [
                     {
-                        "name": "vacation_spots_list",
-                        "parameter": "query",
-                        "type": "string",
+                        "name": "seattle_latitude",
+                        "parameter": "latitude",
+                        "type": "float",
                         "source": "API_Output (Panel 1, Step 1)",
-                        "description": "List of vacation spots from Panel 1",
-                        "value": "[\n      \"Venice, Italy\",\n      \"Paris, France\",\n      \"Rome, Italy\",\n      \"Lisbon, Portugal\",\n      \"Vienna, Austria\",\n      \"Santorini, Greece\",\n      \"Dubrovnik, Croatia\",\n      \"Greek Islands, Greece\",\n      \"Algarve, Portugal\",\n      \"French Riviera, France\",\n      \"Plitvice Lakes, Croatia\",\n      \"Iceland\",\n      \"Faroe Islands\",\n      \"Zermatt, Switzerland\",\n      \"Bay of Kotor, Montenegro\",\n      \"Amsterdam, Netherlands\",\n      \"Barcelona, Spain\",\n      \"Prague, Czech Republic\",\n      \"Florence, Italy\",\n      \"Budapest, Hungary\",\n      \"Positano, Italy\",\n      \"Annecy, France\",\n      \"Bruges, Belgium\",\n      \"Cesky Krumlov, Czech Republic\",\n      \"Verona, Italy\",\n      \"London, England\",\n      \"Swiss Alps, Switzerland\",\n      \"Bavaria, Germany\",\n      \"Cotswolds, England\",\n      \"Lapland, Finland\"\n    ]",
+                        "description": "Latitude of Seattle",
+                        "value": "47.608013",
                         "dependencies": [
                             {
                                 "panel": 1,
                                 "step": 1
                             }
                         ]
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "latitude",
-                        "description": "Latitude for each vacation spot",
-                        "used_by": [
-                            {
-                                "panel": 2,
-                                "step": 2
-                            }
-                        ]
                     },
                     {
-                        "name": "longitude",
-                        "description": "Longitude for each vacation spot",
-                        "used_by": [
-                            {
-                                "panel": 2,
-                                "step": 2
-                            }
-                        ]
-                    }
-                ]
-            },
-            "2": {
-                "api": "Open-Meteo",
-                "handles": "Retrieves current weather data for each location",
-                "input_vars": [
-                    {
-                        "name": "latitude",
-                        "parameter": "latitude",
-                        "type": "float",
-                        "source": "API_Output (Panel 2, Step 1)",
-                        "description": "Latitude of the vacation spot",
-                        "value": "None",
-                        "dependencies": [
-                            {
-                                "panel": 2,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "longitude",
+                        "name": "seattle_longitude",
                         "parameter": "longitude",
                         "type": "float",
-                        "source": "API_Output (Panel 2, Step 1)",
-                        "description": "Longitude of the vacation spot",
-                        "value": "None",
+                        "source": "API_Output (Panel 1, Step 1)",
+                        "description": "Longitude of Seattle",
+                        "value": "-122.335167",
                         "dependencies": [
                             {
-                                "panel": 2,
+                                "panel": 1,
                                 "step": 1
                             }
                         ]
                     },
                     {
-                        "name": "current_weather_flag",
+                        "name": "current_weather_flag_seattle",
                         "parameter": "current_weather",
                         "type": "boolean",
                         "source": "LLM_Generated",
-                        "description": "Flag to include current weather data",
+                        "description": "Flag to get current weather data",
                         "value": "true",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "current_weather_data",
-                        "description": "Current weather conditions for each vacation spot",
-                        "used_by": []
+                        "name": "current_weather_seattle",
+                        "description": "Current weather conditions in Seattle",
+                        "used_by": [],
+                        "value": "{\n      \"time\": \"2024-09-28T15:30\",\n      \"temperature\": \"10.4\u00b0C\",\n      \"windspeed\": \"8.5 km/h\",\n      \"winddirection\": \"54\u00b0\",\n      \"weather_code\": 3\n    }"
                     }
                 ]
             }

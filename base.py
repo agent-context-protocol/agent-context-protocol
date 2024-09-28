@@ -1,8 +1,9 @@
 from openai import OpenAI
+from openai import AzureOpenAI
 import os
 
-os.environ["OPENAI_API_KEY"] = "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"
-client = OpenAI()
+# client = OpenAI()
+client = AzureOpenAI()
 
 
 class BaseNode:
@@ -17,7 +18,7 @@ class BaseNode:
         completion = client.chat.completions.create(
             model="gpt-4o-2024-08-06",
             messages=self.chat_history,
-            temperature = 0
+            # temperature = 0
         )
         output = completion.choices[0].message.content
         self.chat_history.append({"role": "assistant", "content": output})

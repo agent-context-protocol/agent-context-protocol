@@ -542,8 +542,6 @@ class LocalTranslatorNode(BaseNode):
 
 
 
-
-    
     ###################################################################
     # based on the api request we call process the api endpoints here
     def requests_func(self, method, api_endpoint, header=None, body=None):
@@ -773,6 +771,7 @@ class LocalTranslatorNode(BaseNode):
                         print("\nstatus_update : ",status_update)
                         parsed_status_update = self.parse_status_assistance_input(status_update)
                         print("\parsed_status_update : ",parsed_status_update)
+                        run_success = True
                     except:
                         error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT and STATUS_UPDATE without any other details before or after.:\n {str(e)}' 
                         self.chat_history.append({"role": "user", "content": error_message})
@@ -800,6 +799,7 @@ class LocalTranslatorNode(BaseNode):
                         print("\nstatus_update : ",status_update)
                         parsed_status_update = self.parse_status_assistance_input(status_update)
                         print("\parsed_status_update : ",parsed_status_update)
+                        run_success = True
                     except:
                         error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT, STATUS_UPDATE and ASSISTANCE_REQUEST without any other details before or after.:\n {str(e)}' 
                         self.chat_history.append({"role": "user", "content": error_message})

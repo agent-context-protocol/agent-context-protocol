@@ -81,6 +81,9 @@ API Response:
    - Ensure clarity and correctness in variable names, data types, and content.
    - Use valid JSON format where applicable.
 
+8. Filling in the Output_Variables and Dependent_Input_Variables:
+   - Try to include all the important information about the output in the respective output variables or the dependent input variables. For example if you are mentioning about quantitites then inlcude its units.
+
 ### Important Guidelines:
 
 - CHAIN_OF_THOUGHT:
@@ -88,6 +91,7 @@ API Response:
   - Extract and format the relevant data for the Output Variables.
   - Next, assess whether the API response provides the necessary information for dependent steps.
   - Extract and format the required data for each dependent step's Input Variables.
+  - Think about what all information from the api output should be extracted such that things are understandable and complete. Utilize the api documentation present in the chat history.
 
 - Error Handling:
   - Raise 603 INCOMPLETE_INFORMATION if the API response is insufficient for the current step.
@@ -111,6 +115,7 @@ API Response:
 - Provide clear and concise information without additional explanations.
 - Raise errors appropriately and provide clear explanations when necessary.
 - Include important information like unit of things if availableor additional context based on API Documentation, such that it is easy to understand.
+- Try to include all the important information about the output in the respective output variables or the dependent input variables such that the extracted value contains all the context. For example if you are mentioning about quantitites then inlcude its units.
 
 ### Output Format (Strictly follow this):
 

@@ -519,6 +519,7 @@ class MainTranslatorNode(BaseNode):
                 #         print("\updated_workflow : ",updated_workflow)
                 #         parsed_updated_workflow = self.parse_status_assistance_output(updated_workflow)
                 #         print("\parsed_updated_workflow : ", parsed_updated_workflow)
+                #         run_success = True
                 #     except Exception as e:
                 #         error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT, CHOSEN_ACTION and/or WORKFLOW without any other details before or after.:\n {str(e)}' 
                 #         self.chat_history.append({"role": "user", "content": error_message})
