@@ -1,200 +1,82 @@
 {
-    "1": {
-        "panel_description": "Suggest travel destinations based on the user's query.",
-        "steps": {
-            "1": {
-                "api": "Perplexity",
-                "handles": "Retrieves a list of suggested travel destinations",
-                "input_vars": [
-                    {
-                        "name": "query_travel_destinations",
-                        "parameter": "query",
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Query to get travel destination suggestions",
-                        "value": "Where in the world should I go for travelling?",
-                        "dependencies": []
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "travel_destinations_list",
-                        "description": "List of suggested travel destinations",
-                        "used_by": [
-                            {
-                                "panel": 2,
-                                "step": 1
-                            },
-                            {
-                                "panel": 3,
-                                "step": 1
-                            }
-                        ],
-                        "value": "\"Choosing the perfect travel destination depends on your interests, budget, and the type of experience you're looking for. Here are some suggestions based on different criteria:\n    For Natural Beauty and Unique Landscapes\n    - Kuang Si Falls, Laos: Known for its vibrant jungle and three-tiered waterfalls, it's a great spot for nature lovers.\n    - Tu Le Valley, Vietnam: Famous for its golden and green terraced rice paddies, especially beautiful during September.\n    - Lapland, Finland: Ideal for stargazing and witnessing the Northern Lights, with a winter wonderland experience.\n    - Amalfi Coast, Italy: Offers stunning coastal views, outdoor activities, and cultural experiences like visiting Pompeii and the islands of Ischia and Capri.\n    For Cultural and Historical Experiences\n    - Petra, Jordan: A UNESCO World Heritage Site with ancient structures carved into the rock, a must-see for history enthusiasts.\n    - Bagan, Myanmar: Known for its ancient Buddhist temples and pagodas, best seen from a hot-air balloon.\n    - Barcelona, Spain: Famous for its architecture by Antoni Gaud\u00ed, museums, and the historic Gothic Quarter.\n    - Italy: Cities like Rome, Florence, and Venice offer a rich historical and cultural experience.\n    For Beginner Travelers\n    - Thailand: Known as the 'Land of Smiles,' it's safe, easy to navigate, and offers a mix of city life in Bangkok and cultural experiences in Chiang Mai.\n    - Australia: Friendly locals, English as the official language, and a variety of beautiful places to explore, including the Great Barrier Reef and Sydney.\n    - Canada: Friendly people, jaw-dropping landscapes, and easy travel, especially in cities like Toronto.\n    - Ireland: Safe, friendly, and affordable, with breathtaking landscapes and vibrant city life.\n    For a Mix of Modernity and Tradition\n    - Japan: Offers a blend of ancient temples and futuristic technology, with efficient public transport making it easy to get around.\n    - Spain: Vibrant cities, delicious food and wine, and an excellent public transport system.\n    For Budget-Friendly and Sustainable Travel\n    - Portugal: One of the safest and most affordable countries, with a mix of history, culture, and outdoor activities.\n    - Costa Rica: Known for its eco-tourism, offering lush rainforests and pristine beaches at an affordable price.\n    For Specific Interests\n    - Hallstatt, Austria: Perfect for photography and exploring 16th-century alpine houses and an ancient salt mine.\n    - Las Coloradas, Mexico: Known for its pastel lagoons, ideal for a colorful and Instagram-worthy trip.\n    - Chamarel, Mauritius: Features the 'Seven Colored Earths,' a unique geological formation.\""
-                    }
-                ]
-            }
-        }
-    },
     "2": {
-        "panel_description": "Display the weather forecast for the suggested travel destinations.",
+        "panel_description": "Gather expert opinions on automated trading systems from Stack Overflow.",
         "steps": {
             "1": {
                 "api": "Perplexity",
-                "handles": "Fetches latitude and longitude for each travel destination",
+                "handles": "General opinions on automated trading systems",
                 "input_vars": [
                     {
-                        "name": "travel_destinations_list",
+                        "name": "query_trading_systems",
                         "parameter": "query",
                         "type": "string",
-                        "source": "API_Output (Panel 1, Step 1)",
-                        "description": "List of travel destinations from Panel 1",
-                        "value": "[\"Kuang Si Falls, Laos\", \"Tu Le Valley, Vietnam\", \"Lapland, Finland\", \"Amalfi Coast, Italy\", \"Petra, Jordan\", \"Bagan, Myanmar\", \"Barcelona, Spain\", \"Italy\", \"Thailand\", \"Australia\", \"Canada\", \"Ireland\", \"Japan\", \"Spain\", \"Portugal\", \"Costa Rica\", \"Hallstatt, Austria\", \"Las Coloradas, Mexico\", \"Chamarel, Mauritius\"]",
-                        "dependencies": [
-                            {
-                                "panel": 1,
-                                "step": 1
-                            }
-                        ]
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "latitude",
-                        "description": "Latitude for each travel destination",
-                        "used_by": [
-                            {
-                                "panel": 2,
-                                "step": 2
-                            }
-                        ],
-                        "value": "{\n      \"Kuang Si Falls, Laos\": 19.74917,\n      \"Tu Le Valley, Vietnam\": 21.6833,\n      \"Lapland, Finland\": 66.5039,\n      \"Amalfi Coast, Italy\": 40.6278,\n      \"Petra, Jordan\": 30.3286,\n      \"Bagan, Myanmar\": 21.1667,\n      \"Barcelona, Spain\": 41.3888,\n      \"Italy\": 41.9028,\n      \"Thailand\": 13.7563,\n      \"Australia\": -35.2833,\n      \"Canada\": 56.130366,\n      \"Ireland\": 53.0000,\n      \"Japan\": 36.0000,\n      \"Spain\": 40.0000,\n      \"Portugal\": 39.5000,\n      \"Costa Rica\": 10.0000,\n      \"Hallstatt, Austria\": 47.5583,\n      \"Las Coloradas, Mexico\": 21.5000,\n      \"Chamarel, Mauritius\": -20.4333\n    }"
-                    },
-                    {
-                        "name": "longitude",
-                        "description": "Longitude for each travel destination",
-                        "used_by": [
-                            {
-                                "panel": 2,
-                                "step": 2
-                            }
-                        ],
-                        "value": "{\n      \"Kuang Si Falls, Laos\": 101.99167,\n      \"Tu Le Valley, Vietnam\": 104.4333,\n      \"Lapland, Finland\": 25.7289,\n      \"Amalfi Coast, Italy\": 14.4883,\n      \"Petra, Jordan\": 35.4423,\n      \"Bagan, Myanmar\": 94.6167,\n      \"Barcelona, Spain\": 2.1590,\n      \"Italy\": 12.4964,\n      \"Thailand\": 100.5018,\n      \"Australia\": 149.1281,\n      \"Canada\": -106.346771,\n      \"Ireland\": -8.0000,\n      \"Japan\": 138.0000,\n      \"Spain\": -4.0000,\n      \"Portugal\": -8.0000,\n      \"Costa Rica\": -84.0000,\n      \"Hallstatt, Austria\": 13.6467,\n      \"Las Coloradas, Mexico\": -87.5000,\n      \"Chamarel, Mauritius\": 57.3667\n    }"
-                    }
-                ]
-            },
-            "2": {
-                "api": "Open-Meteo",
-                "handles": "Retrieves weather forecast data for each location",
-                "input_vars": [
-                    {
-                        "name": "latitude",
-                        "parameter": "latitude",
-                        "type": "float",
-                        "source": "API_Output (Panel 2, Step 1)",
-                        "description": "Latitude of the travel destination",
-                        "value": "{\n      \"Kuang Si Falls, Laos\": 19.74917,\n      \"Tu Le Valley, Vietnam\": 21.6833,\n      \"Lapland, Finland\": 66.5039,\n      \"Amalfi Coast, Italy\": 40.6278,\n      \"Petra, Jordan\": 30.3286,\n      \"Bagan, Myanmar\": 21.1667,\n      \"Barcelona, Spain\": 41.3888,\n      \"Italy\": 41.9028,\n      \"Thailand\": 13.7563,\n      \"Australia\": -35.2833,\n      \"Canada\": 56.130366,\n      \"Ireland\": 53.0000,\n      \"Japan\": 36.0000,\n      \"Spain\": 40.0000,\n      \"Portugal\": 39.5000,\n      \"Costa Rica\": 10.0000,\n      \"Hallstatt, Austria\": 47.5583,\n      \"Las Coloradas, Mexico\": 21.5000,\n      \"Chamarel, Mauritius\": -20.4333\n    }",
-                        "dependencies": [
-                            {
-                                "panel": 2,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "longitude",
-                        "parameter": "longitude",
-                        "type": "float",
-                        "source": "API_Output (Panel 2, Step 1)",
-                        "description": "Longitude of the travel destination",
-                        "value": "{\n      \"Kuang Si Falls, Laos\": 101.99167,\n      \"Tu Le Valley, Vietnam\": 104.4333,\n      \"Lapland, Finland\": 25.7289,\n      \"Amalfi Coast, Italy\": 14.4883,\n      \"Petra, Jordan\": 35.4423,\n      \"Bagan, Myanmar\": 94.6167,\n      \"Barcelona, Spain\": 2.1590,\n      \"Italy\": 12.4964,\n      \"Thailand\": 100.5018,\n      \"Australia\": 149.1281,\n      \"Canada\": -106.346771,\n      \"Ireland\": -8.0000,\n      \"Japan\": 138.0000,\n      \"Spain\": -4.0000,\n      \"Portugal\": -8.0000,\n      \"Costa Rica\": -84.0000,\n      \"Hallstatt, Austria\": 13.6467,\n      \"Las Coloradas, Mexico\": -87.5000,\n      \"Chamarel, Mauritius\": 57.3667\n    }",
-                        "dependencies": [
-                            {
-                                "panel": 2,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "current_weather_flag",
-                        "parameter": "current_weather",
-                        "type": "boolean",
                         "source": "LLM_Generated",
-                        "description": "Flag to include current weather data",
-                        "value": "true",
+                        "description": "Query to get opinions on automated trading systems",
+                        "value": "Expert opinions on automated trading systems adapting to weather patterns",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "weather_forecast_data",
-                        "description": "Weather forecast data for each travel destination",
+                        "name": "trading_systems_opinions",
+                        "description": "Opinions on automated trading systems",
                         "used_by": [],
-                        "value": "{\n      \"Kuang Si Falls, Laos\": {\n        \"temperature\": 27.0,\n        \"windspeed\": 1.1,\n        \"winddirection\": 288,\n        \"weathercode\": 1,\n        \"is_day\": 1,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Tu Le Valley, Vietnam\": {\n        \"temperature\": 24.4,\n        \"windspeed\": 4.3,\n        \"winddirection\": 95,\n        \"weathercode\": 3,\n        \"is_day\": 1,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Lapland, Finland\": {\n        \"temperature\": 3.2,\n        \"windspeed\": 5.0,\n        \"winddirection\": 156,\n        \"weathercode\": 3,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Amalfi Coast, Italy\": {\n        \"temperature\": 22.0,\n        \"windspeed\": 6.4,\n        \"winddirection\": 164,\n        \"weathercode\": 2,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Petra, Jordan\": {\n        \"temperature\": 21.9,\n        \"windspeed\": 5.6,\n        \"winddirection\": 63,\n        \"weathercode\": 0,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Bagan, Myanmar\": {\n        \"temperature\": 26.0,\n        \"windspeed\": 4.0,\n        \"winddirection\": 170,\n        \"weathercode\": 80,\n        \"is_day\": 1,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Barcelona, Spain\": {\n        \"temperature\": 20.8,\n        \"windspeed\": 3.6,\n        \"winddirection\": 135,\n        \"weathercode\": 1,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Italy\": {\n        \"temperature\": 20.5,\n        \"windspeed\": 6.0,\n        \"winddirection\": 123,\n        \"weathercode\": 1,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Thailand\": {\n        \"temperature\": 28.3,\n        \"windspeed\": 3.3,\n        \"winddirection\": 49,\n        \"weathercode\": 3,\n        \"is_day\": 1,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Australia\": {\n        \"temperature\": 13.8,\n        \"windspeed\": 11.3,\n        \"winddirection\": 97,\n        \"weathercode\": 2,\n        \"is_day\": 1,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Canada\": {\n        \"temperature\": 8.3,\n        \"windspeed\": 8.4,\n        \"winddirection\": 245,\n        \"weathercode\": 2,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Ireland\": {\n        \"temperature\": 6.9,\n        \"windspeed\": 20.2,\n        \"winddirection\": 345,\n        \"weathercode\": 3,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Japan\": {\n        \"temperature\": 19.0,\n        \"windspeed\": 5.8,\n        \"winddirection\": 330,\n        \"weathercode\": 3,\n        \"is_day\": 1,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Spain\": {\n        \"temperature\": 15.2,\n        \"windspeed\": 12.6,\n        \"winddirection\": 265,\n        \"weathercode\": 1,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Portugal\": {\n        \"temperature\": 16.0,\n        \"windspeed\": 5.8,\n        \"winddirection\": 263,\n        \"weathercode\": 2,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Costa Rica\": {\n        \"temperature\": 19.1,\n        \"windspeed\": 3.8,\n        \"winddirection\": 17,\n        \"weathercode\": 3,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Hallstatt, Austria\": {\n        \"temperature\": 14.6,\n        \"windspeed\": 3.7,\n        \"winddirection\": 151,\n        \"weathercode\": 61,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Las Coloradas, Mexico\": {\n        \"temperature\": 26.5,\n        \"windspeed\": 5.2,\n        \"winddirection\": 258,\n        \"weathercode\": 2,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Chamarel, Mauritius\": {\n        \"temperature\": 18.4,\n        \"windspeed\": 27.1,\n        \"winddirection\": 113,\n        \"weathercode\": 2,\n        \"is_day\": 1,\n        \"time\": \"2024-09-27T02:15\"\n      }\n    }"
-                    }
-                ]
-            }
-        }
-    },
-    "3": {
-        "panel_description": "Display current news at the suggested travel destinations.",
-        "steps": {
-            "1": {
-                "api": "Perplexity",
-                "handles": "Fetches country or city names for each travel destination",
-                "input_vars": [
-                    {
-                        "name": "travel_destinations_list",
-                        "parameter": "query",
-                        "type": "string",
-                        "source": "API_Output (Panel 1, Step 1)",
-                        "description": "List of travel destinations from Panel 1",
-                        "value": "[\"Kuang Si Falls, Laos\", \"Tu Le Valley, Vietnam\", \"Lapland, Finland\", \"Amalfi Coast, Italy\", \"Petra, Jordan\", \"Bagan, Myanmar\", \"Barcelona, Spain\", \"Italy\", \"Thailand\", \"Australia\", \"Canada\", \"Ireland\", \"Japan\", \"Spain\", \"Portugal\", \"Costa Rica\", \"Hallstatt, Austria\", \"Las Coloradas, Mexico\", \"Chamarel, Mauritius\"]",
-                        "dependencies": [
-                            {
-                                "panel": 1,
-                                "step": 1
-                            }
-                        ]
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "country_or_city_names",
-                        "description": "Country or city names for each travel destination",
-                        "used_by": [
-                            {
-                                "panel": 3,
-                                "step": 2
-                            }
-                        ]
+                        "value": "\"Automated trading systems, particularly those enhanced with artificial intelligence (AI) and machine learning, can indeed adapt to various external factors, including weather patterns, to make more informed and timely trading decisions.\n\n    ## Integration of Weather Data\n    Automated trading systems can incorporate real-time weather data into their analysis to identify potential impacts on markets. For example, in the energy sector, weather patterns such as temperature, wind speed, and precipitation can significantly influence energy demand and supply. Algorithmic energy trading platforms can analyze these weather data points along with other market information to optimize trading strategies.\n\n    ## Real-Time Analysis and Adaptation\n    AI-driven automated trading systems are capable of processing vast amounts of data, including weather forecasts, in real-time. This allows the systems to adapt quickly to changing market conditions that may be influenced by weather. For instance, a sudden change in weather forecasts could lead to adjustments in energy production or demand, and the trading system can react swiftly to these changes to maximize profits or minimize losses.\n\n    ## Predictive Analytics\n    Predictive analytics, a key component of AI in automated trading, can forecast market movements based on historical and real-time data, including weather patterns. By analyzing past data, these systems can identify correlations between weather events and market behaviors, enabling them to make more accurate predictions and trading decisions. This proactive approach helps in mitigating risks and capitalizing on opportunities arising from weather-related market fluctuations.\n\n    ## Risk Management\n    Automated trading systems also use weather data to enhance risk management. By predicting potential market downturns or anomalies caused by weather events, these systems can adjust trading strategies to minimize losses. For example, if a severe weather event is forecasted to impact a particular region, the system can adjust energy trading strategies to avoid potential imbalances or to take advantage of price discrepancies.\n\n    ## Best Practices and Challenges\n    While integrating weather data into automated trading systems offers significant benefits, it is crucial to follow best practices such as using high-quality and accurate data, regularly updating the system, and monitoring for any issues or errors. The complexity of AI algorithms and the reliance on accurate data are key challenges that need to be addressed to ensure the system's reliability and performance.\n\n    In summary, automated trading systems can effectively adapt to weather patterns by integrating real-time weather data, using predictive analytics, and enhancing risk management strategies. This integration is particularly valuable in sectors like energy trading, where weather has a direct impact on market dynamics.\""
                     }
                 ]
             },
             "2": {
-                "api": "NEWS_API_TOP_HEADLINES",
-                "handles": "Retrieves current news for each location",
+                "api": "Stack_Exchange_Questions",
+                "handles": "Fetches questions about automated trading systems",
                 "input_vars": [
                     {
-                        "name": "country_or_city_names",
-                        "parameter": "q",
+                        "name": "site",
+                        "parameter": "site",
                         "type": "string",
-                        "source": "API_Output (Panel 3, Step 1)",
-                        "description": "Country or city names for each travel destination",
-                        "value": "None",
-                        "dependencies": [
-                            {
-                                "panel": 3,
-                                "step": 1
-                            }
-                        ]
+                        "source": "LLM_Generated",
+                        "description": "Stack Exchange site to query",
+                        "value": "stackoverflow",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "tags",
+                        "parameter": "tagged",
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Tags for filtering questions",
+                        "value": "automated-trading",
+                        "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "current_news_data",
-                        "description": "Current news headlines for each travel destination",
-                        "used_by": []
+                        "name": "trading_questions",
+                        "description": "Questions about automated trading systems",
+                        "used_by": [],
+                        "value": "[]"
+                    }
+                ]
+            },
+            "3": {
+                "api": "Stack_Exchange_Answers",
+                "handles": "Fetches answers to questions about automated trading systems",
+                "input_vars": [
+                    {
+                        "name": "site",
+                        "parameter": "site",
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Stack Exchange site to query",
+                        "value": "stackoverflow",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "trading_answers",
+                        "description": "Answers to questions about automated trading systems",
+                        "used_by": [],
+                        "value": "```json\n    [\n      {\n        \"answer_id\": 79035420,\n        \"question_id\": 79035365,\n        \"is_accepted\": false,\n        \"score\": 0,\n        \"owner\": {\n          \"display_name\": \"Craig Estey\",\n          \"reputation\": 32881,\n          \"profile_link\": \"https://stackoverflow.com/users/5382650/craig-estey\"\n        }\n      },\n      {\n        \"answer_id\": 79035425,\n        \"question_id\": 76225672,\n        \"is_accepted\": false,\n        \"score\": 0,\n        \"owner\": {\n          \"display_name\": \"mehdidrissi\",\n          \"reputation\": 9,\n          \"profile_link\": \"https://stackoverflow.com/users/14105179/mehdidrissi\"\n        }\n      },\n      {\n        \"answer_id\": 79035428,\n        \"question_id\": 77578333,\n        \"is_accepted\": false,\n        \"score\": 0,\n        \"owner\": {\n          \"display_name\": \"Tariq Booker\",\n          \"reputation\": 1,\n          \"profile_link\": \"https://stackoverflow.com/users/27479842/tariq-booker\"\n        }\n      },\n      {\n        \"answer_id\": 79035427,\n        \"question_id\": 79035260,\n        \"is_accepted\": false,\n        \"score\": 0,\n        \"owner\": {\n          \"display_name\": \"iKingNinja\",\n          \"reputation\": 439,\n          \"profile_link\": \"https://stackoverflow.com/users/18141446/ikingninja\"\n        }\n      },\n      {\n        \"answer_id\": 79035426,\n        \"question_id\": 78922469,\n        \"is_accepted\": false,\n        \"score\": 1,\n        \"owner\": {\n          \"display_name\": \"SnailBird\",\n          \"reputation\": 139,\n          \"profile_link\": \"https://stackoverflow.com/users/7184090/snailbird\"\n        }\n      }\n      // Additional answers can be added similarly\n    ]\n    ```"
                     }
                 ]
             }

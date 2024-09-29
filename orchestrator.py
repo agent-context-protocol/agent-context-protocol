@@ -92,7 +92,7 @@ async def main():
     await orchestrator.run("what is the weather in seattle, usa")
     # await orchestrator.run("what is the weather in seattle, usa. Also what are the best spots to visit in seattle?")
     # await orchestrator.run("tell me top 30 vacation spots in europe and current weather there no illustrations")
-    # await orchestrator.run("What are the top 5 most rainy areas in the world? Please ext.")
+    # await orchestrator.run("What are the top 5 most rainy areas in the world?.")
     # await orchestrator.run("what are top news headlines for today? What is the weather at some of the top news headline locations")
     # await orchestrator.run("where in the world should i go for travelling? What is the weather and current news at those places? Also i want to understand what generally causes null pointer errors in java")
 

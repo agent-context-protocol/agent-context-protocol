@@ -1,25 +1,25 @@
 {
     "1": {
-        "panel_description": "Suggest travel destinations based on the user's query.",
+        "panel_description": "Display the top 5 vacation spots in Europe.",
         "steps": {
             "1": {
                 "api": "Perplexity",
-                "handles": "Retrieves a list of suggested travel destinations",
+                "handles": "Retrieves a list of top vacation destinations in Europe",
                 "input_vars": [
                     {
-                        "name": "query_travel_destinations",
+                        "name": "query_vacation_spots",
                         "parameter": "query",
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Query to get travel destination suggestions",
-                        "value": "Where in the world should I go for travelling?",
+                        "description": "Query to get the top 5 vacation spots in Europe",
+                        "value": "Top 5 vacation spots in Europe",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "travel_destinations_list",
-                        "description": "List of suggested travel destinations",
+                        "name": "vacation_spots_list",
+                        "description": "List of recommended vacation spots in Europe",
                         "used_by": [
                             {
                                 "panel": 2,
@@ -30,26 +30,26 @@
                                 "step": 1
                             }
                         ],
-                        "value": "\"Choosing the perfect travel destination depends on your interests, budget, and the type of experience you're looking for. Here are some suggestions based on different criteria:\n    For Natural Beauty and Unique Landscapes\n    - Kuang Si Falls, Laos: Known for its vibrant jungle and three-tiered waterfalls, it's a great spot for nature lovers.\n    - Tu Le Valley, Vietnam: Famous for its golden and green terraced rice paddies, especially beautiful during September.\n    - Lapland, Finland: Ideal for stargazing and witnessing the Northern Lights, with a winter wonderland experience.\n    - Amalfi Coast, Italy: Offers stunning coastal views, outdoor activities, and cultural experiences like visiting Pompeii and the islands of Ischia and Capri.\n    For Cultural and Historical Experiences\n    - Petra, Jordan: A UNESCO World Heritage Site with ancient structures carved into the rock, a must-see for history enthusiasts.\n    - Bagan, Myanmar: Known for its ancient Buddhist temples and pagodas, best seen from a hot-air balloon.\n    - Barcelona, Spain: Famous for its architecture by Antoni Gaud\u00ed, museums, and the historic Gothic Quarter.\n    - Italy: Cities like Rome, Florence, and Venice offer a rich historical and cultural experience.\n    For Beginner Travelers\n    - Thailand: Known as the 'Land of Smiles,' it's safe, easy to navigate, and offers a mix of city life in Bangkok and cultural experiences in Chiang Mai.\n    - Australia: Friendly locals, English as the official language, and a variety of beautiful places to explore, including the Great Barrier Reef and Sydney.\n    - Canada: Friendly people, jaw-dropping landscapes, and easy travel, especially in cities like Toronto.\n    - Ireland: Safe, friendly, and affordable, with breathtaking landscapes and vibrant city life.\n    For a Mix of Modernity and Tradition\n    - Japan: Offers a blend of ancient temples and futuristic technology, with efficient public transport making it easy to get around.\n    - Spain: Vibrant cities, delicious food and wine, and an excellent public transport system.\n    For Budget-Friendly and Sustainable Travel\n    - Portugal: One of the safest and most affordable countries, with a mix of history, culture, and outdoor activities.\n    - Costa Rica: Known for its eco-tourism, offering lush rainforests and pristine beaches at an affordable price.\n    For Specific Interests\n    - Hallstatt, Austria: Perfect for photography and exploring 16th-century alpine houses and an ancient salt mine.\n    - Las Coloradas, Mexico: Known for its pastel lagoons, ideal for a colorful and Instagram-worthy trip.\n    - Chamarel, Mauritius: Features the 'Seven Colored Earths,' a unique geological formation.\""
+                        "value": "[\n      \"Rome, Italy: Home to ancient treasures such as the Colosseum and the Vatican.\",\n      \"Prague, Czech Republic: Known for medieval architecture and vibrant cultural scene.\",\n      \"Budapest, Hungary: Offers medieval and baroque architecture and thermal baths.\",\n      \"Dubrovnik, Croatia: Famous for historic city walls and stunning views of the Adriatic Sea.\",\n      \"Berlin, Germany: Known for bold architecture, nightlife, and historical monuments.\"\n    ]"
                     }
                 ]
             }
         }
     },
     "2": {
-        "panel_description": "Display the weather forecast for the suggested travel destinations.",
+        "panel_description": "Display the current weather in the top vacation spots.",
         "steps": {
             "1": {
                 "api": "Perplexity",
-                "handles": "Fetches latitude and longitude for each travel destination",
+                "handles": "Fetches latitude and longitude for each vacation spot",
                 "input_vars": [
                     {
-                        "name": "travel_destinations_list",
+                        "name": "vacation_spots_list",
                         "parameter": "query",
                         "type": "string",
                         "source": "API_Output (Panel 1, Step 1)",
-                        "description": "List of travel destinations from Panel 1",
-                        "value": "[\"Kuang Si Falls, Laos\", \"Tu Le Valley, Vietnam\", \"Lapland, Finland\", \"Amalfi Coast, Italy\", \"Petra, Jordan\", \"Bagan, Myanmar\", \"Barcelona, Spain\", \"Italy\", \"Thailand\", \"Australia\", \"Canada\", \"Ireland\", \"Japan\", \"Spain\", \"Portugal\", \"Costa Rica\", \"Hallstatt, Austria\", \"Las Coloradas, Mexico\", \"Chamarel, Mauritius\"]",
+                        "description": "List of vacation spots from Panel 1",
+                        "value": "[\"Rome, Italy\", \"Prague, Czech Republic\", \"Budapest, Hungary\", \"Dubrovnik, Croatia\", \"Berlin, Germany\"]",
                         "dependencies": [
                             {
                                 "panel": 1,
@@ -61,39 +61,39 @@
                 "output_vars": [
                     {
                         "name": "latitude",
-                        "description": "Latitude for each travel destination",
+                        "description": "Latitude for each vacation spot",
                         "used_by": [
                             {
                                 "panel": 2,
                                 "step": 2
                             }
                         ],
-                        "value": "{\n      \"Kuang Si Falls, Laos\": 19.74917,\n      \"Tu Le Valley, Vietnam\": 21.6833,\n      \"Lapland, Finland\": 66.5039,\n      \"Amalfi Coast, Italy\": 40.6278,\n      \"Petra, Jordan\": 30.3286,\n      \"Bagan, Myanmar\": 21.1667,\n      \"Barcelona, Spain\": 41.3888,\n      \"Italy\": 41.9028,\n      \"Thailand\": 13.7563,\n      \"Australia\": -35.2833,\n      \"Canada\": 56.130366,\n      \"Ireland\": 53.0000,\n      \"Japan\": 36.0000,\n      \"Spain\": 40.0000,\n      \"Portugal\": 39.5000,\n      \"Costa Rica\": 10.0000,\n      \"Hallstatt, Austria\": 47.5583,\n      \"Las Coloradas, Mexico\": 21.5000,\n      \"Chamarel, Mauritius\": -20.4333\n    }"
+                        "value": "{\"Rome\": 41.89193, \"Prague\": 50.075538, \"Budapest\": 47.497912, \"Dubrovnik\": 42.640278, \"Berlin\": 52.5200066}"
                     },
                     {
                         "name": "longitude",
-                        "description": "Longitude for each travel destination",
+                        "description": "Longitude for each vacation spot",
                         "used_by": [
                             {
                                 "panel": 2,
                                 "step": 2
                             }
                         ],
-                        "value": "{\n      \"Kuang Si Falls, Laos\": 101.99167,\n      \"Tu Le Valley, Vietnam\": 104.4333,\n      \"Lapland, Finland\": 25.7289,\n      \"Amalfi Coast, Italy\": 14.4883,\n      \"Petra, Jordan\": 35.4423,\n      \"Bagan, Myanmar\": 94.6167,\n      \"Barcelona, Spain\": 2.1590,\n      \"Italy\": 12.4964,\n      \"Thailand\": 100.5018,\n      \"Australia\": 149.1281,\n      \"Canada\": -106.346771,\n      \"Ireland\": -8.0000,\n      \"Japan\": 138.0000,\n      \"Spain\": -4.0000,\n      \"Portugal\": -8.0000,\n      \"Costa Rica\": -84.0000,\n      \"Hallstatt, Austria\": 13.6467,\n      \"Las Coloradas, Mexico\": -87.5000,\n      \"Chamarel, Mauritius\": 57.3667\n    }"
+                        "value": "{\"Rome\": 12.51133, \"Prague\": 14.437800, \"Budapest\": 19.040235, \"Dubrovnik\": 18.108333, \"Berlin\": 13.4049544}"
                     }
                 ]
             },
             "2": {
                 "api": "Open-Meteo",
-                "handles": "Retrieves weather forecast data for each location",
+                "handles": "Retrieves current weather data for each location",
                 "input_vars": [
                     {
                         "name": "latitude",
                         "parameter": "latitude",
                         "type": "float",
                         "source": "API_Output (Panel 2, Step 1)",
-                        "description": "Latitude of the travel destination",
-                        "value": "{\n      \"Kuang Si Falls, Laos\": 19.74917,\n      \"Tu Le Valley, Vietnam\": 21.6833,\n      \"Lapland, Finland\": 66.5039,\n      \"Amalfi Coast, Italy\": 40.6278,\n      \"Petra, Jordan\": 30.3286,\n      \"Bagan, Myanmar\": 21.1667,\n      \"Barcelona, Spain\": 41.3888,\n      \"Italy\": 41.9028,\n      \"Thailand\": 13.7563,\n      \"Australia\": -35.2833,\n      \"Canada\": 56.130366,\n      \"Ireland\": 53.0000,\n      \"Japan\": 36.0000,\n      \"Spain\": 40.0000,\n      \"Portugal\": 39.5000,\n      \"Costa Rica\": 10.0000,\n      \"Hallstatt, Austria\": 47.5583,\n      \"Las Coloradas, Mexico\": 21.5000,\n      \"Chamarel, Mauritius\": -20.4333\n    }",
+                        "description": "Latitude of the vacation spot",
+                        "value": "{\"Rome\": 41.89193, \"Prague\": 50.075538, \"Budapest\": 47.497912, \"Dubrovnik\": 42.640278, \"Berlin\": 52.5200066}",
                         "dependencies": [
                             {
                                 "panel": 2,
@@ -106,8 +106,8 @@
                         "parameter": "longitude",
                         "type": "float",
                         "source": "API_Output (Panel 2, Step 1)",
-                        "description": "Longitude of the travel destination",
-                        "value": "{\n      \"Kuang Si Falls, Laos\": 101.99167,\n      \"Tu Le Valley, Vietnam\": 104.4333,\n      \"Lapland, Finland\": 25.7289,\n      \"Amalfi Coast, Italy\": 14.4883,\n      \"Petra, Jordan\": 35.4423,\n      \"Bagan, Myanmar\": 94.6167,\n      \"Barcelona, Spain\": 2.1590,\n      \"Italy\": 12.4964,\n      \"Thailand\": 100.5018,\n      \"Australia\": 149.1281,\n      \"Canada\": -106.346771,\n      \"Ireland\": -8.0000,\n      \"Japan\": 138.0000,\n      \"Spain\": -4.0000,\n      \"Portugal\": -8.0000,\n      \"Costa Rica\": -84.0000,\n      \"Hallstatt, Austria\": 13.6467,\n      \"Las Coloradas, Mexico\": -87.5000,\n      \"Chamarel, Mauritius\": 57.3667\n    }",
+                        "description": "Longitude of the vacation spot",
+                        "value": "{\"Rome\": 12.51133, \"Prague\": 14.437800, \"Budapest\": 19.040235, \"Dubrovnik\": 18.108333, \"Berlin\": 13.4049544}",
                         "dependencies": [
                             {
                                 "panel": 2,
@@ -127,29 +127,29 @@
                 ],
                 "output_vars": [
                     {
-                        "name": "weather_forecast_data",
-                        "description": "Weather forecast data for each travel destination",
+                        "name": "current_weather_data",
+                        "description": "Current weather conditions for each vacation spot",
                         "used_by": [],
-                        "value": "{\n      \"Kuang Si Falls, Laos\": {\n        \"temperature\": 27.0,\n        \"windspeed\": 1.1,\n        \"winddirection\": 288,\n        \"weathercode\": 1,\n        \"is_day\": 1,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Tu Le Valley, Vietnam\": {\n        \"temperature\": 24.4,\n        \"windspeed\": 4.3,\n        \"winddirection\": 95,\n        \"weathercode\": 3,\n        \"is_day\": 1,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Lapland, Finland\": {\n        \"temperature\": 3.2,\n        \"windspeed\": 5.0,\n        \"winddirection\": 156,\n        \"weathercode\": 3,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Amalfi Coast, Italy\": {\n        \"temperature\": 22.0,\n        \"windspeed\": 6.4,\n        \"winddirection\": 164,\n        \"weathercode\": 2,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Petra, Jordan\": {\n        \"temperature\": 21.9,\n        \"windspeed\": 5.6,\n        \"winddirection\": 63,\n        \"weathercode\": 0,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Bagan, Myanmar\": {\n        \"temperature\": 26.0,\n        \"windspeed\": 4.0,\n        \"winddirection\": 170,\n        \"weathercode\": 80,\n        \"is_day\": 1,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Barcelona, Spain\": {\n        \"temperature\": 20.8,\n        \"windspeed\": 3.6,\n        \"winddirection\": 135,\n        \"weathercode\": 1,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Italy\": {\n        \"temperature\": 20.5,\n        \"windspeed\": 6.0,\n        \"winddirection\": 123,\n        \"weathercode\": 1,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Thailand\": {\n        \"temperature\": 28.3,\n        \"windspeed\": 3.3,\n        \"winddirection\": 49,\n        \"weathercode\": 3,\n        \"is_day\": 1,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Australia\": {\n        \"temperature\": 13.8,\n        \"windspeed\": 11.3,\n        \"winddirection\": 97,\n        \"weathercode\": 2,\n        \"is_day\": 1,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Canada\": {\n        \"temperature\": 8.3,\n        \"windspeed\": 8.4,\n        \"winddirection\": 245,\n        \"weathercode\": 2,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Ireland\": {\n        \"temperature\": 6.9,\n        \"windspeed\": 20.2,\n        \"winddirection\": 345,\n        \"weathercode\": 3,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Japan\": {\n        \"temperature\": 19.0,\n        \"windspeed\": 5.8,\n        \"winddirection\": 330,\n        \"weathercode\": 3,\n        \"is_day\": 1,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Spain\": {\n        \"temperature\": 15.2,\n        \"windspeed\": 12.6,\n        \"winddirection\": 265,\n        \"weathercode\": 1,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Portugal\": {\n        \"temperature\": 16.0,\n        \"windspeed\": 5.8,\n        \"winddirection\": 263,\n        \"weathercode\": 2,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Costa Rica\": {\n        \"temperature\": 19.1,\n        \"windspeed\": 3.8,\n        \"winddirection\": 17,\n        \"weathercode\": 3,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Hallstatt, Austria\": {\n        \"temperature\": 14.6,\n        \"windspeed\": 3.7,\n        \"winddirection\": 151,\n        \"weathercode\": 61,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Las Coloradas, Mexico\": {\n        \"temperature\": 26.5,\n        \"windspeed\": 5.2,\n        \"winddirection\": 258,\n        \"weathercode\": 2,\n        \"is_day\": 0,\n        \"time\": \"2024-09-27T02:15\"\n      },\n      \"Chamarel, Mauritius\": {\n        \"temperature\": 18.4,\n        \"windspeed\": 27.1,\n        \"winddirection\": 113,\n        \"weathercode\": 2,\n        \"is_day\": 1,\n        \"time\": \"2024-09-27T02:15\"\n      }\n    }"
+                        "value": "- Rome: \n      - Temperature: 16.5\u00b0C\n      - Wind Speed: 1.8 km/h\n      - Wind Direction: 323\u00b0\n      - Weather Code: 0\n    - Prague: \n      - Temperature: 8.4\u00b0C\n      - Wind Speed: 5.2 km/h\n      - Wind Direction: 282\u00b0\n      - Weather Code: 1\n    - Budapest: \n      - Temperature: 14.0\u00b0C\n      - Wind Speed: 13.0 km/h\n      - Wind Direction: 336\u00b0\n      - Weather Code: 3\n    - Dubrovnik: \n      - Temperature: 20.8\u00b0C\n      - Wind Speed: 7.8 km/h\n      - Wind Direction: 292\u00b0\n      - Weather Code: 2\n    - Berlin: \n      - Temperature: 7.2\u00b0C\n      - Wind Speed: 11.2 km/h\n      - Wind Direction: 276\u00b0\n      - Weather Code: 0"
                     }
                 ]
             }
         }
     },
     "3": {
-        "panel_description": "Display current news at the suggested travel destinations.",
+        "panel_description": "Display the cheapest flights to the top vacation spots.",
         "steps": {
             "1": {
                 "api": "Perplexity",
-                "handles": "Fetches country or city names for each travel destination",
+                "handles": "Retrieves information about the cheapest flights to the vacation spots",
                 "input_vars": [
                     {
-                        "name": "travel_destinations_list",
+                        "name": "vacation_spots_list",
                         "parameter": "query",
                         "type": "string",
                         "source": "API_Output (Panel 1, Step 1)",
-                        "description": "List of travel destinations from Panel 1",
-                        "value": "[\"Kuang Si Falls, Laos\", \"Tu Le Valley, Vietnam\", \"Lapland, Finland\", \"Amalfi Coast, Italy\", \"Petra, Jordan\", \"Bagan, Myanmar\", \"Barcelona, Spain\", \"Italy\", \"Thailand\", \"Australia\", \"Canada\", \"Ireland\", \"Japan\", \"Spain\", \"Portugal\", \"Costa Rica\", \"Hallstatt, Austria\", \"Las Coloradas, Mexico\", \"Chamarel, Mauritius\"]",
+                        "description": "List of vacation spots from Panel 1",
+                        "value": "[\"Rome, Italy\", \"Prague, Czech Republic\", \"Budapest, Hungary\", \"Dubrovnik, Croatia\", \"Berlin, Germany\"]",
                         "dependencies": [
                             {
                                 "panel": 1,
@@ -160,43 +160,10 @@
                 ],
                 "output_vars": [
                     {
-                        "name": "country_or_city_names",
-                        "description": "Country or city names for each travel destination",
-                        "used_by": [
-                            {
-                                "panel": 3,
-                                "step": 2
-                            }
-                        ],
-                        "value": "[\n      \"Kuang Si Falls, Laos\",\n      \"Tu Le Valley, Vietnam\",\n      \"Lapland, Finland\",\n      \"Amalfi Coast, Italy\",\n      \"Petra, Jordan\",\n      \"Bagan, Myanmar\",\n      \"Barcelona, Spain\",\n      \"Italy\",\n      \"Thailand\",\n      \"Australia\",\n      \"Canada\",\n      \"Ireland\",\n      \"Japan\",\n      \"Spain\",\n      \"Portugal\",\n      \"Costa Rica\",\n      \"Hallstatt, Austria\",\n      \"Las Coloradas, Mexico\",\n      \"Chamarel, Mauritius\"\n    ]"
-                    }
-                ]
-            },
-            "2": {
-                "api": "NEWS_API_TOP_HEADLINES",
-                "handles": "Retrieves current news for each location",
-                "input_vars": [
-                    {
-                        "name": "country_or_city_names",
-                        "parameter": "q",
-                        "type": "string",
-                        "source": "API_Output (Panel 3, Step 1)",
-                        "description": "Country or city names for each travel destination",
-                        "value": "[\n      \"Kuang Si Falls, Laos\",\n      \"Tu Le Valley, Vietnam\",\n      \"Lapland, Finland\",\n      \"Amalfi Coast, Italy\",\n      \"Petra, Jordan\",\n      \"Bagan, Myanmar\",\n      \"Barcelona, Spain\",\n      \"Italy\",\n      \"Thailand\",\n      \"Australia\",\n      \"Canada\",\n      \"Ireland\",\n      \"Japan\",\n      \"Spain\",\n      \"Portugal\",\n      \"Costa Rica\",\n      \"Hallstatt, Austria\",\n      \"Las Coloradas, Mexico\",\n      \"Chamarel, Mauritius\"\n    ]",
-                        "dependencies": [
-                            {
-                                "panel": 3,
-                                "step": 1
-                            }
-                        ]
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "current_news_data",
-                        "description": "Current news headlines for each travel destination",
+                        "name": "cheapest_flights_info",
+                        "description": "Information about the cheapest flights to the vacation spots",
                         "used_by": [],
-                        "value": "[\n      {\n        \"Location\": \"Italy\",\n        \"Articles\": [\n          {\n            \"Title\": \"Urso, 'se i prezzi dei voli non scendono interverremo' - Ultima Ora\",\n            \"Description\": \"Il ministero delle Imprese e del made in Italy Adolfo Urso \u00e8 pronto a intervenire contro il caro-voli. (ANSA)\",\n            \"URL\": \"http://www.ansa.it/sito/notizie/topnews/2023/07/11/urso-se-i-prezzi-dei-voli-non-scendono-interverremo_80c27007-c40d-400c-b403-51605b303c2a.html\"\n          },\n          {\n            \"Title\": \"Leaders of Germany, France, Italy, Romania in Ukraine to support fight against Russia\",\n            \"Description\": \"Zelensky expected to push for more arms to withstand the Russian invaders after accusing France, Germany and Italy of foot-dragging\",\n            \"URL\": \"https://www.theglobeandmail.com/world/article-leaders-of-germany-france-italy-romania-in-ukraine-to-support-fight/\"\n          }\n        ]\n      },\n      {\n        \"Location\": \"Australia\",\n        \"Articles\": [\n          {\n            \"Title\": \"Rich List: Kerry Stokes, Lindsay Fox, Imelda Roche\u2019s wealth secrets revealed for first time after 30-year loophole ends\",\n            \"Description\": \"Two years after removing an exemption that allowed Australia\u2019s richest families to keep details of their private companies secret, their financials are filtering through.\",\n            \"URL\": \"http://www.afr.com/wealth/people/rich-lister-wealth-secrets-revealed-after-30-year-loophole-ends-20240923-p5kcuw\"\n          },\n          {\n            \"Title\": \"Aussie company collapses after 34 years\",\n            \"Description\": \"A major Australian food supplier, which had been operating for 34 years, has collapsed.\",\n            \"URL\": \"https://www.news.com.au/finance/business/retail/another-major-australian-food-company-collapses/news-story/c85c4e690dc79f0313c75dfd0483aefa\"\n          },\n          {\n            \"Title\": \"Australia tells thousands of its citizens to leave Lebanon\",\n            \"Description\": \"Australia has urged an estimated 15,000 of its citizens living in Lebanon to leave, flagging a risk Beirut airport may close and the difficulty of evacuating large numbers if the situation worsens.\",\n            \"URL\": \"https://www.reuters.com/world/australia-tells-thousands-its-citizens-leave-lebanon-2024-09-26/\"\n          },\n          {\n            \"Title\": \"ASX 200 LIVE: ASX to rise, Dow drags Wall Street lower\",\n            \"Description\": \"Australian shares are set to open higher. US stocks were mostly lower. Micron results bolster AI outlook. Iron ore rises, oil eases. Follow updates here.\",\n            \"URL\": \"http://www.afr.com/markets/equity-markets/asx-to-rise-dow-drags-wall-street-lower-20240926-p5kdm1\"\n          },\n          {\n            \"Title\": \"Aussies stranded in Lebanon as possible Israeli ground invasion looms to 'continue degrading Hezbollah'\",\n            \"Description\": \"Australians trying to leave Lebanon as hostilities between Israel and Hezbollah increase are running out of options, as flights are cancelled and the IDF's top commander highlights the possibility that troops will cross the border.\",\n            \"URL\": \"https://www.abc.net.au/news/2024-09-26/aussies-stranded-in-lebanon-amid-possible-idf-ground-invasion/104397478\"\n          },\n          {\n            \"Title\": \"AFR Power list 2024: The most covertly powerful people in Australia are Don Farrell, Gina Rinehart, Tim Gartrell, Katy Gallagher, Paul Erickson, Lachlan Murdoch, Simon Holmes \u00e0 Court, Steven Kennedy, Gina Cass-Gottlieb, Matt Comyn\",\n            \"Description\": \"Those who wield the most clout behind the scenes in the nation\u2019s business and politics.\",\n            \"URL\": \"http://www.afr.com/politics/federal/the-10-most-covertly-powerful-people-in-australia-in-2024-20240830-p5k6pa\"\n          },\n          {\n            \"Title\": \"Fresh hope Ukraine will soon receive ageing Australian Abrams tanks as Defence reviews military support\",\n            \"Description\": \"Ukrainian Ambassador Vasyl Myroshnychenko says if Australia's older tanks were eventually donated his country 'will put them good to use'.\",\n            \"URL\": \"https://www.abc.net.au/news/2024-09-26/australian-abrams-tanks-could-be-sent-to-ukraine/104397438\"\n          },\n          {\n            \"Title\": \"Why we\u2019re obsessed with negative gearing\",\n            \"Description\": \"In Australia we pay a lot of tax, and it seems to be increasing every year. Cutting your tax bill will give you more money to save, invest, or just spend today \u2013 but it\u2019s not easy.\",\n            \"URL\": \"https://www.news.com.au/finance/money/tax/top-three-tax-saving-strategies-to-get-ahead-fast/news-story/d819974674c4fa24d6b10531994f31af\"\n          },\n          {\n            \"Title\": \"Australians are the second-wealthiest people in the world \u2013 and we\u2019re on track to have 2.3 millionaires by 2028\",\n            \"Description\": \"Buoyed by property and super, Australians have become the second-richest people in the world, on paper at least.\",\n            \"URL\": \"http://www.afr.com/wealth/personal-finance/australia-will-have-400-000-new-millionaires-by-2028-are-you-one-of-them-20240709-p5jsbh\"\n          }\n        ]\n      },\n      {\n        \"Location\": \"Canada\",\n        \"Articles\": [\n          {\n            \"Title\": \"Canada's population continues its strong growth despite signs of slowdown\",\n            \"Description\": \"Canada\u2019s population is estimated to be 41.2 million as of July this year, as temporary residents has surpass three million. Read more.\",\n            \"URL\": \"https://financialpost.com/news/canada-population-strong-growth\"\n          },\n          {\n            \"Title\": \"Population Growth Slows in Canada for First Time Since 2020\",\n            \"Description\": null,\n            \"URL\": \"https://news.google.com/rss/articles/CBMirwFBVV95cUxOTXZsY1JUckhuLWkzaWtDVDdXQVlWc0VIcUlvc2ZkbkpvbXhUU1N6ZHVzdU9TblkyOUR2VHVQWVhURHJTT3ZTVXA0S2E3bWtDRkpycmhyUWNRYlU0N1R2d3pFUGdzdnpvaHlQRVV0UjFYLXhzSl90WjVRNE9sV21oSUhBMjc3dFowWFN1MkcwRS1qQV9GRjhsTm5Ndnkxd3dpSFNhaVhIRUljYXdKaVJj?oc=5\"\n          },\n          {\n            \"Title\": \"Macklem says \u2018we need to stick the landing\u2019 as inflation falls to 2% target\",\n            \"Description\": \"Bank of Canada governor Tiff Macklem is pleased inflation has moved back to its target, but the central bank has work to do. Read more.\",\n            \"URL\": \"https://financialpost.com/news/macklem-stick-landing-inflation-falls\"\n          },\n          {\n            \"Title\": \"Posthaste: Why CIBC thinks some outsized rate cuts are in the cards for the Bank of Canada\",\n            \"Description\": \"The Bank of Canada likely can't afford to continue its current pace of interest rate cuts and will have to pick up the pace. Keep reading.\",\n            \"URL\": \"https://financialpost.com/news/cibc-thinks-bank-of-canada-cut-interest-rate-faster\"\n          },\n          {\n            \"Title\": \"\u2018It\u2019s a dog eat dog world\u2019 as housing cool-down helps ignite rental market wars\",\n            \"Description\": \"Rents in many parts of Canada are nearing or surging past prepandemic records, just as property values and home resale transactions declined for the second consecutive month in May\",\n            \"URL\": \"https://www.theglobeandmail.com/investing/personal-finance/household-finances/article-its-a-dog-eat-dog-world-as-housing-cool-down-helps-ignite-rental/\"\n          },\n          {\n            \"Title\": \"Across Canada, renters are now saving hundreds of dollars over owning\",\n            \"Description\": \"The math on renting vs. owning a home has changed drastically, says Rob Carrick in this look at the owning versus renting debate\",\n            \"URL\": \"https://www.theglobeandmail.com/investing/personal-finance/young-money/article-across-canada-renters-are-now-saving-hundreds-of-dollars-over-owning/\"\n          },\n          {\n            \"Title\": \"Many women who suffer from intimate partner violence don\u2019t trust the police. Why are they the default response?\",\n            \"Description\": \"Fearing discrimination, revictimization or arrests that do more harm than good, women in Canada often stay silent about their abuse. Other jurisdictions are trying to remove police from the equation\",\n            \"URL\": \"https://www.theglobeandmail.com/canada/article-intimate-partner-violence-police-response/\"\n          }\n        ]\n      },\n      {\n        \"Location\": \"Ireland\",\n        \"Articles\": [\n          {\n            \"Title\": \"State will not turn away refugees despite impact on tourism industry \u2013 Eamon Ryan\",\n            \"Description\": \"Green Party leader was responding to assertion by F\u00e1ilte Ireland that non-accommodation providers in sector will lose \u20ac1.1bn in revenues\",\n            \"URL\": \"https://www.irishtimes.com/business/2023/03/29/state-will-not-turn-away-refugees-despite-impact-on-tourism-industry-eamon-ryan/\"\n          },\n          {\n            \"Title\": \"Boris Johnson has survived Partygate\u2013and he\u2019s coming for Northern Ireland\",\n            \"Description\": \"Boris Johnson will not resign despite polls showing most Brits think he should. Instead, he is doubling down.\",\n            \"URL\": \"https://fortune.com/2022/05/27/boris-johnson-survived-partygate-uk-politics-leadership-international-northern-ireland-international-marina-purkiss/\"\n          }\n        ]\n      },\n      {\n        \"Location\": \"Japan\",\n        \"Articles\": [\n          {\n            \"Title\": \"\u2018Education of hatred\u2019: Killing of Japanese boy sparks soul searching in China over rising nationalism\",\n            \"Description\": \"The killing of a Japanese schoolboy in China has sparked an outpouring of anger and soul searching over the rise of extreme nationalism in the country, with some accusing the government of fanning anti-Japan sentiment and even the \u201ceducation of hatred.\u201d\",\n            \"URL\": \"https://www.cnn.com/2024/09/25/china/china-nationalism-japanese-boy-killing-intl-hnk/index.html\"\n          },\n          {\n            \"Title\": \"On the World Stage: Newsweek's Interviews with Indian Prime Minister Modi and Japanese Prime Minister Kishida\",\n            \"Description\": \"We aim to transcend surface-level narratives, offering coverage that creates opportunities for true international dialogue.\",\n            \"URL\": \"https://www.newsweek.com/world-stage-newsweeks-interviews-indian-prime-minister-modi-japanese-prime-minister-kishida-1895648\"\n          }\n        ]\n      },\n      {\n        \"Location\": \"Portugal\",\n        \"Articles\": [\n          {\n            \"Title\": \"Portugal to begin reopening to EU tourists from Monday\",\n            \"Description\": \"Portugal is to resume admitting tourists from most European countries on Monday, the interior ministry said, following months of restrictions to prevent the spread of Covid-19.\",\n            \"URL\": \"https://www.rte.ie/news/coronavirus/2021/0515/1221758-coronavirus-europe/\"\n          }\n        ]\n      },\n      {\n        \"Location\": \"Costa Rica\",\n        \"Articles\": [\n          {\n            \"Title\": \"Florida's Gulf Coast is still reeling from 2022 hurricane as Helene approaches\",\n            \"Description\": \"Almost exactly two years ago, Hurricane Ian made landfall near Cayo Costa.\",\n            \"URL\": \"https://abcnews.go.com/US/floridas-gulf-coast-reeling-2022-hurricane-helene-approaches/story?id=114103149\"\n          }\n        ]\n      }\n    ]"
+                        "value": "- **Rome, Italy**: \n      - Cheapest Months: January ($591) and November ($763)\n      - Cheapest Day: Tuesday or Wednesday\n      - Cheapest Time of Day: Morning ($643)\n      - Cheapest Airport: Rome Ciampino Airport (CIA)\n      - Prices: One-way from $134, Round-trip from $361\n    - **Prague, Czech Republic**: \n      - Cheapest Month: Off-season (October to March)\n      - Cheapest Day: Tuesday or Wednesday\n      - Cheapest Time of Day: Morning\n      - Prices: One-way under $300 (if booked in advance)\n    - **Budapest, Hungary**: \n      - Cheapest Month: Off-season (October to March)\n      - Cheapest Day: Tuesday or Wednesday\n      - Cheapest Time of Day: Morning\n      - Prices: One-way $300-$400, Round-trip $500-$600\n    - **Dubrovnik, Croatia to Berlin, Germany**: \n      - Berlin to Dubrovnik: One-way from $25, Round-trip from $71\n      - Dubrovnik to Berlin: One-way from $47, Round-trip from $194\n      - Airlines: Ryanair, easyJet, Austrian Airlines\n    - **General Tips**: \n      - Use flight comparison tools like Momondo, Kayak, Skyscanner\n      - Book in advance\n      - Sign up for airline newsletters\n      - Consider alternative airports for cheaper options"
                     }
                 ]
             }

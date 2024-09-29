@@ -1,36 +1,26 @@
 {
     "1": {
         "1": {
-            "panel_description": "Display the current weather in Seattle.",
+            "panel_description": "Summarize the impact of global weather patterns on financial markets in September 2024.",
             "steps": {
                 "1": {
                     "api": "Perplexity",
-                    "handles": "Retrieves coordinates of Seattle",
+                    "handles": "General summary of weather impact on financial markets",
                     "input_vars": [
                         {
-                            "name": "query_seattle_coordinates",
+                            "name": "query_weather_finance",
                             "parameter": "query",
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to find the latitude and longitude of Seattle",
-                            "value": "What are the latitude and longitude of Seattle, USA?",
+                            "description": "Query to get a summary of weather impact on financial markets",
+                            "value": "Impact of global weather patterns on financial markets in September 2024",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "seattle_latitude",
-                            "description": "Latitude of Seattle",
-                            "used_by": [
-                                {
-                                    "panel": 1,
-                                    "step": 2
-                                }
-                            ]
-                        },
-                        {
-                            "name": "seattle_longitude",
-                            "description": "Longitude of Seattle",
+                            "name": "weather_finance_summary",
+                            "description": "Summary of weather impact on financial markets",
                             "used_by": [
                                 {
                                     "panel": 1,
@@ -41,15 +31,15 @@
                     ]
                 },
                 "2": {
-                    "api": "Open-Meteo",
-                    "handles": "Retrieves current weather data for Seattle",
+                    "api": "NEWS_API",
+                    "handles": "Fetches news articles related to weather impact on financial markets",
                     "input_vars": [
                         {
-                            "name": "seattle_latitude",
-                            "parameter": "latitude",
-                            "type": "float",
+                            "name": "weather_finance_summary",
+                            "parameter": "q",
+                            "type": "string",
                             "source": "API_Output (Panel 1, Step 1)",
-                            "description": "Latitude of Seattle",
+                            "description": "Keywords for news search",
                             "value": "None",
                             "dependencies": [
                                 {
@@ -59,33 +49,110 @@
                             ]
                         },
                         {
-                            "name": "seattle_longitude",
-                            "parameter": "longitude",
-                            "type": "float",
-                            "source": "API_Output (Panel 1, Step 1)",
-                            "description": "Longitude of Seattle",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 1,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "current_weather_flag_seattle",
-                            "parameter": "current_weather",
-                            "type": "boolean",
+                            "name": "start_date",
+                            "parameter": "from",
+                            "type": "date",
                             "source": "LLM_Generated",
-                            "description": "Flag to get current weather data",
-                            "value": "true",
+                            "description": "Start date for news articles",
+                            "value": "2024-09-01",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "end_date",
+                            "parameter": "to",
+                            "type": "date",
+                            "source": "LLM_Generated",
+                            "description": "End date for news articles",
+                            "value": "2024-09-27",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "current_weather_seattle",
-                            "description": "Current weather conditions in Seattle",
+                            "name": "news_articles",
+                            "description": "News articles related to weather impact on financial markets",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "2": {
+        "2": {
+            "panel_description": "Gather expert opinions on automated trading systems from Stack Overflow.",
+            "steps": {
+                "1": {
+                    "api": "Perplexity",
+                    "handles": "General opinions on automated trading systems",
+                    "input_vars": [
+                        {
+                            "name": "query_trading_systems",
+                            "parameter": "query",
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get opinions on automated trading systems",
+                            "value": "Expert opinions on automated trading systems adapting to weather patterns",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "trading_systems_opinions",
+                            "description": "Opinions on automated trading systems",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "Stack_Exchange_Questions",
+                    "handles": "Fetches questions about automated trading systems",
+                    "input_vars": [
+                        {
+                            "name": "site",
+                            "parameter": "site",
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Stack Exchange site to query",
+                            "value": "stackoverflow",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "tags",
+                            "parameter": "tagged",
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Tags for filtering questions",
+                            "value": "automated-trading",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "trading_questions",
+                            "description": "Questions about automated trading systems",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "Stack_Exchange_Answers",
+                    "handles": "Fetches answers to questions about automated trading systems",
+                    "input_vars": [
+                        {
+                            "name": "site",
+                            "parameter": "site",
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Stack Exchange site to query",
+                            "value": "stackoverflow",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "trading_answers",
+                            "description": "Answers to questions about automated trading systems",
                             "used_by": []
                         }
                     ]

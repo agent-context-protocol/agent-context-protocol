@@ -1,57 +1,46 @@
 {
     "1": {
-        "panel_description": "Display the current weather in Seattle.",
+        "panel_description": "Summarize the impact of global weather patterns on financial markets in September 2024.",
         "steps": {
             "1": {
                 "api": "Perplexity",
-                "handles": "Retrieves coordinates of Seattle",
+                "handles": "General summary of weather impact on financial markets",
                 "input_vars": [
                     {
-                        "name": "query_seattle_coordinates",
+                        "name": "query_weather_finance",
                         "parameter": "query",
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Query to find the latitude and longitude of Seattle",
-                        "value": "What are the latitude and longitude of Seattle, USA?",
+                        "description": "Query to get a summary of weather impact on financial markets",
+                        "value": "Impact of global weather patterns on financial markets in September 2024",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "seattle_latitude",
-                        "description": "Latitude of Seattle",
+                        "name": "weather_finance_summary",
+                        "description": "Summary of weather impact on financial markets",
                         "used_by": [
                             {
                                 "panel": 1,
                                 "step": 2
                             }
                         ],
-                        "value": "47.608013"
-                    },
-                    {
-                        "name": "seattle_longitude",
-                        "description": "Longitude of Seattle",
-                        "used_by": [
-                            {
-                                "panel": 1,
-                                "step": 2
-                            }
-                        ],
-                        "value": "-122.335167"
+                        "value": "\"The impact of global weather patterns, particularly those associated with climate change and extreme weather events, on financial markets is multifaceted and significant. Key points include underestimation of risks, financial market volatility, climate change impacts, sector-specific effects, pricing and risk management, and the use of climate scenarios. As of September 2024, financial markets continue to grapple with accurately pricing in climate-related risks, affecting financial stability, market volatility, and sector performance.\""
                     }
                 ]
             },
             "2": {
-                "api": "Open-Meteo",
-                "handles": "Retrieves current weather data for Seattle",
+                "api": "NEWS_API",
+                "handles": "Fetches news articles related to weather impact on financial markets",
                 "input_vars": [
                     {
-                        "name": "seattle_latitude",
-                        "parameter": "latitude",
-                        "type": "float",
+                        "name": "weather_finance_summary",
+                        "parameter": "q",
+                        "type": "string",
                         "source": "API_Output (Panel 1, Step 1)",
-                        "description": "Latitude of Seattle",
-                        "value": "47.608013",
+                        "description": "Keywords for news search",
+                        "value": "\"Impact of global weather patterns on financial markets, climate change, financial stability, market volatility, sector performance\"",
                         "dependencies": [
                             {
                                 "panel": 1,
@@ -60,35 +49,30 @@
                         ]
                     },
                     {
-                        "name": "seattle_longitude",
-                        "parameter": "longitude",
-                        "type": "float",
-                        "source": "API_Output (Panel 1, Step 1)",
-                        "description": "Longitude of Seattle",
-                        "value": "-122.335167",
-                        "dependencies": [
-                            {
-                                "panel": 1,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "current_weather_flag_seattle",
-                        "parameter": "current_weather",
-                        "type": "boolean",
+                        "name": "start_date",
+                        "parameter": "from",
+                        "type": "date",
                         "source": "LLM_Generated",
-                        "description": "Flag to get current weather data",
-                        "value": "true",
+                        "description": "Start date for news articles",
+                        "value": "2024-09-01",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "end_date",
+                        "parameter": "to",
+                        "type": "date",
+                        "source": "LLM_Generated",
+                        "description": "End date for news articles",
+                        "value": "2024-09-27",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "current_weather_seattle",
-                        "description": "Current weather conditions in Seattle",
+                        "name": "news_articles",
+                        "description": "News articles related to weather impact on financial markets",
                         "used_by": [],
-                        "value": "{\n      \"time\": \"2024-09-28T15:30\",\n      \"temperature\": \"10.4\u00b0C\",\n      \"windspeed\": \"8.5 km/h\",\n      \"winddirection\": \"54\u00b0\",\n      \"weather_code\": 3\n    }"
+                        "value": "1. Title: Joel Makower Archive\n       Description: Joel Makower Archive\n       Url: https://www.greenbiz.com/temp/JoelMakowerArchive"
                     }
                 ]
             }

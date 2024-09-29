@@ -483,3 +483,78 @@ Status_Code
 Error_Explanation
 
 The API response does not provide the geographic coordinates for Delhi, India. Thus the response remainse incomplete.
+
+#### Example 5: Taking care of units
+
+Input:
+
+Current Step Details:
+
+- API: Open-Meteo
+- Handles: Retrieves current weather data for Mawsynram
+- Input Variables:
+  - Name: latitude
+    - Parameter: latitude
+    - Type: float
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: Latitude of the rainy area
+    - Value: "{
+      "Mawsynram": 25.300,
+    }"
+  - Name: longitude
+    - Parameter: longitude
+    - Type: float
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: Longitude of the rainy area
+    - Value: "{
+      "Mawsynram": 91.583,
+    }"
+  - Name: current_weather_flag
+    - Parameter: current_weather
+    - Type: boolean
+    - Source: LLM_Generated
+    - Description: Flag to include current weather data
+    - Value: "true"
+- Output Variables:
+  - Name: current_weather_data
+    - Description: Current weather conditions in Mawsynram
+
+Dependent Input Variables Step:
+
+API Response 0:
+
+{'latitude': 25.375, 'longitude': 91.625, 'generationtime_ms': 0.05900859832763672, 'utc_offset_seconds': 0, 'timezone': 'GMT', 'timezone_abbreviation': 'GMT', 'elevation': 1421.0, 'current_weather_units': {'time': 'iso8601', 'interval': 'seconds', 'temperature': '°C', 'windspeed': 'km/h', 'winddirection': '°', 'is_day': '', 'weathercode': 'wmo code'}, 'current_weather': {'time': '2024-09-29T00:00', 'interval': 900, 'temperature': 18.9, 'windspeed': 4.6, 'winddirection': 252, 'is_day': 1, 'weathercode': 45}}
+
+Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+- The API responses provide current weather data for each of the specified rainy areas.
+- Each response includes the necessary weather details such as temperature, wind speed, wind direction, and weather code, along with units.
+- The data is complete and matches the expected output for the current step, which is to retrieve current weather conditions for each area.
+- The extracted data will be formatted into a JSON structure for the output variable `current_weather_data`.
+
+$$API_RESPONSE$$
+
+Status_Code
+
+200 OK
+
+Output_Variables
+
+- Variable Name: current_weather_data
+  - Content: 
+    ```json
+    {
+      "Mawsynram": {
+        "temperature": 18.9,
+        "windspeed": 4.6,
+        "winddirection": 252,
+        "weathercode": 45,
+        "units": {
+          "temperature": "°C",
+          "windspeed": "km/h",
+          "winddirection": "°"
+        }
+      },
+    }
