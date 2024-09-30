@@ -52,8 +52,8 @@ def update_interpreter_with_similar_apis(interpreter_message, faiss_index_path='
     for api_name in interpreter_message['request']['relevant_apis']:
         api_details.append({
             'api_name': api_name,
-            'Input': api_data[api_name]['Input'],
-            'Output': api_data[api_name]['Output'],
+            # 'Input': api_data[api_name]['Input'],
+            # 'Output': api_data[api_name]['Output'],
             'Use': api_data[api_name]['Use']
             })
     interpreter_message['request']['relevant_apis'] = api_details

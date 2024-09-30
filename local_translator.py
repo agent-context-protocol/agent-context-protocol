@@ -2,7 +2,7 @@ from base import BaseNode
 from available_apis.hardcoded_format.return_dict import HARDCODED_APIS_DICT
 from available_apis.openapi_format.return_dict import OPEN_APIS_DICT
 from available_apis.function_format.return_dict import FUNCTION_APIS_DOCUMENTATION_DICT, FUNCTION_APIS_FUNCTION_DICT
-from available_apis.function_format.perplexity_function import perplexity_api_response
+from available_apis.rapid_apis_format.return_dict import RAPID_APIS_DICT
 import json
 import requests
 import re
@@ -90,6 +90,11 @@ class LocalTranslatorNode(BaseNode):
         if step['api'] in self.api_keys:
             input_string += "\nAdditonal Input Details:\n"
             input_string += f"API_KEY: {self.api_keys[step['api']]}\n"
+        # in case its a rapid api
+        elif step['api'] in RAPID_APIS_DICT:
+            input_string += "\nAdditonal Input Details:\n"
+            rapid_api_key = self.api_keys["Rapid_API_Key"]
+            input_string += f"API_KEY: {rapid_api_key}\n"
 
         # Add the API documentation provided
         input_string += "\nAPI Documentation:\n"
@@ -654,6 +659,7 @@ class LocalTranslatorNode(BaseNode):
         overall_success_bool = False
         overall_counter = 0
         while not overall_success_bool and overall_counter < 5:
+            self.chat_history = []
             overall_counter += 1
             
             if not self.group_workflow:
@@ -681,10 +687,8 @@ class LocalTranslatorNode(BaseNode):
                 # API_RUNNING Part with Error Handling
 
                 # Call the function to prepare the input for the current step
-                if step['api'] in OPEN_APIS_DICT:
-                    api_documentation = OPEN_APIS_DICT[step['api']]
-                elif step['api'] in HARDCODED_APIS_DICT:
-                    api_documentation = HARDCODED_APIS_DICT[step['api']]
+                if step['api'] in RAPID_APIS_DICT:
+                    api_documentation = RAPID_APIS_DICT[step['api']]
                 elif step['api'] in FUNCTION_APIS_DOCUMENTATION_DICT:
                     api_documentation = FUNCTION_APIS_DOCUMENTATION_DICT[step['api']]
                 else:

@@ -25,29 +25,8 @@ You will receive the following user data:
    * The user's initial request or question
 
 ## Available APIs
-{
-    "Perplexity": {
-      "Use": "As a search engine to retrieve and synthesize information from multiple sources into a single, concise response."
-    },
-    "Open-Meteo": {
-      "Use": "This API is used to retrieve weather forecasts for a specific location given by latitude and longitude coordinates. It is suitable for applications needing weather data for planning events, monitoring conditions, or integrating weather information into services."
-    },
-    "NEWS_API": {
-      "Use": "This API helps you find and analyze news articles from a wide range of sources published in the last 5 years. It’s useful for discovering news on various topics and conducting detailed news analysis."
-    },
-    "NEWS_API_TOP_HEADLINES": {
-      "Use": "This API is used to get the latest breaking news headlines from various sources. It’s useful for staying updated with current events, filtering news by category or source, and getting specific headlines based on keywords."
-    },
-      "Stack_Exchange_Questions": {
-        "Use": "Retrieve and filter questions from the Stack Exchange site based on various criteria such as date range, tags, sorting options, and pagination. Useful for displaying or analyzing questions related to specific topics or time periods."
-      },
-      "Stack_Exchange_Answers": {
-        "Use": "Retrieve details about specific answers to questions, which can be useful for examining responses to particular queries or analyzing the quality of answers."
-      },
-      "Stack_Exchange_Users": {
-        "Use": "Obtain details about users on the Stack Exchange site, which can be useful for user analysis, profile lookups, or understanding user contributions to the site."
-      }        
-}
+
+[Will be provided to you with the input]
 
 ## Core Responsibilities
 

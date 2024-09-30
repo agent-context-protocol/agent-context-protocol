@@ -1,51 +1,46 @@
 {
     "1": {
-        "panel_description": "Display the most beautiful places in the world.",
+        "panel_description": "Display top-rated restaurants in Rome.",
         "steps": {
             "1": {
-                "api": "Perplexity",
-                "handles": "Retrieves a list of beautiful places in the world",
+                "api": "TripadvisorSearchLocation",
+                "handles": "Retrieves the geoId for Rome",
                 "input_vars": [
                     {
-                        "name": "query_beautiful_places",
+                        "name": "query_rome",
                         "parameter": "query",
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Query to get the most beautiful places in the world",
-                        "value": "What are the most beautiful places in the world?",
+                        "description": "Query to get the geoId for Rome",
+                        "value": "Rome",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "beautiful_places_list",
-                        "description": "List of beautiful places in the world",
+                        "name": "geoId",
+                        "description": "The unique identifier for the location of Rome",
                         "used_by": [
                             {
-                                "panel": 2,
-                                "step": 1
+                                "panel": 1,
+                                "step": 2
                             }
                         ],
-                        "value": "\"The world is replete with breathtakingly beautiful places, each offering unique natural wonders, cultural significance, and awe-inspiring landscapes. Here are some of the most stunning destinations highlighted across various sources:\n\n    Montenegro: Kotor Bay, Lake Skadar, Tara River\n    Greece: Lefkada Island\n    Oman: Shariqiya Sands\n    Mexico: Las Coloradas Lagoon\n    Brazil: Rio Sucuri, Paraty\n    Australia: Tarkine Rainforest, Tasmania\n    United States: Joshua Tree National Park, Bisti/De-Na-Zin Wilderness\n    Vietnam: Fansipan, M\u00f9 Cang Ch\u1ea3i, Tu Le Valley\n    Japan: Mount Yoshino, Arashiyama Bamboo Grove\n    Iceland: The Faroe Islands\n    Jordan: Petra\n    Italy: Lake Como, Saturnia\n    Greenland: Ilulissat Icefjord\n    Indonesia: Raja Ampat\""
+                        "value": "187791"
                     }
                 ]
-            }
-        }
-    },
-    "2": {
-        "panel_description": "Display the country heads of the beautiful places.",
-        "steps": {
-            "1": {
-                "api": "Perplexity",
-                "handles": "Finds the country heads of the beautiful places",
+            },
+            "2": {
+                "api": "TripadvisorSearchRestaurants",
+                "handles": "Searches for top-rated restaurants in Rome using the geoId",
                 "input_vars": [
                     {
-                        "name": "beautiful_places_list",
-                        "parameter": "query",
+                        "name": "geoId",
+                        "parameter": "locationId",
                         "type": "string",
                         "source": "API_Output (Panel 1, Step 1)",
-                        "description": "List of beautiful places from Panel 1",
-                        "value": "[\"Kotor Bay\", \"Lake Skadar\", \"Tara River\", \"Lefkada Island\", \"Shariqiya Sands\", \"Las Coloradas Lagoon\", \"Rio Sucuri\", \"Paraty\", \"Tarkine Rainforest\", \"Joshua Tree National Park\", \"Bisti/De-Na-Zin Wilderness\", \"Fansipan\", \"M\u00f9 Cang Ch\u1ea3i\", \"Tu Le Valley\", \"Mount Yoshino\", \"Arashiyama Bamboo Grove\", \"The Faroe Islands\", \"Petra\", \"Lake Como\", \"Saturnia\", \"Ilulissat Icefjord\", \"Raja Ampat\"]",
+                        "description": "The geoId for Rome",
+                        "value": "187791",
                         "dependencies": [
                             {
                                 "panel": 1,
@@ -56,78 +51,10 @@
                 ],
                 "output_vars": [
                     {
-                        "name": "country_heads_list",
-                        "description": "List of country heads for the beautiful places",
-                        "used_by": [
-                            {
-                                "panel": 3,
-                                "step": 1
-                            }
-                        ]
-                    }
-                ]
-            }
-        }
-    },
-    "3": {
-        "panel_description": "Display recent news about the country heads.",
-        "steps": {
-            "1": {
-                "api": "Perplexity",
-                "handles": "Gathers information about the country heads",
-                "input_vars": [
-                    {
-                        "name": "country_heads_list",
-                        "parameter": "query",
-                        "type": "string",
-                        "source": "API_Output (Panel 2, Step 1)",
-                        "description": "Names of country heads from Panel 2",
-                        "value": "None",
-                        "dependencies": [
-                            {
-                                "panel": 2,
-                                "step": 1
-                            }
-                        ]
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "country_heads_info",
-                        "description": "Information about the country heads",
-                        "used_by": [
-                            {
-                                "panel": 3,
-                                "step": 2
-                            }
-                        ]
-                    }
-                ]
-            },
-            "2": {
-                "api": "NEWS_API",
-                "handles": "Fetches recent news articles about the country heads",
-                "input_vars": [
-                    {
-                        "name": "country_heads_info",
-                        "parameter": "q",
-                        "type": "string",
-                        "source": "API_Output (Panel 3, Step 1)",
-                        "description": "Information about country heads from Perplexity",
-                        "value": "None",
-                        "dependencies": [
-                            {
-                                "panel": 3,
-                                "step": 1
-                            }
-                        ]
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "recent_news_articles",
-                        "description": "Recent news articles about the country heads",
-                        "used_by": []
+                        "name": "restaurant_details",
+                        "description": "Details of top-rated restaurants in Rome, including name, rating, and reviews",
+                        "used_by": [],
+                        "value": "```json\n    [\n      {\n        \"name\": \"DOC EnoBistrot - Cruderia & Cucina\",\n        \"averageRating\": 5,\n        \"userReviewCount\": 814,\n        \"reviews\": [\n          {\n            \"reviewText\": \"Fantastic Pasta Experience in DOC\",\n            \"reviewUrl\": \"https://www.tripadvisor.com/ShowUserReviews-g187791-d23564258-r959938494-DOC_EnoBistrot_Cruderia_Cucina-Rome_Lazio.html\"\n          },\n          {\n            \"reviewText\": \"The focaccia bread tastes so fresh and...\",\n            \"reviewUrl\": \"https://www.tripadvisor.com/ShowUserReviews-g187791-d23564258-r804917285-DOC_EnoBistrot_Cruderia_Cucina-Rome_Lazio.html\"\n          }\n        ]\n      },\n      {\n        \"name\": \"Ristorante Ai Cocci\",\n        \"averageRating\": 4.5,\n        \"userReviewCount\": 1104,\n        \"reviews\": [\n          {\n            \"reviewText\": \"If they suggest adding truffle to the carbonara, don\u2019t hesitate!\",\n            \"reviewUrl\": \"https://www.tripadvisor.com/ShowUserReviews-g187791-d15244534-r967253918-Ristorante_Ai_Cocci-Rome_Lazio.html\"\n          },\n          {\n            \"reviewText\": \"Great homemade pasta!\",\n            \"reviewUrl\": \"https://www.tripadvisor.com/ShowUserReviews-g187791-d15244534-r955536167-Ristorante_Ai_Cocci-Rome_Lazio.html\"\n          }\n        ]\n      },\n      {\n        \"name\": \"Bono Bottega Nostrana - San Pietro\",\n        \"averageRating\": 5,\n        \"userReviewCount\": 1688,\n        \"reviews\": [\n          {\n            \"reviewText\": \"We are vegan and we\u2019re happy with the 77 and 79 plus the salad and drinks.\",\n            \"reviewUrl\": \"https://www.tripadvisor.com/ShowUserReviews-g187791-d18850657-r965969389-Bono_Bottega_Nostrana_San_Pietro-Rome_Lazio.html\"\n          },\n          {\n            \"reviewText\": \"It was delicious. You will have a free...\",\n            \"reviewUrl\": \"https://www.tripadvisor.com/ShowUserReviews-g187791-d18850657-r795143816-Bono_Bottega_Nostrana_San_Pietro-Rome_Lazio.html\"\n          }\n        ]\n      }\n      // Additional restaurants can be added similarly\n    ]\n    ```"
                     }
                 ]
             }

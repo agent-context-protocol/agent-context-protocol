@@ -1,51 +1,54 @@
 {
     "1": {
-        "panel_description": "Display the most beautiful places in the world.",
+        "panel_description": "Identify the top 5 places in Europe to visit.",
         "steps": {
             "1": {
                 "api": "Perplexity",
-                "handles": "Retrieves a list of beautiful places in the world",
+                "handles": "Retrieves a list of top places to visit in Europe",
                 "input_vars": [
                     {
-                        "name": "query_beautiful_places",
+                        "name": "query_top_places",
                         "parameter": "query",
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Query to get the most beautiful places in the world",
-                        "value": "What are the most beautiful places in the world?",
+                        "description": "Query to get the top 5 places to visit in Europe",
+                        "value": "Top 5 places to visit in Europe currently",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "beautiful_places_list",
-                        "description": "List of beautiful places in the world",
+                        "name": "top_places_list",
+                        "description": "List of top 5 places to visit in Europe",
                         "used_by": [
+                            {
+                                "panel": 1,
+                                "step": 2
+                            },
                             {
                                 "panel": 2,
                                 "step": 1
+                            },
+                            {
+                                "panel": 3,
+                                "step": 1
                             }
                         ],
-                        "value": "\"The world is replete with breathtakingly beautiful places, each offering unique natural wonders, cultural significance, and awe-inspiring landscapes. Here are some of the most stunning destinations highlighted across various sources:\n\n    Montenegro: Kotor Bay, Lake Skadar, Tara River\n    Greece: Lefkada Island\n    Oman: Shariqiya Sands\n    Mexico: Las Coloradas Lagoon\n    Brazil: Rio Sucuri, Paraty\n    Australia: Tarkine Rainforest, Tasmania\n    United States: Joshua Tree National Park, Bisti/De-Na-Zin Wilderness\n    Vietnam: Fansipan, M\u00f9 Cang Ch\u1ea3i, Tu Le Valley\n    Japan: Mount Yoshino, Arashiyama Bamboo Grove\n    Iceland: The Faroe Islands\n    Jordan: Petra\n    Italy: Lake Como, Saturnia\n    Greenland: Ilulissat Icefjord\n    Indonesia: Raja Ampat\""
+                        "value": "[\"Paris, France\", \"Venice, Italy\", \"Prague, Czech Republic\", \"Barcelona, Spain\", \"Vienna, Austria\"]"
                     }
                 ]
-            }
-        }
-    },
-    "2": {
-        "panel_description": "Display the country heads of the beautiful places.",
-        "steps": {
-            "1": {
-                "api": "Perplexity",
-                "handles": "Finds the country heads of the beautiful places",
+            },
+            "2": {
+                "api": "TripadvisorSearchLocation",
+                "handles": "Retrieves location details for each top place",
                 "input_vars": [
                     {
-                        "name": "beautiful_places_list",
+                        "name": "top_places_list",
                         "parameter": "query",
                         "type": "string",
                         "source": "API_Output (Panel 1, Step 1)",
-                        "description": "List of beautiful places from Panel 1",
-                        "value": "[\"Kotor Bay\", \"Lake Skadar\", \"Tara River\", \"Lefkada Island\", \"Shariqiya Sands\", \"Las Coloradas Lagoon\", \"Rio Sucuri\", \"Paraty\", \"Tarkine Rainforest\", \"Joshua Tree National Park\", \"Bisti/De-Na-Zin Wilderness\", \"Fansipan\", \"M\u00f9 Cang Ch\u1ea3i\", \"Tu Le Valley\", \"Mount Yoshino\", \"Arashiyama Bamboo Grove\", \"The Faroe Islands\", \"Petra\", \"Lake Como\", \"Saturnia\", \"Ilulissat Icefjord\", \"Raja Ampat\"]",
+                        "description": "List of top places from Perplexity",
+                        "value": "[\"Paris, France\", \"Venice, Italy\", \"Prague, Czech Republic\", \"Barcelona, Spain\", \"Vienna, Austria\"]",
                         "dependencies": [
                             {
                                 "panel": 1,
@@ -56,34 +59,62 @@
                 ],
                 "output_vars": [
                     {
-                        "name": "country_heads_list",
-                        "description": "List of country heads for the beautiful places",
-                        "used_by": [
-                            {
-                                "panel": 3,
-                                "step": 1
-                            }
-                        ],
-                        "value": "```json\n    {\n      \"Kotor Bay\": \"President Jakov Milatovi\u0107 - Montenegro\",\n      \"Lake Skadar\": \"President Jakov Milatovi\u0107 - Montenegro, President Bajram Begaj - Albania\",\n      \"Tara River\": \"President Jakov Milatovi\u0107 - Montenegro, Presidency \u017deljko Kom\u0161i\u0107, Milorad Dodik, \u017deljka Cvijanovi\u0107 - Bosnia and Herzegovina\",\n      \"Lefkada Island\": \"President Katerina Sakellaropoulou - Greece\",\n      \"Shariqiya Sands\": \"King Salman bin Abdulaziz Al Saud - Saudi Arabia\",\n      \"Las Coloradas Lagoon\": \"President Andr\u00e9s Manuel L\u00f3pez Obrador - Mexico\",\n      \"Rio Sucuri\": \"President Luiz In\u00e1cio Lula da Silva - Brazil\",\n      \"Paraty\": \"President Luiz In\u00e1cio Lula da Silva - Brazil\",\n      \"Tarkine Rainforest\": \"Prime Minister Anthony Albanese - Australia\",\n      \"Joshua Tree National Park\": \"President Joe Biden - United States\",\n      \"Bisti/De-Na-Zin Wilderness\": \"President Joe Biden - United States\",\n      \"Fansipan\": \"President V\u00f5 V\u0103n Th\u01b0\u1edfng - Vietnam\",\n      \"M\u00f9 Cang Ch\u1ea3i\": \"President V\u00f5 V\u0103n Th\u01b0\u1edfng - Vietnam\",\n      \"Tu Le Valley\": \"President V\u00f5 V\u0103n Th\u01b0\u1edfng - Vietnam\",\n      \"Mount Yoshino\": \"Prime Minister Fumio Kishida - Japan\",\n      \"Arashiyama Bamboo Grove\": \"Prime Minister Fumio Kishida - Japan\",\n      \"The Faroe Islands\": \"King Frederik X - Denmark, Prime Minister Aksel V. Johannesen - Faroe Islands\",\n      \"Petra\": \"King Abdullah II - Jordan, Prime Minister Bisher Al-Khasawneh - Jordan\",\n      \"Lake Como\": \"President Sergio Mattarella - Italy, Prime Minister Giorgia Meloni - Italy\",\n      \"Saturnia\": \"President Sergio Mattarella - Italy, Prime Minister Giorgia Meloni - Italy\",\n      \"Ilulissat Icefjord\": \"King Frederik X - Denmark, Prime Minister M\u00fate Bourup Egede - Greenland\",\n      \"Raja Ampat\": \"President Joko Widodo - Indonesia\"\n    }\n    ```"
+                        "name": "location_details",
+                        "description": "Location details including coordinates for each place",
+                        "used_by": [],
+                        "value": "```json\n    [\n      {\n        \"name\": \"Paris\",\n        \"geoId\": 187147,\n        \"region\": \"Ile-de-France, France\"\n      },\n      {\n        \"name\": \"Venice\",\n        \"geoId\": 187870,\n        \"region\": \"Veneto, Italy\"\n      },\n      {\n        \"name\": \"Prague\",\n        \"geoId\": 274707,\n        \"region\": \"Bohemia, Czech Republic\"\n      },\n      {\n        \"name\": \"Barcelona\",\n        \"geoId\": 187497,\n        \"region\": \"Catalonia, Spain\"\n      },\n      {\n        \"name\": \"Vienna\",\n        \"geoId\": 190454,\n        \"region\": \"Vienna Region, Austria\"\n      }\n    ]\n    ```"
                     }
                 ]
             }
         }
     },
-    "3": {
-        "panel_description": "Display recent news about the country heads.",
+    "2": {
+        "panel_description": "Provide real-time weather information for the top European destinations.",
         "steps": {
             "1": {
                 "api": "Perplexity",
-                "handles": "Gathers information about the country heads",
+                "handles": "Confirms coordinates for each top destination",
                 "input_vars": [
                     {
-                        "name": "country_heads_list",
+                        "name": "top_places_list",
                         "parameter": "query",
                         "type": "string",
+                        "source": "API_Output (Panel 1, Step 1)",
+                        "description": "List of top places from Perplexity",
+                        "value": "[\"Paris, France\", \"Venice, Italy\", \"Prague, Czech Republic\", \"Barcelona, Spain\", \"Vienna, Austria\"]",
+                        "dependencies": [
+                            {
+                                "panel": 1,
+                                "step": 1
+                            }
+                        ]
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "confirmed_coordinates",
+                        "description": "Confirmed coordinates for each destination",
+                        "used_by": [
+                            {
+                                "panel": 2,
+                                "step": 2
+                            }
+                        ],
+                        "value": "```json\n    {\n      \"Paris, France\": {\n        \"latitude\": 48.85341,\n        \"longitude\": 2.3488\n      },\n      \"Venice, Italy\": {\n        \"latitude\": 45.4379,\n        \"longitude\": 12.3325\n      },\n      \"Prague, Czech Republic\": {\n        \"latitude\": 50.0755,\n        \"longitude\": 14.4378\n      },\n      \"Barcelona, Spain\": {\n        \"latitude\": 41.390205,\n        \"longitude\": 2.154007\n      },\n      \"Vienna, Austria\": {\n        \"latitude\": 48.208174,\n        \"longitude\": 16.373819\n      }\n    }\n    ```"
+                    }
+                ]
+            },
+            "2": {
+                "api": "WeatherAPI.com_Realtime_Weather_Api",
+                "handles": "Fetches real-time weather information for each location",
+                "input_vars": [
+                    {
+                        "name": "confirmed_coordinates",
+                        "parameter": "q",
+                        "type": "string",
                         "source": "API_Output (Panel 2, Step 1)",
-                        "description": "Names of country heads from Panel 2",
-                        "value": "```json\n    [\n      \"President Jakov Milatovi\u0107 - Montenegro\",\n      \"President Bajram Begaj - Albania\",\n      \"Presidency \u017deljko Kom\u0161i\u0107, Milorad Dodik, \u017deljka Cvijanovi\u0107 - Bosnia and Herzegovina\",\n      \"President Katerina Sakellaropoulou - Greece\",\n      \"King Salman bin Abdulaziz Al Saud - Saudi Arabia\",\n      \"President Andr\u00e9s Manuel L\u00f3pez Obrador - Mexico\",\n      \"President Luiz In\u00e1cio Lula da Silva - Brazil\",\n      \"Prime Minister Anthony Albanese - Australia\",\n      \"President Joe Biden - United States\",\n      \"President V\u00f5 V\u0103n Th\u01b0\u1edfng - Vietnam\",\n      \"Prime Minister Fumio Kishida - Japan\",\n      \"King Frederik X - Denmark\",\n      \"Prime Minister Aksel V. Johannesen - Faroe Islands\",\n      \"King Abdullah II - Jordan\",\n      \"Prime Minister Bisher Al-Khasawneh - Jordan\",\n      \"President Sergio Mattarella - Italy\",\n      \"Prime Minister Giorgia Meloni - Italy\",\n      \"Prime Minister M\u00fate Bourup Egede - Greenland\",\n      \"President Joko Widodo - Indonesia\"\n    ]\n    ```",
+                        "description": "Coordinates for each destination",
+                        "value": "```json\n    {\n      \"Paris, France\": {\n        \"latitude\": 48.85341,\n        \"longitude\": 2.3488\n      },\n      \"Venice, Italy\": {\n        \"latitude\": 45.4379,\n        \"longitude\": 12.3325\n      },\n      \"Prague, Czech Republic\": {\n        \"latitude\": 50.0755,\n        \"longitude\": 14.4378\n      },\n      \"Barcelona, Spain\": {\n        \"latitude\": 41.390205,\n        \"longitude\": 2.154007\n      },\n      \"Vienna, Austria\": {\n        \"latitude\": 48.208174,\n        \"longitude\": 16.373819\n      }\n    }\n    ```",
                         "dependencies": [
                             {
                                 "panel": 2,
@@ -94,32 +125,32 @@
                 ],
                 "output_vars": [
                     {
-                        "name": "country_heads_info",
-                        "description": "Information about the country heads",
-                        "used_by": [
-                            {
-                                "panel": 3,
-                                "step": 2
-                            }
-                        ],
-                        "value": "```json\n    {\n      \"President Jakov Milatovi\u0107 - Montenegro\": {\n        \"Background\": \"Jakov Milatovi\u0107 is a Montenegrin politician and economist born on December 7, 1986. He is the current President of Montenegro, taking office in May 2023.\",\n        \"Political Career\": \"Before becoming president, Milatovi\u0107 served as the Minister of Economic Development in the cabinet of Zdravko Krivokapi\u0107 from 2020 to 2022. He was also an economist at the European Bank for Reconstruction and Development in London and Podgorica.\",\n        \"Presidency\": \"Milatovi\u0107 won the presidential election in a landslide victory against incumbent President Milo \u0110ukanovi\u0107 in April 2023, securing 58.88% of the popular vote. He is the youngest person to hold the office of president in independent Montenegro and the world's sixth-youngest serving state leader.\",\n        \"Political Positions\": \"Milatovi\u0107 supports Montenegro's accession to the European Union, advocates for closer relations with Serbia, and supports sanctioning Russia due to its invasion of Ukraine. He also supports the Open Balkan initiative and has emphasized improving living standards and tackling corruption.\",\n        \"Recent Activities\": \"Milatovi\u0107 has met with several international leaders, including Pope Francis and U.S. Senator Jim Risch. He has also stated that Montenegro could join the European Union by 2027 or 2028 and has condemned Russia's aggression against Ukraine.\"\n      },\n      \"President Bajram Begaj - Albania\": {\n        \"Background\": \"Bajram Begaj is the current President of Albania, taking office in July 2022. He is a retired general and was elected as the President of Albania by the Parliament.\"\n      },\n      \"Presidency \u017deljko Kom\u0161i\u0107, Milorad Dodik, \u017deljka Cvijanovi\u0107 - Bosnia and Herzegovina\": {\n        \"Background\": \"Bosnia and Herzegovina has a tripartite presidency, consisting of \u017deljko Kom\u0161i\u0107, Milorad Dodik, and \u017deljka Cvijanovi\u0107.\"\n      },\n      \"President Katerina Sakellaropoulou - Greece\": {\n        \"Background\": \"Katerina Sakellaropoulou is the current President of Greece, taking office in March 2020. She is the first female President of Greece and was previously the President of the Council of State.\"\n      },\n      \"King Salman bin Abdulaziz Al Saud - Saudi Arabia\": {\n        \"Background\": \"King Salman has been the King of Saudi Arabia since January 2015. He has been instrumental in various reforms and policies, including the Vision 2030 initiative aimed at diversifying the Saudi economy.\"\n      },\n      \"President Andr\u00e9s Manuel L\u00f3pez Obrador - Mexico\": {\n        \"Background\": \"Andr\u00e9s Manuel L\u00f3pez Obrador, often referred to as AMLO, has been the President of Mexico since December 2018. He is known for his populist policies and efforts to combat corruption and inequality.\"\n      },\n      \"President Luiz In\u00e1cio Lula da Silva - Brazil\": {\n        \"Background\": \"Luiz In\u00e1cio Lula da Silva, commonly known as Lula, is the current President of Brazil, having taken office in January 2023 for his third term. He previously served as President from 2003 to 2010.\"\n      },\n      \"Prime Minister Anthony Albanese - Australia\": {\n        \"Background\": \"Anthony Albanese has been the Prime Minister of Australia since May 2022. He is the leader of the Australian Labor Party and has focused on issues such as climate change, economic recovery, and social welfare.\"\n      },\n      \"President Joe Biden - United States\": {\n        \"Background\": \"Joe Biden is the current President of the United States, taking office in January 2021. He is a member of the Democratic Party and has been involved in various domestic and international policy initiatives, including climate change, healthcare, and foreign policy.\"\n      },\n      \"President V\u00f5 V\u0103n Th\u01b0\u1edfng - Vietnam\": {\n        \"Background\": \"V\u00f5 V\u0103n Th\u01b0\u1edfng is a Vietnamese politician who served as the 12th President of Vietnam from March 2, 2023, to March 21, 2024. He was the youngest president of Vietnam since the country's reunification, taking the office at the age of 52.\"\n      },\n      \"Prime Minister Fumio Kishida - Japan\": {\n        \"Background\": \"Fumio Kishida has been the Prime Minister of Japan since October 4, 2021. He is a member of the Liberal Democratic Party (LDP) and has been involved in Japanese politics for several decades.\"\n      },\n      \"King Frederik X - Denmark\": {\n        \"Background\": \"There is no current or historical figure known as King Frederik X of Denmark. The current monarch of Denmark is Queen Margrethe II, who has been on the throne since 1972.\"\n      },\n      \"Prime Minister Aksel V. Johannesen - Faroe Islands\": {\n        \"Background\": \"Aksel V. Johannesen is a Faroese politician who served as the Prime Minister of the Faroe Islands from 2015 to 2019. He is the leader of the Social Democratic Party (Javna\u00f0arflokkurin).\"\n      },\n      \"King Abdullah II - Jordan\": {\n        \"Background\": \"King Abdullah II has been the monarch of Jordan since February 7, 1999. He is known for his efforts in promoting peace and stability in the Middle East.\"\n      },\n      \"Prime Minister Bisher Al-Khasawneh - Jordan\": {\n        \"Background\": \"Bisher Al-Khasawneh has been the Prime Minister of Jordan since October 12, 2020. He is a veteran diplomat and has served in various high-profile positions.\"\n      },\n      \"President Sergio Mattarella - Italy\": {\n        \"Background\": \"Sergio Mattarella has been the President of Italy since February 3, 2015. He is a member of the Democratic Party and has a long career in Italian politics.\"\n      },\n      \"Prime Minister Giorgia Meloni - Italy\": {\n        \"Background\": \"Giorgia Meloni has been the Prime Minister of Italy since October 22, 2022. She is the leader of the Brothers of Italy (Fratelli d'Italia) party and the first woman to hold the office of Prime Minister in Italy.\"\n      },\n      \"Prime Minister M\u00fate Bourup Egede - Greenland\": {\n        \"Background\": \"M\u00fate Bourup Egede has been the Prime Minister of Greenland since April 23, 2021. He is the leader of the Inuit Ataqatigiit party, which advocates for Greenlandic independence from Denmark.\"\n      },\n      \"President Joko Widodo - Indonesia\": {\n        \"Background\": \"Joko Widodo, commonly known as Jokowi, has been the President of Indonesia since October 20, 2014. He was re-elected for a second term in 2019.\"\n      }\n    }\n    ```"
+                        "name": "weather_info",
+                        "description": "Real-time weather information for each destination",
+                        "used_by": [],
+                        "value": "```json\n    {\n      \"Paris, France\": {\n        \"temperature_c\": 18.3,\n        \"temperature_f\": 64.9,\n        \"condition\": \"Overcast\",\n        \"wind_kph\": 22.7,\n        \"humidity\": 77,\n        \"units\": {\n          \"temperature\": \"\u00b0C/\u00b0F\",\n          \"wind\": \"kph\"\n        }\n      },\n      \"Venice, Italy\": {\n        \"temperature_c\": 19.3,\n        \"temperature_f\": 66.7,\n        \"condition\": \"Sunny\",\n        \"wind_kph\": 8.6,\n        \"humidity\": 64,\n        \"units\": {\n          \"temperature\": \"\u00b0C/\u00b0F\",\n          \"wind\": \"kph\"\n        }\n      },\n      \"Prague, Czech Republic\": {\n        \"temperature_c\": 13.3,\n        \"temperature_f\": 55.9,\n        \"condition\": \"Sunny\",\n        \"wind_kph\": 10.4,\n        \"humidity\": 54,\n        \"units\": {\n          \"temperature\": \"\u00b0C/\u00b0F\",\n          \"wind\": \"kph\"\n        }\n      },\n      \"Barcelona, Spain\": {\n        \"temperature_c\": 24.3,\n        \"temperature_f\": 75.7,\n        \"condition\": \"Partly cloudy\",\n        \"wind_kph\": 14.8,\n        \"humidity\": 65,\n        \"units\": {\n          \"temperature\": \"\u00b0C/\u00b0F\",\n          \"wind\": \"kph\"\n        }\n      },\n      \"Vienna, Austria\": {\n        \"temperature_c\": 15.0,\n        \"temperature_f\": 59.0,\n        \"condition\": \"Sunny\",\n        \"wind_kph\": 7.9,\n        \"humidity\": 44,\n        \"units\": {\n          \"temperature\": \"\u00b0C/\u00b0F\",\n          \"wind\": \"kph\"\n        }\n      }\n    }\n    ```"
                     }
                 ]
-            },
-            "2": {
-                "api": "NEWS_API",
-                "handles": "Fetches recent news articles about the country heads",
+            }
+        }
+    },
+    "3": {
+        "panel_description": "Suggest hotels for each top European destination.",
+        "steps": {
+            "1": {
+                "api": "TripadvisorSearchLocation",
+                "handles": "Retrieves Geo IDs for each top destination",
                 "input_vars": [
                     {
-                        "name": "country_heads_info",
-                        "parameter": "q",
+                        "name": "top_places_list",
+                        "parameter": "query",
                         "type": "string",
-                        "source": "API_Output (Panel 3, Step 1)",
-                        "description": "Information about country heads from Perplexity",
-                        "value": "```json\n    {\n      \"President Jakov Milatovi\u0107 - Montenegro\": {\n        \"Background\": \"Jakov Milatovi\u0107 is a Montenegrin politician and economist born on December 7, 1986. He is the current President of Montenegro, taking office in May 2023.\",\n        \"Political Career\": \"Before becoming president, Milatovi\u0107 served as the Minister of Economic Development in the cabinet of Zdravko Krivokapi\u0107 from 2020 to 2022. He was also an economist at the European Bank for Reconstruction and Development in London and Podgorica.\",\n        \"Presidency\": \"Milatovi\u0107 won the presidential election in a landslide victory against incumbent President Milo \u0110ukanovi\u0107 in April 2023, securing 58.88% of the popular vote. He is the youngest person to hold the office of president in independent Montenegro and the world's sixth-youngest serving state leader.\",\n        \"Political Positions\": \"Milatovi\u0107 supports Montenegro's accession to the European Union, advocates for closer relations with Serbia, and supports sanctioning Russia due to its invasion of Ukraine. He also supports the Open Balkan initiative and has emphasized improving living standards and tackling corruption.\",\n        \"Recent Activities\": \"Milatovi\u0107 has met with several international leaders, including Pope Francis and U.S. Senator Jim Risch. He has also stated that Montenegro could join the European Union by 2027 or 2028 and has condemned Russia's aggression against Ukraine.\"\n      },\n      \"President Bajram Begaj - Albania\": {\n        \"Background\": \"Bajram Begaj is the current President of Albania, taking office in July 2022. He is a retired general and was elected as the President of Albania by the Parliament.\"\n      },\n      \"Presidency \u017deljko Kom\u0161i\u0107, Milorad Dodik, \u017deljka Cvijanovi\u0107 - Bosnia and Herzegovina\": {\n        \"Background\": \"Bosnia and Herzegovina has a tripartite presidency, consisting of \u017deljko Kom\u0161i\u0107, Milorad Dodik, and \u017deljka Cvijanovi\u0107.\"\n      },\n      \"President Katerina Sakellaropoulou - Greece\": {\n        \"Background\": \"Katerina Sakellaropoulou is the current President of Greece, taking office in March 2020. She is the first female President of Greece and was previously the President of the Council of State.\"\n      },\n      \"King Salman bin Abdulaziz Al Saud - Saudi Arabia\": {\n        \"Background\": \"King Salman has been the King of Saudi Arabia since January 2015. He has been instrumental in various reforms and policies, including the Vision 2030 initiative aimed at diversifying the Saudi economy.\"\n      },\n      \"President Andr\u00e9s Manuel L\u00f3pez Obrador - Mexico\": {\n        \"Background\": \"Andr\u00e9s Manuel L\u00f3pez Obrador, often referred to as AMLO, has been the President of Mexico since December 2018. He is known for his populist policies and efforts to combat corruption and inequality.\"\n      },\n      \"President Luiz In\u00e1cio Lula da Silva - Brazil\": {\n        \"Background\": \"Luiz In\u00e1cio Lula da Silva, commonly known as Lula, is the current President of Brazil, having taken office in January 2023 for his third term. He previously served as President from 2003 to 2010.\"\n      },\n      \"Prime Minister Anthony Albanese - Australia\": {\n        \"Background\": \"Anthony Albanese has been the Prime Minister of Australia since May 2022. He is the leader of the Australian Labor Party and has focused on issues such as climate change, economic recovery, and social welfare.\"\n      },\n      \"President Joe Biden - United States\": {\n        \"Background\": \"Joe Biden is the current President of the United States, taking office in January 2021. He is a member of the Democratic Party and has been involved in various domestic and international policy initiatives, including climate change, healthcare, and foreign policy.\"\n      },\n      \"President V\u00f5 V\u0103n Th\u01b0\u1edfng - Vietnam\": {\n        \"Background\": \"V\u00f5 V\u0103n Th\u01b0\u1edfng is a Vietnamese politician who served as the 12th President of Vietnam from March 2, 2023, to March 21, 2024. He was the youngest president of Vietnam since the country's reunification, taking the office at the age of 52.\"\n      },\n      \"Prime Minister Fumio Kishida - Japan\": {\n        \"Background\": \"Fumio Kishida has been the Prime Minister of Japan since October 4, 2021. He is a member of the Liberal Democratic Party (LDP) and has been involved in Japanese politics for several decades.\"\n      },\n      \"King Frederik X - Denmark\": {\n        \"Background\": \"There is no current or historical figure known as King Frederik X of Denmark. The current monarch of Denmark is Queen Margrethe II, who has been on the throne since 1972.\"\n      },\n      \"Prime Minister Aksel V. Johannesen - Faroe Islands\": {\n        \"Background\": \"Aksel V. Johannesen is a Faroese politician who served as the Prime Minister of the Faroe Islands from 2015 to 2019. He is the leader of the Social Democratic Party (Javna\u00f0arflokkurin).\"\n      },\n      \"King Abdullah II - Jordan\": {\n        \"Background\": \"King Abdullah II has been the monarch of Jordan since February 7, 1999. He is known for his efforts in promoting peace and stability in the Middle East.\"\n      },\n      \"Prime Minister Bisher Al-Khasawneh - Jordan\": {\n        \"Background\": \"Bisher Al-Khasawneh has been the Prime Minister of Jordan since October 12, 2020. He is a veteran diplomat and has served in various high-profile positions.\"\n      },\n      \"President Sergio Mattarella - Italy\": {\n        \"Background\": \"Sergio Mattarella has been the President of Italy since February 3, 2015. He is a member of the Democratic Party and has a long career in Italian politics.\"\n      },\n      \"Prime Minister Giorgia Meloni - Italy\": {\n        \"Background\": \"Giorgia Meloni has been the Prime Minister of Italy since October 22, 2022. She is the leader of the Brothers of Italy (Fratelli d'Italia) party and the first woman to hold the office of Prime Minister in Italy.\"\n      },\n      \"Prime Minister M\u00fate Bourup Egede - Greenland\": {\n        \"Background\": \"M\u00fate Bourup Egede has been the Prime Minister of Greenland since April 23, 2021. He is the leader of the Inuit Ataqatigiit party, which advocates for Greenlandic independence from Denmark.\"\n      },\n      \"President Joko Widodo - Indonesia\": {\n        \"Background\": \"Joko Widodo, commonly known as Jokowi, has been the President of Indonesia since October 20, 2014. He was re-elected for a second term in 2019.\"\n      }\n    }\n    ```",
+                        "source": "API_Output (Panel 1, Step 1)",
+                        "description": "List of top places from Perplexity",
+                        "value": "[\"Paris, France\", \"Venice, Italy\", \"Prague, Czech Republic\", \"Barcelona, Spain\", \"Vienna, Austria\"]",
                         "dependencies": [
                             {
-                                "panel": 3,
+                                "panel": 1,
                                 "step": 1
                             }
                         ]
@@ -127,10 +158,60 @@
                 ],
                 "output_vars": [
                     {
-                        "name": "recent_news_articles",
-                        "description": "Recent news articles about the country heads",
-                        "used_by": [],
-                        "value": "1. Title: Montenegro\u2019s PM Caught In Scandal Over Terra Founder Do Kwon Deal And Meetings\n       Description: In a recent interview, President Jakov Milatovi\u0107 of Montenegro accused Prime Minister Milojko Spaji\u0107 of lying about his knowledge of Do Kwon.\n       Url: https://bitcoinist.com/montenegros-pm-caught-in-scandal-over-do-kwon/\n    2. Title: Il presidente albanese, Bajram Begaj visita la Lettonia\n       Description: President Bajram Begaj of Albania visits Latvia.\n       Url: https://www.ansa.it/sito/photogallery/primopiano/2024/09/03/il-presidente-albanese-bajram-begaj-visita-la-lettonia_936b16de-329c-422b-a324-742b0f637795.html\n    3. Title: Saudi Crown Prince Condemns \u2018Crimes of Israeli Occupation,\u2019 Demands Palestinian State\n       Description: Crown Prince Mohammed bin Salman condemns the \u201ccrimes of the Israeli occupation\u201d against Palestinians.\n       Url: https://www.breitbart.com/middle-east/2024/09/19/saudi-crown-prince-condemns-crimes-of-israeli-occupation-demands-palestinian-state/\n    4. Title: L\u00f3pez Obrador critica \"la prepotencia y arrogancia\" de Espa\u00f1a\n       Description: Andr\u00e9s Manuel L\u00f3pez Obrador, president of Mexico, criticizes Spain's arrogance.\n       Url: https://www.elmundo.es/espana/2024/09/25/66f43b99e4d4d8ae568b4595.html\n    5. Title: Brazil President Lula Says X Ban Shows World Can Reject Elon Musk\u2019s \u201cFar-Right Anything Goes\u201d Agenda\n       Description: President Luiz In\u00e1cio Lula da Silva of Brazil comments on the clash with Elon Musk over social network X.\n       Url: http://deadline.com/2024/09/brazil-president-lula-elon-musk-far-right-free-for-all-1236077342/\n    6. Title: Australian PM announces plan to ban young children from social media\n       Description: Australian Prime Minister Anthony Albanese announces plans to ban children from using social media.\n       Url: https://www.aljazeera.com/program/newsfeed/2024/9/10/australian-pm-announces-plan-to-ban-young-children-from-social-media\n    7. Title: US takes aim at Shein and Temu with new import rule proposal\n       Description: The Biden administration addresses an import exemption companies use to avoid tariffs.\n       Url: https://www.theverge.com/2024/9/13/24243653/us-biden-shein-import-rules-de-minimis-loop-hole"
+                        "name": "geo_ids",
+                        "description": "Geo IDs for each destination",
+                        "used_by": [
+                            {
+                                "panel": 3,
+                                "step": 2
+                            }
+                        ],
+                        "value": "{\n      \"Paris, France\": 187147,\n      \"Venice, Italy\": 187870,\n      \"Prague, Czech Republic\": 274707,\n      \"Barcelona, Spain\": 187497,\n      \"Vienna, Austria\": 190454\n    }"
+                    }
+                ]
+            },
+            "2": {
+                "api": "TripadvisorSearchHotels",
+                "handles": "Finds hotels for each location using Geo IDs",
+                "input_vars": [
+                    {
+                        "name": "geo_ids",
+                        "parameter": "geoId",
+                        "type": "string",
+                        "source": "API_Output (Panel 3, Step 1)",
+                        "description": "Geo IDs for each destination",
+                        "value": "{\n      \"Paris, France\": 187147,\n      \"Venice, Italy\": 187870,\n      \"Prague, Czech Republic\": 274707,\n      \"Barcelona, Spain\": 187497,\n      \"Vienna, Austria\": 190454\n    }",
+                        "dependencies": [
+                            {
+                                "panel": 3,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "check_in_date",
+                        "parameter": "checkIn",
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Check-in date for hotel search",
+                        "value": "2023-10-02",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "check_out_date",
+                        "parameter": "checkOut",
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Check-out date for hotel search",
+                        "value": "2023-10-05",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "hotel_suggestions",
+                        "description": "List of hotel suggestions for each destination",
+                        "used_by": []
                     }
                 ]
             }

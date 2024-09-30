@@ -2,6 +2,8 @@ from base import BaseNode
 import re
 import json
 import asyncio
+from available_apis.rapid_apis_format.return_dict import RAPID_APIS_DICT
+from available_apis.function_format.return_dict import FUNCTION_APIS_DOCUMENTATION_DICT
 
 class MainTranslatorNode(BaseNode):
     def __init__(self, node_name, system_prompt = None):
@@ -368,8 +370,8 @@ class MainTranslatorNode(BaseNode):
                 # Store the unique APIs in the dictionary
                 if api['api_name'] not in unique_apis:
                     unique_apis[api['api_name']] = {
-                        "Input": api.get('Input', 'N/A'),
-                        "Output": api.get('Output', 'N/A'),
+                        # "Input": api.get('Input', 'N/A'),
+                        # "Output": api.get('Output', 'N/A'),
                         "Use": api.get('Use', 'N/A')
                     }
             formatted_string += "\n"  # Add a newline after each panel
@@ -380,12 +382,20 @@ class MainTranslatorNode(BaseNode):
         formatted_string += "**Description of APIs:**\n"
         api_id = 1
         for api_name, api_details in unique_apis.items():
-            formatted_string += (
-                f"{api_id}. {api_name}\n"
-                f"   - **Input:** {api_details['Input']}\n"
-                f"   - **Output:** {api_details['Output']}\n"
-                f"   - **Use:** {api_details['Use']}\n\n"
-            )
+            if api_name in RAPID_APIS_DICT:
+                formatted_string += (
+                    f"{api_id}. {api_name}\n"
+                    f"   - **Use:** {api_details['Use']}\n\n"
+                    f"   - **Documentation:** {RAPID_APIS_DICT[api_name]}\n\n"
+                )
+            elif api_name in FUNCTION_APIS_DOCUMENTATION_DICT:
+                formatted_string += (
+                    f"{api_id}. {api_name}\n"
+                    f"   - **Use:** {api_details['Use']}\n\n"
+                    f"   - **Documentation:** {FUNCTION_APIS_DOCUMENTATION_DICT[api_name]}\n\n"
+                )
+            else:
+                raise ValueError(f"Invalid API Name {api_name}. It is not there in RAPID_APIS_DICT or FUNCTION_APIS_FUNCTION_DICT. This error is inside create_first_input_data")
             api_id += 1
 
         return formatted_string
@@ -431,11 +441,18 @@ class MainTranslatorNode(BaseNode):
             result.append("Available API Descriptions:\n")
             api_id = 1
             for api_name, api_details in self.unique_apis.items():
-                result.append(f"{api_id}. {api_name}")
-                result.append(f"   - **Input:** {api_details['Input']}")
-                result.append(f"   - **Output:** {api_details['Output']}")
-                result.append(f"   - **Use:** {api_details['Use']}\n")
-                api_id += 1
+                if api_name in RAPID_APIS_DICT:
+                    result.append(f"{api_id}. {api_name}")
+                    result.append(f"   - **Use:** {api_details['Use']}\n")
+                    result.append(f"   - **Documentation:** {RAPID_APIS_DICT[api_name]}\n")
+                    api_id += 1
+                elif api_name in FUNCTION_APIS_DOCUMENTATION_DICT:
+                    result.append(f"{api_id}. {api_name}")
+                    result.append(f"   - **Use:** {api_details['Use']}\n")
+                    result.append(f"   - **Documentation:** {FUNCTION_APIS_DOCUMENTATION_DICT[api_name]}\n")
+                    api_id += 1
+                else:
+                    raise ValueError(f"Invalid API Name {api_name}. It is not there in RAPID_APIS_DICT or FUNCTION_APIS_FUNCTION_DICT. This error is inside create_first_input_data")
             result.append("\n")  # Add spacing
 
         # Add Status Update section
