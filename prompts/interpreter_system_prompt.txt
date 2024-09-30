@@ -29,12 +29,6 @@ You will receive the following user data:
     "Perplexity": {
       "Use": "As a search engine to retrieve and synthesize information from multiple sources into a single, concise response."
     },
-    "PlotAgent": {
-      "Use": "For queries that can be visualized through graphs or charts. If initial information is insufficient, it triggers a Perplexity search for more data. It can skip plotting if it determines that plotting does not make sense."
-    },
-    "TextToImage": {
-      "Use": "For generating visually compelling illustrations or images that enhance and complement the response, especially when plots are not appropriate."
-    },
     "Open-Meteo": {
       "Use": "This API is used to retrieve weather forecasts for a specific location given by latitude and longitude coordinates. It is suitable for applications needing weather data for planning events, monitoring conditions, or integrating weather information into services."
     },

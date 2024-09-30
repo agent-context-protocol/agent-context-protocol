@@ -530,7 +530,7 @@ Your Output:
 $$CHAIN_OF_THOUGHT$$
 
 - The API responses provide current weather data for each of the specified rainy areas.
-- Each response includes the necessary weather details such as temperature, wind speed, wind direction, and weather code, along with units.
+- Each response includes the necessary weather details such as temperature, wind speed, wind direction, and weather code, along with units (which are mentioned in the api output as well as the api documentation previously).
 - The data is complete and matches the expected output for the current step, which is to retrieve current weather conditions for each area.
 - The extracted data will be formatted into a JSON structure for the output variable `current_weather_data`.
 

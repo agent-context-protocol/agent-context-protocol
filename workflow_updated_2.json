@@ -1,82 +1,134 @@
 {
-    "2": {
-        "panel_description": "Gather expert opinions on automated trading systems from Stack Overflow.",
+    "1": {
+        "panel_description": "Display the most beautiful places in the world.",
         "steps": {
             "1": {
                 "api": "Perplexity",
-                "handles": "General opinions on automated trading systems",
+                "handles": "Retrieves a list of beautiful places in the world",
                 "input_vars": [
                     {
-                        "name": "query_trading_systems",
+                        "name": "query_beautiful_places",
                         "parameter": "query",
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Query to get opinions on automated trading systems",
-                        "value": "Expert opinions on automated trading systems adapting to weather patterns",
+                        "description": "Query to get the most beautiful places in the world",
+                        "value": "What are the most beautiful places in the world?",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "trading_systems_opinions",
-                        "description": "Opinions on automated trading systems",
-                        "used_by": [],
-                        "value": "\"Automated trading systems, particularly those enhanced with artificial intelligence (AI) and machine learning, can indeed adapt to various external factors, including weather patterns, to make more informed and timely trading decisions.\n\n    ## Integration of Weather Data\n    Automated trading systems can incorporate real-time weather data into their analysis to identify potential impacts on markets. For example, in the energy sector, weather patterns such as temperature, wind speed, and precipitation can significantly influence energy demand and supply. Algorithmic energy trading platforms can analyze these weather data points along with other market information to optimize trading strategies.\n\n    ## Real-Time Analysis and Adaptation\n    AI-driven automated trading systems are capable of processing vast amounts of data, including weather forecasts, in real-time. This allows the systems to adapt quickly to changing market conditions that may be influenced by weather. For instance, a sudden change in weather forecasts could lead to adjustments in energy production or demand, and the trading system can react swiftly to these changes to maximize profits or minimize losses.\n\n    ## Predictive Analytics\n    Predictive analytics, a key component of AI in automated trading, can forecast market movements based on historical and real-time data, including weather patterns. By analyzing past data, these systems can identify correlations between weather events and market behaviors, enabling them to make more accurate predictions and trading decisions. This proactive approach helps in mitigating risks and capitalizing on opportunities arising from weather-related market fluctuations.\n\n    ## Risk Management\n    Automated trading systems also use weather data to enhance risk management. By predicting potential market downturns or anomalies caused by weather events, these systems can adjust trading strategies to minimize losses. For example, if a severe weather event is forecasted to impact a particular region, the system can adjust energy trading strategies to avoid potential imbalances or to take advantage of price discrepancies.\n\n    ## Best Practices and Challenges\n    While integrating weather data into automated trading systems offers significant benefits, it is crucial to follow best practices such as using high-quality and accurate data, regularly updating the system, and monitoring for any issues or errors. The complexity of AI algorithms and the reliance on accurate data are key challenges that need to be addressed to ensure the system's reliability and performance.\n\n    In summary, automated trading systems can effectively adapt to weather patterns by integrating real-time weather data, using predictive analytics, and enhancing risk management strategies. This integration is particularly valuable in sectors like energy trading, where weather has a direct impact on market dynamics.\""
+                        "name": "beautiful_places_list",
+                        "description": "List of beautiful places in the world",
+                        "used_by": [
+                            {
+                                "panel": 2,
+                                "step": 1
+                            }
+                        ],
+                        "value": "\"The world is replete with breathtakingly beautiful places, each offering unique natural wonders, cultural significance, and awe-inspiring landscapes. Here are some of the most stunning destinations highlighted across various sources:\n\n    Montenegro: Kotor Bay, Lake Skadar, Tara River\n    Greece: Lefkada Island\n    Oman: Shariqiya Sands\n    Mexico: Las Coloradas Lagoon\n    Brazil: Rio Sucuri, Paraty\n    Australia: Tarkine Rainforest, Tasmania\n    United States: Joshua Tree National Park, Bisti/De-Na-Zin Wilderness\n    Vietnam: Fansipan, M\u00f9 Cang Ch\u1ea3i, Tu Le Valley\n    Japan: Mount Yoshino, Arashiyama Bamboo Grove\n    Iceland: The Faroe Islands\n    Jordan: Petra\n    Italy: Lake Como, Saturnia\n    Greenland: Ilulissat Icefjord\n    Indonesia: Raja Ampat\""
+                    }
+                ]
+            }
+        }
+    },
+    "2": {
+        "panel_description": "Display the country heads of the beautiful places.",
+        "steps": {
+            "1": {
+                "api": "Perplexity",
+                "handles": "Finds the country heads of the beautiful places",
+                "input_vars": [
+                    {
+                        "name": "beautiful_places_list",
+                        "parameter": "query",
+                        "type": "string",
+                        "source": "API_Output (Panel 1, Step 1)",
+                        "description": "List of beautiful places from Panel 1",
+                        "value": "[\"Kotor Bay\", \"Lake Skadar\", \"Tara River\", \"Lefkada Island\", \"Shariqiya Sands\", \"Las Coloradas Lagoon\", \"Rio Sucuri\", \"Paraty\", \"Tarkine Rainforest\", \"Joshua Tree National Park\", \"Bisti/De-Na-Zin Wilderness\", \"Fansipan\", \"M\u00f9 Cang Ch\u1ea3i\", \"Tu Le Valley\", \"Mount Yoshino\", \"Arashiyama Bamboo Grove\", \"The Faroe Islands\", \"Petra\", \"Lake Como\", \"Saturnia\", \"Ilulissat Icefjord\", \"Raja Ampat\"]",
+                        "dependencies": [
+                            {
+                                "panel": 1,
+                                "step": 1
+                            }
+                        ]
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "country_heads_list",
+                        "description": "List of country heads for the beautiful places",
+                        "used_by": [
+                            {
+                                "panel": 3,
+                                "step": 1
+                            }
+                        ],
+                        "value": "```json\n    {\n      \"Kotor Bay\": \"President Jakov Milatovi\u0107 - Montenegro\",\n      \"Lake Skadar\": \"President Jakov Milatovi\u0107 - Montenegro, President Bajram Begaj - Albania\",\n      \"Tara River\": \"President Jakov Milatovi\u0107 - Montenegro, Presidency \u017deljko Kom\u0161i\u0107, Milorad Dodik, \u017deljka Cvijanovi\u0107 - Bosnia and Herzegovina\",\n      \"Lefkada Island\": \"President Katerina Sakellaropoulou - Greece\",\n      \"Shariqiya Sands\": \"King Salman bin Abdulaziz Al Saud - Saudi Arabia\",\n      \"Las Coloradas Lagoon\": \"President Andr\u00e9s Manuel L\u00f3pez Obrador - Mexico\",\n      \"Rio Sucuri\": \"President Luiz In\u00e1cio Lula da Silva - Brazil\",\n      \"Paraty\": \"President Luiz In\u00e1cio Lula da Silva - Brazil\",\n      \"Tarkine Rainforest\": \"Prime Minister Anthony Albanese - Australia\",\n      \"Joshua Tree National Park\": \"President Joe Biden - United States\",\n      \"Bisti/De-Na-Zin Wilderness\": \"President Joe Biden - United States\",\n      \"Fansipan\": \"President V\u00f5 V\u0103n Th\u01b0\u1edfng - Vietnam\",\n      \"M\u00f9 Cang Ch\u1ea3i\": \"President V\u00f5 V\u0103n Th\u01b0\u1edfng - Vietnam\",\n      \"Tu Le Valley\": \"President V\u00f5 V\u0103n Th\u01b0\u1edfng - Vietnam\",\n      \"Mount Yoshino\": \"Prime Minister Fumio Kishida - Japan\",\n      \"Arashiyama Bamboo Grove\": \"Prime Minister Fumio Kishida - Japan\",\n      \"The Faroe Islands\": \"King Frederik X - Denmark, Prime Minister Aksel V. Johannesen - Faroe Islands\",\n      \"Petra\": \"King Abdullah II - Jordan, Prime Minister Bisher Al-Khasawneh - Jordan\",\n      \"Lake Como\": \"President Sergio Mattarella - Italy, Prime Minister Giorgia Meloni - Italy\",\n      \"Saturnia\": \"President Sergio Mattarella - Italy, Prime Minister Giorgia Meloni - Italy\",\n      \"Ilulissat Icefjord\": \"King Frederik X - Denmark, Prime Minister M\u00fate Bourup Egede - Greenland\",\n      \"Raja Ampat\": \"President Joko Widodo - Indonesia\"\n    }\n    ```"
+                    }
+                ]
+            }
+        }
+    },
+    "3": {
+        "panel_description": "Display recent news about the country heads.",
+        "steps": {
+            "1": {
+                "api": "Perplexity",
+                "handles": "Gathers information about the country heads",
+                "input_vars": [
+                    {
+                        "name": "country_heads_list",
+                        "parameter": "query",
+                        "type": "string",
+                        "source": "API_Output (Panel 2, Step 1)",
+                        "description": "Names of country heads from Panel 2",
+                        "value": "```json\n    [\n      \"President Jakov Milatovi\u0107 - Montenegro\",\n      \"President Bajram Begaj - Albania\",\n      \"Presidency \u017deljko Kom\u0161i\u0107, Milorad Dodik, \u017deljka Cvijanovi\u0107 - Bosnia and Herzegovina\",\n      \"President Katerina Sakellaropoulou - Greece\",\n      \"King Salman bin Abdulaziz Al Saud - Saudi Arabia\",\n      \"President Andr\u00e9s Manuel L\u00f3pez Obrador - Mexico\",\n      \"President Luiz In\u00e1cio Lula da Silva - Brazil\",\n      \"Prime Minister Anthony Albanese - Australia\",\n      \"President Joe Biden - United States\",\n      \"President V\u00f5 V\u0103n Th\u01b0\u1edfng - Vietnam\",\n      \"Prime Minister Fumio Kishida - Japan\",\n      \"King Frederik X - Denmark\",\n      \"Prime Minister Aksel V. Johannesen - Faroe Islands\",\n      \"King Abdullah II - Jordan\",\n      \"Prime Minister Bisher Al-Khasawneh - Jordan\",\n      \"President Sergio Mattarella - Italy\",\n      \"Prime Minister Giorgia Meloni - Italy\",\n      \"Prime Minister M\u00fate Bourup Egede - Greenland\",\n      \"President Joko Widodo - Indonesia\"\n    ]\n    ```",
+                        "dependencies": [
+                            {
+                                "panel": 2,
+                                "step": 1
+                            }
+                        ]
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "country_heads_info",
+                        "description": "Information about the country heads",
+                        "used_by": [
+                            {
+                                "panel": 3,
+                                "step": 2
+                            }
+                        ]
                     }
                 ]
             },
             "2": {
-                "api": "Stack_Exchange_Questions",
-                "handles": "Fetches questions about automated trading systems",
+                "api": "NEWS_API",
+                "handles": "Fetches recent news articles about the country heads",
                 "input_vars": [
                     {
-                        "name": "site",
-                        "parameter": "site",
+                        "name": "country_heads_info",
+                        "parameter": "q",
                         "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Stack Exchange site to query",
-                        "value": "stackoverflow",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "tags",
-                        "parameter": "tagged",
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Tags for filtering questions",
-                        "value": "automated-trading",
-                        "dependencies": []
+                        "source": "API_Output (Panel 3, Step 1)",
+                        "description": "Information about country heads from Perplexity",
+                        "value": "None",
+                        "dependencies": [
+                            {
+                                "panel": 3,
+                                "step": 1
+                            }
+                        ]
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "trading_questions",
-                        "description": "Questions about automated trading systems",
-                        "used_by": [],
-                        "value": "[]"
-                    }
-                ]
-            },
-            "3": {
-                "api": "Stack_Exchange_Answers",
-                "handles": "Fetches answers to questions about automated trading systems",
-                "input_vars": [
-                    {
-                        "name": "site",
-                        "parameter": "site",
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Stack Exchange site to query",
-                        "value": "stackoverflow",
-                        "dependencies": []
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "trading_answers",
-                        "description": "Answers to questions about automated trading systems",
-                        "used_by": [],
-                        "value": "```json\n    [\n      {\n        \"answer_id\": 79035420,\n        \"question_id\": 79035365,\n        \"is_accepted\": false,\n        \"score\": 0,\n        \"owner\": {\n          \"display_name\": \"Craig Estey\",\n          \"reputation\": 32881,\n          \"profile_link\": \"https://stackoverflow.com/users/5382650/craig-estey\"\n        }\n      },\n      {\n        \"answer_id\": 79035425,\n        \"question_id\": 76225672,\n        \"is_accepted\": false,\n        \"score\": 0,\n        \"owner\": {\n          \"display_name\": \"mehdidrissi\",\n          \"reputation\": 9,\n          \"profile_link\": \"https://stackoverflow.com/users/14105179/mehdidrissi\"\n        }\n      },\n      {\n        \"answer_id\": 79035428,\n        \"question_id\": 77578333,\n        \"is_accepted\": false,\n        \"score\": 0,\n        \"owner\": {\n          \"display_name\": \"Tariq Booker\",\n          \"reputation\": 1,\n          \"profile_link\": \"https://stackoverflow.com/users/27479842/tariq-booker\"\n        }\n      },\n      {\n        \"answer_id\": 79035427,\n        \"question_id\": 79035260,\n        \"is_accepted\": false,\n        \"score\": 0,\n        \"owner\": {\n          \"display_name\": \"iKingNinja\",\n          \"reputation\": 439,\n          \"profile_link\": \"https://stackoverflow.com/users/18141446/ikingninja\"\n        }\n      },\n      {\n        \"answer_id\": 79035426,\n        \"question_id\": 78922469,\n        \"is_accepted\": false,\n        \"score\": 1,\n        \"owner\": {\n          \"display_name\": \"SnailBird\",\n          \"reputation\": 139,\n          \"profile_link\": \"https://stackoverflow.com/users/7184090/snailbird\"\n        }\n      }\n      // Additional answers can be added similarly\n    ]\n    ```"
+                        "name": "recent_news_articles",
+                        "description": "Recent news articles about the country heads",
+                        "used_by": []
                     }
                 ]
             }

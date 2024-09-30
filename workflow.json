@@ -1,29 +1,103 @@
 {
     "1": {
         "1": {
-            "panel_description": "Summarize the impact of global weather patterns on financial markets in September 2024.",
+            "panel_description": "Display the most beautiful places in the world.",
             "steps": {
                 "1": {
                     "api": "Perplexity",
-                    "handles": "General summary of weather impact on financial markets",
+                    "handles": "Retrieves a list of beautiful places in the world",
                     "input_vars": [
                         {
-                            "name": "query_weather_finance",
+                            "name": "query_beautiful_places",
                             "parameter": "query",
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to get a summary of weather impact on financial markets",
-                            "value": "Impact of global weather patterns on financial markets in September 2024",
+                            "description": "Query to get the most beautiful places in the world",
+                            "value": "What are the most beautiful places in the world?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "weather_finance_summary",
-                            "description": "Summary of weather impact on financial markets",
+                            "name": "beautiful_places_list",
+                            "description": "List of beautiful places in the world",
                             "used_by": [
                                 {
+                                    "panel": 2,
+                                    "step": 1
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "2": {
+            "panel_description": "Display the country heads of the beautiful places.",
+            "steps": {
+                "1": {
+                    "api": "Perplexity",
+                    "handles": "Finds the country heads of the beautiful places",
+                    "input_vars": [
+                        {
+                            "name": "beautiful_places_list",
+                            "parameter": "query",
+                            "type": "string",
+                            "source": "API_Output (Panel 1, Step 1)",
+                            "description": "List of beautiful places from Panel 1",
+                            "value": "None",
+                            "dependencies": [
+                                {
                                     "panel": 1,
+                                    "step": 1
+                                }
+                            ]
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "country_heads_list",
+                            "description": "List of country heads for the beautiful places",
+                            "used_by": [
+                                {
+                                    "panel": 3,
+                                    "step": 1
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "3": {
+            "panel_description": "Display recent news about the country heads.",
+            "steps": {
+                "1": {
+                    "api": "Perplexity",
+                    "handles": "Gathers information about the country heads",
+                    "input_vars": [
+                        {
+                            "name": "country_heads_list",
+                            "parameter": "query",
+                            "type": "string",
+                            "source": "API_Output (Panel 2, Step 1)",
+                            "description": "Names of country heads from Panel 2",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "panel": 2,
+                                    "step": 1
+                                }
+                            ]
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "country_heads_info",
+                            "description": "Information about the country heads",
+                            "used_by": [
+                                {
+                                    "panel": 3,
                                     "step": 2
                                 }
                             ]
@@ -32,127 +106,27 @@
                 },
                 "2": {
                     "api": "NEWS_API",
-                    "handles": "Fetches news articles related to weather impact on financial markets",
+                    "handles": "Fetches recent news articles about the country heads",
                     "input_vars": [
                         {
-                            "name": "weather_finance_summary",
+                            "name": "country_heads_info",
                             "parameter": "q",
                             "type": "string",
-                            "source": "API_Output (Panel 1, Step 1)",
-                            "description": "Keywords for news search",
+                            "source": "API_Output (Panel 3, Step 1)",
+                            "description": "Information about country heads from Perplexity",
                             "value": "None",
                             "dependencies": [
                                 {
-                                    "panel": 1,
+                                    "panel": 3,
                                     "step": 1
                                 }
                             ]
-                        },
-                        {
-                            "name": "start_date",
-                            "parameter": "from",
-                            "type": "date",
-                            "source": "LLM_Generated",
-                            "description": "Start date for news articles",
-                            "value": "2024-09-01",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "end_date",
-                            "parameter": "to",
-                            "type": "date",
-                            "source": "LLM_Generated",
-                            "description": "End date for news articles",
-                            "value": "2024-09-27",
-                            "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "news_articles",
-                            "description": "News articles related to weather impact on financial markets",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        }
-    },
-    "2": {
-        "2": {
-            "panel_description": "Gather expert opinions on automated trading systems from Stack Overflow.",
-            "steps": {
-                "1": {
-                    "api": "Perplexity",
-                    "handles": "General opinions on automated trading systems",
-                    "input_vars": [
-                        {
-                            "name": "query_trading_systems",
-                            "parameter": "query",
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to get opinions on automated trading systems",
-                            "value": "Expert opinions on automated trading systems adapting to weather patterns",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "trading_systems_opinions",
-                            "description": "Opinions on automated trading systems",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "2": {
-                    "api": "Stack_Exchange_Questions",
-                    "handles": "Fetches questions about automated trading systems",
-                    "input_vars": [
-                        {
-                            "name": "site",
-                            "parameter": "site",
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Stack Exchange site to query",
-                            "value": "stackoverflow",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "tags",
-                            "parameter": "tagged",
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Tags for filtering questions",
-                            "value": "automated-trading",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "trading_questions",
-                            "description": "Questions about automated trading systems",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "3": {
-                    "api": "Stack_Exchange_Answers",
-                    "handles": "Fetches answers to questions about automated trading systems",
-                    "input_vars": [
-                        {
-                            "name": "site",
-                            "parameter": "site",
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Stack Exchange site to query",
-                            "value": "stackoverflow",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "trading_answers",
-                            "description": "Answers to questions about automated trading systems",
+                            "name": "recent_news_articles",
+                            "description": "Recent news articles about the country heads",
                             "used_by": []
                         }
                     ]

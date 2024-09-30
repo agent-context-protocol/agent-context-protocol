@@ -1,78 +1,133 @@
 {
     "1": {
-        "panel_description": "Summarize the impact of global weather patterns on financial markets in September 2024.",
+        "panel_description": "Display the most beautiful places in the world.",
         "steps": {
             "1": {
                 "api": "Perplexity",
-                "handles": "General summary of weather impact on financial markets",
+                "handles": "Retrieves a list of beautiful places in the world",
                 "input_vars": [
                     {
-                        "name": "query_weather_finance",
+                        "name": "query_beautiful_places",
                         "parameter": "query",
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Query to get a summary of weather impact on financial markets",
-                        "value": "Impact of global weather patterns on financial markets in September 2024",
+                        "description": "Query to get the most beautiful places in the world",
+                        "value": "What are the most beautiful places in the world?",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "weather_finance_summary",
-                        "description": "Summary of weather impact on financial markets",
+                        "name": "beautiful_places_list",
+                        "description": "List of beautiful places in the world",
                         "used_by": [
                             {
-                                "panel": 1,
-                                "step": 2
+                                "panel": 2,
+                                "step": 1
                             }
                         ],
-                        "value": "\"The impact of global weather patterns, particularly those associated with climate change and extreme weather events, on financial markets is multifaceted and significant. Key points include underestimation of risks, financial market volatility, climate change impacts, sector-specific effects, pricing and risk management, and the use of climate scenarios. As of September 2024, financial markets continue to grapple with accurately pricing in climate-related risks, affecting financial stability, market volatility, and sector performance.\""
+                        "value": "\"The world is replete with breathtakingly beautiful places, each offering unique natural wonders, cultural significance, and awe-inspiring landscapes. Here are some of the most stunning destinations highlighted across various sources:\n\n    Montenegro: Kotor Bay, Lake Skadar, Tara River\n    Greece: Lefkada Island\n    Oman: Shariqiya Sands\n    Mexico: Las Coloradas Lagoon\n    Brazil: Rio Sucuri, Paraty\n    Australia: Tarkine Rainforest, Tasmania\n    United States: Joshua Tree National Park, Bisti/De-Na-Zin Wilderness\n    Vietnam: Fansipan, M\u00f9 Cang Ch\u1ea3i, Tu Le Valley\n    Japan: Mount Yoshino, Arashiyama Bamboo Grove\n    Iceland: The Faroe Islands\n    Jordan: Petra\n    Italy: Lake Como, Saturnia\n    Greenland: Ilulissat Icefjord\n    Indonesia: Raja Ampat\""
                     }
                 ]
-            },
-            "2": {
-                "api": "NEWS_API",
-                "handles": "Fetches news articles related to weather impact on financial markets",
+            }
+        }
+    },
+    "2": {
+        "panel_description": "Display the country heads of the beautiful places.",
+        "steps": {
+            "1": {
+                "api": "Perplexity",
+                "handles": "Finds the country heads of the beautiful places",
                 "input_vars": [
                     {
-                        "name": "weather_finance_summary",
-                        "parameter": "q",
+                        "name": "beautiful_places_list",
+                        "parameter": "query",
                         "type": "string",
                         "source": "API_Output (Panel 1, Step 1)",
-                        "description": "Keywords for news search",
-                        "value": "\"Impact of global weather patterns on financial markets, climate change, financial stability, market volatility, sector performance\"",
+                        "description": "List of beautiful places from Panel 1",
+                        "value": "[\"Kotor Bay\", \"Lake Skadar\", \"Tara River\", \"Lefkada Island\", \"Shariqiya Sands\", \"Las Coloradas Lagoon\", \"Rio Sucuri\", \"Paraty\", \"Tarkine Rainforest\", \"Joshua Tree National Park\", \"Bisti/De-Na-Zin Wilderness\", \"Fansipan\", \"M\u00f9 Cang Ch\u1ea3i\", \"Tu Le Valley\", \"Mount Yoshino\", \"Arashiyama Bamboo Grove\", \"The Faroe Islands\", \"Petra\", \"Lake Como\", \"Saturnia\", \"Ilulissat Icefjord\", \"Raja Ampat\"]",
                         "dependencies": [
                             {
                                 "panel": 1,
                                 "step": 1
                             }
                         ]
-                    },
-                    {
-                        "name": "start_date",
-                        "parameter": "from",
-                        "type": "date",
-                        "source": "LLM_Generated",
-                        "description": "Start date for news articles",
-                        "value": "2024-09-01",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "end_date",
-                        "parameter": "to",
-                        "type": "date",
-                        "source": "LLM_Generated",
-                        "description": "End date for news articles",
-                        "value": "2024-09-27",
-                        "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "news_articles",
-                        "description": "News articles related to weather impact on financial markets",
-                        "used_by": [],
-                        "value": "1. Title: Joel Makower Archive\n       Description: Joel Makower Archive\n       Url: https://www.greenbiz.com/temp/JoelMakowerArchive"
+                        "name": "country_heads_list",
+                        "description": "List of country heads for the beautiful places",
+                        "used_by": [
+                            {
+                                "panel": 3,
+                                "step": 1
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "3": {
+        "panel_description": "Display recent news about the country heads.",
+        "steps": {
+            "1": {
+                "api": "Perplexity",
+                "handles": "Gathers information about the country heads",
+                "input_vars": [
+                    {
+                        "name": "country_heads_list",
+                        "parameter": "query",
+                        "type": "string",
+                        "source": "API_Output (Panel 2, Step 1)",
+                        "description": "Names of country heads from Panel 2",
+                        "value": "None",
+                        "dependencies": [
+                            {
+                                "panel": 2,
+                                "step": 1
+                            }
+                        ]
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "country_heads_info",
+                        "description": "Information about the country heads",
+                        "used_by": [
+                            {
+                                "panel": 3,
+                                "step": 2
+                            }
+                        ]
+                    }
+                ]
+            },
+            "2": {
+                "api": "NEWS_API",
+                "handles": "Fetches recent news articles about the country heads",
+                "input_vars": [
+                    {
+                        "name": "country_heads_info",
+                        "parameter": "q",
+                        "type": "string",
+                        "source": "API_Output (Panel 3, Step 1)",
+                        "description": "Information about country heads from Perplexity",
+                        "value": "None",
+                        "dependencies": [
+                            {
+                                "panel": 3,
+                                "step": 1
+                            }
+                        ]
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "recent_news_articles",
+                        "description": "Recent news articles about the country heads",
+                        "used_by": []
                     }
                 ]
             }

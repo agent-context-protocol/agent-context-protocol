@@ -236,6 +236,53 @@ class LocalTranslatorNode(BaseNode):
 
         # Join and return the final string
         return "\n".join(result)
+    
+
+    # for making the string including the whole workflow with filled in values of the output variables. We send this for getting the user readable output
+    def make_final_workflow_with_output_values(self, workflow_dict):
+        # Initialize the formatted result string
+        result = []
+        
+        # Extract panel description
+        panel_data = workflow_dict[str(self.panel_no)]
+        panel_description = panel_data["panel_description"]
+        
+        # Workflow details
+        result.append("Please make user readable output for this workflow:\n")
+        result.append("Workflow:")
+        result.append(f"Panel Description: {panel_description}")
+        result.append("\nWorkflow Steps:")
+        
+        # Iterate through each step and build the formatted input
+        steps = panel_data["steps"]
+        for step_key, step_data in steps.items():
+            # if int(step_key) > step_no:
+            #     break
+            
+            # Add step details
+            result.append(f"\nStep {step_key}")
+            result.append(f"- API: {step_data['api']}")
+            result.append(f"- Handles: {step_data['handles']}")
+            
+            # Input Variables
+            result.append("- Input Variables:")
+            for input_var in step_data['input_vars']:
+                result.append(f"  - Name: {input_var['name']}")
+                result.append(f"    - Parameter: {input_var['parameter']}")
+                result.append(f"    - Type: {input_var['type']}")
+                result.append(f"    - Source: {input_var['source']}")
+                result.append(f"    - Description: {input_var['description']}")
+                result.append(f"    - Value: {input_var['value']}")
+            
+            # Output Variables
+            result.append("- Output Variables:")
+            for output_var in step_data['output_vars']:
+                result.append(f"  - Name: {output_var['name']}")
+                result.append(f"    - Description: {output_var['description']}")
+                result.append(f"    - Value: {output_var['value']}")
+
+        # Join and return the final string
+        return "\n".join(result)
 
     
     ###################################################################
@@ -823,7 +870,9 @@ class LocalTranslatorNode(BaseNode):
             raise ValueError(f"Overall the workflow failed for {self.panel_no}")
         
     def get_results(self):
+        final_workflow_with_values = self.make_final_workflow_with_output_values(self.group_workflow)
         self.chat_history.append({"role": "user", "content": self.user_readable_output_prompt})
+        self.chat_history.append({"role": "user", "content": final_workflow_with_values})
         output = self.generate()
         return {
             'panel_description' : self.panel_description,
