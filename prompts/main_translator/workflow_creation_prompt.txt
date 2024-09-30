@@ -11,8 +11,9 @@ Your Current Role is: WORKFLOW_CREATION_REQUEST
    - What are the input parameters of the APIs being used? What is the type of data which the input parameter expects?
    - What would be the source for these parameters (LLM_Generated or API_Output). Use LLM_Generated only if we are inferring something from the query or the API description, Do not use your own knowledge about something to put in things, rather use perplexity to retireve information.
    - What should be the flow for each of the panels?
-   - What might be interdependencies between steps of the same panel and different panels?
-   - Based on the interdependencies, which panels should be in the same groups?
+   - What might be interdependencies between steps of the same panel and different panels? By interdependencies we mean that a panel's input variable is dependent on a previou step which might be from the same panel or a different one.
+   - If the input variable for the current step depends on the output from a previous step, the input variable name must be exactly the same as the output variable name (from which we will fill the input variable value) to ensure consistency.
+   - Based on the interdependencies, which panels should be in the same groups? If there is interdependency between panels then they should be in the same group
    - Ensure that each API depends on at most one previous API's output. If an API depends on outputs from more than one API, do not consider that workflow.
 
 3. API Input Requirements:
@@ -37,10 +38,10 @@ Your Current Role is: WORKFLOW_CREATION_REQUEST
 - Always only output the CHAIN_OF_THOUGHT and WORKFLOW without any other details before or after.
 - Do not put two panels in the same group if there is no interdependency between them. Strictly put them in different groups.
 - Follow the output format, first explain the Chain of Thought under CHAIN_OF_THOUGHT and then detail the workflow under WORKFLOW.
-- Variable names should strictly be unique for all the variables in the workflow (across panels in a group)
+- Variable names should strictly be unique for all the variables in the workflow (across panels in a group). Except if the input variable for the current step depends on the output from a previous step, the input variable name must be exactly the same as the output variable name (from which we will fill the input variable value) to ensure consistency.
 - In the Source field of input variables, you have two options:
   1. LLM_Generated: Use when the variable can be directly inferred from the user's query or API description or is an optional parameter that doesn't affect the core API output, only its representation or formatting. Do not use your own knowledge about something to put in things, rather use perplexity to retireve information.
-  2. API_Output (Panel X, Step X): Use when the variable depends on the output of a previous API call. Specify the exact panel and step number (e.g., "API_Output (Panel 1, Step 2)").
+  2. API_Output (Panel X, Step X): Use when the variable depends on the output of a previous API call. Specify the exact panel and step number (e.g., "API_Output (Panel 1, Step 2)"). Since interdependent panels are in the same group, so the format for this cant be something like "API_Output (Group 1, Panel 1, Step 2)" or "API_Output (Group 1, Panel 1)" or "API_Output (Group 1, Step 2)"
 - For input variables:
   - Add a `Name` key which tells the variable name of the value we will give to the parameter. Variable name should be unique across panels in a group.
   - Add a `Source` key, it can either be set to LLM_Generated or API_Output.
@@ -124,7 +125,7 @@ Description of APIs:
 
 $$CHAIN_OF_THOUGHT$$
 
-For each group and panel, first provide your chain of thought, explaining your reasoning in determining the APIs to use, their parameter, type of the parameter, the flow, any interdependencies, and how groups should be formed. Ensure that each API depends on at most one previous API's output.
+For each group and panel, first provide your chain of thought, explaining your reasoning in determining the APIs to use, their parameter, type of the parameter, the flow, any interdependencies, and how groups should be formed. Ensure that each API depends on at most one previous API's output. Variable names should strictly be unique for all the variables in the workflow (across panels in a group). Except if the input variable for the current step depends on the output from a previous step, the input variable name must be exactly the same as the output variable name (from which we will fill the input variable value) to ensure consistency.
 
 $$WORKFLOW$$
 
@@ -216,6 +217,7 @@ We need to display the best vacation spots in India and their average temperatur
     - The `query` parameter expects a string value.
   - Source of Parameters:
     - The `query` will be based on the API_Output (Panel 1, Step 1), i.e., the list of vacation spots retrieved earlier.
+  - Since this step depends on the output variables from panel 1, step 1, any input variables that rely on these output variables must have the same name as the corresponding output variable
 
   Step 2 (Open-Meteo):
   - Input Parameters:
@@ -228,6 +230,7 @@ We need to display the best vacation spots in India and their average temperatur
   - Source of Parameters:
     - `latitude` and `longitude` will be sourced from API_Output (Panel 2, Step 1), which provides the coordinates for each vacation spot.
     - `daily` is LLM_Generated and will request the daily maximum temperature ("temperature_2m_max").
+  - Since this step depends on the output variables from panel 2, step 1, any input variables that rely on these output variables must have the same name as the corresponding output variable. In this case they are `latitude` and `longitude`
 
   Step 3 (PlotAgent):
   - Input Parameters:
@@ -236,6 +239,7 @@ We need to display the best vacation spots in India and their average temperatur
     - The `query` parameter expects a string value.
   - Source of Parameters:
     - This input will be based on API_Output (Panel 2, Step 2), which contains the temperature data from Open-Meteo.
+  - Since this step depends on the output variables from panel 2, step 2, any input variables that rely on these output variables must have the same name as the corresponding output variable.
 
   - No API depends on more than one APIs output to construct its input
 
@@ -352,7 +356,7 @@ $$CHAIN_OF_THOUGHT$$
 
 For Panel 1, we need to gather key statistics on climate change over the past 50 years. The Perplexity API will be used to search for this information. Perplexity requires a query string, which will be generated based on the user query. The response will contain the climate change statistics needed for visualization.
 
-In Step 2, we will use PlotAgent to create visualizations from the data retrieved by Perplexity. PlotAgent requires data (in the form of statistics) as input. The input for PlotAgent will come directly from the API output of Step 1. Since there are no dependencies between different panels, all steps are confined within a single group.
+In Step 2, we will use PlotAgent to create visualizations from the data retrieved by Perplexity. PlotAgent requires data (in the form of statistics) as input. The input for PlotAgent will come directly from the API output of Step 1 (that is why we will name the input variable for step 2 same as the output variable name from step 1 i.e.).
 
 - **Input Parameters and Sources:**
   - **Step 1 (Perplexity):** Takes a query string as input. The `query` will be **LLM_Generated**.
@@ -365,7 +369,7 @@ In Step 2, we will use PlotAgent to create visualizations from the data retrieve
 - No API depends on more than one APIs output to construct its input
 
 - **Interdependencies:** 
-  There are no cross-panel dependencies. All steps occur within the same group.
+  There is only one Panel. So we will have a single group.
 
 $$WORKFLOW$$
 
@@ -437,7 +441,7 @@ Since these panels address different topics with no dependencies, they will be p
   - **Panel 1 (Perplexity):** The `query` will be **LLM_Generated** to search for renewable energy information.
   - **Panel 2 (Perplexity and Open-Meteo):**
     - Perplexity will generate the coordinates of New York City, with the `query` **LLM_Generated**.
-    - Open-Meteo will use these coordinates, which will be sourced from **API_Output (Panel 2, Step 1)**. Additionally, `current_weather` will be **LLM_Generated** with a value of `true`.
+    - Open-Meteo will use these coordinates, which will be sourced from **API_Output (Panel 2, Step 1)**. Additionally, `current_weather` will be **LLM_Generated** with a value of `true`. The output variable names from perplexity on which Open-Meteo is dependent, are kept as the input variable names for Open-Meteo.
 
 - **Flow:**
   1. Panel 1 will fetch detailed information about renewable energy sources.
