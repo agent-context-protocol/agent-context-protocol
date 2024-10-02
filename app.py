@@ -1,24 +1,45 @@
 import streamlit as st
 import asyncio
 from orchestrator import MainOrchestrator
+import math
 
 class StreamlitOrchestrator:
     def __init__(self):
         self.orchestrator = MainOrchestrator()
         self.output = {}
+        self.group_placeholders = {}
+
+    def create_group_sections(self):
+        workflow = self.orchestrator.main_translator.workflow
+        num_groups = len(workflow)
+        num_cols = 3  # You can adjust this number to change the number of columns
+        num_rows = math.ceil(num_groups / num_cols)
+        
+        # Create a grid of columns
+        cols = st.columns(num_cols)
+        
+        # Populate the grid with placeholders
+        for i, group_id in enumerate(workflow.keys()):
+            with cols[i % num_cols]:
+                self.group_placeholders[str(group_id)] = st.empty()
 
     async def run_orchestrator(self, user_query):
+        workflow = await self.orchestrator.initialise(user_query)
+        self.create_group_sections()
         async for group_id, group_results in self.orchestrator.run(user_query):
             self.output[group_id] = group_results
+            self.update_group_section(group_id, group_results)
 
-    def display_results(self):
-        for group_id, group_results in self.output.items():
+    def update_group_section(self, group_id, group_results):
+        print(self.group_placeholders.keys())
+        print(group_id)
+        with self.group_placeholders[group_id].container():
             st.subheader(f"Group {group_id}")
             for panel_id, panel_result in group_results.items():
                 st.write(f"Panel {panel_id}:")
                 st.write(f"Description: {panel_result['panel_description']}")
                 st.write(f"Output:")
-                st.write(panel_result['output'])  # Display the text returned by build_verify()
+                st.write(panel_result['output'])
                 st.write("---")
 
 async def main():
@@ -34,12 +55,12 @@ async def main():
         status_text = st.empty()
 
         async def update_progress():
-            total_panels = sum(len(group) for group in orchestrator.orchestrator.main_translator.workflow.values())
+            total_groups = len(orchestrator.orchestrator.main_translator.workflow)
             while True:
-                completed_panels = sum(len(group_results) for group_results in orchestrator.output.values())
-                progress = completed_panels / total_panels
+                completed_groups = len(orchestrator.output)
+                progress = completed_groups / total_groups
                 progress_bar.progress(progress)
-                status_text.text(f"Completed {completed_panels} out of {total_panels} panels")
+                status_text.text(f"Completed {completed_groups} out of {total_groups} groups")
                 if progress >= 1.0:
                     break
                 await asyncio.sleep(0.1)
@@ -51,8 +72,6 @@ async def main():
         )
 
         st.success("Workflow completed!")
-
-    orchestrator.display_results()
 
 if __name__ == "__main__":
     asyncio.run(main())

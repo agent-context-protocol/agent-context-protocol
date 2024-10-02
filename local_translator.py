@@ -7,6 +7,7 @@ import json
 import requests
 import re
 import asyncio
+import time
 
 class LocalTranslatorNode(BaseNode):
     def __init__(self, panel_no, panel_description, system_prompt=None, main_translator=None):
@@ -21,6 +22,9 @@ class LocalTranslatorNode(BaseNode):
 
         self.get_system_prompts()
         self.get_api_keys()
+
+        self.drop = False
+        self.modify = False
 
     def get_system_prompts(self):
         # api_running_prompt
@@ -640,10 +644,16 @@ class LocalTranslatorNode(BaseNode):
             self.chat_history.append({"role": "user", "content": "Prev Status Update as Summary: " + self.prev_status_update['string']})
         else:
             self.chat_history.append({"role": "user", "content": "Prev Status Update as Summary:\nNone"})
-        
+
+    async def wait_for_response(self, timeout=60):
+        start_time = time.time()
+        while not (self.drop or self.modify):
+            if time.time() - start_time > timeout:
+                raise TimeoutError("Timeout waiting for MainTranslator response")
+            await asyncio.sleep(0.1)
 
     ###################################################################
-    def build_verify(self):
+    async def build_verify(self):
         """
         This function goes through each step of the workflow and prepares inputs based on the workflow details
         and the API descriptions provided.
@@ -674,7 +684,7 @@ class LocalTranslatorNode(BaseNode):
 
                 ###########
                 # At the start of each step we will reset the self.chat_history
-                print("\nself.chat_history : ",self.chat_history)
+                # print("\nself.chat_history : ",self.chat_history)
                 self.reset_chat_history()
             
                 ###########
@@ -692,7 +702,7 @@ class LocalTranslatorNode(BaseNode):
                 input_data = self.prepare_input_for_api_running_step(step, api_documentation)
                 # print(f"Prepared input for step {step['step']}: {input_data}")
 
-                print("input_data : ",input_data)
+                # print("input_data : ",input_data)
 
                 # generating the api request from the LLM
                 self.chat_history.append({"role": "system", "content": self.api_running_prompt}) # system prompt for workflow_creation
@@ -709,20 +719,20 @@ class LocalTranslatorNode(BaseNode):
                     api_input_error_counter += 1
                     try:
                         api_request_llm = self.generate()
-                        print("api_request_llm : ",api_request_llm)
+                        # print("api_request_llm : ",api_request_llm)
                         parse_error_bool, parsed_api_request = self.parse_api_request(api_request_llm)
                         if parse_error_bool:
                             # need to call main translator module for assistance
-                            print("\nparsed_api_request : ",parsed_api_request)
+                            # print("\nparsed_api_request : ",parsed_api_request)
                             assistance_request_bool = True
                             assistance_error_dict = parsed_api_request
                             break
-                        print("parsed_api_request : ",parsed_api_request)
+                        # print("parsed_api_request : ",parsed_api_request)
                         run_success = True
                     except Exception as e:
                         error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT and API_REQUEST without any other details before or after.:\n {str(e)}' 
                         self.chat_history.append({"role": "user", "content": error_message})
-                        print("api input error_message : ",error_message)
+                        # print("api input error_message : ",error_message)
                         continue
 
                     # running the api
@@ -736,7 +746,7 @@ class LocalTranslatorNode(BaseNode):
                             # if its a 4xx error then we can retry as it is possible that llm made a wrong api request
                             if not api_success_bool and api_output["status_code"]/100 == 4:
                                 # error handling part here
-                                print("\napi_output : ",api_output)
+                                # print("\napi_output : ",api_output)
                                 raise ValueError(f"api_output : {api_output}")
                             # apart from 4xx errors we should just call the main translator for assistance
                             if not api_success_bool:
@@ -750,7 +760,7 @@ class LocalTranslatorNode(BaseNode):
                     except Exception as e:
                         error_message = f'There was an error while running the API, please rectify based on this error message, only output the CHAIN_OF_THOUGHT and API_REQUEST without any other details before or after.:\n {str(e)}' 
                         self.chat_history.append({"role": "user", "content": error_message})
-                        print("api running error_message : ",error_message)
+                        # print("api running error_message : ",error_message)
                         api_outputs_list = []
 
                 if assistance_request_bool:
@@ -761,13 +771,13 @@ class LocalTranslatorNode(BaseNode):
                     
                 ###########
                 # API_OUTPUT, API_OUTPUT_DEPENDENCY Part with Error Handling
-                print("api_output : ",api_output)
+                # print("api_output : ",api_output)
 
                 # give the api_output to LLM and ask it to first verify if it seems plausile for our expectations from the api, then save the relevant part in the right format
                 # additionally the LLM Agent will check if the api output has enough information such that we can fulfil the input variable requirement for future steps which depend on its output, and retrieve the relevant information and save it in the right format
                 # api_output_llm_input = self.prepare_input_for_api_output(api_outputs_list[0], self.panel_no, step_no)
                 api_output_llm_input = self.prepare_input_for_api_output(api_outputs_list, self.panel_no, step_no)
-                print("\napi_output_llm_input : ",api_output_llm_input)
+                # print("\napi_output_llm_input : ",api_output_llm_input)
                 # generating the api response format from the LLM
                 self.chat_history.append({"role": "system", "content": self.api_output_prompt}) # system prompt for workflow_creation
                 self.chat_history.append({"role": "user", "content": api_output_llm_input })
@@ -779,7 +789,7 @@ class LocalTranslatorNode(BaseNode):
                     counter += 1
                     try:
                         api_output_llm_output = self.generate()
-                        print("\napi_output_llm_output : ",api_output_llm_output)
+                        # print("\napi_output_llm_output : ",api_output_llm_output)
                         api_parsed_output = self.parse_and_store_api_response(api_output_llm_output, self.panel_no, step_no)
                         # if a 6xx error was raised then status_code key will be there in api_parsed_output
                         if 'status_code' in api_parsed_output:
@@ -788,12 +798,12 @@ class LocalTranslatorNode(BaseNode):
                             assistance_error_dict = api_parsed_output
                             break
                         self.group_workflow = api_parsed_output
-                        print("api_parsed_output : ",self.group_workflow)
+                        # print("api_parsed_output : ",self.group_workflow)
                         run_success = True
                     except Exception as e:
                         error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT and API_RESPONSE without any other details before or after.:\n {str(e)}' 
                         self.chat_history.append({"role": "user", "content": error_message})
-                        print("error_message : ",error_message)
+                        # print("error_message : ",error_message)
 
                 if assistance_request_bool:
                     break
@@ -850,7 +860,7 @@ class LocalTranslatorNode(BaseNode):
                         status_update = self.generate()
                         print("\nstatus_update : ",status_update)
                         parsed_status_update = self.parse_status_assistance_input(status_update)
-                        print("\parsed_status_update : ",parsed_status_update)
+                        print("\nparsed_status_update : ",parsed_status_update)
                         run_success = True
                     except:
                         error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT, STATUS_UPDATE and ASSISTANCE_REQUEST without any other details before or after.:\n {str(e)}' 
@@ -860,7 +870,17 @@ class LocalTranslatorNode(BaseNode):
                 if not run_success:
                     raise ValueError("Something is going wrong with the llm or the parsing function in status_update send with assistance request. It is not an expected kind of error.")
 
-                asyncio.run(self.main_translator.communicate(parsed_status_update, self.panel_no, self))
+                await self.main_translator.communicate(parsed_status_update, self.panel_no, self)
+                try:
+                    await self.wait_for_response()
+                except TimeoutError:
+                    print(f"Timeout waiting for response from MainTranslator for panel {self.panel_no}")
+                    return None
+
+                if self.drop:
+                    return None
+                if self.modify:
+                    return None
                 continue
             else:
                 # overall this step was succesful
@@ -870,6 +890,12 @@ class LocalTranslatorNode(BaseNode):
             raise ValueError(f"Overall the workflow failed for {self.panel_no}")
         
     def get_results(self):
+        if self.drop:
+            return {
+            'panel_description' : self.panel_description,
+            'output' : 'This Panel Was Dropped'
+        }
+
         final_workflow_with_values = self.make_final_workflow_with_output_values(self.group_workflow)
         self.chat_history.append({"role": "user", "content": self.user_readable_output_prompt})
         self.chat_history.append({"role": "user", "content": final_workflow_with_values})

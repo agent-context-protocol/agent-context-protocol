@@ -506,38 +506,40 @@ class MainTranslatorNode(BaseNode):
                 # Simulate some processing time
                 await asyncio.sleep(1)
 
-                # status_assistance_llm_input = self.make_input_status_update(local_translator_object.group_workflow, status_update_dict)
+                status_assistance_llm_input = self.make_input_status_update(local_translator_object.group_workflow, status_update_dict)
 
-                # # generating the workflow from the LLM
-                # self.chat_history.append({"role": "system", "content": self.status_assistance_prompt}) # system prompt for workflow_creation
-                # self.chat_history.append({"role": "user", "content": status_assistance_llm_input})
+                # generating the workflow from the LLM
+                self.chat_history.append({"role": "system", "content": self.status_assistance_prompt}) # system prompt for workflow_creation
+                self.chat_history.append({"role": "user", "content": status_assistance_llm_input})
 
-                # run_success = False
-                # counter = 0
-                # while not run_success and counter < 5:
-                #     counter += 1
-                #     try:
-                #         updated_workflow = self.generate()
-                #         print("\updated_workflow : ",updated_workflow)
-                #         parsed_updated_workflow = self.parse_status_assistance_output(updated_workflow)
-                #         print("\parsed_updated_workflow : ", parsed_updated_workflow)
-                #         run_success = True
-                #     except Exception as e:
-                #         error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT, CHOSEN_ACTION and/or WORKFLOW without any other details before or after.:\n {str(e)}' 
-                #         self.chat_history.append({"role": "user", "content": error_message})
-                #         print("error_message : ",error_message)
+                run_success = False
+                counter = 0
+                while not run_success and counter < 5:
+                    counter += 1
+                    try:
+                        updated_workflow = self.generate()
+                        print("updated_workflow : ",updated_workflow)
+                        parsed_updated_workflow = self.parse_status_assistance_output(updated_workflow)
+                        print("parsed_updated_workflow : ", parsed_updated_workflow)
+                        run_success = True
+                    except Exception as e:
+                        error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT, CHOSEN_ACTION and/or WORKFLOW without any other details before or after.:\n {str(e)}' 
+                        self.chat_history.append({"role": "user", "content": error_message})
+                        print("error_message : ",error_message)
 
-                # if not run_success:
-                #     raise ValueError("Something is wrong with the LLM or the parsing status_assistance in main translator. An error is not expected here")
+                if not run_success:
+                    raise ValueError("Something is wrong with the LLM or the parsing status_assistance in main translator. An error is not expected here")
 
-                # if parsed_updated_workflow['chosen_action'] == "DROP_PANEL":
-                #     raise NotImplemented
-                # elif parsed_updated_workflow['chosen_action'] == "MODIFY":
-                #     local_translator_object.group_workflow = 
-                # else:
-                #     raise ValueError("The chosen_action key must specify either MODIFY or DROP_PANEL.")
+                if parsed_updated_workflow['chosen_action'] == "DROP_PANEL":
+                    local_translator_object.drop = True
+                    print('Sent Request to Drop Panel')
+                elif parsed_updated_workflow['chosen_action'] == "MODIFY":
+                    local_translator_object.modify = True
+                    local_translator_object.group_workflow = parsed_updated_workflow['workflow']
+                else:
+                    raise ValueError("The chosen_action key must specify either MODIFY or DROP_PANEL.")
                 
                 print(f"Finished processing update from Local Translator {local_translator_id}")
             
             # Release the lock and allow a short time for other tasks to acquire it
-            await asyncio.sleep(0)
+            await asyncio.sleep(0.1)
