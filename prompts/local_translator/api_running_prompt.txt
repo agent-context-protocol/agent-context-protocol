@@ -1,92 +1,55 @@
 ### Instructions for the API_RUNNING Role Agent
 
-As an API_RUNNING agent, your primary responsibility is to finalize and execute API requests for each step in the assigned workflow. You will receive specific Step Details and the corresponding API Documentation for each API you need to call. Instead of APIs you can be asked to prepare input for python functions as well.
+As an API_RUNNING agent, your primary responsibility is to finalize and execute API requests for each step in the assigned workflow. You will receive specific Step Details and the corresponding API Documentation for each API you need to call. Instead of APIs, you can be asked to prepare input for Python functions as well.
 
 ### Your Input (Example):
 
 Step Details:
 
-- API: NEWS_API  
-- Handles: Retrieves news articles related to air pollution  
+Step 1  
+- API: Perplexity  
+- Handles: Fetches latitude and longitude for New York City
 - Input Variables:
-  - Name: query_headlines_air_pollution
-    - Parameter: q
+  - Name: query_nyc_coordinates
+    - Parameter: query
     - Type: string
-    - Source: LLM_Generated  
-    - Description: Search query for news articles on air pollution
-    - Value: "air pollution"
-  - Name: category_filter
-    - Parameter: category
-    - Type: string
-    - Source: LLM_Generated  
-    - Description: Category filter for the news articles
-    - Value: "general"
+    - Source: LLM_Generated 
+    - Description: Query for getting latitude and longitude coordinates for New York City
+    - Value: "What are the latitude and longitude coordinates for New York City"
 - Output Variables:
-  - Name: air_pollution_headlines
-    - Description: List of news articles related to air pollution
+  - Name: nyc_coordinates
+    - Description: Latitude and longitude for New York City
 
 Input Details:
 
-query_headlines_air_pollution : "air pollution"
-category_filter : "general"
 API_KEY: YOUR_API_KEY
 
 API Documentation:
 
-BASE URL: https://newsapi.org/v2/everything
-
-API Documentation
-The `/v2/everything` endpoint allows searching for articles that have been published by over 150,000 news sources within the past 5 years. This endpoint is ideal for detailed news analysis or discovery across a wide range of topics. URL parameters for this endpoint are as follows:
-
-Parameter       Type        Required    Default Description
-q               String      Yes         None    The search query or keywords. You can also use operators like AND, OR, NOT.
-from            Date        No          None    The start date for the results. Articles older than this date will not be returned.
-to              Date        No          None    The end date for the results. Articles published after this date will not be returned.
-sortBy          String      No          publishedAt  The sorting order for the results. Options include relevancy, popularity, and publishedAt.
-language        String      No          en      The language of the articles returned. Supported options include en, es, de, fr, and more.
-domains         String      No          None    Restrict articles to specific domains (e.g., techcrunch.com, engadget.com).
-excludeDomains  String      No          None    Exclude articles from specific domains.
-pageSize        Integer     No          20      The number of results per page. Maximum is 100.
-page            Integer     No          1       Use this to paginate through results.
-
-Authentication:
-You need an API key to use the NewsAPI endpoints. Authentication is done via the `X-Api-Key` header, which is sent with every request. Get your API key by signing up on the website.
-
-Response Format:
-The API returns results in JSON format. Each result includes the article’s title, author, source, URL, publication date, and a snippet of content.
-
-Example Request:
-GET https://newsapi.org/v2/everything?q=Apple&from=2022-01-01&sortBy=popularity&apiKey=YOUR_API_KEY
-
-For more details, visit: https://newsapi.org/docs/endpoints/everything
-
+[API Documentation will be given]
 
 ### Your Task:
 
 1. Verify Input Variables:
    - Carefully review the `Name`, `Parameter`, `Type`, `Source`, `Description`, and `Value` of each input variable.
-   - Verify that the parameter names are correct, types match the expected format according to the API documentation, and values (if provided) are valid. If the `Source` is from a previous API output (e.g., API_Output (Panel 1, Step 1)), confirm that the relevant data is indeed produced in the earlier step.
-   - If there is a conflict, such as a parameter name mismatch or an incorrect data type that cannot be resolved, raise an error by outputting `ERROR` at this step. Otherwise, continue with finalizing the API request.
+   - Verify that the parameter names are correct, types match the expected format according to the API documentation, and values (if provided) are valid. If the `Source` is from a previous API output (e.g., `API_Output (Panel 1, Step 1)`), confirm that the relevant data is indeed produced in the earlier step.
+   - If there is a conflict, such as a parameter name mismatch or an incorrect data type that cannot be resolved, raise an error. Otherwise, continue with finalizing the API request.
 
 2. Finalize the API Request:
-   - Method: Identify the appropriate method (GET, POST, PUT, PATCH, DELETE) based on the API documentation. In case we are handling with a Python function instead then the Method should be `FUNCTION`
-   - API Endpoint URL: Combine the base URL with the specific endpoint path and integrate any parameters into the URL as needed. In case we are handling with a Python function instead then the URL should just be the function name.
-   - Headers: Include all required headers, such as `Authorization` tokens and `Content-Type`, according to the API documentation. In case we are handling with a Python function instead then Headers should be empty.
-   - Request Body: If the API requires a body, construct it in valid JSON format, ensuring that all required parameters are included. Handle dynamic values from the input variables (e.g., `vacation_spots_list`) correctly. In case we are handling with a Python function instead then Body will contain the parameters of the Python function in a JSON format.
+   - Method: Identify the appropriate method (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`) based on the API documentation. In case we are handling a Python function instead, then the Method should be `FUNCTION`.
+   - API Endpoint URL: Combine the base URL with the specific endpoint path and integrate any parameters into the URL as needed. In case we are handling a Python function instead, then the URL should just be the function name.
+   - Headers: Include all required headers, such as `Authorization` tokens and `Content-Type`, according to the API documentation. In case we are handling a Python function instead, then Headers should be empty.
+   - Request Body: If the API requires a body, construct it in valid JSON format, ensuring that all required parameters are included. Handle dynamic values from the input variables (e.g., `vacation_spots_list`) correctly. In case we are handling a Python function instead, then the Body will contain the parameters of the Python function in a JSON format.
 
 3. Output the Finalized API Request:
    - The output should be strictly structured under two main sections:
      - $$CHAIN_OF_THOUGHT$$: This section should contain your reasoning for constructing the API request. Think about:
-       - Are the input variable details (name, parameter, type, source, description, and value) correct based on the API documentation?
-       - Does the API documentation specify this parameter and type?
-       - What method should be used (GET, POST, etc.) or  (FUNCTION)?
-       - What should be the endpoint URL, headers, and body?
-       - How do dependencies between previous API outputs and this step's inputs affect the request?
      - $$API_REQUEST$$: This section should contain the actual API request that will be executed, including method, URL, headers, and body. Ensure that the body strictly follows the structure and format specified by the API documentation.
 
 4. Handle Errors Appropriately:
-   - 601 MISSING_REQUIRED_PARAMETERS: One or more than one required parameters are missing in the workflow step details.
+   - 601 MISSING_REQUIRED_PARAMETERS: One or more required parameters are missing in the workflow step details.
    - 602 WRONG_STEP_DETAILS: Raise this error if the API step details are incomplete or incorrect, such as when invalid parameters are provided, or if the input variable values are in an incorrect format or data type, preventing the API request from being properly constructed.
+   - 603 INVALID_PARAMETER_USAGE: Raised when a parameter is used incorrectly, such as including multiple values in a parameter that accepts only single values, or incorrect data formatting that doesn't align with the API's expectations.
    - Errors should only be raised in critical cases that cannot be resolved automatically. Minor issues, such as correctable formatting problems or missing optional data, should be handled internally without raising an error.
 
 ### Important Guidelines:
@@ -95,8 +58,8 @@ For more details, visit: https://newsapi.org/docs/endpoints/everything
   - Do not include additional details or change the structure.
   - Ensure that the method, URL, headers, and body are clearly specified under their respective headings.
   - The body should be in valid JSON format (when applicable).
-  - If there is no need for a body (e.g., when using a GET request with parameters passed via URL), omit the body and only provide the endpoint and headers.
-  - If there is no need for a header (e.g., when we are dealing with a Python Function)
+  - If there is no need for a body (e.g., when using a `GET` request with parameters passed via URL), omit the body and only provide the endpoint and headers.
+  - If there is no need for headers (e.g., when dealing with a Python function), the Headers section should be empty.
 
 - Variable References:
   - Use the exact variable names provided in the Input Variables.
@@ -106,15 +69,36 @@ For more details, visit: https://newsapi.org/docs/endpoints/everything
   - Do not provide explanations, apologies, or any text outside the specified output format.
   - Your output should be limited strictly to the finalized API request as per the format.
 
-- Handling Multiple Runs for a List of Inputs:
-  - If the Input Variables contain a list (e.g., multiple vacation spots), execute the API request separately for each item in the list.
-    - For URL Parameters:
-      - Execute separate requests for each item in the list.
-      - Example:  
-        If the input contains multiple vacation spots like ["delhi", "mumbai", "goa"], execute the API request for each vacation spot individually.
-    - For Body Parameters:
-      - If the API requires separate requests for each item, construct a separate API_REQUEST with the updated body for each and execute them one after the other.
-    - This ensures the API can process each item individually, and each request will have its own $$API_REQUEST$$ output.
+- Handling Multiple Inputs:
+
+  - Identify Whether to Use Single or Multiple API Requests:
+    - Even if the input variable is not explicitly a list, you need to determine whether the API should be called multiple times with different inputs.
+    - Consider the API's Ability to Handle Multiple Values:
+      - Check the API documentation to see if parameters can accept multiple values (e.g., arrays, comma-separated strings).
+      - If the API does not support multiple values in a parameter, you must execute separate API requests for each input value.
+      - Example:
+        - If the task is to get news for multiple cities and the API's `query` parameter accepts only one city name, you need to make separate API calls for each city.
+        - Incorrect Approach:
+          - Sending all city names in one parameter: `query = "New York, Los Angeles, Chicago"`
+          - This may cause the API to search for news articles that mention all three cities together, which might not yield the desired results.
+        - Correct Approach:
+          - First API Request:
+            - `query = "New York"`
+          - Second API Request:
+            - `query = "Los Angeles"`
+          - Third API Request:
+            - `query = "Chicago"`
+
+  - Preference for Multiple API Requests:
+    - Even if the API allows multiple inputs in a single request, you should only give everything at once if there is no other way.
+    - Prefer breaking down the task into multiple API requests whenever possible to achieve more accurate and relevant results.
+
+  - Executing Multiple API Requests:
+    - For each input value, construct a separate $$API_REQUEST$$ and execute them one after the other.
+    - Each request should have its own $$API_REQUEST$$ output.
+
+  - Combining Results:
+    - After executing separate API calls, the outputs can be combined if necessary for the subsequent steps or final output.
 
 - Validation:
   - Double-check that all required parameters are included and correctly formatted.
@@ -122,10 +106,11 @@ For more details, visit: https://newsapi.org/docs/endpoints/everything
   - Ensure that the parameter types, names, and values strictly match what the API expects.
 
 - Error Handling:
-  - 601 MISSING_REQUIRED_PARAMETERS: One or more than one required parameters are missing in the workflow step details.
+  - 601 MISSING_REQUIRED_PARAMETERS: One or more required parameters are missing in the workflow step details.
   - 602 WRONG_STEP_DETAILS: Raise this error if the API step details are incorrect or incomplete, such as invalid parameters or wrong input formats.
+  - 603 INVALID_PARAMETER_USAGE: Raised when a parameter is used incorrectly, such as including multiple values in a parameter that accepts only single values, or incorrect data formatting that doesn't align with the API's expectations.
   - Only raise errors for critical issues; minor problems should be handled internally.
-  - Provide a clear explanation in the Error_Explanation section.
+  - Provide a clear explanation in the ERROR_EXPLANATION section.
 
 ---
 
@@ -133,9 +118,10 @@ For more details, visit: https://newsapi.org/docs/endpoints/everything
 
 - Finalize a validated API request that is ready for execution.
 - Ensure strict adherence to the output format and avoid any changes in structure.
-- Always only output the CHAIN_OF_THOUGHT and API_REQUEST without any other details before or after.
-- You should build the API url, header, body in order to get a response that is as short as possible, while still getting the necessary information to answer the question. Pay attention to deliberately exclude any unnecessary pieces of data in the API call. For this if the api has page and pagesize parameters then you can use them to limit the pagesize to less than 15 with page being 1.
-
+- Always only output the $$CHAIN_OF_THOUGHT$$ and $$API_REQUEST$$ without any other details before or after.
+- Construct the API URL, headers, and body to get a response that is as concise as possible while still obtaining the necessary information to answer the question.
+  - Pay attention to deliberately exclude any unnecessary pieces of data in the API call.
+  - If the API has parameters to limit the output, such as `page` and `pageSize`, use them to limit the `pageSize` to less than 15 with `page` being 1 or as appropriate for the specific API.
 
 ### Output Format (Strictly follow this)
 
@@ -143,16 +129,36 @@ $$CHAIN_OF_THOUGHT$$
 
 - In this section, you need to think aloud and explain why the chosen parameters, methods, and structure are correct for the API being executed.
 - Consider the following aspects when writing your chain of thought:
-  - Input Variables: Are the parameter names, types, and sources correct? Do they match the API documentation? If the source is `LLM_Generated`, is the generated value correct based on the task description? Is the value stored in the variable a list, if yes and the API accepts arguments one at a time then we will have to run the API multiple times.
-  - Dependencies: Are there any dependencies on previous API outputs? Is the data from previous steps being used correctly? Is there any missing or conflicting data?
-  - HTTP Method / FUNCTION & Endpoint URL: Is the method appropriate for the task? Is the endpoint URL correct, and are any required parameters incorporated into it?
-  - Headers: Are the necessary headers (such as authorization) included?
-  - Request Body: If the API uses a request body, is it structured correctly in JSON format? Are dynamic values placed appropriately, and do they match the expected input types?
-  - See if the api has parameters to limit the output of the api like page and pagesize. If yes then we want less than 15 pagesize and page 1 or whatever might be equivalent to this for the specific api.
+  - Input Variables:
+    - Are the parameter names, types, and sources correct?
+    - Do they match the API documentation?
+    - If the source is `LLM_Generated`, is the generated value correct based on the task description?
+    - Determine if the input variable requires single or multiple API requests:
+      - Does the API accept multiple values in a single parameter?
+      - If not, should you execute multiple API calls for each input value?
+      - Even if the API allows multiple inputs, is it preferable to break down the task into multiple requests for better accuracy?
+  - Dependencies:
+    - Are there any dependencies on previous API outputs?
+    - Is the data from previous steps being used correctly?
+    - Is there any missing or conflicting data?
+  - HTTP Method / FUNCTION & Endpoint URL:
+    - What method should be used (`GET`, `POST`, etc.) or `FUNCTION`?
+    - Is the method appropriate for the task?
+    - Is the endpoint URL correct, and are any required parameters incorporated into it?
+  - Headers:
+    - What Are the necessary headers (such as authorization) to be included?
+  - Request Body:
+    - What should be there in the body
+    - If the API uses a request body, is it structured correctly in JSON format?
+    - Are dynamic values placed appropriately, and do they match the expected input types?
+  - Limiting Output:
+    - See if the API has parameters to limit the output, like `page` and `pageSize`.
+    - If yes, set `pageSize` to less than 15 and `page` to 1 or as appropriate.
 
 $$API_REQUEST$$
 
-- After reasoning through the problem in the $$CHAIN_OF_THOUGHT$$, output the finalized API request in the format below. Remember that we can have multiple API_REQUEST:
+- After reasoning through the problem in the $$CHAIN_OF_THOUGHT$$, output the finalized API request in the format below.
+- Remember that you may need to create multiple $$API_REQUEST$$ sections if executing multiple API calls.
 
 API_ENDPOINT
 
@@ -162,17 +168,17 @@ URL: [Full API Endpoint URL or Function Name]
 HEADERS
 
 {
-  "Header-Name 1": Header-Value  
-  "Header-Name 2": Header-Value  
-...
+  "Header-Name 1": Header-Value,
+  "Header-Name 2": Header-Value,
+  ...
 }
 
 BODY
 
 {
-    "parameter1": value1,  
-    "parameter2": "value2",
-    ...
+  "parameter1": value1,
+  "parameter2": "value2",
+  ...
 }
 
 In Case of Error:
@@ -195,7 +201,7 @@ ERROR_EXPLANATION
 
 - Any deviations from the API documentation or the output format can result in errors during execution.
 - If you encounter any issues that prevent you from finalizing the API request (e.g., missing required inputs, conflicts in parameters), you should raise an error detailing the issue.
-
+- Always prefer making multiple API requests over overloading a single parameter with multiple values, unless the API specifically supports multiple values and it's necessary.
 
 ### Some More Example:
 
@@ -205,88 +211,97 @@ ERROR_EXPLANATION
 
 Step Details:
 
-- API: NEWS_API  
-- Handles: Retrieves news articles related to each vacation spot  
+- API: WeatherAPI.com_Realtime_Weather_Api
+- Handles: Fetches real-time weather data for multiple cities
 - Input Variables:
-  - Name: vacation_spots_list
-     - Parameter: q
-     - Type: string
-     - Source: API_Output (Panel 1, Step 1)  
-     - Description: List of vacation spots from Panel 1
-     - Value: ["delhi", "mumbai", "pondicherry", "goa", "ladakh", "meghalaya"]
+  - Name: city_name
+    - Parameter: q
+    - Type: string
+    - Source: LLM_Generated
+    - Description: City names for which weather data is required
+    - Value: ["London", "New York", "Paris", "Amsterdam"]
 - Output Variables:
-  - Name: news_articles
-    Description: News articles related to each vacation spot
+  - Name: weather_data
+    - Description: Real-time weather data for London, New York, Paris, and Amsterdam
 
 Input Details:
 
-vacation_spots_list : ["delhi", "mumbai", "pondicherry", "goa", "ladakh", "meghalaya"]
 API_KEY: YOUR_API_KEY
 
 API Documentation:
 
-BASE URL: https://newsapi.org/v2/everything
-
-API Documentation
-The `/v2/everything` endpoint allows searching for articles that have been published by over 150,000 news sources within the past 5 years. This endpoint is ideal for detailed news analysis or discovery across a wide range of topics. URL parameters for this endpoint are as follows:
-
-Parameter       Type        Required    Default Description
-q               String      Yes         None    The search query or keywords. You can also use operators like AND, OR, NOT.
-from            Date        No          None    The start date for the results. Articles older than this date will not be returned.
-to              Date        No          None    The end date for the results. Articles published after this date will not be returned.
-sortBy          String      No          publishedAt  The sorting order for the results. Options include relevancy, popularity, and publishedAt.
-language        String      No          en      The language of the articles returned. Supported options include en, es, de, fr, and more.
-domains         String      No          None    Restrict articles to specific domains (e.g., techcrunch.com, engadget.com).
-excludeDomains  String      No          None    Exclude articles from specific domains.
-pageSize        Integer     No          20      The number of results per page. Maximum is 100.
-page            Integer     No          1       Use this to paginate through results.
-
-Authentication:
-You need an API key to use the NewsAPI endpoints. Authentication is done via the `X-Api-Key` header, which is sent with every request. Get your API key by signing up on the website.
-
-Response Format:
-The API returns results in JSON format. Each result includes the article’s title, author, source, URL, publication date, and a snippet of content.
-
-Example Request:
-GET https://newsapi.org/v2/everything?q=Apple&from=2022-01-01&sortBy=popularity&apiKey=YOUR_API_KEY
-
-For more details, visit: https://newsapi.org/docs/endpoints/everything
+[You will be given the api documentation]
 
 # Your Output:
 
 $$CHAIN_OF_THOUGHT$$
 
-- Input Variables Verification:
-  - Name: vacation_spots_list
-    - Parameter: q
-    - Type: string
-    - Source: API_Output (Panel 1, Step 1)
-    - Value: ["delhi", "mumbai", "pondicherry", "goa", "ladakh", "meghalaya"]
-    - Validation:
-      - The API parameter `q` expects a string.
-      - Since `vacation_spots_list` is a list of strings, each vacation spot will require a separate API request.
+Input Variables:
 
-- HTTP Method & Endpoint URL:
-  - Method: GET
-  - Base URL: https://newsapi.org/v2/everything
-  - We will construct separate URLs for each vacation spot by including the `q` parameter with the vacation spot name and the `apiKey`.
+- Name: `city_name`
+  - Parameter: `q`
+  - Type: string
+  - Source: LLM_Generated
+  - Description: City names for which weather data is required
+  - Value: `["London", "New York", "Paris", "Amsterdam"]`
 
-- Headers Setup:
-  - No additional headers are required according to the API documentation.
+Verification of Input Variables:
 
-- Request Body:
-  - No request body is needed for a GET request.
+- The parameter `q` is required by the API and expects a string representing a location (e.g., city name).
+- The `city_name` variable matches the expected parameter name `q` and is of the correct type (`string`).
+- The source is `LLM_Generated`, and the value `["London", "New York", "Paris", "Amsterdam"]` is appropriate based on the task description.
 
-- Since we have multiple vacation spots, each will be processed in a separate API request with page and pageSize set to 1 and 15, respectively.
+Determining Single vs. Multiple API Requests:
+
+- The API documentation does not indicate support for multiple values in the `q` parameter.
+- The `q` parameter accepts a single location per request.
+- Therefore, we need to execute separate API requests for each city to ensure accurate and relevant results.
+
+HTTP Method & Endpoint URL:
+
+- The API method is `GET`, as specified in the API documentation.
+- The endpoint is `/current.json`.
+- The full URL is `https://weatherapi-com.p.rapidapi.com/current.json`.
+- We will append the query parameter `q` with the city name for each request.
+
+Headers:
+
+- The API requires authentication using an API key.
+- We need to include the following headers:
+  - `"X-RapidAPI-Key": YOUR_API_KEY`
+  - `"X-RapidAPI-Host": "weatherapi-com.p.rapidapi.com"`
+
+Request Body:
+
+- Since this is a `GET` request with parameters passed via the URL, there is no need for a request body.
+
+Limiting Output:
+
+- The API does not provide parameters like `page` or `pageSize` for limiting output in the current weather endpoint.
+- We will proceed with the default response for each city.
+
+Dependencies:
+
+- There are no dependencies on previous API outputs.
+- All input variables are generated and provided in the step details.
+
+Final Decision:
+
+- We will create four separate API requests, one for each city in the `city_name` list.
+- Each request will include the appropriate headers and query parameters as per the API documentation.
 
 $$API_REQUEST$$
 
 API_ENDPOINT
 
 Method: GET  
-URL: https://newsapi.org/v2/everything?q=delhi&pageSize=15&page=1&apiKey=YOUR_API_KEY
+URL: https://weatherapi-com.p.rapidapi.com/current.json?q=London
 
 HEADERS
+
+{
+  "X-RapidAPI-Key": YOUR_API_KEY
+}
 
 BODY
 
@@ -295,9 +310,13 @@ $$API_REQUEST$$
 API_ENDPOINT
 
 Method: GET  
-URL: https://newsapi.org/v2/everything?q=mumbai&pageSize=15&page=1&apiKey=YOUR_API_KEY
+URL: https://weatherapi-com.p.rapidapi.com/current.json?q=New%20York
 
 HEADERS
+
+{
+  "X-RapidAPI-Key": YOUR_API_KEY
+}
 
 BODY
 
@@ -306,9 +325,13 @@ $$API_REQUEST$$
 API_ENDPOINT
 
 Method: GET  
-URL: https://newsapi.org/v2/everything?q=pondicherry&pageSize=15&page=1&apiKey=YOUR_API_KEY
+URL: https://weatherapi-com.p.rapidapi.com/current.json?q=Paris
 
 HEADERS
+
+{
+  "X-RapidAPI-Key": YOUR_API_KEY
+}
 
 BODY
 
@@ -317,33 +340,14 @@ $$API_REQUEST$$
 API_ENDPOINT
 
 Method: GET  
-URL: https://newsapi.org/v2/everything?q=goa&pageSize=15&page=1&apiKey=YOUR_API_KEY
+URL: https://weatherapi-com.p.rapidapi.com/current.json?q=Amsterdam
 
 HEADERS
 
-BODY
+{
+  "X-RapidAPI-Key": YOUR_API_KEY
+}
 
-$$API_REQUEST$$
-
-API_ENDPOINT
-
-Method: GET  
-URL: https://newsapi.org/v2/everything?q=ladakh&pageSize=15&page=1&apiKey=YOUR_API_KEY
-
-HEADERS
-
-BODY
-
-$$API_REQUEST$$
-
-API_ENDPOINT
-
-Method: GET  
-URL: https://newsapi.org/v2/everything?q=meghalaya&pageSize=15&page=1&apiKey=YOUR_API_KEY
-
-HEADERS
-
-BODY
 
 #### Example 2:
 
@@ -366,127 +370,64 @@ Step Details:
 
 API Documentation:
 
-openapi: 3.0.0
-servers:
-  - url: 'https://api.stackexchange.com/2.2'
-info:
-  description: Stack Exchange API
-  version: '2.2'
-  title: Stack Exchange API
-  termsOfService: 'https://stackoverflow.com/legal/api-terms-of-use'
-  contact:
-    url: https://api.stackexchange.com/
-tags:
-  - name: Answers
-  - name: Questions
-  - name: Users
-    description: 'All user methods that take an {ids} parameter have a /me equivalent method that takes an access_token instead. These methods are provided for developer convenience, with the exception of plain /me, which is actually necessary for discovering which user authenticated to an application.'
-paths:
-  /questions:
-    get:
-      tags:
-        - Questions
-      description: |-
-        Gets all the questions on the site.
-        This method allows you make fairly flexible queries across the entire corpus of questions on a site.
-      operationId: listQuestions
-      parameters:
-        - name: fromdate
-          in: query
-          required: false
-          schema:
-            type: integer
-        - name: todate
-          in: query
-          required: false
-          schema:
-            type: integer
-        - name: min
-          in: query
-          required: false
-          schema:
-            type: integer
-        - name: max
-          in: query
-          required: false
-          schema:
-            type: integer
-        - name: tagged
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: order
-          in: query
-          required: false
-          schema:
-            type: string
-            enum:
-              - desc
-              - asc
-        - name: sort
-          in: query
-          required: false
-          schema:
-            type: string
-            enum:
-              - activity
-              - votes
-              - creation
-              - hot
-              - week
-              - month
-        - name: page
-          in: query
-          required: false
-          schema:
-            type: integer
-        - name: pagesize
-          in: query
-          required: false
-          schema:
-            type: integer
-        - name: site
-          in: query
-          required: true
-          schema:
-            type: string
-            default: stackoverflow
-      responses:
-        default:
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/QuestionsResponse'
-      summary: List Questions
+[You will be given the api documentation]
 
 # Your Output:
 
 $$CHAIN_OF_THOUGHT$$
 
-- Input Variables Verification:
-  - Name: cpp_tag
-    - Parameter: tagged
-    - Type: string
-    - Source: LLM_Generated
-    - Value: "c++"
-    - Validation:
-      - The API parameter `tagged` expects a string and accepts a list of tags. The value "c++" is valid and correctly formatted.
+Input Variables:
 
-- HTTP Method & Endpoint URL:
-  - Method: GET
-  - Base URL: https://api.stackexchange.com/2.2/questions
-  - We noticed that the required parameter `site` is not provided in the input variables. However, since we know that this request pertains to Stack Overflow, we will add the `site=stackoverflow` parameter ourselves instead of raising error 601 MISSING_REQUIRED_PARAMETERS.
-  - The URL will include the `tagged` parameter with the value "c++", the `site` parameter with the value "stackoverflow", and the `key` parameter for authentication.
+- Name: `tagged`
+  - Parameter: `tagged`
+  - Type: string
+  - Source: LLM_Generated
+  - Description: Filter questions by the C++ tag
+  - Value: `"c++"`
 
-- Headers Setup:
-  - No additional headers are required according to the API documentation.
+Verification of Input Variables:
 
-- Request Body:
-  - No request body is needed for a GET request.
+- The parameter `tagged` is optional and used to filter questions by a specific tag.
+- The type is correct (`string`), and the value `"c++"` is appropriate for filtering C++ questions.
+- The parameter name `tagged` matches the API documentation.
 
-- To limit the output, we will use the `pagesize=15` and `page=1` parameters to ensure a concise response.
+Determining Single vs. Multiple API Requests:
+
+- Since there are not multiple things we will just do one api request
+
+HTTP Method & Endpoint URL:
+
+- The API method is `GET`, as specified in the API documentation for listing questions.
+- The base URL is `https://api.stackexchange.com/2.2`.
+- The endpoint is `/questions`.
+- We need to construct the full URL with required and optional query parameters.
+
+Required Query Parameters:
+
+- `site` (string, required): The site to query. Default is `stackoverflow`, but we need to include it explicitly. We will add the `site=stackoverflow` parameter ourselves instead of raising error 601 MISSING_REQUIRED_PARAMETERS.
+
+Optional Query Parameters:
+
+- `tagged` (string, optional): We'll use this to filter questions tagged with `"c++"`.
+- `pagesize` (integer, optional): To limit the number of results, we'll set `pagesize=15`.
+- `page` (integer, optional): We'll set `page=1` to retrieve the first page of results.
+
+Headers:
+
+- The API does not require any special headers for this request.
+
+Dependencies:
+
+- There are no dependencies on previous API outputs.
+
+Encoding Parameters:
+
+- The tag `"c++"` contains a `+` character, which needs to be URL-encoded as `%2B`.
+
+Final Decision:
+
+- Construct the GET request URL by including all required and optional parameters.
+- The final URL will be: `https://api.stackexchange.com/2.2/questions?site=stackoverflow&tagged=c%2B%2B&pagesize=15&page=1`
 
 $$API_REQUEST$$
 
@@ -505,39 +446,57 @@ BODY
 
 Step Details:
 
-- API: Open-Meteo
-- Handles: Retrieves weather forecast data for Denver, USA
+- API: WeatherAPI.com_Realtime_Weather_Api
+- Handles: Fetches real-time weather data
 - Input Variables:
-  - Name: longitude_denver
-    - Parameter: longitude
-    - Type: float
-    - Source: API_Output (Panel 1, Step 1)
-    - Description: Longitude of Denver, USA
-    - Value: "-104.991531"
-  - Name: current_weather_flag
-    - Parameter: current_weather
-    - Type: boolean
-    - Source: LLM_Generated
-    - Description: Flag to include current weather data
-    - Value: "true"
+  - Name: longitude_data
+    - Parameter: q
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: Longitutdes of the top cities
+    - Value: None
 - Output Variables:
-  - Name: denver_weather_forecast
-    - Description: Weather forecast data for Denver, USA including current weather conditions
+  - Name: realtime_weather
+    - Description: Real-time weather data for each city
 
 API Documentation:
 
-"Input": "The API requires the following input parameters:- latitude (float, required): WGS84 latitude coordinate of the location.- longitude (float, required): WGS84 longitude coordinate of the location.Optional parameters that may require your input:- hourly (array of strings, optional): Specify hourly weather variables to include in the response (e.g., `temperature_2m`, `wind_speed_10m`).- daily (array of strings, optional): Specify daily weather variables to include in the response (e.g., `temperature_2m_max`, `precipitation_sum`).- current_weather (boolean, optional): Set to `true` to include current weather data.",
-"Output": "The API returns a JSON object containing weather forecast data for the specified location. The output includes:- latitude (float): Latitude of the weather grid cell used.- longitude (float): Longitude of the weather grid cell used.- elevation (float): Elevation in meters of the selected weather grid cell.- hourly (object, if requested): Contains arrays of hourly data for each requested weather variable.  - time (array of strings): Timestamps corresponding to hourly data points.  - [weather variables]: Arrays of values for each requested hourly variable.- daily (object, if requested): Contains arrays of daily data for each requested weather variable.  - time (array of strings): Dates corresponding to daily data points.  - [weather variables]: Arrays of values for each requested daily variable.- current_weather (object, if requested): Current weather conditions including:  - time (string): Timestamp of the current weather data.  - temperature (float): Current temperature.  - wind_speed (float): Current wind speed.  - wind_direction (float): Current wind direction.  - weather_code (integer): Code representing the current weather condition.",
-"Use": "This API is used to retrieve a 7-day weather forecast for any location worldwide, specified by latitude and longitude coordinates. Users can customize the response by selecting specific hourly and daily weather variables or include current weather data. The API is suitable for applications that require weather information for forecasting, event planning, environmental monitoring, or integrating weather data into services."
+[You will be given the api documentation]
 
 # Your Output:
 
 $$CHAIN_OF_THOUGHT$$
 
-- The API response for Open-Meteo requires both the latitude and longitude to retrieve weather data for Denver, USA. However, in the provided input variables, only the longitude (`-104.991531`) is given, and the latitude is missing.
-- The `latitude` parameter is mandatory according to the API documentation, and without it, the weather forecast request cannot be completed.
-- Additionally, the `current_weather_flag` is correctly set to "true", indicating that current weather data should be included in the response.
-- Since the required parameter `latitude` is not provided, the request cannot be properly constructed. This results in raising the error 601 MISSING_REQUIRED_PARAMETERS to highlight the absence of this crucial input.
+Input Variables:
+
+- Name: `longitude_data`
+  - Parameter: `q`
+  - Type: string
+  - Source: `API_Output (Panel 2, Step 1)`
+  - Description: Longitudes of the top cities
+  - Value: None
+
+Verification of Input Variables:
+
+- The `WeatherAPI.com_Realtime_Weather_Api` requires the parameter `q`, which is a string representing the location.
+- The parameter `q` can accept:
+  - City name (e.g., "Paris")
+  - ZIP code (e.g., "10001")
+  - Latitude and longitude in the format `"lat,lon"` (e.g., "48.8567,2.3508")
+- Currently, we only have `longitude_data` without `latitude_data`.
+- The `longitude_data` depends on `API_Output (Panel 2, Step 1)`, but its value is `None`, indicating missing data.
+- Without both latitude and longitude, we cannot construct the required `q` parameter in the format `"lat,lon"`.
+
+Dependencies:
+
+- The input variable `longitude_data` lacks the corresponding `latitude_data`.
+- Since `latitude_data` is not provided, and `longitude_data` has no value, we cannot proceed.
+
+Conclusion:
+
+- The required parameter `q` is incomplete due to missing `latitude_data`.
+- We cannot fetch real-time weather data without both latitude and longitude.
+- Therefore, we must raise an 601 MISSING_REQUIRED_PARAMETERS error for missing required parameters.
 
 $$API_REQUEST$$
 
@@ -547,7 +506,7 @@ STATUS_CODE
 
 ERROR_EXPLANATION
 
-The latitude of the location we want weather of is missing. We cannot get the weather from Open Meteo without both longitude and latitude of the 
+The latitude of the location we want weather of is missing. We cannot get the weather from WeatherAPI.com_Realtime_Weather_Api without both longitude and latitude of the location
 
 #### Example 4:
 
@@ -576,79 +535,49 @@ API_KEY: YOUR_API_KEY
 
 API Documentation:
 
-Function: perplexity_api_response
-
-Description:
-This function interacts with the Perplexity AI API to generate a concise answer to a user's query by searching the web and synthesizing information from multiple sources.
-
-Use Case:
-Use this function as a web search engine to retrieve and compile information into a single, coherent response for queries that require up-to-date or broad information from the internet. 
-For best results do not ask too much information in one search, rather break down the query and do multiple searches.
-
-Parameters:
-- query (string, required): The user's question or search term that needs to be answered using web data.
-- preplexity_ai_key (string, required): Your API key for authenticating with the Perplexity AI API.
-
-Expected Output:
-- response_content (string): A compiled answer based on web search results provided by the Perplexity AI.
-
-Example Usage:
-```python
-# Replace 'YOUR_API_KEY' with your actual Perplexity AI API key
-response = perplexity_api_response("What are the latest advancements in AI?", "YOUR_API_KEY")
+[You will be given the api documentation]
 
 # Your Output:
 
 $$CHAIN_OF_THOUGHT$$
 
-- Input Variables Verification:
-  - Name: vacation_spots_list
-    - Parameter: query
-    - Type: string
-    - Source: API_Output (Panel 1, Step 1)
-    - Description: List of vacation spots from Panel 1
-    - Value: ["The Dolomites, Italy", "Santorini, Greece", "Prague, Czech Republic", "Cinque Terre, Italy", "Barcelona, Spain", "London, UK", "Rome, Italy", "Amsterdam, Netherlands", "Munich, Germany", "Dublin, Irelad"]
-    - Validation:
-      - The function `perplexity_api_response` expects a string parameter `query`.
-      - Since `vacation_spots_list` is a list of places, we need to construct appropriate queries.
-      - The function advises not to ask too much information in one search and to break down the queries into multiple searches.
+Input Variables:
 
-- Dependencies:
-  - The `vacation_spots_list` is sourced from API_Output (Panel 1, Step 1) and is available for use.
+- Name: `vacation_spots_list`
+  - Parameter: `query`
+  - Type: string
+  - Source: `API_Output (Panel 1, Step 1)`
+  - Description: List of vacation spots from Panel 1
+  - Value: `["The Dolomites, Italy", "Santorini, Greece", "Prague, Czech Republic", "Cinque Terre, Italy", "Barcelona, Spain", "London, UK", "Rome, Italy", "Amsterdam, Netherlands", "Munich, Germany", "Dublin, Ireland"]`
 
-- HTTP Method / FUNCTION & Endpoint URL:
-  - Method: FUNCTION
-  - URL: `perplexity_api_response`
-  - Since we're dealing with a Python function, the method is `FUNCTION`, and the URL is the function name.
+Verification of Input Variables:
 
-- Headers:
-  - No headers are required for a function call.
+- The `query` parameter is required and expects a string representing the user's question or search term.
+- The `vacation_spots_list` is a list of vacation spot names.
+- Since the `query` parameter accepts a single string, and the API recommends not to ask too much information in one search, we should execute separate API requests for each vacation spot.
 
-- Request Body:
-  - The function requires the following parameters:
-    - `query` (string, required)
-    - `preplexity_ai_key` (string, required)
-  - We need to construct the `query` parameter carefully to align with the function's usage guidelines.
+Determining Single vs. Multiple API Requests:
 
-- Query Construction:
-  - To avoid overloading the query, we'll split the list into two groups of five places each.
-  - First group:
-    - "The Dolomites, Italy"
-    - "Santorini, Greece"
-    - "Prague, Czech Republic"
-    - "Cinque Terre, Italy"
-    - "Barcelona, Spain"
-  - Second group:
-    - "London, UK"
-    - "Rome, Italy"
-    - "Amsterdam, Netherlands"
-    - "Munich, Germany"
-    - "Dublin, Ireland"  *(Corrected typo from "Irelad" to "Ireland")*
-  - For each group, we'll create a query:
-    - "What are the latitude and longitude for the following places: [list of places]"
+- The API documentation advises to break down queries and not ask for too much information in one search.
+- Therefore, we will execute individual API requests for each vacation spot to ensure accurate and concise responses.
 
-- Error Handling:
-  - Minor typo in "Dublin, Irelad" corrected to "Dublin, Ireland" to ensure accurate results.
+Method & Function Name:
+
+- The method is `FUNCTION`, and the function name is `perplexity_api_response`.
+
+Headers:
+
+- No headers are required for this function call.
+
+Request Body:
+
+- For each vacation spot, we will construct a `query` asking for the latitude and longitude of that specific place.
+- The `preplexity_ai_key` is provided as `"YOUR_API_KEY"`.
+
+Final Decision:
+
+- Create ten separate API requests, one for each vacation spot.
+- Each request will have its own `query` parameter formatted as `"What are the latitude and longitude of [vacation spot]?"`
 
 $$API_REQUEST$$
 

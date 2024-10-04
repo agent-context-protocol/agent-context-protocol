@@ -1,71 +1,4 @@
 {
-    "1": {
-        "1": {
-            "panel_description": "Retrieve current weather information for Los Angeles.",
-            "steps": {
-                "1": {
-                    "api": "WeatherAPI.com_Realtime_Weather_Api",
-                    "handles": "Fetches current weather data for Los Angeles",
-                    "input_vars": [
-                        {
-                            "name": "city_name",
-                            "parameter": "q",
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "City name for weather query",
-                            "value": "Los Angeles",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "current_weather_la",
-                            "description": "Current weather details for Los Angeles",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        }
-    },
-    "2": {
-        "2": {
-            "panel_description": "Provide weather forecast for Chicago from October 10th to October 15th, 2024.",
-            "steps": {
-                "1": {
-                    "api": "WeatherAPI.com_Forecast_Weather_API",
-                    "handles": "Fetches weather forecast for Chicago",
-                    "input_vars": [
-                        {
-                            "name": "forecast_city_name",
-                            "parameter": "q",
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "City name for weather forecast",
-                            "value": "Chicago",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "forecast_dates",
-                            "parameter": "dt",
-                            "type": "date",
-                            "source": "LLM_Generated",
-                            "description": "Dates for weather forecast",
-                            "value": "[\"2024-10-10\", \"2024-10-11\", \"2024-10-12\", \"2024-10-13\", \"2024-10-14\", \"2024-10-15\"]",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "weather_forecast_chicago",
-                            "description": "Weather forecast for Chicago for specified dates",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        }
-    },
     "3": {
         "3": {
             "panel_description": "Retrieve hotel options in Chicago for specified dates.",
@@ -86,7 +19,7 @@
                     ],
                     "output_vars": [
                         {
-                            "name": "location_geoId",
+                            "name": "chicago_geoId",
                             "description": "Geo ID for Chicago",
                             "used_by": [
                                 {
@@ -102,7 +35,7 @@
                     "handles": "Retrieves hotel options using geoId",
                     "input_vars": [
                         {
-                            "name": "location_geoId",
+                            "name": "chicago_geoId",
                             "parameter": "geoId",
                             "type": "string",
                             "source": "API_Output (Panel 3, Step 1)",
@@ -136,7 +69,7 @@
                     ],
                     "output_vars": [
                         {
-                            "name": "hotel_options_chicago",
+                            "name": "hotel_options",
                             "description": "List of available hotels in Chicago",
                             "used_by": []
                         }

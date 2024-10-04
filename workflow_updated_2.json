@@ -1,216 +1,36 @@
 {
-    "1": {
-        "panel_description": "Identify the top 5 places in Europe to visit.",
-        "steps": {
-            "1": {
-                "api": "Perplexity",
-                "handles": "Retrieves a list of top places to visit in Europe",
-                "input_vars": [
-                    {
-                        "name": "query_top_places",
-                        "parameter": "query",
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Query to get the top 5 places to visit in Europe",
-                        "value": "Top 5 places to visit in Europe currently",
-                        "dependencies": []
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "top_places_list",
-                        "description": "List of top 5 places to visit in Europe",
-                        "used_by": [
-                            {
-                                "panel": 1,
-                                "step": 2
-                            },
-                            {
-                                "panel": 2,
-                                "step": 1
-                            },
-                            {
-                                "panel": 3,
-                                "step": 1
-                            }
-                        ],
-                        "value": "[\"Paris, France\", \"Venice, Italy\", \"Prague, Czech Republic\", \"Barcelona, Spain\", \"Vienna, Austria\"]"
-                    }
-                ]
-            },
-            "2": {
-                "api": "TripadvisorSearchLocation",
-                "handles": "Retrieves location details for each top place",
-                "input_vars": [
-                    {
-                        "name": "top_places_list",
-                        "parameter": "query",
-                        "type": "string",
-                        "source": "API_Output (Panel 1, Step 1)",
-                        "description": "List of top places from Perplexity",
-                        "value": "[\"Paris, France\", \"Venice, Italy\", \"Prague, Czech Republic\", \"Barcelona, Spain\", \"Vienna, Austria\"]",
-                        "dependencies": [
-                            {
-                                "panel": 1,
-                                "step": 1
-                            }
-                        ]
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "location_details",
-                        "description": "Location details including coordinates for each place",
-                        "used_by": [],
-                        "value": "```json\n    [\n      {\n        \"name\": \"Paris\",\n        \"geoId\": 187147,\n        \"region\": \"Ile-de-France, France\"\n      },\n      {\n        \"name\": \"Venice\",\n        \"geoId\": 187870,\n        \"region\": \"Veneto, Italy\"\n      },\n      {\n        \"name\": \"Prague\",\n        \"geoId\": 274707,\n        \"region\": \"Bohemia, Czech Republic\"\n      },\n      {\n        \"name\": \"Barcelona\",\n        \"geoId\": 187497,\n        \"region\": \"Catalonia, Spain\"\n      },\n      {\n        \"name\": \"Vienna\",\n        \"geoId\": 190454,\n        \"region\": \"Vienna Region, Austria\"\n      }\n    ]\n    ```"
-                    }
-                ]
-            }
-        }
-    },
     "2": {
-        "panel_description": "Provide real-time weather information for the top European destinations.",
+        "panel_description": "Provide weather forecast for Chicago from October 10th to October 15th, 2024.",
         "steps": {
             "1": {
-                "api": "Perplexity",
-                "handles": "Confirms coordinates for each top destination",
+                "api": "WeatherAPI.com_Forecast_Weather_API",
+                "handles": "Fetches weather forecast for Chicago",
                 "input_vars": [
                     {
-                        "name": "top_places_list",
-                        "parameter": "query",
-                        "type": "string",
-                        "source": "API_Output (Panel 1, Step 1)",
-                        "description": "List of top places from Perplexity",
-                        "value": "[\"Paris, France\", \"Venice, Italy\", \"Prague, Czech Republic\", \"Barcelona, Spain\", \"Vienna, Austria\"]",
-                        "dependencies": [
-                            {
-                                "panel": 1,
-                                "step": 1
-                            }
-                        ]
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "confirmed_coordinates",
-                        "description": "Confirmed coordinates for each destination",
-                        "used_by": [
-                            {
-                                "panel": 2,
-                                "step": 2
-                            }
-                        ],
-                        "value": "```json\n    {\n      \"Paris, France\": {\n        \"latitude\": 48.85341,\n        \"longitude\": 2.3488\n      },\n      \"Venice, Italy\": {\n        \"latitude\": 45.4379,\n        \"longitude\": 12.3325\n      },\n      \"Prague, Czech Republic\": {\n        \"latitude\": 50.0755,\n        \"longitude\": 14.4378\n      },\n      \"Barcelona, Spain\": {\n        \"latitude\": 41.390205,\n        \"longitude\": 2.154007\n      },\n      \"Vienna, Austria\": {\n        \"latitude\": 48.208174,\n        \"longitude\": 16.373819\n      }\n    }\n    ```"
-                    }
-                ]
-            },
-            "2": {
-                "api": "WeatherAPI.com_Realtime_Weather_Api",
-                "handles": "Fetches real-time weather information for each location",
-                "input_vars": [
-                    {
-                        "name": "confirmed_coordinates",
+                        "name": "forecast_city_name",
                         "parameter": "q",
                         "type": "string",
-                        "source": "API_Output (Panel 2, Step 1)",
-                        "description": "Coordinates for each destination",
-                        "value": "```json\n    {\n      \"Paris, France\": {\n        \"latitude\": 48.85341,\n        \"longitude\": 2.3488\n      },\n      \"Venice, Italy\": {\n        \"latitude\": 45.4379,\n        \"longitude\": 12.3325\n      },\n      \"Prague, Czech Republic\": {\n        \"latitude\": 50.0755,\n        \"longitude\": 14.4378\n      },\n      \"Barcelona, Spain\": {\n        \"latitude\": 41.390205,\n        \"longitude\": 2.154007\n      },\n      \"Vienna, Austria\": {\n        \"latitude\": 48.208174,\n        \"longitude\": 16.373819\n      }\n    }\n    ```",
-                        "dependencies": [
-                            {
-                                "panel": 2,
-                                "step": 1
-                            }
-                        ]
+                        "source": "LLM_Generated",
+                        "description": "City name for weather forecast",
+                        "value": "Chicago",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "forecast_dates",
+                        "parameter": "dt",
+                        "type": "date",
+                        "source": "LLM_Generated",
+                        "description": "Dates for weather forecast",
+                        "value": "[\"2024-10-10\", \"2024-10-11\", \"2024-10-12\", \"2024-10-13\", \"2024-10-14\", \"2024-10-15\"]",
+                        "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "weather_info",
-                        "description": "Real-time weather information for each destination",
+                        "name": "weather_forecast_chicago",
+                        "description": "Weather forecast for Chicago for specified dates",
                         "used_by": [],
-                        "value": "```json\n    {\n      \"Paris, France\": {\n        \"temperature_c\": 18.3,\n        \"temperature_f\": 64.9,\n        \"condition\": \"Overcast\",\n        \"wind_kph\": 22.7,\n        \"humidity\": 77,\n        \"units\": {\n          \"temperature\": \"\u00b0C/\u00b0F\",\n          \"wind\": \"kph\"\n        }\n      },\n      \"Venice, Italy\": {\n        \"temperature_c\": 19.3,\n        \"temperature_f\": 66.7,\n        \"condition\": \"Sunny\",\n        \"wind_kph\": 8.6,\n        \"humidity\": 64,\n        \"units\": {\n          \"temperature\": \"\u00b0C/\u00b0F\",\n          \"wind\": \"kph\"\n        }\n      },\n      \"Prague, Czech Republic\": {\n        \"temperature_c\": 13.3,\n        \"temperature_f\": 55.9,\n        \"condition\": \"Sunny\",\n        \"wind_kph\": 10.4,\n        \"humidity\": 54,\n        \"units\": {\n          \"temperature\": \"\u00b0C/\u00b0F\",\n          \"wind\": \"kph\"\n        }\n      },\n      \"Barcelona, Spain\": {\n        \"temperature_c\": 24.3,\n        \"temperature_f\": 75.7,\n        \"condition\": \"Partly cloudy\",\n        \"wind_kph\": 14.8,\n        \"humidity\": 65,\n        \"units\": {\n          \"temperature\": \"\u00b0C/\u00b0F\",\n          \"wind\": \"kph\"\n        }\n      },\n      \"Vienna, Austria\": {\n        \"temperature_c\": 15.0,\n        \"temperature_f\": 59.0,\n        \"condition\": \"Sunny\",\n        \"wind_kph\": 7.9,\n        \"humidity\": 44,\n        \"units\": {\n          \"temperature\": \"\u00b0C/\u00b0F\",\n          \"wind\": \"kph\"\n        }\n      }\n    }\n    ```"
-                    }
-                ]
-            }
-        }
-    },
-    "3": {
-        "panel_description": "Suggest hotels for each top European destination.",
-        "steps": {
-            "1": {
-                "api": "TripadvisorSearchLocation",
-                "handles": "Retrieves Geo IDs for each top destination",
-                "input_vars": [
-                    {
-                        "name": "top_places_list",
-                        "parameter": "query",
-                        "type": "string",
-                        "source": "API_Output (Panel 1, Step 1)",
-                        "description": "List of top places from Perplexity",
-                        "value": "[\"Paris, France\", \"Venice, Italy\", \"Prague, Czech Republic\", \"Barcelona, Spain\", \"Vienna, Austria\"]",
-                        "dependencies": [
-                            {
-                                "panel": 1,
-                                "step": 1
-                            }
-                        ]
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "geo_ids",
-                        "description": "Geo IDs for each destination",
-                        "used_by": [
-                            {
-                                "panel": 3,
-                                "step": 2
-                            }
-                        ]
-                    }
-                ]
-            },
-            "2": {
-                "api": "TripadvisorSearchHotels",
-                "handles": "Finds hotels for each location using Geo IDs",
-                "input_vars": [
-                    {
-                        "name": "geo_ids",
-                        "parameter": "geoId",
-                        "type": "string",
-                        "source": "API_Output (Panel 3, Step 1)",
-                        "description": "Geo IDs for each destination",
-                        "value": "None",
-                        "dependencies": [
-                            {
-                                "panel": 3,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "check_in_date",
-                        "parameter": "checkIn",
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Check-in date for hotel search",
-                        "value": "2023-10-02",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "check_out_date",
-                        "parameter": "checkOut",
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Check-out date for hotel search",
-                        "value": "2023-10-05",
-                        "dependencies": []
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "hotel_suggestions",
-                        "description": "List of hotel suggestions for each destination",
-                        "used_by": []
+                        "value": "```json\n    {\n      \"2024-10-10\": {\n        \"maxtemp_c\": 21.9,\n        \"mintemp_c\": 16.5,\n        \"condition\": \"Sunny\",\n        \"precip_mm\": 0.0,\n        \"wind_kph\": 14.4\n      },\n      \"2024-10-11\": {\n        \"maxtemp_c\": 24.3,\n        \"mintemp_c\": 15.2,\n        \"condition\": \"Sunny\",\n        \"precip_mm\": 0.0,\n        \"wind_kph\": 15.5\n      },\n      \"2024-10-12\": {\n        \"maxtemp_c\": 26.8,\n        \"mintemp_c\": 17.6,\n        \"condition\": \"Sunny\",\n        \"precip_mm\": 0.0,\n        \"wind_kph\": 19.8\n      },\n      \"2024-10-13\": {\n        \"maxtemp_c\": 25.4,\n        \"mintemp_c\": 17.5,\n        \"condition\": \"Patchy rain nearby\",\n        \"precip_mm\": 3.24,\n        \"wind_kph\": 22.3\n      },\n      \"2024-10-14\": {\n        \"maxtemp_c\": 16.4,\n        \"mintemp_c\": 15.1,\n        \"condition\": \"Patchy rain nearby\",\n        \"precip_mm\": 0.09,\n        \"wind_kph\": 23.4\n      },\n      \"2024-10-15\": {\n        \"maxtemp_c\": 20.2,\n        \"mintemp_c\": 13.8,\n        \"condition\": \"Sunny\",\n        \"precip_mm\": 0.0,\n        \"wind_kph\": 7.6\n      }\n    }\n    ```"
                     }
                 ]
             }

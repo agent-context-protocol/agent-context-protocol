@@ -1,0 +1,31 @@
+{
+    "2": {
+        "2": {
+            "panel_description": "Provide weather forecast for Chicago from October 10th to October 15th.",
+            "steps": {
+                "1": {
+                    "api": "Perplexity",
+                    "handles": "Retrieves weather forecast for Chicago for specified dates",
+                    "input_vars": [
+                        {
+                            "name": "query_forecast_data",
+                            "parameter": "query",
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get weather forecast for Chicago from October 10th to October 15th",
+                            "value": "Weather forecast for Chicago from October 10th to October 15th",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "chicago_weather_forecast",
+                            "description": "Weather forecast for Chicago for specified dates",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

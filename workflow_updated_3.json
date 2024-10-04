@@ -1,186 +1,46 @@
 {
-    "1": {
-        "panel_description": "Identify the top 5 places in Europe to visit.",
+    "3": {
+        "panel_description": "Retrieve hotel options in Chicago for specified dates.",
         "steps": {
             "1": {
-                "api": "Perplexity",
-                "handles": "Retrieves a list of top places to visit in Europe",
+                "api": "TripadvisorSearchLocation",
+                "handles": "Retrieves geoId for Chicago",
                 "input_vars": [
                     {
-                        "name": "query_top_places",
+                        "name": "location_query",
                         "parameter": "query",
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Query to get the top 5 places to visit in Europe",
-                        "value": "Top 5 places to visit in Europe currently",
+                        "description": "Search query for Chicago",
+                        "value": "Chicago",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "top_places_list",
-                        "description": "List of top 5 places to visit in Europe",
-                        "used_by": [
-                            {
-                                "panel": 1,
-                                "step": 2
-                            },
-                            {
-                                "panel": 2,
-                                "step": 1
-                            },
-                            {
-                                "panel": 3,
-                                "step": 1
-                            }
-                        ],
-                        "value": "[\"Paris, France\", \"Venice, Italy\", \"Prague, Czech Republic\", \"Barcelona, Spain\", \"Vienna, Austria\"]"
-                    }
-                ]
-            },
-            "2": {
-                "api": "TripadvisorSearchLocation",
-                "handles": "Retrieves location details for each top place",
-                "input_vars": [
-                    {
-                        "name": "top_places_list",
-                        "parameter": "query",
-                        "type": "string",
-                        "source": "API_Output (Panel 1, Step 1)",
-                        "description": "List of top places from Perplexity",
-                        "value": "[\"Paris, France\", \"Venice, Italy\", \"Prague, Czech Republic\", \"Barcelona, Spain\", \"Vienna, Austria\"]",
-                        "dependencies": [
-                            {
-                                "panel": 1,
-                                "step": 1
-                            }
-                        ]
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "location_details",
-                        "description": "Location details including coordinates for each place",
-                        "used_by": [],
-                        "value": "```json\n    [\n      {\n        \"name\": \"Paris\",\n        \"geoId\": 187147,\n        \"region\": \"Ile-de-France, France\"\n      },\n      {\n        \"name\": \"Venice\",\n        \"geoId\": 187870,\n        \"region\": \"Veneto, Italy\"\n      },\n      {\n        \"name\": \"Prague\",\n        \"geoId\": 274707,\n        \"region\": \"Bohemia, Czech Republic\"\n      },\n      {\n        \"name\": \"Barcelona\",\n        \"geoId\": 187497,\n        \"region\": \"Catalonia, Spain\"\n      },\n      {\n        \"name\": \"Vienna\",\n        \"geoId\": 190454,\n        \"region\": \"Vienna Region, Austria\"\n      }\n    ]\n    ```"
-                    }
-                ]
-            }
-        }
-    },
-    "2": {
-        "panel_description": "Provide real-time weather information for the top European destinations.",
-        "steps": {
-            "1": {
-                "api": "Perplexity",
-                "handles": "Confirms coordinates for each top destination",
-                "input_vars": [
-                    {
-                        "name": "top_places_list",
-                        "parameter": "query",
-                        "type": "string",
-                        "source": "API_Output (Panel 1, Step 1)",
-                        "description": "List of top places from Perplexity",
-                        "value": "[\"Paris, France\", \"Venice, Italy\", \"Prague, Czech Republic\", \"Barcelona, Spain\", \"Vienna, Austria\"]",
-                        "dependencies": [
-                            {
-                                "panel": 1,
-                                "step": 1
-                            }
-                        ]
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "confirmed_coordinates",
-                        "description": "Confirmed coordinates for each destination",
-                        "used_by": [
-                            {
-                                "panel": 2,
-                                "step": 2
-                            }
-                        ],
-                        "value": "```json\n    {\n      \"Paris, France\": {\n        \"latitude\": 48.85341,\n        \"longitude\": 2.3488\n      },\n      \"Venice, Italy\": {\n        \"latitude\": 45.4379,\n        \"longitude\": 12.3325\n      },\n      \"Prague, Czech Republic\": {\n        \"latitude\": 50.0755,\n        \"longitude\": 14.4378\n      },\n      \"Barcelona, Spain\": {\n        \"latitude\": 41.390205,\n        \"longitude\": 2.154007\n      },\n      \"Vienna, Austria\": {\n        \"latitude\": 48.208174,\n        \"longitude\": 16.373819\n      }\n    }\n    ```"
-                    }
-                ]
-            },
-            "2": {
-                "api": "WeatherAPI.com_Realtime_Weather_Api",
-                "handles": "Fetches real-time weather information for each location",
-                "input_vars": [
-                    {
-                        "name": "confirmed_coordinates",
-                        "parameter": "q",
-                        "type": "string",
-                        "source": "API_Output (Panel 2, Step 1)",
-                        "description": "Coordinates for each destination",
-                        "value": "```json\n    {\n      \"Paris, France\": {\n        \"latitude\": 48.85341,\n        \"longitude\": 2.3488\n      },\n      \"Venice, Italy\": {\n        \"latitude\": 45.4379,\n        \"longitude\": 12.3325\n      },\n      \"Prague, Czech Republic\": {\n        \"latitude\": 50.0755,\n        \"longitude\": 14.4378\n      },\n      \"Barcelona, Spain\": {\n        \"latitude\": 41.390205,\n        \"longitude\": 2.154007\n      },\n      \"Vienna, Austria\": {\n        \"latitude\": 48.208174,\n        \"longitude\": 16.373819\n      }\n    }\n    ```",
-                        "dependencies": [
-                            {
-                                "panel": 2,
-                                "step": 1
-                            }
-                        ]
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "weather_info",
-                        "description": "Real-time weather information for each destination",
-                        "used_by": [],
-                        "value": "```json\n    {\n      \"Paris, France\": {\n        \"temperature_c\": 18.3,\n        \"temperature_f\": 64.9,\n        \"condition\": \"Overcast\",\n        \"wind_kph\": 22.7,\n        \"humidity\": 77,\n        \"units\": {\n          \"temperature\": \"\u00b0C/\u00b0F\",\n          \"wind\": \"kph\"\n        }\n      },\n      \"Venice, Italy\": {\n        \"temperature_c\": 19.3,\n        \"temperature_f\": 66.7,\n        \"condition\": \"Sunny\",\n        \"wind_kph\": 8.6,\n        \"humidity\": 64,\n        \"units\": {\n          \"temperature\": \"\u00b0C/\u00b0F\",\n          \"wind\": \"kph\"\n        }\n      },\n      \"Prague, Czech Republic\": {\n        \"temperature_c\": 13.3,\n        \"temperature_f\": 55.9,\n        \"condition\": \"Sunny\",\n        \"wind_kph\": 10.4,\n        \"humidity\": 54,\n        \"units\": {\n          \"temperature\": \"\u00b0C/\u00b0F\",\n          \"wind\": \"kph\"\n        }\n      },\n      \"Barcelona, Spain\": {\n        \"temperature_c\": 24.3,\n        \"temperature_f\": 75.7,\n        \"condition\": \"Partly cloudy\",\n        \"wind_kph\": 14.8,\n        \"humidity\": 65,\n        \"units\": {\n          \"temperature\": \"\u00b0C/\u00b0F\",\n          \"wind\": \"kph\"\n        }\n      },\n      \"Vienna, Austria\": {\n        \"temperature_c\": 15.0,\n        \"temperature_f\": 59.0,\n        \"condition\": \"Sunny\",\n        \"wind_kph\": 7.9,\n        \"humidity\": 44,\n        \"units\": {\n          \"temperature\": \"\u00b0C/\u00b0F\",\n          \"wind\": \"kph\"\n        }\n      }\n    }\n    ```"
-                    }
-                ]
-            }
-        }
-    },
-    "3": {
-        "panel_description": "Suggest hotels for each top European destination.",
-        "steps": {
-            "1": {
-                "api": "TripadvisorSearchLocation",
-                "handles": "Retrieves Geo IDs for each top destination",
-                "input_vars": [
-                    {
-                        "name": "top_places_list",
-                        "parameter": "query",
-                        "type": "string",
-                        "source": "API_Output (Panel 1, Step 1)",
-                        "description": "List of top places from Perplexity",
-                        "value": "[\"Paris, France\", \"Venice, Italy\", \"Prague, Czech Republic\", \"Barcelona, Spain\", \"Vienna, Austria\"]",
-                        "dependencies": [
-                            {
-                                "panel": 1,
-                                "step": 1
-                            }
-                        ]
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "geo_ids",
-                        "description": "Geo IDs for each destination",
+                        "name": "location_geoId",
+                        "description": "Geo ID for Chicago",
                         "used_by": [
                             {
                                 "panel": 3,
                                 "step": 2
                             }
                         ],
-                        "value": "{\n      \"Paris, France\": 187147,\n      \"Venice, Italy\": 187870,\n      \"Prague, Czech Republic\": 274707,\n      \"Barcelona, Spain\": 187497,\n      \"Vienna, Austria\": 190454\n    }"
+                        "value": "35805"
                     }
                 ]
             },
             "2": {
                 "api": "TripadvisorSearchHotels",
-                "handles": "Finds hotels for each location using Geo IDs",
+                "handles": "Retrieves hotel options using geoId",
                 "input_vars": [
                     {
-                        "name": "geo_ids",
+                        "name": "location_geoId",
                         "parameter": "geoId",
                         "type": "string",
                         "source": "API_Output (Panel 3, Step 1)",
-                        "description": "Geo IDs for each destination",
-                        "value": "{\n      \"Paris, France\": 187147,\n      \"Venice, Italy\": 187870,\n      \"Prague, Czech Republic\": 274707,\n      \"Barcelona, Spain\": 187497,\n      \"Vienna, Austria\": 190454\n    }",
+                        "description": "Geo ID for Chicago",
+                        "value": "35805",
                         "dependencies": [
                             {
                                 "panel": 3,
@@ -193,8 +53,8 @@
                         "parameter": "checkIn",
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Check-in date for hotel search",
-                        "value": "2023-10-02",
+                        "description": "Check-in date",
+                        "value": "2024-10-10",
                         "dependencies": []
                     },
                     {
@@ -202,16 +62,17 @@
                         "parameter": "checkOut",
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Check-out date for hotel search",
-                        "value": "2023-10-05",
+                        "description": "Check-out date",
+                        "value": "2024-10-15",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "hotel_suggestions",
-                        "description": "List of hotel suggestions for each destination",
-                        "used_by": []
+                        "name": "hotel_options_chicago",
+                        "description": "List of available hotels in Chicago",
+                        "used_by": [],
+                        "value": "```json\n    [\n      {\n        \"title\": \"The Blackstone, Autograph Collection\",\n        \"location\": \"Downtown / The Loop\",\n        \"rating\": 4.5,\n        \"reviews\": \"2,935\",\n        \"price\": \"$723\",\n        \"details\": \"Free cancellation \u2022 Reserve now, pay at stay\",\n        \"provider\": \"Booking.com\",\n        \"link\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=35114445&geo=841981&from=HotelDateSearch_Hotels&slot=1&matchID=1&oos=0&cnt=1&silo=47212&bucket=995258&nrank=1&crank=1&clt=SLMM&ttype=SponsoredMobileMeta&tm=307970517&managed=false&capped=false&gosox=mG_NRyap2SyPT34vYBrK6h-YTiWMn9QOrmIg-a_J_MbDzNQTKmSH_8ORiRn1gjv-FTBs5HL5K2eZhcfG3KARzY0JQ3sDZDTy6nC6RFGhsuiRqs0787sw6-L84qQLZWKPzom7N7xIg9r8VYbwpzEMqF1LK-8Juayx6LBOcEdWQmAhwZM3zRQMVqoSiOW2TDYT3f5-bjS6QxG8YSAoyk7icuxji-5Dkq5IZK2He5jyMDm5YaCJHuAxakmtfPZ2IOVLqpPQSActRw6Os63fv94AuA&priceShown=722&pm=AI&hac=AVAILABLE&mbl=MEET&mbldelta=0&rq=P&rate=615.0000&taxesRate=107.0200&feesRate=0&fees=107.0200&cur=USD&adults=1&child_rm_ages=&inDay=10&outDay=15&rdex=RDEX_a15c82fa0b718ae48a738f8f092cb56&rooms=1&inMonth=10&inYear=2024&outMonth=10&outYear=2024&auid=e59c5a0c-915b-4c69-8636-a2424936ae9d&def_d=true&bld=L_5,D_6,G_1,W_4,U_1,C_241010,T_12&bh=true&cs=1ae36b837ebbaf313836c1657e0a7c220&ik=773bcfeaf4a9453996ade8c7b68af5c1&aok=61ee9d844bc84d24867f4b2279d2c39c&tp=APS-Hotels&pageLocId=35805&area=Spons%7CSpons_Meta_Pref\"\n      },\n      {\n        \"title\": \"Swissotel Chicago\",\n        \"location\": \"Downtown / The Loop\",\n        \"rating\": 4.5,\n        \"reviews\": \"6,829\",\n        \"price\": \"$638\",\n        \"details\": \"Free cancellation \u2022 Reserve now, pay at stay\",\n        \"provider\": \"Booking.com\",\n        \"link\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=32448176&geo=114581&from=HotelDateSearch_Hotels&slot=1&matchID=1&oos=0&cnt=7&silo=10476&bucket=902999&nrank=1&crank=1&clt=M&ttype=MobileCR&tm=307970517&managed=false&capped=false&gosox=6vS60O_HgkBSaY7nhOEtdD_ZjUIvFgpEDJN1lcSPpCQfmE4ljJ_UDq5iIPmvyfzGDrABLAgrkm1j-FCdgAK9JFQwKJkrhD0K8M-kiFbZVqWNCUN7A2Q08upwukRRobLoGJbQdoaQYeoKlOBlpKXyutdiXvMKDpntYKkQ069GSZMf6Vkx7EZPzOsTe_iM_rpxZh5E5MOv-tSynoEyUq4QkGJ50vpp3V6gb_xJGRUPw3kjg1X0CimbTDwTF9nJFudx1dPZ3VPtaDRaSQtDHeZpeieqjlLxlYZLvW3SuRGZmsQ&priceShown=637&pm=AI&hac=AVAILABLE&mbl=LOSE&mbldelta=5400&rq=P&rate=517.7500&taxesRate=90.0900&feesRate=29.3500&fees=119.4400&cur=USD&adults=1&child_rm_ages=&inDay=10&outDay=15&rdex=RDEX_26e8bc1514411ca6a9025f000d4c7e79&rooms=1&inMonth=10&inYear=2024&outMonth=10&outYear=2024&auid=e90b2200-aee7-4a22-94db-c0f6aa18fec3&def_d=true&bld=L_5,D_6,G_1,W_4,U_1,C_241010,T_12&bh=true&cs=1d0e55d741080619cba1d2529b5590a0b&ik=773bcfeaf4a9453996ade8c7b68af5c1&aok=6bc3e8b31610407681ccff0d79632522&tp=APS-Hotels&pageLocId=35805\"\n      },\n      {\n        \"title\": \"The Royal Sonesta Chicago River North\",\n        \"location\": \"Near North Side\",\n        \"rating\": 4.5,\n        \"reviews\": \"3,539\",\n        \"price\": \"$533\",\n        \"details\": \"Free cancellation \u2022 Reserve now, pay at stay\",\n        \"provider\": \"Booking.com\",\n        \"link\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=33400293&geo=1566945&from=HotelDateSearch_Hotels&slot=1&matchID=1&oos=0&cnt=5&silo=10476&bucket=902999&nrank=1&crank=1&clt=M&ttype=MobileCR&tm=307970517&managed=false&capped=false&gosox=6vS60O_HgkBSaY7nhOEtdD_ZjUIvFgpEDJN1lcSPpCQfmE4ljJ_UDq5iIPmvyfzGVWLObS4NCXVtZuV4Zpqf6y2_zdjj7HGuvs4_ECLcdk6NCUN7A2Q08upwukRRobLosUX9CoS3ZVJaCCUuQski4ZF4Xm2A1z3Wml3Dwmr10dtuTIvJ5wZaAibn3AlHrSb5SkPdipmLZLlHmT39wnk_u1pI69GrjPPHLqPIb-9ZRAgjg1X0CimbTDwTF9nJFudx1dPZ3VPtaDRaSQtDHeZpeieqjlLxlYZLvW3SuRGZmsQ&priceShown=533&pm=AI&hac=AVAILABLE&mbl=LOSE&mbldelta=6700&rq=P&rate=426.4000&taxesRate=74.1900&feesRate=32.0000&fees=106.1900&cur=USD&adults=1&child_rm_ages=&inDay=10&outDay=15&rdex=RDEX_57f21f6a1d98800b13a9de7cfe44653&rooms=1&inMonth=10&inYear=2024&outMonth=10&outYear=2024&auid=85200907-a503-40ec-8e3d-07e9ed8f6e29&def_d=true&bld=L_5,D_6,G_1,W_4,U_1,C_241010,T_12&bh=true&cs=1f64693cc92afea657c930dd3a360f3d6&ik=773bcfeaf4a9453996ade8c7b68af5c1&aok=c1efef17b85144eda92fef27e27d1dac&tp=APS-Hotels&pageLocId=35805\"\n      },\n      {\n        \"title\": \"Virgin Hotels Chicago\",\n        \"location\": \"Downtown / The Loop\",\n        \"rating\": 4.5,\n        \"reviews\": \"3,603\",\n        \"price\": \"$518\",\n        \"details\": \"Free cancellation \u2022 Reserve now, pay at stay\",\n        \"provider\": \"Booking.com\",\n        \"link\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=65056708&geo=6883336&from=HotelDateSearch_Hotels&slot=1&matchID=1&oos=0&cnt=5&silo=10476&bucket=902999&nrank=1&crank=1&clt=M&ttype=MobileCR&tm=307970517&managed=false&capped=false&gosox=6vS60O_HgkBSaY7nhOEtdD_ZjUIvFgpEDJN1lcSPpCQfmE4ljJ_UDq5iIPmvyfzGyZeSt6FGfOoePtaAVLCL9pcD1bxKhFnyGdeiCqUWA3qNCUN7A2Q08upwukRRobLomIlUpCpeg7H6HFZ03SS_ZPpbZ9lu68uuBliCUMSmKdh28aJqabdlj5lLAcP9ZJqWd1lPKztknjB_jVd770iZqWJ50vpp3V6gb_xJGRUPw3kjg1X0CimbTDwTF9nJFudx1dPZ3VPtaDRaSQtDHeZpeieqjlLxlYZLvW3SuRGZmsQ&priceShown=518&pm=AI&hac=AVAILABLE&mbl=MEET&mbldelta=0&rq=ML&rate=416.1600&taxesRate=76.7600&feesRate=25.0000&fees=101.7600&cur=USD&adults=1&child_rm_ages=&inDay=10&outDay=15&rdex=RDEX_13e1cebc86aa124eddc5a00d217dc848&rooms=1&inMonth=10&inYear=2024&outMonth=10&outYear=2024&auid=a61cb0c9-0291-4163-9d20-e3134b6f68b4&def_d=true&bld=L_5,D_6,G_1,W_4,U_1,C_241010,T_12&bh=true&cs=14539d93a12be4ff1d03e2da3c3e9f2c5&ik=773bcfeaf4a9453996ade8c7b68af5c1&aok=582f1be447b6441e84d66c9f59dc082d&tp=APS-Hotels&pageLocId=35805\"\n      },\n      {\n        \"title\": \"Holiday Inn & Suites Chicago-Downtown, an IHG hotel\",\n        \"location\": \"West Side\",\n        \"rating\": 4,\n        \"reviews\": \"998\",\n        \"price\": \"$413\",\n        \"details\": \"Free cancellation \u2022 Reserve now, pay at stay\",\n        \"provider\": \"Booking.com\",\n        \"link\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=32501587&geo=90969&from=HotelDateSearch_Hotels&slot=1&matchID=1&oos=0&cnt=5&silo=10476&bucket=902999&nrank=1&crank=1&clt=M&ttype=MobileCR&tm=307970517&managed=false&capped=false&gosox=6vS60O_HgkBSaY7nhOEtdD_ZjUIvFgpEDJN1lcSPpCQfmE4ljJ_UDq5iIPmvyfzGQ91tX9U-jreHQQXFOkwyZpsf56Q4HxcI1Verjm9J6DiNCUN7A2Q08upwukRRobLoc6YQphxOswtz3Jk_km5Bp3nEX_JllJuCOfmL2ovcbCkTivSIZ8b23DbDeizz2p4OkmIjloNbmQzwyaEMu19V5GVc6-0tRLxrm0EIslr9fNvsY4vuQ5KuSGSth3uY8jA5uWGgiR7gMWpJrXz2diDlS6qT0EgHLUcOjrOt37_eALg&priceShown=412&pm=AI&hac=AVAILABLE&mbl=MEET&mbldelta=0&rq=P&rate=342.8000&taxesRate=59.6500&feesRate=10.0000&fees=69.6500&cur=USD&adults=1&child_rm_ages=&inDay=10&outDay=15&rdex=RDEX_53bb27e1b93eb5c0b2dbb15f6c0f44f&rooms=1&inMonth=10&inYear=2024&outMonth=10&outYear=2024&auid=a861e85b-7192-42f5-8262-ad24586690f3&def_d=true&bld=L_5,D_6,G_1,W_4,U_1,C_241010,T_12&bh=true&cs=1acf4cd15385dee3c0101a1c7d10b2537&ik=773bcfeaf4a9453996ade8c7b68af5c1&aok=49090d9c1de844a7a25546ccb4f04083&tp=APS-Hotels&pageLocId=35805\"\n      }\n    ]\n    ```"
                     }
                 ]
             }

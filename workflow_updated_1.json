@@ -1,60 +1,27 @@
 {
     "1": {
-        "panel_description": "Display top-rated restaurants in Rome.",
+        "panel_description": "Retrieve current weather information for Los Angeles.",
         "steps": {
             "1": {
-                "api": "TripadvisorSearchLocation",
-                "handles": "Retrieves the geoId for Rome",
+                "api": "WeatherAPI.com_Realtime_Weather_Api",
+                "handles": "Fetches current weather data for Los Angeles",
                 "input_vars": [
                     {
-                        "name": "query_rome",
-                        "parameter": "query",
+                        "name": "city_name",
+                        "parameter": "q",
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Query to get the geoId for Rome",
-                        "value": "Rome",
+                        "description": "City name for weather query",
+                        "value": "Los Angeles",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "geoId",
-                        "description": "The unique identifier for the location of Rome",
-                        "used_by": [
-                            {
-                                "panel": 1,
-                                "step": 2
-                            }
-                        ],
-                        "value": "187791"
-                    }
-                ]
-            },
-            "2": {
-                "api": "TripadvisorSearchRestaurants",
-                "handles": "Searches for top-rated restaurants in Rome using the geoId",
-                "input_vars": [
-                    {
-                        "name": "geoId",
-                        "parameter": "locationId",
-                        "type": "string",
-                        "source": "API_Output (Panel 1, Step 1)",
-                        "description": "The geoId for Rome",
-                        "value": "187791",
-                        "dependencies": [
-                            {
-                                "panel": 1,
-                                "step": 1
-                            }
-                        ]
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "restaurant_details",
-                        "description": "Details of top-rated restaurants in Rome, including name, rating, and reviews",
+                        "name": "current_weather_la",
+                        "description": "Current weather details for Los Angeles",
                         "used_by": [],
-                        "value": "```json\n    [\n      {\n        \"name\": \"DOC EnoBistrot - Cruderia & Cucina\",\n        \"averageRating\": 5,\n        \"userReviewCount\": 814,\n        \"reviews\": [\n          {\n            \"reviewText\": \"Fantastic Pasta Experience in DOC\",\n            \"reviewUrl\": \"https://www.tripadvisor.com/ShowUserReviews-g187791-d23564258-r959938494-DOC_EnoBistrot_Cruderia_Cucina-Rome_Lazio.html\"\n          },\n          {\n            \"reviewText\": \"The focaccia bread tastes so fresh and...\",\n            \"reviewUrl\": \"https://www.tripadvisor.com/ShowUserReviews-g187791-d23564258-r804917285-DOC_EnoBistrot_Cruderia_Cucina-Rome_Lazio.html\"\n          }\n        ]\n      },\n      {\n        \"name\": \"Ristorante Ai Cocci\",\n        \"averageRating\": 4.5,\n        \"userReviewCount\": 1104,\n        \"reviews\": [\n          {\n            \"reviewText\": \"If they suggest adding truffle to the carbonara, don\u2019t hesitate!\",\n            \"reviewUrl\": \"https://www.tripadvisor.com/ShowUserReviews-g187791-d15244534-r967253918-Ristorante_Ai_Cocci-Rome_Lazio.html\"\n          },\n          {\n            \"reviewText\": \"Great homemade pasta!\",\n            \"reviewUrl\": \"https://www.tripadvisor.com/ShowUserReviews-g187791-d15244534-r955536167-Ristorante_Ai_Cocci-Rome_Lazio.html\"\n          }\n        ]\n      },\n      {\n        \"name\": \"Bono Bottega Nostrana - San Pietro\",\n        \"averageRating\": 5,\n        \"userReviewCount\": 1688,\n        \"reviews\": [\n          {\n            \"reviewText\": \"We are vegan and we\u2019re happy with the 77 and 79 plus the salad and drinks.\",\n            \"reviewUrl\": \"https://www.tripadvisor.com/ShowUserReviews-g187791-d18850657-r965969389-Bono_Bottega_Nostrana_San_Pietro-Rome_Lazio.html\"\n          },\n          {\n            \"reviewText\": \"It was delicious. You will have a free...\",\n            \"reviewUrl\": \"https://www.tripadvisor.com/ShowUserReviews-g187791-d18850657-r795143816-Bono_Bottega_Nostrana_San_Pietro-Rome_Lazio.html\"\n          }\n        ]\n      }\n      // Additional restaurants can be added similarly\n    ]\n    ```"
+                        "value": "```json\n    {\n      \"location\": {\n        \"name\": \"Los Angeles\",\n        \"region\": \"California\",\n        \"country\": \"United States of America\",\n        \"latitude\": 34.0522,\n        \"longitude\": -118.2428,\n        \"timezone\": \"America/Los_Angeles\",\n        \"localtime\": \"2024-10-04 09:17\"\n      },\n      \"current_weather\": {\n        \"temperature_c\": 22.1,\n        \"temperature_f\": 71.8,\n        \"condition\": \"Sunny\",\n        \"wind_speed_mph\": 2.2,\n        \"wind_speed_kph\": 3.6,\n        \"wind_direction\": \"SW\",\n        \"humidity\": 65,\n        \"pressure_mb\": 1015.0,\n        \"pressure_in\": 29.96,\n        \"precipitation_mm\": 0.0,\n        \"precipitation_in\": 0.0,\n        \"feels_like_c\": 24.6,\n        \"feels_like_f\": 76.2,\n        \"visibility_km\": 16.0,\n        \"visibility_miles\": 9.0,\n        \"uv_index\": 6.0\n      }\n    }\n    ```"
                     }
                 ]
             }

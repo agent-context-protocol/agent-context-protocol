@@ -7,6 +7,8 @@ import json
 import requests
 import re
 import asyncio
+import time
+import tiktoken
 
 class LocalTranslatorNode(BaseNode):
     def __init__(self, panel_no, panel_description, system_prompt=None, main_translator=None):
@@ -16,11 +18,15 @@ class LocalTranslatorNode(BaseNode):
         self.group_workflow = None
         self.panel_workflow = None
         self.main_translator = main_translator
+        self.group_id = None
 
         self.prev_status_update = None
 
         self.get_system_prompts()
         self.get_api_keys()
+
+        self.drop = False
+        self.modify = False
 
     def get_system_prompts(self):
         # api_running_prompt
@@ -35,8 +41,13 @@ class LocalTranslatorNode(BaseNode):
         with open('prompts/local_translator/status_assistance_prompt.txt', 'r') as file:
             self.status_assistance_prompt = file.read()
 
+        # user_readable_output_prompt
         with open('prompts/local_translator/user_readable_output_prompt.txt', 'r') as file:
             self.user_readable_output_prompt = file.read()
+
+        # api summarize prompt
+        with open('prompts/local_translator/api_output_summarizer_prompt.txt', 'r') as file:
+            self.api_output_summarizer_prompt = file.read()
 
     def get_api_keys(self):
         with open("./external_env_details/api_keys.json", "r") as json_file:
@@ -172,6 +183,122 @@ class LocalTranslatorNode(BaseNode):
         
         return result_str
     
+    def prepare_input_for_api_output_summarize(self, api_response, panel_no, step_no):
+        result_str = f"{self.api_output_summarizer_prompt}"
+
+        # Get the current panel and step data
+        panel_data = self.group_workflow[str(panel_no)]
+        step_data = panel_data['steps'][str(step_no)]
+
+        # Check if any output is used by dependent steps
+        has_dependent_steps = False
+        visited_panel_steps = []
+        for output_var in step_data['output_vars']:
+            if output_var['used_by']:
+                if not has_dependent_steps:
+                    # Add the dependent section header only once
+                    result_str += f"\nDependent Input Variables Step Details:\n"
+                    has_dependent_steps = True
+
+                for dependent in output_var['used_by']:
+                    dependent_panel_no = dependent['panel']
+                    dependent_step_no = dependent['step']
+                    if [dependent_panel_no, dependent_step_no] in visited_panel_steps:
+                        continue
+                    visited_panel_steps.append([dependent_panel_no, dependent_step_no])
+                    
+                    # Fetch the dependent step data from the appropriate panel
+                    dependent_panel_data = self.group_workflow[str(dependent_panel_no)]
+                    dependent_step_data = dependent_panel_data['steps'][str(dependent_step_no)]
+
+                    result_str += f"\nPanel {dependent_panel_no}, Step {dependent_step_no}:\n"
+                    result_str += f"- API: {dependent_step_data['api']}\n"
+                    result_str += f"- Handles: {dependent_step_data['handles']}\n"
+                    result_str += "- Input Variables:\n"
+
+                    for dep_input_var in dependent_step_data['input_vars']:
+                        result_str += f"  - Name: {dep_input_var['name']}\n"
+                        result_str += f"    - Parameter: {dep_input_var['parameter']}\n"
+                        result_str += f"    - Type: {dep_input_var['type']}\n"
+                        result_str += f"    - Source: {dep_input_var['source']}\n"
+                        result_str += f"    - Description: {dep_input_var['description']}\n"
+                        result_str += f"    - Value: {dep_input_var['value']}\n"
+
+        # Append the API Response at the end
+        result_str += f"\nAPI Response :\n\n{api_response}\n"
+        
+        return result_str
+    
+    # def prepare_status_assistance_input(self, workflow_dict, step_no, error_dict = None):
+    #     # Initialize the formatted result string
+    #     result = []
+        
+    #     # Extract panel description
+    #     panel_data = workflow_dict[str(self.panel_no)]
+    #     panel_description = panel_data["panel_description"]
+        
+    #     # Workflow details
+    #     result.append("Workflow:")
+    #     result.append(f"Panel Description: {panel_description}")
+    #     result.append("\nWorkflow Steps:")
+        
+    #     # Iterate through each step and build the formatted input
+    #     steps = panel_data["steps"]
+    #     for step_key, step_data in steps.items():
+    #         # if int(step_key) > step_no:
+    #         #     break
+            
+    #         # Add step details
+    #         result.append(f"\nStep {step_key}")
+    #         result.append(f"- API: {step_data['api']}")
+    #         result.append(f"- Handles: {step_data['handles']}")
+            
+    #         # Input Variables
+    #         result.append("- Input Variables:")
+    #         for input_var in step_data['input_vars']:
+    #             result.append(f"  - Name: {input_var['name']}")
+    #             result.append(f"    - Parameter: {input_var['parameter']}")
+    #             result.append(f"    - Type: {input_var['type']}")
+    #             result.append(f"    - Source: {input_var['source']}")
+    #             result.append(f"    - Description: {input_var['description']}")
+    #             result.append(f"    - Value: {input_var.get('value', 'None')}")
+            
+    #         # Output Variables
+    #         result.append("- Output Variables:")
+    #         for output_var in step_data['output_vars']:
+    #             result.append(f"  - Name: {output_var['name']}")
+    #             result.append(f"    - Description: {output_var['description']}")
+        
+    #     # Add Current API Step
+    #     result.append(f"\nCurrent API Step: Panel {self.panel_no}, Step {step_no}")
+        
+    #     # Add Previous Status Update (if exists)
+    #     previous_update_str = "\nPrevious Status Update:\n"
+        
+    #     if self.prev_status_update:
+    #         prev_status = self.prev_status_update
+    #         previous_update_str += "\n- Progress:"
+    #         previous_update_str += f"\n  - Previous Progress:\n    - {prev_status['previous_progress']}"
+    #         previous_update_str += f"\n  - Current Progress:\n    - {prev_status['current_progress']}"
+    #         previous_update_str += f"\n- Current Step: Panel {prev_status['current_step']['panel']}, Step {prev_status['current_step']['step']}"
+    #         previous_update_str += "\n- Completed APIs:"
+    #         for api in prev_status['completed_apis']:
+    #             previous_update_str += f"\n  - {api['name']}:"
+    #             previous_update_str += f"\n    - Purpose: {api['purpose']}"
+    #             previous_update_str += f"\n    - Accomplished: {api['accomplished']}"
+    #         previous_update_str += f"\n- Encountered Issues: {prev_status['issues']}"
+        
+    #     result.append(previous_update_str)
+
+    #     # Add Assistance Request Needed section if error_dict is provided
+    #     if error_dict:
+    #         assistance_request_str = "\nAssistance Request Needed, Error is:\n"
+    #         assistance_request_str += f"{str(error_dict)}"  # Convert the entire error_dict to string and add it
+    #         result.append(assistance_request_str)
+
+    #     # Join and return the final string
+    #     return "\n".join(result)
+
     def prepare_status_assistance_input(self, workflow_dict, step_no, error_dict = None):
         # Initialize the formatted result string
         result = []
@@ -219,24 +346,14 @@ class LocalTranslatorNode(BaseNode):
         previous_update_str = "\nPrevious Status Update:\n"
         
         if self.prev_status_update:
-            prev_status = self.prev_status_update
-            previous_update_str += "\n- Progress:"
-            previous_update_str += f"\n  - Previous Progress:\n    - {prev_status['previous_progress']}"
-            previous_update_str += f"\n  - Current Progress:\n    - {prev_status['current_progress']}"
-            previous_update_str += f"\n- Current Step: Panel {prev_status['current_step']['panel']}, Step {prev_status['current_step']['step']}"
-            previous_update_str += "\n- Completed APIs:"
-            for api in prev_status['completed_apis']:
-                previous_update_str += f"\n  - {api['name']}:"
-                previous_update_str += f"\n    - Purpose: {api['purpose']}"
-                previous_update_str += f"\n    - Accomplished: {api['accomplished']}"
-            previous_update_str += f"\n- Encountered Issues: {prev_status['issues']}"
+            previous_update_str += self.prev_status_update
         
         result.append(previous_update_str)
 
         # Add Assistance Request Needed section if error_dict is provided
         if error_dict:
             assistance_request_str = "\nAssistance Request Needed, Error is:\n"
-            assistance_request_str += f"{str(error_dict)}"  # Convert the entire error_dict to string and add it
+            assistance_request_str += f"{str(error_dict)}"
             result.append(assistance_request_str)
 
         # Join and return the final string
@@ -504,96 +621,169 @@ class LocalTranslatorNode(BaseNode):
         return self.group_workflow
     
 
+    # def parse_status_assistance_input(self, input_str):
+    #     # Initialize the result dictionary
+    #     result = {
+    #         'chain_of_thought': '',
+    #         'status_update': {
+    #             'previous_progress': '',
+    #             'current_progress': '',
+    #             'current_step': {},
+    #             'completed_apis': [],
+    #             'issues': '',
+    #             'string': ''  # Store the full status update string
+    #         },
+    #         'assistance_request': None  # Initialize assistance request as None by default
+    #     }
+
+    #     # Split the input string into sections
+    #     sections = re.split(r'\$\$CHAIN_OF_THOUGHT\$\$|\$\$STATUS_UPDATE\$\$|\$\$ASSISTANCE_REQUEST\$\$', input_str)
+
+    #     if len(sections) < 3:
+    #         raise ValueError("Input string must contain both $$CHAIN_OF_THOUGHT$$ and $$STATUS_UPDATE$$ sections.")
+
+    #     # Parse the chain of thought section
+    #     chain_of_thought = sections[1].strip()
+    #     result['chain_of_thought'] = chain_of_thought
+
+    #     # Parse the status update section
+    #     status_update = sections[2].strip()
+    #     result['status_update']['string'] = status_update  # Save the full status update string
+
+    #     # Extract previous and current progress
+    #     previous_progress_match = re.search(r"Previous Progress:\n(?:\s+-\s+)?(.*?)(?=\n\s+-\s+|\n-|\Z)", status_update, re.DOTALL)
+    #     current_progress_match = re.search(r"Current Progress:\n(?:\s+-\s+)?(.*?)(?=\n\s+-\s+|\n-|\Z)", status_update, re.DOTALL)
+    #     current_step_match = re.search(r"Current Step:\s*Panel\s*(\d+),\s*Step\s*(\d+)", status_update)
+    #     issues_match = re.search(r"Encountered Issues:\n(?:\s+-\s+)?(.*)", status_update, re.DOTALL)
+
+    #     # Assign extracted values
+    #     result['status_update']['previous_progress'] = previous_progress_match.group(1).strip() if previous_progress_match else "None"
+    #     result['status_update']['current_progress'] = current_progress_match.group(1).strip() if current_progress_match else ""
+    #     result['status_update']['current_step'] = {
+    #         'panel': int(current_step_match.group(1)) if current_step_match else None,
+    #         'step': int(current_step_match.group(2)) if current_step_match else None
+    #     }
+    #     result['status_update']['issues'] = issues_match.group(1).strip() if issues_match else ""
+
+    #     # Parse the completed APIs
+    #     completed_apis_section_match = re.search(r"Completed APIs:\n(.*?)(?:\n- Encountered Issues:|\Z)", status_update, re.DOTALL)
+    #     if completed_apis_section_match:
+    #         apis_text = completed_apis_section_match.group(1)
+    #         result['status_update']['completed_apis'] = self.parse_completed_apis(apis_text)
+
+    #     # Check if any previously completed APIs are missing in the new status update
+    #     if hasattr(self, 'prev_status_update') and self.prev_status_update:
+    #         prev_completed_apis = {api['name'] for api in self.prev_status_update.get('completed_apis', [])}
+    #         current_completed_apis = {api['name'] for api in result['status_update']['completed_apis']}
+
+    #         print("prev_completed_apis : ",prev_completed_apis)
+    #         print("current_completed_apis : ",current_completed_apis)
+            
+    #         missing_apis = prev_completed_apis - current_completed_apis
+    #         if missing_apis:
+    #             raise ValueError(f"Status update error: Missing previously completed APIs: {', '.join(missing_apis)}")
+
+    #     # Parse the assistance request section if present
+    #     if len(sections) >= 4:
+    #         assistance_request = sections[3].strip()
+    #         result['assistance_request'] = {'string': assistance_request}
+
+    #         error_type_match = re.search(r"Error Type:\s+(\d{3})", assistance_request)
+    #         error_step_match = re.search(r"Error Step:\s+Panel\s+(\d+),\s+Step\s+(\d+)", assistance_request)
+    #         error_api_match = re.search(r"Error API:\s+(.*)", assistance_request)
+    #         error_description_match = re.search(r"Error Description:\n(?:\s+-\s+)?(.*)", assistance_request, re.DOTALL)
+    #         relevant_context_match = re.search(r"Relevant Context:\n(?:\s+-\s+)?(.*)", assistance_request, re.DOTALL)
+    #         suggested_resolution_match = re.search(r"Suggested Resolution:\n(?:\s+-\s+)?(.*)", assistance_request, re.DOTALL)
+            
+    #         if error_type_match and error_type_match.group(1)[0] in ['4', '5', '6']:
+    #             result['assistance_request'].update({
+    #                 'error_type': error_type_match.group(1).strip(),
+    #                 'error_step': {
+    #                     'panel': int(error_step_match.group(1)) if error_step_match else None,
+    #                     'step': int(error_step_match.group(2)) if error_step_match else None
+    #                 },
+    #                 'error_api': error_api_match.group(1).strip() if error_api_match else "",
+    #                 'error_description': error_description_match.group(1).strip() if error_description_match else "",
+    #                 'relevant_context': relevant_context_match.group(1).strip() if relevant_context_match else "",
+    #                 'suggested_resolution': suggested_resolution_match.group(1).strip() if suggested_resolution_match else ""
+    #             })
+    #     else:
+    #         result['assistance_request'] = None
+
+    #     return result
+
+    # def parse_completed_apis(self, apis_text):
+    #     completed_apis = []
+    #     current_api = None
+    #     current_section = None
+    #     lines = apis_text.strip().split('\n')
+    #     for line in lines:
+    #         stripped_line = line.strip()
+    #         if re.match(r'^-\s+\S+:$', stripped_line):
+    #             # New API name
+    #             if current_api:
+    #                 completed_apis.append(current_api)
+    #             api_name = stripped_line.lstrip('- ').rstrip(':')
+    #             current_api = {'name': api_name, 'purpose': '', 'accomplished': ''}
+    #             current_section = None
+    #         elif re.match(r'^-\s+Purpose:', stripped_line):
+    #             # Purpose line
+    #             purpose = stripped_line.lstrip('- Purpose:').strip()
+    #             current_api['purpose'] = purpose
+    #             current_section = 'purpose'
+    #         elif re.match(r'^-\s+Accomplished:', stripped_line):
+    #             # Accomplished section starts
+    #             current_section = 'accomplished'
+    #             current_api['accomplished'] = ''
+    #         elif re.match(r'^-\s+.*', stripped_line):
+    #             # Sub-item under Accomplished or multi-line Purpose
+    #             content = stripped_line.lstrip('- ').strip()
+    #             if current_section == 'accomplished':
+    #                 if current_api['accomplished']:
+    #                     current_api['accomplished'] += ' ' + content
+    #                 else:
+    #                     current_api['accomplished'] = content
+    #             elif current_section == 'purpose':
+    #                 current_api['purpose'] += ' ' + content
+    #         else:
+    #             # Continuation of previous section (multi-line)
+    #             if current_section == 'accomplished':
+    #                 current_api['accomplished'] += ' ' + stripped_line
+    #             elif current_section == 'purpose':
+    #                 current_api['purpose'] += ' ' + stripped_line
+    #     if current_api:
+    #         completed_apis.append(current_api)
+    #     return completed_apis
+            
     def parse_status_assistance_input(self, input_str):
         # Initialize the result dictionary
         result = {
             'chain_of_thought': '',
-            'status_update': {
-                'previous_progress': '',
-                'current_progress': '',
-                'current_step': {},
-                'completed_apis': [],
-                'issues': '',
-                'string': ''  # Store the full status update string
-            },
-            'assistance_request': None  # Initialize assistance request as None by default
+            'status_update': '',
+            'assistance_request': None
         }
 
         # Split the input string into sections
-        sections = re.split(r'\$\$CHAIN_OF_THOUGHT\$\$|\$\$STATUS_UPDATE\$\$|\$\$ASSISTANCE_REQUEST\$\$', input_str)
+        sections = re.split(r'\$\$CHAIN_OF_THOUGHT\$\$\s*', input_str)
+        if len(sections) != 2:
+            raise ValueError("The input must contain $$CHAIN_OF_THOUGHT$$ section.")
+        chain_of_thought_and_rest = sections[1]
 
-        if len(sections) < 3:
-            raise ValueError("Input string must contain both $$CHAIN_OF_THOUGHT$$ and $$STATUS_UPDATE$$ sections.")
-        
-        # Parse the chain of thought section
-        chain_of_thought = sections[1].strip()
-        result['chain_of_thought'] = chain_of_thought
+        sections = re.split(r'\$\$STATUS_UPDATE\$\$\s*', chain_of_thought_and_rest)
+        if len(sections) != 2:
+            raise ValueError("The input must contain $$STATUS_UPDATE$$ section.")
+        result['chain_of_thought'] = sections[0].strip()
+        status_update_and_rest = sections[1]
 
-        # Parse the status update section
-        status_update = sections[2].strip()
-        result['status_update']['string'] = status_update  # Save the full status update string
+        sections = re.split(r'\$\$ASSISTANCE_REQUEST\$\$\s*', status_update_and_rest)
+        result['status_update'] = sections[0].strip()
+        if len(sections) == 2:
+            result['assistance_request'] = sections[1].strip()
+        else:
+            result['assistance_request'] = None
 
-        # Extract previous and current progress
-        previous_progress_match = re.search(r"Previous Progress:\n\s+- (.*)", status_update)
-        current_progress_match = re.search(r"Current Progress:\n\s+- (.*)", status_update)
-        current_step_match = re.search(r"Current Step:\s*Panel\s*(\d+),\s*Step\s*(\d+)", status_update)
-        issues_match = re.search(r"Encountered Issues:\n\s+- (.*)", status_update)
-        
-        # Assign extracted values
-        result['status_update']['previous_progress'] = previous_progress_match.group(1).strip() if previous_progress_match else "None"
-        result['status_update']['current_progress'] = current_progress_match.group(1).strip() if current_progress_match else ""
-        result['status_update']['current_step'] = {
-            'panel': int(current_step_match.group(1)) if current_step_match else None,
-            'step': int(current_step_match.group(2)) if current_step_match else None
-        }
-        result['status_update']['issues'] = issues_match.group(1).strip() if issues_match else ""
-
-        # Parse the completed APIs
-        completed_apis_section = re.findall(r"Completed APIs:\n\s+- (.*?API).*?\n\s+- Purpose: (.*?)\n\s+- Accomplished:\n\s+- (.*?)(?=\n\s*-|\n$)", status_update, re.DOTALL)
-        
-        for api_name, purpose, accomplished in completed_apis_section:
-            result['status_update']['completed_apis'].append({
-                'name': api_name.strip(),
-                'purpose': purpose.strip(),
-                'accomplished': accomplished.strip()
-            })
-
-        # Check if any previously completed APIs are missing in the new status update
-        if self.prev_status_update:
-            prev_completed_apis = {api['name'] for api in self.prev_status_update.get('completed_apis', [])}
-            current_completed_apis = {api['name'] for api in result['status_update']['completed_apis']}
-            
-            missing_apis = prev_completed_apis - current_completed_apis
-            if missing_apis:
-                raise ValueError(f"Status update error: Missing previously completed APIs: {', '.join(missing_apis)}")
-
-        # Parse the assistance request section if present
-        if len(sections) == 4:  # Check if there is an $$ASSISTANCE_REQUEST$$ section
-            assistance_request = sections[3].strip()
-            result['assistance_request'] = {'string': assistance_request}  # Save the full assistance request string
-
-            error_type_match = re.search(r"Error Type:\s+(\d{3})", assistance_request)
-            error_step_match = re.search(r"Error Step:\s+Panel\s+(\d+),\s+Step\s+(\d+)", assistance_request)
-            error_api_match = re.search(r"Error API:\s+(.*)", assistance_request)
-            error_description_match = re.search(r"Error Description:\n\s+- (.*)", assistance_request, re.DOTALL)
-            relevant_context_match = re.search(r"Relevant Context:\n\s+- (.*)", assistance_request, re.DOTALL)
-            suggested_resolution_match = re.search(r"Suggested Resolution:\n\s+- (.*)", assistance_request, re.DOTALL)
-            
-            # Assign assistance request details to result dictionary if error type matches 4xx, 5xx, or 6xx
-            if error_type_match and error_type_match.group(1)[0] in ['4', '5', '6']:
-                result['assistance_request'].update({
-                    'error_type': error_type_match.group(1).strip(),
-                    'error_step': {
-                        'panel': int(error_step_match.group(1)) if error_step_match else None,
-                        'step': int(error_step_match.group(2)) if error_step_match else None
-                    },
-                    'error_api': error_api_match.group(1).strip() if error_api_match else "",
-                    'error_description': error_description_match.group(1).strip() if error_description_match else "",
-                    'relevant_context': relevant_context_match.group(1).strip() if relevant_context_match else "",
-                    'suggested_resolution': suggested_resolution_match.group(1).strip() if suggested_resolution_match else ""
-                })
-            
         return result
+            
 
 
 
@@ -642,13 +832,27 @@ class LocalTranslatorNode(BaseNode):
         self.chat_history.append({"role": "system", "content": self.system_prompt})
         # prev_status_update will act like summary
         if self.prev_status_update:
-            self.chat_history.append({"role": "user", "content": "Prev Status Update as Summary: " + self.prev_status_update['string']})
+            self.chat_history.append({"role": "user", "content": "Prev Status Update as Summary: " + self.prev_status_update})
         else:
             self.chat_history.append({"role": "user", "content": "Prev Status Update as Summary:\nNone"})
+
+    def num_tokens_from_string(self, string, encoding_name = 'gpt-4'):
+        """Returns the number of tokens in a text string."""
+        encoding = tiktoken.encoding_for_model(encoding_name)
+        num_tokens = len(encoding.encode(string))
+        return num_tokens
+
+    ###################################################################
+    async def wait_for_response(self, timeout=60):
+        start_time = time.time()
+        while not (self.drop or self.modify):
+            if time.time() - start_time > timeout:
+                raise TimeoutError("Timeout waiting for MainTranslator response")
+            await asyncio.sleep(0.1)
         
 
     ###################################################################
-    def build_verify(self):
+    async def build_verify(self):
         """
         This function goes through each step of the workflow and prepares inputs based on the workflow details
         and the API descriptions provided.
@@ -659,7 +863,7 @@ class LocalTranslatorNode(BaseNode):
         overall_success_bool = False
         overall_counter = 0
         while not overall_success_bool and overall_counter < 5:
-            self.chat_history = []
+            # self.chat_history = []
             overall_counter += 1
             
             if not self.group_workflow:
@@ -699,7 +903,7 @@ class LocalTranslatorNode(BaseNode):
                 print("input_data : ",input_data)
 
                 # generating the api request from the LLM
-                self.chat_history.append({"role": "system", "content": self.api_running_prompt}) # system prompt for workflow_creation
+                self.chat_history.append({"role": "user", "content": self.api_running_prompt}) # system prompt for workflow_creation
                 self.chat_history.append({"role": "user", "content": input_data})
 
                 # running the llm and if the format is wrong then we will ask it to retry.
@@ -731,31 +935,47 @@ class LocalTranslatorNode(BaseNode):
 
                     # running the api
                     api_running_error_counter += 1
-                    try:
-                        for api_req_i in range(len(parsed_api_request['api_requests'])):
-                            if parsed_api_request['api_requests'][api_req_i]['method'] == "FUNCTION":
-                                api_success_bool, api_output = self.function_call(step['api'], parsed_api_request['api_requests'][api_req_i]['body'])
-                            else:
-                                api_success_bool, api_output = self.requests_func(parsed_api_request['api_requests'][api_req_i]['method'], parsed_api_request['api_requests'][api_req_i]['url'], parsed_api_request['api_requests'][api_req_i]['headers'], parsed_api_request['api_requests'][api_req_i]['body'])
-                            # if its a 4xx error then we can retry as it is possible that llm made a wrong api request
-                            if not api_success_bool and api_output["status_code"]/100 == 4:
-                                # error handling part here
-                                print("\napi_output : ",api_output)
-                                raise ValueError(f"api_output : {api_output}")
-                            # apart from 4xx errors we should just call the main translator for assistance
-                            if not api_success_bool:
-                                assistance_request_bool = True
-                                assistance_error_dict = api_output
-                                break
-                            
-                            api_outputs_list.append(api_output)
+                    # try:
+                    for api_req_i in range(len(parsed_api_request['api_requests'])):
+                        if parsed_api_request['api_requests'][api_req_i]['method'] == "FUNCTION":
+                            api_success_bool, api_output = self.function_call(step['api'], parsed_api_request['api_requests'][api_req_i]['body'])
+                        else:
+                            api_success_bool, api_output = self.requests_func(parsed_api_request['api_requests'][api_req_i]['method'], parsed_api_request['api_requests'][api_req_i]['url'], parsed_api_request['api_requests'][api_req_i]['headers'], parsed_api_request['api_requests'][api_req_i]['body'])
 
-                        run_success = True
-                    except Exception as e:
-                        error_message = f'There was an error while running the API, please rectify based on this error message, only output the CHAIN_OF_THOUGHT and API_REQUEST without any other details before or after.:\n {str(e)}' 
-                        self.chat_history.append({"role": "user", "content": error_message})
-                        print("api running error_message : ",error_message)
-                        api_outputs_list = []
+                        # if api_output is too big then we will summarize here itslef else it would take a lot of context
+                        # _ = tiktoken.get_encoding("cl100k_base")
+                        print("num of tokens : ",self.num_tokens_from_string(f"{api_output}"))
+                        if self.num_tokens_from_string(f"{api_output}") > 10000:
+                            llm_input_api_output_summarize = self.prepare_input_for_api_output_summarize(api_output, self.panel_no, step_no)
+                            print("llm_input_api_output_summarize : ",llm_input_api_output_summarize)
+                            self.chat_history.append({"role": "user", "content": llm_input_api_output_summarize })
+                            llm_output_api_output_summarize = self.generate()
+                            # remove the last two chat history
+                            self.chat_history.pop()
+                            self.chat_history.pop()
+                            # assign llm_output_api_output_summarize to api_output
+                            api_output = llm_output_api_output_summarize
+                            print("after summarize num of tokens : ",self.num_tokens_from_string(f"{api_output}"))
+
+                        # if its a 4xx error then we can retry as it is possible that llm made a wrong api request
+                        if not api_success_bool and api_output["status_code"]/100 == 4:
+                            # error handling part here
+                            print("\napi_output : ",api_output)
+                            raise ValueError(f"api_output : {api_output}")
+                        # apart from 4xx errors we should just call the main translator for assistance
+                        if not api_success_bool:
+                            assistance_request_bool = True
+                            assistance_error_dict = api_output
+                            break
+                        
+                        api_outputs_list.append(api_output)
+
+                    run_success = True
+                    # except Exception as e:
+                    #     error_message = f'There was an error while running the API, please rectify based on this error message, only output the CHAIN_OF_THOUGHT and API_REQUEST without any other details before or after.:\n {str(e)}' 
+                    #     self.chat_history.append({"role": "user", "content": error_message})
+                    #     print("api running error_message : ",error_message)
+                    #     api_outputs_list = []
 
                 if assistance_request_bool:
                     break
@@ -765,7 +985,6 @@ class LocalTranslatorNode(BaseNode):
                     
                 ###########
                 # API_OUTPUT, API_OUTPUT_DEPENDENCY Part with Error Handling
-                print("api_output : ",api_output)
 
                 # give the api_output to LLM and ask it to first verify if it seems plausile for our expectations from the api, then save the relevant part in the right format
                 # additionally the LLM Agent will check if the api output has enough information such that we can fulfil the input variable requirement for future steps which depend on its output, and retrieve the relevant information and save it in the right format
@@ -773,7 +992,7 @@ class LocalTranslatorNode(BaseNode):
                 api_output_llm_input = self.prepare_input_for_api_output(api_outputs_list, self.panel_no, step_no)
                 print("\napi_output_llm_input : ",api_output_llm_input)
                 # generating the api response format from the LLM
-                self.chat_history.append({"role": "system", "content": self.api_output_prompt}) # system prompt for workflow_creation
+                self.chat_history.append({"role": "user", "content": self.api_output_prompt}) # system prompt for workflow_creation
                 self.chat_history.append({"role": "user", "content": api_output_llm_input })
 
 
@@ -828,7 +1047,7 @@ class LocalTranslatorNode(BaseNode):
                         parsed_status_update = self.parse_status_assistance_input(status_update)
                         print("\parsed_status_update : ",parsed_status_update)
                         run_success = True
-                    except:
+                    except Exception as e:
                         error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT and STATUS_UPDATE without any other details before or after.:\n {str(e)}' 
                         self.chat_history.append({"role": "user", "content": error_message})
                         print("error_message : ",error_message)
@@ -856,7 +1075,7 @@ class LocalTranslatorNode(BaseNode):
                         parsed_status_update = self.parse_status_assistance_input(status_update)
                         print("\parsed_status_update : ",parsed_status_update)
                         run_success = True
-                    except:
+                    except Exception as e:
                         error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT, STATUS_UPDATE and ASSISTANCE_REQUEST without any other details before or after.:\n {str(e)}' 
                         self.chat_history.append({"role": "user", "content": error_message})
                         print("error_message : ",error_message)
@@ -864,7 +1083,19 @@ class LocalTranslatorNode(BaseNode):
                 if not run_success:
                     raise ValueError("Something is going wrong with the llm or the parsing function in status_update send with assistance request. It is not an expected kind of error.")
 
-                asyncio.run(self.main_translator.communicate(parsed_status_update, self.panel_no, self))
+                await self.main_translator.communicate(parsed_status_update, self.panel_no, self)
+                try:
+                    await self.wait_for_response()
+                except TimeoutError:
+                    print(f"Timeout waiting for response from MainTranslator for panel {self.panel_no}")
+                    return None
+
+                if self.drop:
+                    return None
+                if self.modify:
+                    return None
+                
+                await asyncio.sleep(0.2)
                 continue
             else:
                 # overall this step was succesful
@@ -874,10 +1105,17 @@ class LocalTranslatorNode(BaseNode):
             raise ValueError(f"Overall the workflow failed for {self.panel_no}")
         
     def get_results(self):
+        if self.drop:
+            return {
+            'panel_description' : self.panel_description,
+            'output' : 'This Panel Was Dropped'
+        }
+
         final_workflow_with_values = self.make_final_workflow_with_output_values(self.group_workflow)
         self.chat_history.append({"role": "user", "content": self.user_readable_output_prompt})
         self.chat_history.append({"role": "user", "content": final_workflow_with_values})
         output = self.generate()
+        print("output.split('$$FORMATTED_OUTPUT$$')[-1] : ", output.split('$$FORMATTED_OUTPUT$$')[-1])
         return {
             'panel_description' : self.panel_description,
             'output' : output.split('$$FORMATTED_OUTPUT$$')[-1]

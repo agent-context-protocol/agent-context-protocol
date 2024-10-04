@@ -28,7 +28,7 @@ class MainTranslatorNode(BaseNode):
     ########################
     # ALL THE PARSING FUNCTIONS WILL BE HERE
 
-    def parse_main_translator_workflow(self, text):
+    def parse_main_translator_workflow(self, text, restrict_one_group = False):
         # First, split the text into CHAIN_OF_THOUGHT and WORKFLOW sections
         sections = re.split(r"\$\$WORKFLOW\$\$", text)
         if len(sections) != 2:
@@ -457,12 +457,11 @@ class MainTranslatorNode(BaseNode):
 
         # Add Status Update section
         result.append("Status Update:\n")
-        result.append(status_update_dict['status_update']['string'])
+        result.append(status_update_dict['status_update'])
 
         # Add Assistance Request section if present
-        if status_update_dict.get('assistance_request') and status_update_dict['assistance_request'].get('string'):
-            result.append("\nAssistance Request:\n")
-            result.append(status_update_dict['assistance_request']['string'])
+        result.append("\nAssistance Request:\n")
+        result.append(status_update_dict['assistance_request'])
 
         # Return the final formatted string
         return "\n".join(result)
@@ -475,13 +474,15 @@ class MainTranslatorNode(BaseNode):
         print("\nformatted_string : \n",formatted_string)
 
         # generating the workflow from the LLM
-        self.chat_history.append({"role": "system", "content": self.workflow_creation_prompt}) # system prompt for workflow_creation
+        self.chat_history.append({"role": "user", "content": self.workflow_creation_prompt}) # system prompt for workflow_creation
         self.chat_history.append({"role": "user", "content": formatted_string})
         run_success = False
         counter = 0
         while not run_success and counter < 5:
             try:
                 llm_response_workflow = self.generate()
+                llm_response_workflow = llm_response_workflow.replace("**", "")
+                llm_response_workflow = llm_response_workflow.replace("`", "")
                 print("llm_response_workflow : \n",llm_response_workflow)
                 _, workflow_dict = self.parse_main_translator_workflow(llm_response_workflow)
                 run_success = True
@@ -515,6 +516,7 @@ class MainTranslatorNode(BaseNode):
                     await asyncio.sleep(0.1)
                     continue
                 status_update_dict, local_translator_id, local_translator_object = await self.queue.get()
+                print("status_update_dict : ",status_update_dict)
                 
                 # Process the update here
                 # This is where you'd put the logic to handle the communication
@@ -523,38 +525,46 @@ class MainTranslatorNode(BaseNode):
                 # Simulate some processing time
                 await asyncio.sleep(1)
 
-                # status_assistance_llm_input = self.make_input_status_update(local_translator_object.group_workflow, status_update_dict)
+                status_assistance_llm_input = self.make_input_status_update(local_translator_object.group_workflow, status_update_dict)
 
-                # # generating the workflow from the LLM
-                # self.chat_history.append({"role": "system", "content": self.status_assistance_prompt}) # system prompt for workflow_creation
-                # self.chat_history.append({"role": "user", "content": status_assistance_llm_input})
+                # generating the workflow from the LLM
+                self.chat_history.append({"role": "user", "content": self.status_assistance_prompt}) # system prompt for workflow_creation
+                self.chat_history.append({"role": "user", "content": status_assistance_llm_input})
 
-                # run_success = False
-                # counter = 0
-                # while not run_success and counter < 5:
-                #     counter += 1
-                #     try:
-                #         updated_workflow = self.generate()
-                #         print("\updated_workflow : ",updated_workflow)
-                #         parsed_updated_workflow = self.parse_status_assistance_output(updated_workflow)
-                #         print("\parsed_updated_workflow : ", parsed_updated_workflow)
-                #         run_success = True
-                #     except Exception as e:
-                #         error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT, CHOSEN_ACTION and/or WORKFLOW without any other details before or after.:\n {str(e)}' 
-                #         self.chat_history.append({"role": "user", "content": error_message})
-                #         print("error_message : ",error_message)
+                run_success = False
+                counter = 0
+                while not run_success and counter < 5:
+                    counter += 1
+                    try:
+                        updated_workflow = self.generate()
+                        updated_workflow = updated_workflow.replace("**", "")
+                        updated_workflow = updated_workflow.replace("`", "")
+                        print("updated_workflow : ",updated_workflow)
+                        parsed_updated_workflow = self.parse_status_assistance_output(updated_workflow)
+                        print("parsed_updated_workflow : ", parsed_updated_workflow)
+                        run_success = True
+                    except Exception as e:
+                        error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT, CHOSEN_ACTION and/or WORKFLOW without any other details before or after.:\n {str(e)}' 
+                        self.chat_history.append({"role": "user", "content": error_message})
+                        print("error_message : ",error_message)
 
-                # if not run_success:
-                #     raise ValueError("Something is wrong with the LLM or the parsing status_assistance in main translator. An error is not expected here")
+                if not run_success:
+                    raise ValueError("Something is wrong with the LLM or the parsing status_assistance in main translator. An error is not expected here")
 
-                # if parsed_updated_workflow['chosen_action'] == "DROP_PANEL":
-                #     raise NotImplemented
-                # elif parsed_updated_workflow['chosen_action'] == "MODIFY":
-                #     local_translator_object.group_workflow = 
-                # else:
-                #     raise ValueError("The chosen_action key must specify either MODIFY or DROP_PANEL.")
+                if parsed_updated_workflow['chosen_action'] == "DROP_PANEL":
+                    local_translator_object.drop = True
+                    print('Sent Request to Drop Panel')
+                elif parsed_updated_workflow['chosen_action'] == "MODIFY":
+                    local_translator_object.modify = True
+                    with open(f"updated_workflow_group_{local_translator_object.group_id}.json", "w") as json_file:
+                        json.dump(parsed_updated_workflow['workflow'], json_file, indent=4)
+                    with open("workflow.json", "r") as json_file:
+                        updated_workflow_dict = json.load(json_file)
+                    local_translator_object.group_workflow = updated_workflow_dict
+                else:
+                    raise ValueError("The chosen_action key must specify either MODIFY or DROP_PANEL.")
                 
                 print(f"Finished processing update from Local Translator {local_translator_id}")
             
             # Release the lock and allow a short time for other tasks to acquire it
-            await asyncio.sleep(0)
+            await asyncio.sleep(0.1)
