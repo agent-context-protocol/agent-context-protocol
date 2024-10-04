@@ -105,6 +105,7 @@ class LocalTranslatorNode(BaseNode):
         result_str = ""
 
         # Get the current panel and step data
+        print(self.group_workflow)
         panel_data = self.group_workflow[str(panel_no)]
         step_data = panel_data['steps'][str(step_no)]
 
@@ -881,6 +882,8 @@ class LocalTranslatorNode(BaseNode):
                     return None
                 if self.modify:
                     return None
+
+                await asyncio.sleep(0.2)
                 continue
             else:
                 # overall this step was succesful

@@ -8,6 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 class Manager:
     def __init__(self, workflow, main_translator, local_translator_system_prompt):
         self.main_translator = main_translator
+        self.local_translator_system_prompt = local_translator_system_prompt
         self.groups = {}
         self.local_translators = {}
         self.thread_pool = ThreadPoolExecutor()
@@ -46,21 +47,38 @@ class Manager:
             pass
 
     async def modify_group(self, modified_workflow, group_id):
-        group_translators = []
-        for translator_id, translator_data in modified_workflow.items():
-            translator = LocalTranslatorNode(
-                int(translator_id),
-                translator_data["description"],
-                system_prompt=local_translator_system_prompt,
-                main_translator=self.main_translator
-            )
-            translator.group_workflow = group_data
-            translator.panel_workflow = translator_data["steps"]
-            self.local_translators[translator_id] = translator
-            group_translators.append(translator)
-        self.groups[group_id] = group_translators
+        # group_translators = []
+        # print(modified_workflow)
+        # for translator_id, translator_data in modified_workflow.items():
+        #     translator = LocalTranslatorNode(
+        #         int(translator_id),
+        #         translator_data["panel_description"],
+        #         system_prompt=local_translator_system_prompt,
+        #         main_translator=self.main_translator
+        #     )
+        #     translator.group_workflow = group_data
+        #     translator.panel_workflow = translator_data["steps"]
+        #     self.local_translators[translator_id] = translator
+        #     group_translators.append(translator)
+        # self.groups[group_id] = group_translators
+        for group_id, group_data in modified_workflow.items():
+            group_translators = []
+            for translator_id, translator_data in group_data.items():
+                translator = LocalTranslatorNode(
+                    int(translator_id),
+                    translator_data["panel_description"],
+                    system_prompt=self.local_translator_system_prompt,
+                    main_translator=self.main_translator
+                )
+                translator.group_workflow = group_data
+                translator.panel_workflow = translator_data["steps"]
+                self.local_translators[translator_id] = translator
+                group_translators.append(translator)
+            self.groups[group_id] = group_translators
 
-        await asyncio.asleep(0.1)
+        print('Successfully Modified This Groups Workflow.')
+
+        await asyncio.sleep(0.1)
 
     async def run_group(self, group_id):
         group_results = {}
@@ -69,20 +87,20 @@ class Manager:
         while True and counter < 5:
             group_done = True
             for translator in self.groups[group_id]:
-                try:
-                    await translator.build_verify()
-                    if translator.drop:
-                        print('Dropping This Workflow...')
+                # try:
+                await translator.build_verify()
+                if translator.drop:
+                    print('Dropping This Workflow...')
                     
-                    if translator.modify:
-                        print('Modifying This Workflow...')
-                        group_done = False
-                        await self.modify_group(translator.group_workflow, group_id)
-                        break
+                if translator.modify:
+                    print('Modifying This Workflow...')
+                    group_done = False
+                    await self.modify_group(translator.group_workflow, group_id)
+                    break
                         # return None
-                    group_results[translator.panel_no] =translator.get_results()
-                except Exception as e:
-                    print(f"Error in translator {translator.panel_no}: {str(e)}")
+                group_results[translator.panel_no] =translator.get_results()
+                # except Exception as e:
+                #     print(f"Error in translator {translator.panel_no}: {str(e)}")
 
             counter += 1
             if group_done:
@@ -115,7 +133,7 @@ class MainOrchestrator:
         workflow = self.main_translator.setup(user_query, panels_list)
         return workflow
 
-    async def run(self, user_query):
+    async def run(self, user_query, workflow):
         # Get initial setup from interpreter and send to main translator
         # self.interpreter.user_query = user_query
         # panels_list = self.interpreter.setup()
