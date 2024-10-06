@@ -529,6 +529,7 @@ class MainTranslatorNode(BaseNode):
 
                 # generating the workflow from the LLM
                 self.chat_history.append({"role": "user", "content": self.status_assistance_prompt}) # system prompt for workflow_creation
+
                 self.chat_history.append({"role": "user", "content": status_assistance_llm_input})
 
                 run_success = False
