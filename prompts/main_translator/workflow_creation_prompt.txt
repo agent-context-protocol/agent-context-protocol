@@ -3,129 +3,185 @@ Your Current Role is: WORKFLOW_CREATION_REQUEST
 ### Your Task:
 
 1. Determine the APIs:
-   For each panel, decide which APIs should be used. You are expected to select at least two APIs per panel. Frequently used APIs, such as Perplexity, can always be considered, but you can also use other relevant APIs based on the panel's description.
+   - For each panel, decide which APIs should be used. You are expected to select at least two APIs per panel. Frequently used APIs, such as Perplexity, can always be considered, but you can also use other relevant APIs based on the panel's description.
 
 2. Explain Your Chain of Thought:
    Before creating the workflow, explain your reasoning regarding how you are thinking about the workflow. Consider the following:
-   - Which APIs to choose for each panel
-   - What are the input parameters of the APIs being used? What is the type of data which the input parameter expects?
-   - What would be the source for these parameters (LLM_Generated or API_Output). Use LLM_Generated only if we are inferring something from the query or the API description, Do not use your own knowledge about something to put in things, rather use perplexity to retireve information.
-   - What should be the flow for each of the panels?
-   - What might be interdependencies between steps of the same panel and different panels? By interdependencies we mean that a panel's input variable is dependent on a previou step which might be from the same panel or a different one.
-   - If the input variable for the current step depends on the output from a previous step, the input variable name must be exactly the same as the output variable name (from which we will fill the input variable value) to ensure consistency.
-   - Based on the interdependencies, which panels should be in the same groups? If there is interdependency between panels then they should be in the same group
-   - Ensure that each API depends on at most one previous API's output. If an API depends on outputs from more than one API, do not consider that workflow.
+
+   - API Selection:
+     - Which APIs to choose for each panel.
+
+   - Input Parameters:
+     - What are the input parameters of the APIs being used? What is the type of data each input parameter expects?
+
+   - Source of Inputs:
+     - What would be the source for these parameters (LLM_Generated or API_Output)? Use LLM_Generated only if we are inferring something from the query or the API description. Do not use your own knowledge; rather, use Perplexity to retrieve information.
+
+   - Workflow Flow:
+     - What should be the flow for each of the panels? Since we have to run all the panels quickly in a time-sensitive manner, we should try to make the workflow minimal, simple, and straightforward. 
+
+   - Interdependencies:
+     - What might be interdependencies between steps of the same panel and different panels? Interdependencies mean that a panel's input variable depends on a previous step, which might be from the same panel or a different one.
+     - Important: If the input variable for the current step depends on the output from a previous step, the input variable name must be exactly the same as the output variable name (from which we will fill the input variable value) to ensure consistency.
+     - Example for Issue 1:
+       - Correct:
+         - Output Variable from Step 1: `location_data`
+         - Input Variable for Step 2:
+           - Name: `location_data` (matches the output variable name)
+           - Source: `API_Output (Panel 1, Step 1)`
+       - Incorrect:
+         - Output Variable from Step 1: `location_data`
+         - Input Variable for Step 2:
+           - Name: `input_location` (different name)
+           - Source: `API_Output (Panel 1, Step 1)`
+
+   - Grouping Panels:
+     - Based on the interdependencies, which panels should be in the same groups? If there is interdependency between panels, then they should be in the same group.
+
+   - Dependency Limitation:
+     - Ensure that each API depends on at most one previous API's output. If an API depends on outputs from more than one API, do not consider that workflow.
 
 3. API Input Requirements:
-   Be sure to check and understand the API input requirements very carefully and their data type, then only proceed to use them.
+   - Be sure to check and understand the API input requirements very carefully and their data types before proceeding to use them.
 
 4. Order of Execution and Workflow Creation:
-   Ensure that the APIs are executed in the correct order to satisfy input requirements. For example, if the Weather API needs data, Perplexity may need to run first to gather that data. The workflow must strictly follow the API's requirements, and ensure that inputs, outputs, and the sequence of steps are all based on the exact API description. Follow the input arguments of each API very carefully and do not add or modify any of the API parameters unless explicitly allowed by the API documentation.
+   - Ensure that the APIs are executed in the correct order to satisfy input requirements. For example, if the Weather API needs data, Perplexity may need to run first to gather that data.
+   - The workflow must strictly follow the API's requirements, ensuring that inputs, outputs, and the sequence of steps are all based on the exact API description.
+   - Follow the input arguments of each API very carefully and do not add or modify any of the API parameters unless explicitly allowed by the API documentation.
 
 5. Group Panels Based on Cross Dependencies:
-   Identify if there are cross-panel dependencies, where one panel's data is needed for another panel. If so, group these panels together and ensure the workflows reflect these dependencies. Only panels with interdependencies should be placed in the same group, and panels that do not depend on each other must be strictly placed in different groups.
+   - Identify if there are cross-panel dependencies where one panel's data is needed for another panel. If so, group these panels together and ensure the workflows reflect these dependencies.
+   - Only panels with interdependencies should be placed in the same group, and panels that do not depend on each other must be strictly placed in different groups.
 
 6. Handle API Dependencies:
-   When there's a dependency between steps or panels, ensure the step whose output will be used in other steps provides the correct data. Structure the inputs according to API specifications to guarantee the API produces the necessary output for the dependent step.
+   - When there's a dependency between steps or panels, ensure the step whose output will be used in other steps provides the correct data.
+   - Structure the inputs according to API specifications to guarantee the API produces the necessary output for the dependent step.
 
----
+7. Keep the Workflow Minimal:
+   - Since we need to run the whole workflow quickly, we should only perform important steps to build the panels.
+   - Always choose the most straightforward, simple, and minimal workflow for each panel.
+
+
 
 ### Important Note:
 
-- Always cross-check the inputs and outputs with the API description.
-- Never assume additional inputs or outputs beyond what is specified in the API documentation.
-- Strictly follow the input arguments required by each API and ensure the workflows adhere to the specific API parameters without altering them.
-- Always only output the CHAIN_OF_THOUGHT and WORKFLOW without any other details before or after.
-- Do not put two panels in the same group if there is no interdependency between them. Strictly put them in different groups.
-- Follow the output format, first explain the Chain of Thought under CHAIN_OF_THOUGHT and then detail the workflow under WORKFLOW.
-- Variable names should strictly be unique for all the variables in the workflow (across panels in a group). Except if the input variable for the current step depends on the output from a previous step, the input variable name must be exactly the same as the output variable name (from which we will fill the input variable value) to ensure consistency.
-- In the Source field of input variables, you have two options:
-  1. LLM_Generated: Use when the variable can be directly inferred from the user's query or API description or is an optional parameter that doesn't affect the core API output, only its representation or formatting. Do not use your own knowledge about something to put in things, rather use perplexity to retireve information.
-  2. API_Output (Panel X, Step X): Use when the variable depends on the output of a previous API call. Specify the exact panel and step number (e.g., "API_Output (Panel 1, Step 2)"). Since interdependent panels are in the same group, so the format for this cant be something like "API_Output (Group 1, Panel 1, Step 2)" or "API_Output (Group 1, Panel 1)" or "API_Output (Group 1, Step 2)"
-- For input variables:
-  - Add a `Name` key which tells the variable name of the value we will give to the parameter. Variable name should be unique across panels in a group.
-  - Add a `Source` key, it can either be set to LLM_Generated or API_Output.
-  - Add a `Description` key, which describes the variable and how do we intend to use it
-  - Add a `Parameter` key, which specifies the exact parameter name as required by the API documentation to which this input variable value should be assigned.
-  - Add a `Type` key, which specifies the expected data type of the parameter based on the API documentation.
-  - Add a `Value` key, which is only filled when the source is LLM_Generated; it stores the value of the variable generated based on the user query and what the step in the panel is handling. If the source is API_Output, the Value should be None.
-- Be sure to use the same variable name when utilizing information from the output variable of some previous panel.
+- Cross-Check Inputs and Outputs:
+  - Always cross-check the inputs and outputs with the API description.
+  - Never assume additional inputs or outputs beyond what is specified in the API documentation.
+
+- Strict Adherence to API Parameters:
+  - Strictly follow the input arguments required by each API and ensure the workflows adhere to the specific API parameters without altering them.
+
+- Output Format:
+  - Always only output the CHAIN_OF_THOUGHT and WORKFLOW without any other details before or after.
+  - Follow the output format precisely, first explaining the Chain of Thought under CHAIN_OF_THOUGHT and then detailing the workflow under WORKFLOW.
+
+- Grouping Panels:
+  - Do not put two panels in the same group if there is no interdependency between them. Strictly put them in different groups.
+
+- Variable Naming:
+  - Variable names should strictly be unique for all variables in the workflow (across panels in a group).
+  - Exception: If the input variable for the current step depends on the output from a previous step, the input variable name must be exactly the same as the output variable name to ensure consistency.
+  - Example for Issue 1:
+    - Correct:
+      - Output Variable from Step 1: `data_result`
+      - Input Variable for Step 2:
+        - Name: `data_result` (matches the output variable name)
+        - Source: `API_Output (Panel X, Step Y)`
+    - Incorrect:
+      - Output Variable from Step 1: `data_result`
+      - Input Variable for Step 2:
+        - Name: `result_data` (different name)
+        - Source: `API_Output (Panel X, Step Y)`
+
+- Source Field of Input Variables:
+  - In the Source field of input variables, you have two options:
+    1. LLM_Generated:
+       - Use when the variable can be directly inferred from the user's query or API description or is an optional parameter that doesn't affect the core API output, only its representation or formatting.
+       - Do not use your own knowledge about something to input values; rather, use Perplexity to retrieve information.
+       - Must Provide Value:
+         - When the Source is LLM_Generated, you must provide a Value based on the user's query or API descriptions.
+       - Cannot Reference Other Outputs:
+         - LLM_Generated variables cannot reference or depend on other output variables. If they do, the Source should be API_Output.
+       - Example for Issue 3:
+         - Correct:
+           - Input Variable:
+             - Name: `search_query`
+             - Source: `LLM_Generated`
+             - Value: `"Best vacation spots in India"`
+         - Incorrect:
+           - Input Variable:
+             - Name: `search_query`
+             - Source: `LLM_Generated`
+             - Value: `Result from previous step output_variable`
+
+    2. API_Output (Panel X, Step X):
+       - Use when the variable depends on the output of a previous API call.
+       - Specify the exact panel and step number (e.g., "API_Output (Panel 1, Step 2)").
+       - Since interdependent panels are in the same group, the format cannot include the group (e.g., do not use "API_Output (Group 1, Panel 1, Step 2)").
+
+- Input Variables Structure:
+  - For input variables, include the following keys:
+    - Name: Unique variable name across panels in a group.
+    - Parameter: Specifies the exact parameter name as required by the API documentation.
+    - Type: Expected data type of the parameter based on the API documentation.
+    - Source: LLM_Generated or API_Output (Panel X, Step X).
+    - Description: Describes the variable and how you intend to use it.
+    - Value: If the source is LLM_Generated, provide the value generated based on the user query and what the step in the panel is handling. If the source is API_Output, the Value should be None.
+
+- Output Variables Usage:
+  - Only include output variables that:
+    - Provide data directly used in the panel's display.
+    - Are required inputs for subsequent steps.
+  - Do not include unnecessary outputs that are not directly contributing to the panel's goal or the workflow's progression.
+
+- Workflow Efficiency:
+  - Since we have to run all the panels quickly in a time-sensitive manner, you should try to make the workflow minimal, simple, and straightforward.
+
+- Do not use  in your output strictly.
 
 
----
 
 ### Your Input:
 
-1. Query:  
-   You will receive the query from the user.
+1. Query:
+   - You will receive the query from the user.
 
-2. Interpreter's Panel Requests:  
-   You will receive requests from the Interpreter detailing the number of panels to be created and the specific information each panel should display.
+2. Interpreter's Panel Requests:
+   - You will receive requests from the Interpreter detailing the number of panels to be created and the specific information each panel should display.
 
-3. API List:  
-   For each Panel, you will be provided with a list of available APIs and their descriptions. Your task is to select the most appropriate APIs for each panel and create a workflow with that.
+3. API List:
+   - For each panel, you will be provided with a list of available APIs and their descriptions. Your task is to select the most appropriate APIs for each panel and create a workflow with that.
 
----
+
 
 ### Example Input:
 
 Query: "What are the best vacation spots in India and their average temperatures?"
 
 Interpreter's Panel Requests:
+
 1. Panel 1: Best Vacation Spots in India
-   List of Relevant APIs:
-      - Perplexity
+   - List of Relevant APIs:
+     - Perplexity
+
 2. Panel 2: Average Temperatures of Vacation Spots
-   List of Relevant APIs:
-      - Perplexity
-      - Open-Meteo
-      - PlotAgent
+   - List of Relevant APIs:
+     - Perplexity
+     - WeatherAPI.com_Realtime_Weather_Api
+     - WeatherAPI.com_Forecast_Weather_API
 
 Description of APIs:
 
-1. PlotAgent  
-   - Input: A query (string, required) which also includes the relevant response from Perplexity.
-   - Output: If plots are generated, it returns the location where plots are saved and a plot explanation string; otherwise, it returns "Fail."  
-   - Use: For queries that can be visualized through graphs or charts. If initial information is insufficient, it triggers a Perplexity search for more data.
+[Description of APIs]
 
-2. Open-Meteo
-   - Input: The API requires the following input parameters:
-     - latitude (float, required): WGS84 latitude coordinate of the location.
-     - longitude (float, required): WGS84 longitude coordinate of the location.
-     Optional parameters that may require your input:
-     - hourly (array of strings, optional): Specify hourly weather variables to include in the response (e.g., `temperature_2m`, `wind_speed_10m`).
-     - daily (array of strings, optional): Specify daily weather variables to include in the response (e.g., `temperature_2m_max`, `precipitation_sum`).
-     - current_weather (boolean, optional): Set to `true` to include current weather data.
-   - Output: The API returns a JSON object containing weather forecast data for the specified location. The output includes:
-     - latitude (float): Latitude of the weather grid cell used.
-     - longitude (float): Longitude of the weather grid cell used.
-     - elevation (float): Elevation in meters of the selected weather grid cell.
-     - hourly (object, if requested): Contains arrays of hourly data for each requested weather variable.
-       - time (array of strings): Timestamps corresponding to hourly data points.
-       - [weather variables]: Arrays of values for each requested hourly variable.
-     - daily (object, if requested): Contains arrays of daily data for each requested weather variable.
-       - time (array of strings): Dates corresponding to daily data points.
-       - [weather variables]: Arrays of values for each requested daily variable.
-     - current_weather (object, if requested): Current weather conditions including:
-       - time (string): Timestamp of the current weather data.
-       - temperature (float): Current temperature.
-       - wind_speed (float): Current wind speed.
-       - wind_direction (float): Current wind direction.
-       - weather_code (integer): Code representing the current weather condition.
-   - Use: This API is used to retrieve weather forecasts for a specific location given by latitude and longitude coordinates. It is suitable for applications needing weather data for planning events, monitoring conditions, or integrating weather information into services.
 
-3. Perplexity
-   - Input: A simple query (string, required) that requires searching the web.
-   - Output: A compiled answer based on web search results.
-   - Use: As a search engine to retrieve and synthesize information from multiple sources into a single, concise response.
 
----
-
-### Your Output Format (Strictly follow this, first CHAIN_OF_THOUGHT and then WORKFLOW):
+### Your Output Format (Strictly follow this, first CHAIN_OF_THOUGHT and then WORKFLOW. Do not use  in your output strictly.):
 
 $$CHAIN_OF_THOUGHT$$
 
-For each group and panel, first provide your chain of thought, explaining your reasoning in determining the APIs to use, their parameter, type of the parameter, the flow, any interdependencies, and how groups should be formed. Ensure that each API depends on at most one previous API's output. Variable names should strictly be unique for all the variables in the workflow (across panels in a group). Except if the input variable for the current step depends on the output from a previous step, the input variable name must be exactly the same as the output variable name (from which we will fill the input variable value) to ensure consistency.
+For each group and panel, first provide your chain of thought, explaining your reasoning in determining the APIs to use, their parameters, types of the parameters, the flow, any interdependencies, and how groups should be formed. Ensure that each API depends on at most one previous API's output. Variable names should strictly be unique for all the variables in the workflow (across panels in a group). Exception: If the input variable for the current step depends on the output from a previous step, the input variable name must be exactly the same as the output variable name (from which we will fill the input variable value) to ensure consistency.
 
 $$WORKFLOW$$
 
@@ -137,20 +193,21 @@ Panel Description: [Description of the panel's objective]
 
 Workflow Steps:
 
-Step [Step Number]  
-- API: [API Name]  
-- Handles: [Portion of query handled by this API]  
+Step [Step Number]
+
+- API: [API Name]
+- Handles: [Portion of query handled by this API]
 - Input Variables:
   - Name: [VARIABLE_NAME]
     - Parameter: [Exact parameter name as per API documentation]
     - Type: [Data type expected by the parameter]
-    - Source: [LLM_Generated | API_Output (Panel X, Step X)]  
+    - Source: [LLM_Generated | API_Output (Panel X, Step X)]
     - Description: [Brief description of what this variable holds]
     - Value: [If Source is LLM_Generated, provide the value generated based on the user query and what the step in the panel is handling; if Source is API_Output, this should be None]
   - Name: [VARIABLE_NAME]
     - Parameter: [Exact parameter name as per API documentation]
     - Type: [Data type expected by the parameter]
-    - Source: [LLM_Generated | API_Output (Panel X, Step X)]  
+    - Source: [LLM_Generated | API_Output (Panel X, Step X)]
     - Description: [Brief description of what this variable holds]
     - Value: [If Source is LLM_Generated, provide the value generated based on the user query and what the step in the panel is handling; if Source is API_Output, this should be None]
 - Output Variables:
@@ -161,93 +218,207 @@ Step [Step Number]
 
 ### Example Outputs:
 
-Example 1:
+#### Example 1:
 
-Query: "What are the best vacation spots in India and their average temperatures?"
+Query: "What top 5 cities in usa? what is weather and news there? What does reddit say about them? What are some good restaurants there?"
 
 Interpreter's Panel Requests:
-1. Panel 1: Best Vacation Spots in India
-   - List of Relevant APIs:
-     - Perplexity
-2. Panel 2: Average Temperatures of Vacation Spots
-   - List of Relevant APIs:
-     - Perplexity
-     - Open-Meteo
-     - PlotAgent
+1. Panel 1: Top 5 Cities in USA Overview
+List of Relevant APIs:
+   - TripadvisorSearchLocation
+   - Perplexity
+
+2. Panel 2: Weather in Top 5 Cities
+List of Relevant APIs:
+   - WeatherAPI.com_Realtime_Weather_Api
+   - WeatherAPI.com_Forecast_Weather_API
+   - Perplexity
+
+3. Panel 3: News in Top 5 Cities
+List of Relevant APIs:
+   - NewsAPISearchByKeyWord
+   - Perplexity
+
+4. Panel 4: Reddit Discussions on Top 5 Cities
+List of Relevant APIs:
+   - RedditTopPostsBySubreddit
+   - Perplexity
+
+5. Panel 5: Top Restaurants in Top 5 Cities
+List of Relevant APIs:
+   - TripadvisorSearchRestaurants
+   - Perplexity
 
 Description of APIs:
 
-_As above._
+[Will be given to you]
 
 Your Output:
 
 $$CHAIN_OF_THOUGHT$$
 
-We need to display the best vacation spots in India and their average temperatures.
+Panel 1: Top 5 Cities in USA Overview
 
-### Panel 1:
+- API Selection:
+  - We need to identify the top 5 cities in the USA. Perplexity is suitable for retrieving this information by synthesizing data from multiple sources.
+  - To get specific location details like `geoId` for each city, we'll use TripadvisorSearchLocation.
+    - Note: TripadvisorSearchLocation is only reliable for obtaining `geoId` and not longitude or latitude, and that too for well-known cities.
 
-- API Used: Perplexity
 - Input Parameters:
-  - `query` (string) – This API requires a query to generate a response.
-- Type of Data Expected:
-  - The input parameter `query` expects a string value.
-- Source for Parameters:
-  - The `query` parameter will be LLM_Generated based on the user's query, "What are the best vacation spots in India?"
-- Flow: 
-  - The Perplexity API will return a list of top vacation spots in India based on the query.
-- Interdependencies: 
-  - No interdependencies within this panel.
-- No API depends on more than one APIs output to construct its input
+  - Perplexity:
+    - `query` (string): Requires a search query. We'll use "What are the top 5 cities in the USA?".
+  - TripadvisorSearchLocation:
+    - `query` (string): Requires city names. We'll input the list of cities obtained from Perplexity.
 
-### Panel 2:
+- Source of Inputs:
+  - Perplexity:
+    - `query`: LLM_Generated based on the user's query.
+  - TripadvisorSearchLocation:
+    - `query`: API_Output (Panel 1, Step 1), using `top_cities_list` from Perplexity's output.
 
-- APIs Used: Perplexity, Open-Meteo, PlotAgent
-- Flow:
-  1. Step 1: Use Perplexity to get the coordinates (latitude and longitude) of the vacation spots identified in Panel 1. Because we cannot guess the latitude and longitude, better to search it on the web.
-  2. Step 2: Use Open-Meteo to fetch the average temperature data for each location using the coordinates.
-  3. Step 3: Use PlotAgent to generate a graph based on the retrieved temperature data.
-  
-- Input Parameters and Sources:
+- Workflow Flow:
+  - Step 1: Use Perplexity to get the list of the top 5 cities.
+  - Step 2: Use TripadvisorSearchLocation to obtain `geoId` details for each city.
+    - Acknowledging that this API is only reliable for well-known cities.
 
-  Step 1 (Perplexity):
-  - Input Parameters:
-    - `query` (string): A query to fetch the coordinates for each vacation spot.
-  - Type of Data Expected:
-    - The `query` parameter expects a string value.
-  - Source of Parameters:
-    - The `query` will be based on the API_Output (Panel 1, Step 1), i.e., the list of vacation spots retrieved earlier.
-  - Since this step depends on the output variables from panel 1, step 1, any input variables that rely on these output variables must have the same name as the corresponding output variable
+- Variable Naming:
+  - Input variable name for Step 1: `query_top_cities`
+  - Output variable name for Step 1: `top_cities_list`.
+  - Input variable name for Step 2: `top_cities_list` (matches the output variable name).
+  - Output variable name for Step 2: `city_geoID_details`
 
-  Step 2 (Open-Meteo):
-  - Input Parameters:
-    - `latitude` (float): The latitude of the vacation spot.
-    - `longitude` (float): The longitude of the vacation spot.
-    - `daily` (array of strings): Weather variables for daily data.
-  - Type of Data Expected:
-    - The `latitude` and `longitude` parameters expect float values.
-    - The `daily` parameter expects an array of strings.
-  - Source of Parameters:
-    - `latitude` and `longitude` will be sourced from API_Output (Panel 2, Step 1), which provides the coordinates for each vacation spot.
-    - `daily` is LLM_Generated and will request the daily maximum temperature ("temperature_2m_max").
-  - Since this step depends on the output variables from panel 2, step 1, any input variables that rely on these output variables must have the same name as the corresponding output variable. In this case they are `latitude` and `longitude`
 
-  Step 3 (PlotAgent):
-  - Input Parameters:
-    - `query` (string): The data for generating the graph.
-  - Type of Data Expected:
-    - The `query` parameter expects a string value.
-  - Source of Parameters:
-    - This input will be based on API_Output (Panel 2, Step 2), which contains the temperature data from Open-Meteo.
-  - Since this step depends on the output variables from panel 2, step 2, any input variables that rely on these output variables must have the same name as the corresponding output variable.
+Panel 2: Weather in Top 5 Cities
 
-  - No API depends on more than one APIs output to construct its input
+- API Selection:
+  - WeatherAPI.com_Realtime_Weather_Api may not always return accurate results with city name queries.
+  - Therefore, we'll use Perplexity to find the latitude and longitude of each city.
+  - We'll then use WeatherAPI.com_Realtime_Weather_Api with these coordinates to fetch accurate weather data.
+
+- Input Parameters:
+  - Perplexity:
+    - `query` (string): Queries to find latitude and longitude for each city we got from Panel 1, Step 1.
+  - WeatherAPI.com_Realtime_Weather_Api:
+    - `q` (string): Latitude and longitude in the format "lat,lon".
+
+- Source of Inputs:
+  - Perplexity:
+    - `query`: API_Output, (Panel 1, Step 1), using top_cities_list
+  - WeatherAPI.com_Realtime_Weather_Api:
+    - `q`: API_Output (Panel 2, Step 1), using `city_coordinates`.
+
+- Workflow Flow:
+  - Step 1: Use Perplexity to find the latitude and longitude of each city.
+  - Step 2: Use WeatherAPI.com_Realtime_Weather_Api with these coordinates to fetch real-time weather data.
 
 - Interdependencies:
-  - Panel 2 depends on Panel 1 to provide a list of vacation spots. Panel 2’s steps are sequential and dependent on the data from each prior step.
-  
-- Grouping:
-  - Since Panel 2 depends on the output from Panel 1, they should be grouped together as Group 1.
+  - Step 2 depends on Step 1 (`city_coordinates`).
+
+- Variable Naming:
+  - Input variable name for Step 1: top_cities_list (matching the output variable name from Panel 1, Step 1).
+  - Output variable name for Step 1: `latitude_data` and `longitude_data`.
+  - Input variable name for Step 2: `latitude_data` and `longitude_data` (matching the output variable name from Panel 2, Step 1).
+  - Out variable name for Step 2: `realtime_weather`
+
+
+Panel 3: News in Top 5 Cities
+
+- API Selection:
+  - To fetch news articles, we'll use NewsAPISearchByKeyWord.
+  - We can input city names directly; Perplexity is not necessary here.
+
+- Input Parameters:
+  - NewsAPISearchByKeyWord:
+    - `query` (string): City names.
+    - `language` (string): We'll set this to "en".
+    - `region` (string): We'll set this to "US".
+
+- Source of Inputs:
+  - `query`: API_Output (Panel 1, Step 1), using `top_cities_list`.
+  - `language`: LLM_Generated, value "en".
+  - `region`: LLM_Generated, value "US".
+
+- Workflow Flow:
+  - Step 1: Use NewsAPI to retrieve news articles for each city.
+
+- Interdependencies:
+  - Depends on Panel 1, Step 1 for city names.
+
+- Variable Naming:
+  - Input variable name for Step 1: `top_cities_list`, matching the output from Panel 1, Step 1.
+  - Output variable name for Step 1: `news_articles`
+
+
+Panel 4: Reddit Discussions on Top 5 Cities
+
+- API Selection:
+  - To find relevant subreddits, we'll use Perplexity.
+  - To get top Reddit posts, we'll use RedditTopPostsBySubreddit.
+
+- Input Parameters:
+  - Perplexity:
+    - `query` (string): Queries to find subreddits for each city.
+  - RedditTopPostsBySubreddit:
+    - `subreddit` (string): Subreddit names.
+    - `time` (string): We'll set this to "day".
+
+- Source of Inputs:
+  - Perplexity:
+    - `query`: API_Output (Panel 1, Step 1)., using city names from top_cities_list
+  - RedditTopPostsBySubreddit:
+    - `subreddit`: API_Output (Panel 4, Step 1), using `subreddits`.
+    - `time`: LLM_Generated, value "day".
+
+- Workflow Flow:
+  - Step 1: Use Perplexity to find subreddits related to each city.
+  - Step 2: Use Reddit API to fetch top posts from these subreddits.
+
+- Interdependencies:
+  - Step 2 depends on Step 1 (`subreddits`).
+  - Perplexity in Step 1 uses city names from Panel 1, Step 1.
+
+- Variable Naming:
+  - Input variable name for Step 1: `top_cities_list`
+  - Output variable name for Step 1: `subreddits`.
+  - Input variable name for Step 2: `subreddits`.
+  - Output variable name for Step 2: `reddit_posts`
+
+
+Panel 5: Top Restaurants in Top 5 Cities
+
+- API Selection:
+  - We'll use TripadvisorSearchRestaurants to find top restaurants using `geoId`.
+
+- Input Parameters:
+  - TripadvisorSearchRestaurants:
+    - `locationId` (string): `geoId` of each city.
+
+- Source of Inputs:
+  - `locationId`: API_Output (Panel 1, Step 2), using `city_geoID_details`.
+
+- Workflow Flow:
+  - Step 1: Use the Tripadvisor API to get top restaurants for each city.
+
+- Interdependencies:
+  - Depends on Panel 1, Step 2 for `geoId`.
+
+- Variable Naming:
+  - Input variable name for Step 1: `city_geoID_details`, matching the output from Panel 1, Step 2.
+  - Output variable name for Step 1: `top_restaurants`
+
+
+Grouping Panels and Interdependencies
+
+- All panels depend on outputs from Panel 1. Therefore, we will place all panels in Group 1.
+- Ensured that each API depends on at most one previous API's output.
+- Input variables that depend on previous outputs have matching names to maintain consistency.
+
+Workflow Efficiency
+
+- Kept the workflow minimal by:
+  - Avoiding unnecessary APIs (e.g., not using Perplexity where not essential).
+  - Using city names directly when possible.
+  - Limiting each panel to essential steps only.
 
 $$WORKFLOW$$
 
@@ -255,121 +426,276 @@ Group 1:
 
 Workflow for Panel 1:
 
-Panel Description: Display the best places for vacation in India.
+Panel Description: Identify and provide an overview of the top 5 cities in the USA.
 
 Workflow Steps:
 
-Step 1  
-- API: Perplexity  
-- Handles: Retrieves a list of top vacation destinations in India  
+Step 1
+- API: Perplexity
+- Handles: Retrieves the top 5 cities in the USA
 - Input Variables:
-  - Name: query_vacation_spots
+  - Name: query_top_cities
     - Parameter: query
     - Type: string
-    - Source: LLM_Generated  
-    - Description: Query to get the best vacation spots in India
-    - Value: "What are the best vacation spots in India?"
+    - Source: LLM_Generated
+    - Description: Query to find the top 5 cities in the USA
+    - Value: "What are the top 5 cities in the USA?"
 - Output Variables:
-  - Name: vacation_spots_list
-    - Description: List of recommended vacation spots in India
+  - Name: top_cities_list
+    - Description: List of the top 5 cities in the USA
+
+Step 2
+- API: TripadvisorSearchLocation
+- Handles: Fetches geoID about each city
+- Input Variables:
+  - Name: top_cities_list
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: List of top cities from Perplexity
+    - Value: None
+- Output Variables:
+  - Name: city_geoID_details
+    - Description: GeoID for each city
 
 Workflow for Panel 2:
 
-Panel Description: Display a graph of average temperatures in the top 10 vacation spots.
+Panel Description: Provide real-time weather information for the top 5 cities.
 
 Workflow Steps:
 
 Step 1  
 - API: Perplexity  
-- Handles: Fetches latitude and longitude for each vacation spot  
+- Handles: Fetches latitude and longitude for each top city in USA
 - Input Variables:
-  - Name: vacation_spots_list
+  - Name: top_cities_list
     - Parameter: query
     - Type: string
     - Source: API_Output (Panel 1, Step 1)  
-    - Description: List of vacation spots from Panel 1
+    - Description: List of top cities in USA
     - Value: None
 - Output Variables:
-  - Name: latitude
-    - Description: Latitude for each vacation spot
-  - Name: longitude
-    - Description: Longitude for each vacation spot
+  - Name: latitude_data
+    - Description: Latitude for each top city
+  - Name: longitude_data
+    - Description: Longitude for each top city
 
-Step 2  
-- API: Open-Meteo  
-- Handles: Retrieves average temperature data for each location  
+Step 2
+- API: WeatherAPI.com_Realtime_Weather_Api
+- Handles: Fetches real-time weather data
 - Input Variables:
-  - Name: latitude
-    - Parameter: latitude
-    - Type: float
-    - Source: API_Output (Panel 2, Step 1)  
-    - Description: Latitude of the vacation spot
+  - Name: latitude_data
+    - Parameter: q
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: Latitude of the top cities
     - Value: None
-  - Name: longitude
-    - Parameter: longitude
-    - Type: float
-    - Source: API_Output (Panel 2, Step 1)  
-    - Description: Longitude of the vacation spot
+  - Name: longitude_data
+    - Parameter: q
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: Longitutdes of the top cities
     - Value: None
-  - Name: daily_parameters
-    - Parameter: daily
-    - Type: array of strings
+- Output Variables:
+  - Name: realtime_weather
+    - Description: Real-time weather data for each city
+
+Workflow for Panel 3:
+
+Panel Description: Display recent news articles for the top 5 cities.
+
+Workflow Steps:
+
+Step 1
+- API: NewsAPISearchByKeyWord
+- Handles: Fetches detailed news articles
+- Input Variables:
+  - Name: top_cities_list
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: City names which can used as query keyword for searching news
+    - Value: None
+- Output Variables:
+  - Name: news_articles
+    - Description: Detailed news articles for each city
+
+Workflow for Panel 4:
+
+Panel Description: Display top Reddit discussions for the top 5 cities.
+
+Workflow Steps:
+
+Step 1
+- API: Perplexity
+- Handles: Identifies relevant subreddits for each city
+- Input Variables:
+  - Name: top_cities_list
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: List of top cities
+    - Value: None
+- Output Variables:
+  - Name: subreddits
+    - Description: Relevant subreddits for each city
+
+Step 2
+- API: RedditTopPostsBySubreddit
+- Handles: Fetches top posts from relevant subreddits
+- Input Variables:
+  - Name: subreddits
+    - Parameter: subreddit
+    - Type: string
+    - Source: API_Output (Panel 4, Step 1)
+    - Description: Subreddits identified by Perplexity
+    - Value: None
+  - Name: time_period
+    - Parameter: time
+    - Type: string
     - Source: LLM_Generated
-    - Description: Weather variables to include in the daily response
-    - Value: ["temperature_2m_max"]
+    - Description: Time period for top posts
+    - Value: "day"
 - Output Variables:
-  - Name: temperature_data
-    - Description: Average temperature data for each vacation spot
+  - Name: reddit_posts
+    - Description: Top Reddit posts for each city
 
-Step 3  
-- API: PlotAgent  
-- Handles: Generates a temperature graph for the vacation spots  
+Workflow for Panel 5:
+
+Panel Description: Display top restaurants in the top 5 cities.
+
+Workflow Steps:
+
+Step 1
+- API: TripadvisorSearchRestaurants
+- Handles: Searches for top restaurants in each city
 - Input Variables:
-  - Name: temperature_data
-    - Parameter: query
+  - Name: city_geoID_details
+    - Parameter: locationId
     - Type: string
-    - Source: API_Output (Panel 2, Step 2)  
-    - Description: Temperature data from Open-Meteo
+    - Source: API_Output (Panel 1, Step 2)
+    - Description: geoId of each city
     - Value: None
 - Output Variables:
-  - Name: temperature_graph
-    - Description: A graph showing average temperatures for the vacation spots
+  - Name: top_restaurants
+    - Description: List of top restaurants in each city
 
+#### Example 2:
 
-Example 2:
-
-Query: "What are the key statistics on climate change in the past 50 years?"
+Query: "what are the hotel options in new york city from 10th october 2024 to 12th october 2024.  Also what will the weather be like then?"
 
 Interpreter's Panel Requests:
-1. Panel 1: Key Statistics on Climate Change
-   - List of Relevant APIs:
-     - Perplexity
-     - PlotAgent
+1. Panel 1: Hotel Options in New York City
+List of Relevant APIs:
+   - TripadvisorSearchLocation
+   - TripadvisorSearchHotels
+   - Perplexity
+
+2. Panel 2: Weather Forecast for New York City
+List of Relevant APIs:
+   - WeatherAPI.com_Forecast_Weather_API
+   - Perplexity
 
 Description of APIs:
 
-_As above._
+[Will be given to you]
 
 Your Output:
 
 $$CHAIN_OF_THOUGHT$$
 
-For Panel 1, we need to gather key statistics on climate change over the past 50 years. The Perplexity API will be used to search for this information. Perplexity requires a query string, which will be generated based on the user query. The response will contain the climate change statistics needed for visualization.
+Panel 1: Hotel Options in New York City
 
-In Step 2, we will use PlotAgent to create visualizations from the data retrieved by Perplexity. PlotAgent requires data (in the form of statistics) as input. The input for PlotAgent will come directly from the API output of Step 1 (that is why we will name the input variable for step 2 same as the output variable name from step 1 i.e.).
+- API Selection:
+  - To find hotel options in New York City for the specified dates.
+  - TripadvisorSearchLocation: To obtain the `geoId` for New York City.
+    - Note: TripadvisorSearchLocation is reliable for obtaining `geoId` for well-known locations, and not longitude or latitude.
+  - TripadvisorSearchHotels: To retrieve hotel options using the `geoId` and the specified dates.
+  - Perplexity: Not necessary here since we can obtain all required data using Tripadvisor APIs, keeping the workflow minimal.
 
-- **Input Parameters and Sources:**
-  - **Step 1 (Perplexity):** Takes a query string as input. The `query` will be **LLM_Generated**.
-  - **Step 2 (PlotAgent):** Takes the climate change statistics as input. This will be sourced from **API_Output (Panel 1, Step 1)**.
-  
-- **Flow:** 
-  1. Perplexity will retrieve the key statistics on climate change.
-  2. PlotAgent will then visualize the statistics retrieved by Perplexity.
+- Input Parameters:
+  - TripadvisorSearchLocation:
+    - `query` (string): The location name to search for.
+  - TripadvisorSearchHotels:
+    - `geoId` (string): The `geoId` obtained from TripadvisorSearchLocation.
+    - `checkIn` (string): The check-in date in YYYY-MM-DD format.
+    - `checkOut` (string): The check-out date in YYYY-MM-DD format.
 
-- No API depends on more than one APIs output to construct its input
+- Source of Inputs:
+  - TripadvisorSearchLocation:
+    - `query`: LLM_Generated, value `"New York City"`, extracted from the user's query.
+  - TripadvisorSearchHotels:
+    - `geoId`: API_Output (Panel 1, Step 1), output `location_geoId` from TripadvisorSearchLocation.
+    - `checkIn`: LLM_Generated, value `"2024-10-10"`, extracted from the user's query.
+    - `checkOut`: LLM_Generated, value `"2024-10-12"`, extracted from the user's query.
 
-- **Interdependencies:** 
-  There is only one Panel. So we will have a single group.
+- Workflow Flow:
+  - Step 1: Use TripadvisorSearchLocation to get the `geoId` for New York City.
+  - Step 2: Use TripadvisorSearchHotels with the `geoId` and dates to retrieve hotel options.
+
+- Interdependencies:
+  - Step 2 depends on Step 1 for the `geoId` (`location_geoId`).
+  - The input variable `location_geoId` in Step 2 must match the output variable name from Step 1.
+
+- Variable Naming:
+  - Input variable name for Step 1: `location_query`
+  - Output variable name for Step 1: `location_geoId`.
+  - Input variable name for Step 2: `location_geoId` (matching the output variable name), `check_in_date`, `check_out_date`.
+  - Output variable name for Step 2: `hotel_options`.
+
+Panel 2: Weather Forecast for New York City
+
+- API Selection:
+  - To provide the weather forecast for New York City for the specified dates.
+  - Perplexity: To obtain the latitude and longitude of New York City, as using coordinates can provide more accurate results with WeatherAPI.com_Forecast_Weather_API.
+  - WeatherAPI.com_Forecast_Weather_API: To fetch the weather forecast using the coordinates and dates.
+
+- Input Parameters:
+  - Perplexity:
+    - `query` (string): A query to obtain the latitude and longitude of New York City.
+  - WeatherAPI.com_Forecast_Weather_API:
+    - `q` (string): The latitude and longitude in "lat,lon" format.
+    - `dt` (date): Specific dates for which the forecast is required.
+
+- Source of Inputs:
+  - Perplexity:
+    - `query`: LLM_Generated, value `"What is the latitude and longitude of New York City?"`, inferred from the user's query.
+  - WeatherAPI.com_Forecast_Weather_API:
+    - `q`: API_Output (Panel 2, Step 1), output `nyc_coordinates` from Perplexity.
+    - `dt`: LLM_Generated, value `["2024-10-10", "2024-10-11", "2024-10-12"]`, extracted from the user's query.
+
+- Workflow Flow:
+  - Step 1: Use Perplexity to obtain the latitude and longitude of New York City.
+  - Step 2: Use WeatherAPI.com_Forecast_Weather_API with the coordinates and dates to fetch the weather forecast.
+
+- Interdependencies:
+  - Step 2 depends on Step 1 for the coordinates (`nyc_coordinates`).
+  - The input variable `nyc_coordinates` in Step 2 must match the output variable name from Step 1.
+
+- Variable Naming:
+  - Input variable name for Step 1: `query_nyc_coordinates`
+  - Output variable for Step 1: `nyc_coordinates`.
+  - Input variable name for Step 2: `nyc_coordinates` (matching the output variable name), `forecast_dates`.
+  - Output variable name for Step 2: `weather_forecast`
+
+Grouping Panels and Interdependencies
+
+- Panel 1 and Panel 2 do not have interdependencies between them.
+- Therefore, they should be placed in different groups:
+  - Panel 1 is in Group 1.
+  - Panel 2 is in Group 2.
+
+Dependency Limitation
+
+- Ensured that each API depends on at most one previous API's output.
+- All input variables that depend on previous outputs have matching names to maintain consistency.
+
+Workflow Efficiency
+
+- Kept the workflow minimal by:
+  - Using only necessary APIs.
+  - Avoiding unnecessary steps like additional Perplexity calls.
+  - Extracting dates directly from the user's query without additional processing.
 
 $$WORKFLOW$$
 
@@ -377,157 +703,178 @@ Group 1:
 
 Workflow for Panel 1:
 
-Panel Description: Display key statistics on climate change over the past 50 years.
+Panel Description: Retrieve hotel options in New York City for specified dates.
 
 Workflow Steps:
 
-Step 1  
-- API: Perplexity  
-- Handles: Searches for key climate change statistics over the past 50 years  
+Step 1
+- API: TripadvisorSearchLocation
+- Handles: Retrieves `geoId` for New York City
 - Input Variables:
-  - Name: query_climate_stats
+  - Name: location_query
     - Parameter: query
     - Type: string
-    - Source: LLM_Generated  
-    - Description: Query to get key statistics on climate change
-    - Value: "What are the key statistics on climate change in the past 50 years?"
+    - Source: LLM_Generated
+    - Description: Search query for New York City
+    - Value: "New York City"
 - Output Variables:
-  - Name: climate_statistics
-    - Description: Key statistics on climate change over the past 50 years
+  - Name: location_geoId
+    - Description: Geo ID for New York City
 
-Step 2  
-- API: PlotAgent  
-- Handles: Creates visualizations of the climate statistics  
+Step 2
+- API: TripadvisorSearchHotels
+- Handles: Retrieves hotel options using `geoId`
 - Input Variables:
-  - Name: climate_statistics
-    - Parameter: query
+  - Name: location_geoId
+    - Parameter: geoId
     - Type: string
-    - Source: API_Output (Panel 1, Step 1)  
-    - Description: Data retrieved by Perplexity
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: Geo ID for New York City
     - Value: None
-- Output Variables:
-  - Name: climate_statistics_graph
-    - Description: Graphs visualizing key climate change statistics
-
-
-Example 3:
-
-Query: "Provide information about renewable energy sources and display the current weather in New York City."
-
-Interpreter's Panel Requests:
-1. Panel 1: Information about Renewable Energy Sources
-   - List of Relevant APIs:
-     - Perplexity
-2. Panel 2: Current Weather in New York City
-   - List of Relevant APIs:
-     - Perplexity
-     - Open-Meteo
-
-Description of APIs:
-
-_As above._
-
-Your Output:
-
-$$CHAIN_OF_THOUGHT$$
-
-For Panel 1, we need to provide detailed information on renewable energy sources. Perplexity will be used to gather this information, with a query string generated from the user's request.
-
-In Panel 2, the task is to display the current weather in New York City. The Perplexity API will first retrieve the latitude and longitude of New York City, followed by Open-Meteo, which will fetch the weather data based on these coordinates. Both APIs expect specific input parameters: `query` for Perplexity and `latitude`, `longitude`, and `current_weather` for Open-Meteo.
-
-Since these panels address different topics with no dependencies, they will be placed in separate groups.
-
-- **Input Parameters and Sources:**
-  - **Panel 1 (Perplexity):** The `query` will be **LLM_Generated** to search for renewable energy information.
-  - **Panel 2 (Perplexity and Open-Meteo):**
-    - Perplexity will generate the coordinates of New York City, with the `query` **LLM_Generated**.
-    - Open-Meteo will use these coordinates, which will be sourced from **API_Output (Panel 2, Step 1)**. Additionally, `current_weather` will be **LLM_Generated** with a value of `true`. The output variable names from perplexity on which Open-Meteo is dependent, are kept as the input variable names for Open-Meteo.
-
-- **Flow:**
-  1. Panel 1 will fetch detailed information about renewable energy sources.
-  2. Panel 2 will retrieve the coordinates of New York City and use these to fetch the current weather conditions. Better to not guess the coordinates of New York City.
-
-- No API depends on more than one APIs output to construct its input
-  
-- **Interdependencies:** 
-  No interdependencies exist between the two panels, so they will be grouped separately.
-
-$$WORKFLOW$$
-
-Group 1:
-
-Workflow for Panel 1:
-
-Panel Description: Provide information about renewable energy sources.
-
-Workflow Steps:
-
-Step 1  
-- API: Perplexity  
-- Handles: Gathers information on renewable energy sources  
-- Input Variables:
-  - Name: query_renewable_energy
-    - Parameter: query
+  - Name: check_in_date
+    - Parameter: checkIn
     - Type: string
-    - Source: LLM_Generated  
-    - Description: Query about renewable energy sources
-    - Value: "Information about renewable energy sources"
+    - Source: LLM_Generated
+    - Description: Check-in date
+    - Value: "2024-10-10"
+  - Name: check_out_date
+    - Parameter: checkOut
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Check-out date
+    - Value: "2024-10-12"
 - Output Variables:
-  - Name: renewable_energy_info
-    - Description: Detailed information about renewable energy sources
+  - Name: hotel_options
+    - Description: List of available hotels in New York City
 
 Group 2:
 
 Workflow for Panel 2:
 
-Panel Description: Display the current weather in New York City.
+Panel Description: Provide weather forecast for New York City for specified dates.
 
 Workflow Steps:
 
 Step 1  
 - API: Perplexity  
-- Handles: Retrieves latitude and longitude of New York City  
+- Handles: Fetches latitude and longitude for New York City
 - Input Variables:
   - Name: query_nyc_coordinates
     - Parameter: query
     - Type: string
-    - Source: LLM_Generated  
-    - Description: Query to get the coordinates of New York City
-    - Value: "What are the latitude and longitude of New York City?"
+    - Source: LLM_Generated 
+    - Description: query to for getting latitude and longitude coordinates for New York City
+    - Value: "What is the latitude and longitude coordinates for New York City"
 - Output Variables:
-  - Name: latitude
-    - Description: Latitude for each vacation spot
-  - Name: longitude
-    - Description: Longitude for each vacation spot
+  - Name: nyc_coordinates
+    - Description: Longitude and Latitude for New York City
 
-Step 2  
-- API: Open-Meteo  
-- Handles: Retrieves current weather data for New York City  
+Step 2
+- API: WeatherAPI.com_Forecast_Weather_API
+- Handles: Fetches weather forecast for New York City
 - Input Variables:
-  - Name: latitude
-    - Parameter: latitude
-    - Type: float
-    - Source: API_Output (Panel 2, Step 1)  
-    - Description: Latitude of New York City
+  - Name: nyc_coordinates
+    - Parameter: q
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: Longitude and Latitude for New York City
     - Value: None
-  - Name: longitude
-    - Parameter: longitude
-    - Type: float
-    - Source: API_Output (Panel 2, Step 1)  
-    - Description: Longitude of New York City
-    - Value: None
-  - Name: current_weather_flag
-    - Parameter: current_weather
-    - Type: boolean
-    - Source: LLM_Generated  
-    - Description: Flag to include current weather data
-    - Value: true
+  - Name: forecast_dates
+    - Parameter: dt
+    - Type: date
+    - Source: LLM_Generated
+    - Description: Forecast dates on which we have to check the weather
+    - Value: "[2024-10-10, 2024-10-11, 2024-10-12]"
 - Output Variables:
-  - Name: current_weather_data
-    - Description: Current weather conditions in New York City
+  - Name: weather_forecast
+    - Description: Weather forecast for New York City on specified dates
 
 
+#### Example 3:
+
+Query: "What is the news in Netherlands?"
+
+Interpreter's Panel Requests:
+1. Panel 1: Hotel Options in New York City
+List of Relevant APIs:
+   - TripadvisorSearchLocation
+   - TripadvisorSearchHotels
+   - Perplexity
+
+2. Panel 2: Weather Forecast for New York City
+List of Relevant APIs:
+   - WeatherAPI.com_Forecast_Weather_API
+   - Perplexity
+
+Description of APIs:
+
+[Will be given to you]
+
+Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+Panel 1: News in the Netherlands
+
+- API Selection:
+  - The user's query is "What is the news in Netherlands?"
+  - We can directly use the NewsAPISearchByKeyWord API to fetch news articles related to the Netherlands.
+  - Perplexity is not necessary here since we can use the country name directly as the search query.
+  - We should avoid using the `region` parameter in the NewsAPI if we are unsure about the exact region code or if it might limit the results in unintended ways.
+
+- Input Parameters:
+  - NewsAPISearchByKeyWord:
+    - `query` (string): The keyword or phrase to search for in news articles.
+    - `language` (string): The language of the news articles. This is optional but can be set to "en" for English.
+    - `region` (string): The region or country code. Since we are not sure about the correct region code for the Netherlands in the API, it's best to omit this parameter to ensure we don't miss relevant articles.
+
+- Source of Inputs:
+  - `query`: LLM_Generated, value `"Netherlands"`, directly extracted from the user's query.
+  - `language`: LLM_Generated, value `"en"`, assuming the user wants news articles in English.
+  - We will not use the `region` parameter to avoid potential issues with incorrect or restrictive region codes.
+
+- Workflow Flow:
+  - Step 1: Use NewsAPISearchByKeyWord to fetch recent news articles about the Netherlands using the keyword and language parameters.
+
+- Interdependencies:
+  - As this is a single-step workflow, there are no interdependencies with other steps or panels.
+
+- Variable Naming:
+  - Input Variables:
+    - `news_query` (for the `query` parameter)
+    - `news_language` (for the `language` parameter)
+  - Output Variables:
+    - `news_articles`
+
+- Grouping Panels and Interdependencies:
+  - Since there's only one panel, it will be placed in Group 1.
+  - There are no dependencies on other panels.
+
+- Dependency Limitation:
+  - The API call does not depend on any previous API outputs.
+
+- Workflow Efficiency:
+  - The workflow is minimal and straightforward, using only one API call.
+  - By avoiding unnecessary parameters like `region`, we reduce the risk of errors and ensure we retrieve the most comprehensive set of news articles.
 
 
+$$WORKFLOW$$
 
-
+- API: NewsAPISearchByKeyWord
+- Handles: Fetches news articles for Netherlands
+- Input Variables:
+  - Name: vacation_spots_list
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: query should be Netherlands
+    - Value: "Netherlands"
+  - Name: language
+    - Parameter: language
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Language for news articles
+    - Value: en
+- Output Variables:
+  - Name: news_articles
+    - Description: News articles for Netherlands

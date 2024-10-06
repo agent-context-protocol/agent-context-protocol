@@ -1,136 +1,78 @@
 {
-    "1": {
-        "panel_description": "Display the most beautiful places in the world.",
+    "3": {
+        "panel_description": "Retrieve hotel options in Chicago for specified dates.",
         "steps": {
             "1": {
-                "api": "Perplexity",
-                "handles": "Retrieves a list of beautiful places in the world",
+                "api": "TripadvisorSearchLocation",
+                "handles": "Retrieves geoId for Chicago",
                 "input_vars": [
                     {
-                        "name": "query_beautiful_places",
+                        "name": "location_query",
                         "parameter": "query",
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Query to get the most beautiful places in the world",
-                        "value": "What are the most beautiful places in the world?",
+                        "description": "Search query for Chicago",
+                        "value": "Chicago",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "beautiful_places_list",
-                        "description": "List of beautiful places in the world",
-                        "used_by": [
-                            {
-                                "panel": 2,
-                                "step": 1
-                            }
-                        ],
-                        "value": "\"The world is replete with breathtakingly beautiful places, each offering unique natural wonders, cultural significance, and awe-inspiring landscapes. Here are some of the most stunning destinations highlighted across various sources:\n\n    Montenegro: Kotor Bay, Lake Skadar, Tara River\n    Greece: Lefkada Island\n    Oman: Shariqiya Sands\n    Mexico: Las Coloradas Lagoon\n    Brazil: Rio Sucuri, Paraty\n    Australia: Tarkine Rainforest, Tasmania\n    United States: Joshua Tree National Park, Bisti/De-Na-Zin Wilderness\n    Vietnam: Fansipan, M\u00f9 Cang Ch\u1ea3i, Tu Le Valley\n    Japan: Mount Yoshino, Arashiyama Bamboo Grove\n    Iceland: The Faroe Islands\n    Jordan: Petra\n    Italy: Lake Como, Saturnia\n    Greenland: Ilulissat Icefjord\n    Indonesia: Raja Ampat\""
-                    }
-                ]
-            }
-        }
-    },
-    "2": {
-        "panel_description": "Display the country heads of the beautiful places.",
-        "steps": {
-            "1": {
-                "api": "Perplexity",
-                "handles": "Finds the country heads of the beautiful places",
-                "input_vars": [
-                    {
-                        "name": "beautiful_places_list",
-                        "parameter": "query",
-                        "type": "string",
-                        "source": "API_Output (Panel 1, Step 1)",
-                        "description": "List of beautiful places from Panel 1",
-                        "value": "[\"Kotor Bay\", \"Lake Skadar\", \"Tara River\", \"Lefkada Island\", \"Shariqiya Sands\", \"Las Coloradas Lagoon\", \"Rio Sucuri\", \"Paraty\", \"Tarkine Rainforest\", \"Joshua Tree National Park\", \"Bisti/De-Na-Zin Wilderness\", \"Fansipan\", \"M\u00f9 Cang Ch\u1ea3i\", \"Tu Le Valley\", \"Mount Yoshino\", \"Arashiyama Bamboo Grove\", \"The Faroe Islands\", \"Petra\", \"Lake Como\", \"Saturnia\", \"Ilulissat Icefjord\", \"Raja Ampat\"]",
-                        "dependencies": [
-                            {
-                                "panel": 1,
-                                "step": 1
-                            }
-                        ]
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "country_heads_list",
-                        "description": "List of country heads for the beautiful places",
-                        "used_by": [
-                            {
-                                "panel": 3,
-                                "step": 1
-                            }
-                        ],
-                        "value": "```json\n    {\n      \"Kotor Bay\": \"President Jakov Milatovi\u0107 - Montenegro\",\n      \"Lake Skadar\": \"President Jakov Milatovi\u0107 - Montenegro, President Bajram Begaj - Albania\",\n      \"Tara River\": \"President Jakov Milatovi\u0107 - Montenegro, Presidency \u017deljko Kom\u0161i\u0107, Milorad Dodik, \u017deljka Cvijanovi\u0107 - Bosnia and Herzegovina\",\n      \"Lefkada Island\": \"President Katerina Sakellaropoulou - Greece\",\n      \"Shariqiya Sands\": \"King Salman bin Abdulaziz Al Saud - Saudi Arabia\",\n      \"Las Coloradas Lagoon\": \"President Andr\u00e9s Manuel L\u00f3pez Obrador - Mexico\",\n      \"Rio Sucuri\": \"President Luiz In\u00e1cio Lula da Silva - Brazil\",\n      \"Paraty\": \"President Luiz In\u00e1cio Lula da Silva - Brazil\",\n      \"Tarkine Rainforest\": \"Prime Minister Anthony Albanese - Australia\",\n      \"Joshua Tree National Park\": \"President Joe Biden - United States\",\n      \"Bisti/De-Na-Zin Wilderness\": \"President Joe Biden - United States\",\n      \"Fansipan\": \"President V\u00f5 V\u0103n Th\u01b0\u1edfng - Vietnam\",\n      \"M\u00f9 Cang Ch\u1ea3i\": \"President V\u00f5 V\u0103n Th\u01b0\u1edfng - Vietnam\",\n      \"Tu Le Valley\": \"President V\u00f5 V\u0103n Th\u01b0\u1edfng - Vietnam\",\n      \"Mount Yoshino\": \"Prime Minister Fumio Kishida - Japan\",\n      \"Arashiyama Bamboo Grove\": \"Prime Minister Fumio Kishida - Japan\",\n      \"The Faroe Islands\": \"King Frederik X - Denmark, Prime Minister Aksel V. Johannesen - Faroe Islands\",\n      \"Petra\": \"King Abdullah II - Jordan, Prime Minister Bisher Al-Khasawneh - Jordan\",\n      \"Lake Como\": \"President Sergio Mattarella - Italy, Prime Minister Giorgia Meloni - Italy\",\n      \"Saturnia\": \"President Sergio Mattarella - Italy, Prime Minister Giorgia Meloni - Italy\",\n      \"Ilulissat Icefjord\": \"King Frederik X - Denmark, Prime Minister M\u00fate Bourup Egede - Greenland\",\n      \"Raja Ampat\": \"President Joko Widodo - Indonesia\"\n    }\n    ```"
-                    }
-                ]
-            }
-        }
-    },
-    "3": {
-        "panel_description": "Display recent news about the country heads.",
-        "steps": {
-            "1": {
-                "api": "Perplexity",
-                "handles": "Gathers information about the country heads",
-                "input_vars": [
-                    {
-                        "name": "country_heads_list",
-                        "parameter": "query",
-                        "type": "string",
-                        "source": "API_Output (Panel 2, Step 1)",
-                        "description": "Names of country heads from Panel 2",
-                        "value": "```json\n    [\n      \"President Jakov Milatovi\u0107 - Montenegro\",\n      \"President Bajram Begaj - Albania\",\n      \"Presidency \u017deljko Kom\u0161i\u0107, Milorad Dodik, \u017deljka Cvijanovi\u0107 - Bosnia and Herzegovina\",\n      \"President Katerina Sakellaropoulou - Greece\",\n      \"King Salman bin Abdulaziz Al Saud - Saudi Arabia\",\n      \"President Andr\u00e9s Manuel L\u00f3pez Obrador - Mexico\",\n      \"President Luiz In\u00e1cio Lula da Silva - Brazil\",\n      \"Prime Minister Anthony Albanese - Australia\",\n      \"President Joe Biden - United States\",\n      \"President V\u00f5 V\u0103n Th\u01b0\u1edfng - Vietnam\",\n      \"Prime Minister Fumio Kishida - Japan\",\n      \"King Frederik X - Denmark\",\n      \"Prime Minister Aksel V. Johannesen - Faroe Islands\",\n      \"King Abdullah II - Jordan\",\n      \"Prime Minister Bisher Al-Khasawneh - Jordan\",\n      \"President Sergio Mattarella - Italy\",\n      \"Prime Minister Giorgia Meloni - Italy\",\n      \"Prime Minister M\u00fate Bourup Egede - Greenland\",\n      \"President Joko Widodo - Indonesia\"\n    ]\n    ```",
-                        "dependencies": [
-                            {
-                                "panel": 2,
-                                "step": 1
-                            }
-                        ]
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "country_heads_info",
-                        "description": "Information about the country heads",
+                        "name": "location_geoId",
+                        "description": "Geo ID for Chicago",
                         "used_by": [
                             {
                                 "panel": 3,
                                 "step": 2
                             }
                         ],
-                        "value": "```json\n    {\n      \"President Jakov Milatovi\u0107 - Montenegro\": {\n        \"Background\": \"Jakov Milatovi\u0107 is a Montenegrin politician and economist born on December 7, 1986. He is the current President of Montenegro, taking office in May 2023.\",\n        \"Political Career\": \"Before becoming president, Milatovi\u0107 served as the Minister of Economic Development in the cabinet of Zdravko Krivokapi\u0107 from 2020 to 2022. He was also an economist at the European Bank for Reconstruction and Development in London and Podgorica.\",\n        \"Presidency\": \"Milatovi\u0107 won the presidential election in a landslide victory against incumbent President Milo \u0110ukanovi\u0107 in April 2023, securing 58.88% of the popular vote. He is the youngest person to hold the office of president in independent Montenegro and the world's sixth-youngest serving state leader.\",\n        \"Political Positions\": \"Milatovi\u0107 supports Montenegro's accession to the European Union, advocates for closer relations with Serbia, and supports sanctioning Russia due to its invasion of Ukraine. He also supports the Open Balkan initiative and has emphasized improving living standards and tackling corruption.\",\n        \"Recent Activities\": \"Milatovi\u0107 has met with several international leaders, including Pope Francis and U.S. Senator Jim Risch. He has also stated that Montenegro could join the European Union by 2027 or 2028 and has condemned Russia's aggression against Ukraine.\"\n      },\n      \"President Bajram Begaj - Albania\": {\n        \"Background\": \"Bajram Begaj is the current President of Albania, taking office in July 2022. He is a retired general and was elected as the President of Albania by the Parliament.\"\n      },\n      \"Presidency \u017deljko Kom\u0161i\u0107, Milorad Dodik, \u017deljka Cvijanovi\u0107 - Bosnia and Herzegovina\": {\n        \"Background\": \"Bosnia and Herzegovina has a tripartite presidency, consisting of \u017deljko Kom\u0161i\u0107, Milorad Dodik, and \u017deljka Cvijanovi\u0107.\"\n      },\n      \"President Katerina Sakellaropoulou - Greece\": {\n        \"Background\": \"Katerina Sakellaropoulou is the current President of Greece, taking office in March 2020. She is the first female President of Greece and was previously the President of the Council of State.\"\n      },\n      \"King Salman bin Abdulaziz Al Saud - Saudi Arabia\": {\n        \"Background\": \"King Salman has been the King of Saudi Arabia since January 2015. He has been instrumental in various reforms and policies, including the Vision 2030 initiative aimed at diversifying the Saudi economy.\"\n      },\n      \"President Andr\u00e9s Manuel L\u00f3pez Obrador - Mexico\": {\n        \"Background\": \"Andr\u00e9s Manuel L\u00f3pez Obrador, often referred to as AMLO, has been the President of Mexico since December 2018. He is known for his populist policies and efforts to combat corruption and inequality.\"\n      },\n      \"President Luiz In\u00e1cio Lula da Silva - Brazil\": {\n        \"Background\": \"Luiz In\u00e1cio Lula da Silva, commonly known as Lula, is the current President of Brazil, having taken office in January 2023 for his third term. He previously served as President from 2003 to 2010.\"\n      },\n      \"Prime Minister Anthony Albanese - Australia\": {\n        \"Background\": \"Anthony Albanese has been the Prime Minister of Australia since May 2022. He is the leader of the Australian Labor Party and has focused on issues such as climate change, economic recovery, and social welfare.\"\n      },\n      \"President Joe Biden - United States\": {\n        \"Background\": \"Joe Biden is the current President of the United States, taking office in January 2021. He is a member of the Democratic Party and has been involved in various domestic and international policy initiatives, including climate change, healthcare, and foreign policy.\"\n      },\n      \"President V\u00f5 V\u0103n Th\u01b0\u1edfng - Vietnam\": {\n        \"Background\": \"V\u00f5 V\u0103n Th\u01b0\u1edfng is a Vietnamese politician who served as the 12th President of Vietnam from March 2, 2023, to March 21, 2024. He was the youngest president of Vietnam since the country's reunification, taking the office at the age of 52.\"\n      },\n      \"Prime Minister Fumio Kishida - Japan\": {\n        \"Background\": \"Fumio Kishida has been the Prime Minister of Japan since October 4, 2021. He is a member of the Liberal Democratic Party (LDP) and has been involved in Japanese politics for several decades.\"\n      },\n      \"King Frederik X - Denmark\": {\n        \"Background\": \"There is no current or historical figure known as King Frederik X of Denmark. The current monarch of Denmark is Queen Margrethe II, who has been on the throne since 1972.\"\n      },\n      \"Prime Minister Aksel V. Johannesen - Faroe Islands\": {\n        \"Background\": \"Aksel V. Johannesen is a Faroese politician who served as the Prime Minister of the Faroe Islands from 2015 to 2019. He is the leader of the Social Democratic Party (Javna\u00f0arflokkurin).\"\n      },\n      \"King Abdullah II - Jordan\": {\n        \"Background\": \"King Abdullah II has been the monarch of Jordan since February 7, 1999. He is known for his efforts in promoting peace and stability in the Middle East.\"\n      },\n      \"Prime Minister Bisher Al-Khasawneh - Jordan\": {\n        \"Background\": \"Bisher Al-Khasawneh has been the Prime Minister of Jordan since October 12, 2020. He is a veteran diplomat and has served in various high-profile positions.\"\n      },\n      \"President Sergio Mattarella - Italy\": {\n        \"Background\": \"Sergio Mattarella has been the President of Italy since February 3, 2015. He is a member of the Democratic Party and has a long career in Italian politics.\"\n      },\n      \"Prime Minister Giorgia Meloni - Italy\": {\n        \"Background\": \"Giorgia Meloni has been the Prime Minister of Italy since October 22, 2022. She is the leader of the Brothers of Italy (Fratelli d'Italia) party and the first woman to hold the office of Prime Minister in Italy.\"\n      },\n      \"Prime Minister M\u00fate Bourup Egede - Greenland\": {\n        \"Background\": \"M\u00fate Bourup Egede has been the Prime Minister of Greenland since April 23, 2021. He is the leader of the Inuit Ataqatigiit party, which advocates for Greenlandic independence from Denmark.\"\n      },\n      \"President Joko Widodo - Indonesia\": {\n        \"Background\": \"Joko Widodo, commonly known as Jokowi, has been the President of Indonesia since October 20, 2014. He was re-elected for a second term in 2019.\"\n      }\n    }\n    ```"
+                        "value": "35805"
                     }
                 ]
             },
             "2": {
-                "api": "NEWS_API",
-                "handles": "Fetches recent news articles about the country heads",
+                "api": "TripadvisorSearchHotels",
+                "handles": "Retrieves hotel options using geoId",
                 "input_vars": [
                     {
-                        "name": "country_heads_info",
-                        "parameter": "q",
+                        "name": "location_geoId",
+                        "parameter": "geoId",
                         "type": "string",
                         "source": "API_Output (Panel 3, Step 1)",
-                        "description": "Information about country heads from Perplexity",
-                        "value": "```json\n    {\n      \"President Jakov Milatovi\u0107 - Montenegro\": {\n        \"Background\": \"Jakov Milatovi\u0107 is a Montenegrin politician and economist born on December 7, 1986. He is the current President of Montenegro, taking office in May 2023.\",\n        \"Political Career\": \"Before becoming president, Milatovi\u0107 served as the Minister of Economic Development in the cabinet of Zdravko Krivokapi\u0107 from 2020 to 2022. He was also an economist at the European Bank for Reconstruction and Development in London and Podgorica.\",\n        \"Presidency\": \"Milatovi\u0107 won the presidential election in a landslide victory against incumbent President Milo \u0110ukanovi\u0107 in April 2023, securing 58.88% of the popular vote. He is the youngest person to hold the office of president in independent Montenegro and the world's sixth-youngest serving state leader.\",\n        \"Political Positions\": \"Milatovi\u0107 supports Montenegro's accession to the European Union, advocates for closer relations with Serbia, and supports sanctioning Russia due to its invasion of Ukraine. He also supports the Open Balkan initiative and has emphasized improving living standards and tackling corruption.\",\n        \"Recent Activities\": \"Milatovi\u0107 has met with several international leaders, including Pope Francis and U.S. Senator Jim Risch. He has also stated that Montenegro could join the European Union by 2027 or 2028 and has condemned Russia's aggression against Ukraine.\"\n      },\n      \"President Bajram Begaj - Albania\": {\n        \"Background\": \"Bajram Begaj is the current President of Albania, taking office in July 2022. He is a retired general and was elected as the President of Albania by the Parliament.\"\n      },\n      \"Presidency \u017deljko Kom\u0161i\u0107, Milorad Dodik, \u017deljka Cvijanovi\u0107 - Bosnia and Herzegovina\": {\n        \"Background\": \"Bosnia and Herzegovina has a tripartite presidency, consisting of \u017deljko Kom\u0161i\u0107, Milorad Dodik, and \u017deljka Cvijanovi\u0107.\"\n      },\n      \"President Katerina Sakellaropoulou - Greece\": {\n        \"Background\": \"Katerina Sakellaropoulou is the current President of Greece, taking office in March 2020. She is the first female President of Greece and was previously the President of the Council of State.\"\n      },\n      \"King Salman bin Abdulaziz Al Saud - Saudi Arabia\": {\n        \"Background\": \"King Salman has been the King of Saudi Arabia since January 2015. He has been instrumental in various reforms and policies, including the Vision 2030 initiative aimed at diversifying the Saudi economy.\"\n      },\n      \"President Andr\u00e9s Manuel L\u00f3pez Obrador - Mexico\": {\n        \"Background\": \"Andr\u00e9s Manuel L\u00f3pez Obrador, often referred to as AMLO, has been the President of Mexico since December 2018. He is known for his populist policies and efforts to combat corruption and inequality.\"\n      },\n      \"President Luiz In\u00e1cio Lula da Silva - Brazil\": {\n        \"Background\": \"Luiz In\u00e1cio Lula da Silva, commonly known as Lula, is the current President of Brazil, having taken office in January 2023 for his third term. He previously served as President from 2003 to 2010.\"\n      },\n      \"Prime Minister Anthony Albanese - Australia\": {\n        \"Background\": \"Anthony Albanese has been the Prime Minister of Australia since May 2022. He is the leader of the Australian Labor Party and has focused on issues such as climate change, economic recovery, and social welfare.\"\n      },\n      \"President Joe Biden - United States\": {\n        \"Background\": \"Joe Biden is the current President of the United States, taking office in January 2021. He is a member of the Democratic Party and has been involved in various domestic and international policy initiatives, including climate change, healthcare, and foreign policy.\"\n      },\n      \"President V\u00f5 V\u0103n Th\u01b0\u1edfng - Vietnam\": {\n        \"Background\": \"V\u00f5 V\u0103n Th\u01b0\u1edfng is a Vietnamese politician who served as the 12th President of Vietnam from March 2, 2023, to March 21, 2024. He was the youngest president of Vietnam since the country's reunification, taking the office at the age of 52.\"\n      },\n      \"Prime Minister Fumio Kishida - Japan\": {\n        \"Background\": \"Fumio Kishida has been the Prime Minister of Japan since October 4, 2021. He is a member of the Liberal Democratic Party (LDP) and has been involved in Japanese politics for several decades.\"\n      },\n      \"King Frederik X - Denmark\": {\n        \"Background\": \"There is no current or historical figure known as King Frederik X of Denmark. The current monarch of Denmark is Queen Margrethe II, who has been on the throne since 1972.\"\n      },\n      \"Prime Minister Aksel V. Johannesen - Faroe Islands\": {\n        \"Background\": \"Aksel V. Johannesen is a Faroese politician who served as the Prime Minister of the Faroe Islands from 2015 to 2019. He is the leader of the Social Democratic Party (Javna\u00f0arflokkurin).\"\n      },\n      \"King Abdullah II - Jordan\": {\n        \"Background\": \"King Abdullah II has been the monarch of Jordan since February 7, 1999. He is known for his efforts in promoting peace and stability in the Middle East.\"\n      },\n      \"Prime Minister Bisher Al-Khasawneh - Jordan\": {\n        \"Background\": \"Bisher Al-Khasawneh has been the Prime Minister of Jordan since October 12, 2020. He is a veteran diplomat and has served in various high-profile positions.\"\n      },\n      \"President Sergio Mattarella - Italy\": {\n        \"Background\": \"Sergio Mattarella has been the President of Italy since February 3, 2015. He is a member of the Democratic Party and has a long career in Italian politics.\"\n      },\n      \"Prime Minister Giorgia Meloni - Italy\": {\n        \"Background\": \"Giorgia Meloni has been the Prime Minister of Italy since October 22, 2022. She is the leader of the Brothers of Italy (Fratelli d'Italia) party and the first woman to hold the office of Prime Minister in Italy.\"\n      },\n      \"Prime Minister M\u00fate Bourup Egede - Greenland\": {\n        \"Background\": \"M\u00fate Bourup Egede has been the Prime Minister of Greenland since April 23, 2021. He is the leader of the Inuit Ataqatigiit party, which advocates for Greenlandic independence from Denmark.\"\n      },\n      \"President Joko Widodo - Indonesia\": {\n        \"Background\": \"Joko Widodo, commonly known as Jokowi, has been the President of Indonesia since October 20, 2014. He was re-elected for a second term in 2019.\"\n      }\n    }\n    ```",
+                        "description": "Geo ID for Chicago",
+                        "value": "35805",
                         "dependencies": [
                             {
                                 "panel": 3,
                                 "step": 1
                             }
                         ]
+                    },
+                    {
+                        "name": "check_in_date",
+                        "parameter": "checkIn",
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Check-in date",
+                        "value": "2024-10-10",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "check_out_date",
+                        "parameter": "checkOut",
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Check-out date",
+                        "value": "2024-10-15",
+                        "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "recent_news_articles",
-                        "description": "Recent news articles about the country heads",
+                        "name": "hotel_options_chicago",
+                        "description": "List of available hotels in Chicago",
                         "used_by": [],
-                        "value": "1. Title: Montenegro\u2019s PM Caught In Scandal Over Terra Founder Do Kwon Deal And Meetings\n       Description: In a recent interview, President Jakov Milatovi\u0107 of Montenegro accused Prime Minister Milojko Spaji\u0107 of lying about his knowledge of Do Kwon.\n       Url: https://bitcoinist.com/montenegros-pm-caught-in-scandal-over-do-kwon/\n    2. Title: Il presidente albanese, Bajram Begaj visita la Lettonia\n       Description: President Bajram Begaj of Albania visits Latvia.\n       Url: https://www.ansa.it/sito/photogallery/primopiano/2024/09/03/il-presidente-albanese-bajram-begaj-visita-la-lettonia_936b16de-329c-422b-a324-742b0f637795.html\n    3. Title: Saudi Crown Prince Condemns \u2018Crimes of Israeli Occupation,\u2019 Demands Palestinian State\n       Description: Crown Prince Mohammed bin Salman condemns the \u201ccrimes of the Israeli occupation\u201d against Palestinians.\n       Url: https://www.breitbart.com/middle-east/2024/09/19/saudi-crown-prince-condemns-crimes-of-israeli-occupation-demands-palestinian-state/\n    4. Title: L\u00f3pez Obrador critica \"la prepotencia y arrogancia\" de Espa\u00f1a\n       Description: Andr\u00e9s Manuel L\u00f3pez Obrador, president of Mexico, criticizes Spain's arrogance.\n       Url: https://www.elmundo.es/espana/2024/09/25/66f43b99e4d4d8ae568b4595.html\n    5. Title: Brazil President Lula Says X Ban Shows World Can Reject Elon Musk\u2019s \u201cFar-Right Anything Goes\u201d Agenda\n       Description: President Luiz In\u00e1cio Lula da Silva of Brazil comments on the clash with Elon Musk over social network X.\n       Url: http://deadline.com/2024/09/brazil-president-lula-elon-musk-far-right-free-for-all-1236077342/\n    6. Title: Australian PM announces plan to ban young children from social media\n       Description: Australian Prime Minister Anthony Albanese announces plans to ban children from using social media.\n       Url: https://www.aljazeera.com/program/newsfeed/2024/9/10/australian-pm-announces-plan-to-ban-young-children-from-social-media\n    7. Title: US takes aim at Shein and Temu with new import rule proposal\n       Description: The Biden administration addresses an import exemption companies use to avoid tariffs.\n       Url: https://www.theverge.com/2024/9/13/24243653/us-biden-shein-import-rules-de-minimis-loop-hole"
+                        "value": "```json\n    [\n      {\n        \"title\": \"The Blackstone, Autograph Collection\",\n        \"location\": \"Downtown / The Loop\",\n        \"rating\": 4.5,\n        \"reviews\": \"2,935\",\n        \"price\": \"$723\",\n        \"details\": \"Free cancellation \u2022 Reserve now, pay at stay\",\n        \"provider\": \"Booking.com\",\n        \"link\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=35114445&geo=841981&from=HotelDateSearch_Hotels&slot=1&matchID=1&oos=0&cnt=1&silo=47212&bucket=995258&nrank=1&crank=1&clt=SLMM&ttype=SponsoredMobileMeta&tm=307970517&managed=false&capped=false&gosox=mG_NRyap2SyPT34vYBrK6h-YTiWMn9QOrmIg-a_J_MbDzNQTKmSH_8ORiRn1gjv-FTBs5HL5K2eZhcfG3KARzY0JQ3sDZDTy6nC6RFGhsuiRqs0787sw6-L84qQLZWKPzom7N7xIg9r8VYbwpzEMqF1LK-8Juayx6LBOcEdWQmAhwZM3zRQMVqoSiOW2TDYT3f5-bjS6QxG8YSAoyk7icuxji-5Dkq5IZK2He5jyMDm5YaCJHuAxakmtfPZ2IOVLqpPQSActRw6Os63fv94AuA&priceShown=722&pm=AI&hac=AVAILABLE&mbl=MEET&mbldelta=0&rq=P&rate=615.0000&taxesRate=107.0200&feesRate=0&fees=107.0200&cur=USD&adults=1&child_rm_ages=&inDay=10&outDay=15&rdex=RDEX_a15c82fa0b718ae48a738f8f092cb56&rooms=1&inMonth=10&inYear=2024&outMonth=10&outYear=2024&auid=e59c5a0c-915b-4c69-8636-a2424936ae9d&def_d=true&bld=L_5,D_6,G_1,W_4,U_1,C_241010,T_12&bh=true&cs=1ae36b837ebbaf313836c1657e0a7c220&ik=773bcfeaf4a9453996ade8c7b68af5c1&aok=61ee9d844bc84d24867f4b2279d2c39c&tp=APS-Hotels&pageLocId=35805&area=Spons%7CSpons_Meta_Pref\"\n      },\n      {\n        \"title\": \"Swissotel Chicago\",\n        \"location\": \"Downtown / The Loop\",\n        \"rating\": 4.5,\n        \"reviews\": \"6,829\",\n        \"price\": \"$638\",\n        \"details\": \"Free cancellation \u2022 Reserve now, pay at stay\",\n        \"provider\": \"Booking.com\",\n        \"link\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=32448176&geo=114581&from=HotelDateSearch_Hotels&slot=1&matchID=1&oos=0&cnt=7&silo=10476&bucket=902999&nrank=1&crank=1&clt=M&ttype=MobileCR&tm=307970517&managed=false&capped=false&gosox=6vS60O_HgkBSaY7nhOEtdD_ZjUIvFgpEDJN1lcSPpCQfmE4ljJ_UDq5iIPmvyfzGDrABLAgrkm1j-FCdgAK9JFQwKJkrhD0K8M-kiFbZVqWNCUN7A2Q08upwukRRobLoGJbQdoaQYeoKlOBlpKXyutdiXvMKDpntYKkQ069GSZMf6Vkx7EZPzOsTe_iM_rpxZh5E5MOv-tSynoEyUq4QkGJ50vpp3V6gb_xJGRUPw3kjg1X0CimbTDwTF9nJFudx1dPZ3VPtaDRaSQtDHeZpeieqjlLxlYZLvW3SuRGZmsQ&priceShown=637&pm=AI&hac=AVAILABLE&mbl=LOSE&mbldelta=5400&rq=P&rate=517.7500&taxesRate=90.0900&feesRate=29.3500&fees=119.4400&cur=USD&adults=1&child_rm_ages=&inDay=10&outDay=15&rdex=RDEX_26e8bc1514411ca6a9025f000d4c7e79&rooms=1&inMonth=10&inYear=2024&outMonth=10&outYear=2024&auid=e90b2200-aee7-4a22-94db-c0f6aa18fec3&def_d=true&bld=L_5,D_6,G_1,W_4,U_1,C_241010,T_12&bh=true&cs=1d0e55d741080619cba1d2529b5590a0b&ik=773bcfeaf4a9453996ade8c7b68af5c1&aok=6bc3e8b31610407681ccff0d79632522&tp=APS-Hotels&pageLocId=35805\"\n      },\n      {\n        \"title\": \"The Royal Sonesta Chicago River North\",\n        \"location\": \"Near North Side\",\n        \"rating\": 4.5,\n        \"reviews\": \"3,539\",\n        \"price\": \"$533\",\n        \"details\": \"Free cancellation \u2022 Reserve now, pay at stay\",\n        \"provider\": \"Booking.com\",\n        \"link\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=33400293&geo=1566945&from=HotelDateSearch_Hotels&slot=1&matchID=1&oos=0&cnt=5&silo=10476&bucket=902999&nrank=1&crank=1&clt=M&ttype=MobileCR&tm=307970517&managed=false&capped=false&gosox=6vS60O_HgkBSaY7nhOEtdD_ZjUIvFgpEDJN1lcSPpCQfmE4ljJ_UDq5iIPmvyfzGVWLObS4NCXVtZuV4Zpqf6y2_zdjj7HGuvs4_ECLcdk6NCUN7A2Q08upwukRRobLosUX9CoS3ZVJaCCUuQski4ZF4Xm2A1z3Wml3Dwmr10dtuTIvJ5wZaAibn3AlHrSb5SkPdipmLZLlHmT39wnk_u1pI69GrjPPHLqPIb-9ZRAgjg1X0CimbTDwTF9nJFudx1dPZ3VPtaDRaSQtDHeZpeieqjlLxlYZLvW3SuRGZmsQ&priceShown=533&pm=AI&hac=AVAILABLE&mbl=LOSE&mbldelta=6700&rq=P&rate=426.4000&taxesRate=74.1900&feesRate=32.0000&fees=106.1900&cur=USD&adults=1&child_rm_ages=&inDay=10&outDay=15&rdex=RDEX_57f21f6a1d98800b13a9de7cfe44653&rooms=1&inMonth=10&inYear=2024&outMonth=10&outYear=2024&auid=85200907-a503-40ec-8e3d-07e9ed8f6e29&def_d=true&bld=L_5,D_6,G_1,W_4,U_1,C_241010,T_12&bh=true&cs=1f64693cc92afea657c930dd3a360f3d6&ik=773bcfeaf4a9453996ade8c7b68af5c1&aok=c1efef17b85144eda92fef27e27d1dac&tp=APS-Hotels&pageLocId=35805\"\n      },\n      {\n        \"title\": \"Virgin Hotels Chicago\",\n        \"location\": \"Downtown / The Loop\",\n        \"rating\": 4.5,\n        \"reviews\": \"3,603\",\n        \"price\": \"$518\",\n        \"details\": \"Free cancellation \u2022 Reserve now, pay at stay\",\n        \"provider\": \"Booking.com\",\n        \"link\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=65056708&geo=6883336&from=HotelDateSearch_Hotels&slot=1&matchID=1&oos=0&cnt=5&silo=10476&bucket=902999&nrank=1&crank=1&clt=M&ttype=MobileCR&tm=307970517&managed=false&capped=false&gosox=6vS60O_HgkBSaY7nhOEtdD_ZjUIvFgpEDJN1lcSPpCQfmE4ljJ_UDq5iIPmvyfzGyZeSt6FGfOoePtaAVLCL9pcD1bxKhFnyGdeiCqUWA3qNCUN7A2Q08upwukRRobLomIlUpCpeg7H6HFZ03SS_ZPpbZ9lu68uuBliCUMSmKdh28aJqabdlj5lLAcP9ZJqWd1lPKztknjB_jVd770iZqWJ50vpp3V6gb_xJGRUPw3kjg1X0CimbTDwTF9nJFudx1dPZ3VPtaDRaSQtDHeZpeieqjlLxlYZLvW3SuRGZmsQ&priceShown=518&pm=AI&hac=AVAILABLE&mbl=MEET&mbldelta=0&rq=ML&rate=416.1600&taxesRate=76.7600&feesRate=25.0000&fees=101.7600&cur=USD&adults=1&child_rm_ages=&inDay=10&outDay=15&rdex=RDEX_13e1cebc86aa124eddc5a00d217dc848&rooms=1&inMonth=10&inYear=2024&outMonth=10&outYear=2024&auid=a61cb0c9-0291-4163-9d20-e3134b6f68b4&def_d=true&bld=L_5,D_6,G_1,W_4,U_1,C_241010,T_12&bh=true&cs=14539d93a12be4ff1d03e2da3c3e9f2c5&ik=773bcfeaf4a9453996ade8c7b68af5c1&aok=582f1be447b6441e84d66c9f59dc082d&tp=APS-Hotels&pageLocId=35805\"\n      },\n      {\n        \"title\": \"Holiday Inn & Suites Chicago-Downtown, an IHG hotel\",\n        \"location\": \"West Side\",\n        \"rating\": 4,\n        \"reviews\": \"998\",\n        \"price\": \"$413\",\n        \"details\": \"Free cancellation \u2022 Reserve now, pay at stay\",\n        \"provider\": \"Booking.com\",\n        \"link\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=32501587&geo=90969&from=HotelDateSearch_Hotels&slot=1&matchID=1&oos=0&cnt=5&silo=10476&bucket=902999&nrank=1&crank=1&clt=M&ttype=MobileCR&tm=307970517&managed=false&capped=false&gosox=6vS60O_HgkBSaY7nhOEtdD_ZjUIvFgpEDJN1lcSPpCQfmE4ljJ_UDq5iIPmvyfzGQ91tX9U-jreHQQXFOkwyZpsf56Q4HxcI1Verjm9J6DiNCUN7A2Q08upwukRRobLoc6YQphxOswtz3Jk_km5Bp3nEX_JllJuCOfmL2ovcbCkTivSIZ8b23DbDeizz2p4OkmIjloNbmQzwyaEMu19V5GVc6-0tRLxrm0EIslr9fNvsY4vuQ5KuSGSth3uY8jA5uWGgiR7gMWpJrXz2diDlS6qT0EgHLUcOjrOt37_eALg&priceShown=412&pm=AI&hac=AVAILABLE&mbl=MEET&mbldelta=0&rq=P&rate=342.8000&taxesRate=59.6500&feesRate=10.0000&fees=69.6500&cur=USD&adults=1&child_rm_ages=&inDay=10&outDay=15&rdex=RDEX_53bb27e1b93eb5c0b2dbb15f6c0f44f&rooms=1&inMonth=10&inYear=2024&outMonth=10&outYear=2024&auid=a861e85b-7192-42f5-8262-ad24586690f3&def_d=true&bld=L_5,D_6,G_1,W_4,U_1,C_241010,T_12&bh=true&cs=1acf4cd15385dee3c0101a1c7d10b2537&ik=773bcfeaf4a9453996ade8c7b68af5c1&aok=49090d9c1de844a7a25546ccb4f04083&tp=APS-Hotels&pageLocId=35805\"\n      }\n    ]\n    ```"
                     }
                 ]
             }

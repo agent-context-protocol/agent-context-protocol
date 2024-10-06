@@ -1,0 +1,81 @@
+{
+    "3": {
+        "3": {
+            "panel_description": "Retrieve hotel options in Chicago for specified dates.",
+            "steps": {
+                "1": {
+                    "api": "TripadvisorSearchLocation",
+                    "handles": "Retrieves geoId for Chicago",
+                    "input_vars": [
+                        {
+                            "name": "chicago_location_query",
+                            "parameter": "query",
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Search query for Chicago",
+                            "value": "Chicago",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "chicago_geoId",
+                            "description": "Geo ID for Chicago",
+                            "used_by": [
+                                {
+                                    "panel": 3,
+                                    "step": 2
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "TripadvisorSearchHotels",
+                    "handles": "Retrieves hotel options using geoId",
+                    "input_vars": [
+                        {
+                            "name": "chicago_geoId",
+                            "parameter": "geoId",
+                            "type": "string",
+                            "source": "API_Output (Panel 3, Step 1)",
+                            "description": "Geo ID for Chicago",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "panel": 3,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "check_in_date",
+                            "parameter": "checkIn",
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Check-in date",
+                            "value": "2023-12-01",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "check_out_date",
+                            "parameter": "checkOut",
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Check-out date",
+                            "value": "2023-12-05",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "chicago_hotel_options",
+                            "description": "List of available hotels in Chicago",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

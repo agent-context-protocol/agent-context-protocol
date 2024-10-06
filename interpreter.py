@@ -10,11 +10,32 @@ class InterpreterNode(BaseNode):
             data = json.load(file)
         self.personal_json = data
 
+    def create_available_api_string(self):
+        # Load the dictionary from the JSON file
+        with open('./external_env_details/brief_details.json', 'r') as file:
+            api_details = json.load(file)
+
+        # Start the string with "Available APIs"
+        result_string = "Available APIs\n\n"
+
+        # Loop through the dictionary and format each API's details
+        for api_name, details in api_details.items():
+            result_string += f"{api_name}:\n"
+            for key, value in details.items():
+                result_string += f"  {key}: {value}\n"
+            result_string += "\n"
+
+        return result_string
+
+
     def setup(self):
         if self.user_query:
             initial_message = fetch_user_data(self.personal_json, self.user_query)
             print('User Context: ',initial_message)
             self.chat_history.append({"role": "user", "content": initial_message})
+            available_api_string = self.create_available_api_string()
+            print("available_api_string : ",available_api_string)
+            self.chat_history.append({"role": "user", "content": available_api_string})
             output = self.generate()
             print(output)
             output = self.modify_message(output)

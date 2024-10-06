@@ -2,6 +2,8 @@ from base import BaseNode
 import re
 import json
 import asyncio
+from available_apis.rapid_apis_format.return_dict import RAPID_APIS_DICT
+from available_apis.function_format.return_dict import FUNCTION_APIS_DOCUMENTATION_DICT
 
 class MainTranslatorNode(BaseNode):
     def __init__(self, node_name, system_prompt = None):
@@ -26,7 +28,7 @@ class MainTranslatorNode(BaseNode):
     ########################
     # ALL THE PARSING FUNCTIONS WILL BE HERE
 
-    def parse_main_translator_workflow(self, text):
+    def parse_main_translator_workflow(self, text, restrict_one_group = False):
         # First, split the text into CHAIN_OF_THOUGHT and WORKFLOW sections
         sections = re.split(r"\$\$WORKFLOW\$\$", text)
         if len(sections) != 2:
@@ -368,8 +370,8 @@ class MainTranslatorNode(BaseNode):
                 # Store the unique APIs in the dictionary
                 if api['api_name'] not in unique_apis:
                     unique_apis[api['api_name']] = {
-                        "Input": api.get('Input', 'N/A'),
-                        "Output": api.get('Output', 'N/A'),
+                        # "Input": api.get('Input', 'N/A'),
+                        # "Output": api.get('Output', 'N/A'),
                         "Use": api.get('Use', 'N/A')
                     }
             formatted_string += "\n"  # Add a newline after each panel
@@ -380,12 +382,20 @@ class MainTranslatorNode(BaseNode):
         formatted_string += "**Description of APIs:**\n"
         api_id = 1
         for api_name, api_details in unique_apis.items():
-            formatted_string += (
-                f"{api_id}. {api_name}\n"
-                f"   - **Input:** {api_details['Input']}\n"
-                f"   - **Output:** {api_details['Output']}\n"
-                f"   - **Use:** {api_details['Use']}\n\n"
-            )
+            if api_name in RAPID_APIS_DICT:
+                formatted_string += (
+                    f"{api_id}. {api_name}\n"
+                    f"   - **Use:** {api_details['Use']}\n\n"
+                    f"   - **Documentation:** {RAPID_APIS_DICT[api_name]}\n\n"
+                )
+            elif api_name in FUNCTION_APIS_DOCUMENTATION_DICT:
+                formatted_string += (
+                    f"{api_id}. {api_name}\n"
+                    f"   - **Use:** {api_details['Use']}\n\n"
+                    f"   - **Documentation:** {FUNCTION_APIS_DOCUMENTATION_DICT[api_name]}\n\n"
+                )
+            else:
+                raise ValueError(f"Invalid API Name {api_name}. It is not there in RAPID_APIS_DICT or FUNCTION_APIS_FUNCTION_DICT. This error is inside create_first_input_data")
             api_id += 1
 
         return formatted_string
@@ -431,21 +441,27 @@ class MainTranslatorNode(BaseNode):
             result.append("Available API Descriptions:\n")
             api_id = 1
             for api_name, api_details in self.unique_apis.items():
-                result.append(f"{api_id}. {api_name}")
-                result.append(f"   - **Input:** {api_details['Input']}")
-                result.append(f"   - **Output:** {api_details['Output']}")
-                result.append(f"   - **Use:** {api_details['Use']}\n")
-                api_id += 1
+                if api_name in RAPID_APIS_DICT:
+                    result.append(f"{api_id}. {api_name}")
+                    result.append(f"   - **Use:** {api_details['Use']}\n")
+                    result.append(f"   - **Documentation:** {RAPID_APIS_DICT[api_name]}\n")
+                    api_id += 1
+                elif api_name in FUNCTION_APIS_DOCUMENTATION_DICT:
+                    result.append(f"{api_id}. {api_name}")
+                    result.append(f"   - **Use:** {api_details['Use']}\n")
+                    result.append(f"   - **Documentation:** {FUNCTION_APIS_DOCUMENTATION_DICT[api_name]}\n")
+                    api_id += 1
+                else:
+                    raise ValueError(f"Invalid API Name {api_name}. It is not there in RAPID_APIS_DICT or FUNCTION_APIS_FUNCTION_DICT. This error is inside create_first_input_data")
             result.append("\n")  # Add spacing
 
         # Add Status Update section
         result.append("Status Update:\n")
-        result.append(status_update_dict['status_update']['string'])
+        result.append(status_update_dict['status_update'])
 
         # Add Assistance Request section if present
-        if status_update_dict.get('assistance_request') and status_update_dict['assistance_request'].get('string'):
-            result.append("\nAssistance Request:\n")
-            result.append(status_update_dict['assistance_request']['string'])
+        result.append("\nAssistance Request:\n")
+        result.append(status_update_dict['assistance_request'])
 
         # Return the final formatted string
         return "\n".join(result)
@@ -458,13 +474,15 @@ class MainTranslatorNode(BaseNode):
         print("\nformatted_string : \n",formatted_string)
 
         # generating the workflow from the LLM
-        self.chat_history.append({"role": "system", "content": self.workflow_creation_prompt}) # system prompt for workflow_creation
+        self.chat_history.append({"role": "user", "content": self.workflow_creation_prompt}) # system prompt for workflow_creation
         self.chat_history.append({"role": "user", "content": formatted_string})
         run_success = False
         counter = 0
         while not run_success and counter < 5:
             try:
                 llm_response_workflow = self.generate()
+                llm_response_workflow = llm_response_workflow.replace("**", "")
+                llm_response_workflow = llm_response_workflow.replace("`", "")
                 print("llm_response_workflow : \n",llm_response_workflow)
                 _, workflow_dict = self.parse_main_translator_workflow(llm_response_workflow)
                 run_success = True
@@ -498,6 +516,7 @@ class MainTranslatorNode(BaseNode):
                     await asyncio.sleep(0.1)
                     continue
                 status_update_dict, local_translator_id, local_translator_object = await self.queue.get()
+                print("status_update_dict : ",status_update_dict)
                 
                 # Process the update here
                 # This is where you'd put the logic to handle the communication
@@ -509,7 +528,8 @@ class MainTranslatorNode(BaseNode):
                 status_assistance_llm_input = self.make_input_status_update(local_translator_object.group_workflow, status_update_dict)
 
                 # generating the workflow from the LLM
-                self.chat_history.append({"role": "system", "content": self.status_assistance_prompt}) # system prompt for workflow_creation
+                self.chat_history.append({"role": "user", "content": self.status_assistance_prompt}) # system prompt for workflow_creation
+
                 self.chat_history.append({"role": "user", "content": status_assistance_llm_input})
 
                 run_success = False
@@ -518,6 +538,8 @@ class MainTranslatorNode(BaseNode):
                     counter += 1
                     try:
                         updated_workflow = self.generate()
+                        updated_workflow = updated_workflow.replace("**", "")
+                        updated_workflow = updated_workflow.replace("`", "")
                         print("updated_workflow : ",updated_workflow)
                         parsed_updated_workflow = self.parse_status_assistance_output(updated_workflow)
                         print("parsed_updated_workflow : ", parsed_updated_workflow)
@@ -535,7 +557,11 @@ class MainTranslatorNode(BaseNode):
                     print('Sent Request to Drop Panel')
                 elif parsed_updated_workflow['chosen_action'] == "MODIFY":
                     local_translator_object.modify = True
-                    local_translator_object.group_workflow = parsed_updated_workflow['workflow']
+                    with open(f"updated_workflow_group_{local_translator_object.group_id}.json", "w") as json_file:
+                        json.dump(parsed_updated_workflow['workflow'], json_file, indent=4)
+                    with open("workflow.json", "r") as json_file:
+                        updated_workflow_dict = json.load(json_file)
+                    local_translator_object.group_workflow = updated_workflow_dict
                 else:
                     raise ValueError("The chosen_action key must specify either MODIFY or DROP_PANEL.")
                 

@@ -1,0 +1,31 @@
+{
+    "1": {
+        "2": {
+            "panel_description": "Provide weather and news for each vacation spot.",
+            "steps": {
+                "1": {
+                    "api": "Perplexity",
+                    "handles": "Fetches news articles for each vacation spot",
+                    "input_vars": [
+                        {
+                            "name": "news_query",
+                            "parameter": "query",
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Vacation spot names for news search",
+                            "value": "News about Rome, Italy; Venice, Italy; Prague, Czech Republic; Dubrovnik, Croatia; Budapest, Hungary",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "news_articles",
+                            "description": "News articles for each vacation spot",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

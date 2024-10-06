@@ -23,6 +23,7 @@ class Manager:
                     main_translator=self.main_translator
                 )
                 translator.group_workflow = group_data
+                translator.group_id = group_id
                 translator.panel_workflow = translator_data["steps"]
                 self.local_translators[translator_id] = translator
                 group_translators.append(translator)
