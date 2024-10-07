@@ -97,6 +97,8 @@ class StreamlitOrchestrator:
         st.markdown('</div>', unsafe_allow_html=True)
 
     async def run_orchestrator(self, user_query, workflow):
+        # # Re initialize the orchasterator
+        # self.orchestrator = MainOrchestrator()
         # Display the group panels
         self.create_group_sections(workflow)
 

@@ -1,27 +1,160 @@
 {
     "1": {
-        "panel_description": "Retrieve current weather information for Los Angeles.",
+        "panel_description": "Create a detailed itinerary for a trip to Sydney from October 15th to October 20th, 2024, based on the weather forecast.",
         "steps": {
             "1": {
-                "api": "WeatherAPI.com_Realtime_Weather_Api",
-                "handles": "Fetches current weather data for Los Angeles",
+                "api": "Perplexity",
+                "handles": "Fetches latitude and longitude for Sydney",
                 "input_vars": [
                     {
-                        "name": "city_name",
-                        "parameter": "q",
+                        "name": "query_sydney_coordinates",
+                        "parameter": [
+                            "query"
+                        ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "City name for weather query",
-                        "value": "Los Angeles",
+                        "description": "Query to find latitude and longitude of Sydney",
+                        "value": "What is the latitude and longitude of Sydney?",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "current_weather_la",
-                        "description": "Current weather details for Los Angeles",
+                        "name": "sydney_coordinates",
+                        "description": "Latitude and longitude of Sydney",
+                        "used_by": [
+                            {
+                                "panel": 1,
+                                "step": 2
+                            }
+                        ],
+                        "value": "\"-33.86785,151.20732\""
+                    }
+                ]
+            },
+            "2": {
+                "api": "WeatherAPI.com_Forecast_Weather_API",
+                "handles": "Fetches weather forecast for Sydney",
+                "input_vars": [
+                    {
+                        "name": "sydney_coordinates",
+                        "parameter": [
+                            "q"
+                        ],
+                        "type": "string",
+                        "source": "API_Output (Panel 1, Step 1)",
+                        "description": "Latitude and longitude of Sydney",
+                        "value": "\"-33.86785,151.20732\"",
+                        "dependencies": [
+                            {
+                                "panel": 1,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "forecast_dates",
+                        "parameter": [
+                            "dt"
+                        ],
+                        "type": "date",
+                        "source": "LLM_Generated",
+                        "description": "Dates for the weather forecast",
+                        "value": "[\"2024-10-15\", \"2024-10-16\", \"2024-10-17\", \"2024-10-18\", \"2024-10-19\", \"2024-10-20\"]",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "weather_forecast",
+                        "description": "Weather forecast for Sydney",
                         "used_by": [],
-                        "value": "```json\n    {\n      \"location\": {\n        \"name\": \"Los Angeles\",\n        \"region\": \"California\",\n        \"country\": \"United States of America\",\n        \"latitude\": 34.0522,\n        \"longitude\": -118.2428,\n        \"timezone\": \"America/Los_Angeles\",\n        \"localtime\": \"2024-10-04 09:17\"\n      },\n      \"current_weather\": {\n        \"temperature_c\": 22.1,\n        \"temperature_f\": 71.8,\n        \"condition\": \"Sunny\",\n        \"wind_speed_mph\": 2.2,\n        \"wind_speed_kph\": 3.6,\n        \"wind_direction\": \"SW\",\n        \"humidity\": 65,\n        \"pressure_mb\": 1015.0,\n        \"pressure_in\": 29.96,\n        \"precipitation_mm\": 0.0,\n        \"precipitation_in\": 0.0,\n        \"feels_like_c\": 24.6,\n        \"feels_like_f\": 76.2,\n        \"visibility_km\": 16.0,\n        \"visibility_miles\": 9.0,\n        \"uv_index\": 6.0\n      }\n    }\n    ```"
+                        "value": "```json\n    {\n      \"2024-10-15\": {\n        \"maxtemp_c\": 19.9,\n        \"mintemp_c\": 13.8,\n        \"condition\": \"Patchy rain nearby\",\n        \"chance_of_rain\": 88,\n        \"uv\": 5.0\n      },\n      \"2024-10-16\": {\n        \"maxtemp_c\": 19.6,\n        \"mintemp_c\": 15.8,\n        \"condition\": \"Patchy rain nearby\",\n        \"chance_of_rain\": 84,\n        \"uv\": 5.0\n      },\n      \"2024-10-17\": {\n        \"maxtemp_c\": 21.7,\n        \"mintemp_c\": 16.1,\n        \"condition\": \"Patchy rain nearby\",\n        \"chance_of_rain\": 83,\n        \"uv\": 5.0\n      },\n      \"2024-10-18\": {\n        \"maxtemp_c\": 20.5,\n        \"mintemp_c\": 16.4,\n        \"condition\": \"Patchy rain nearby\",\n        \"chance_of_rain\": 85,\n        \"uv\": 5.0\n      },\n      \"2024-10-19\": {\n        \"maxtemp_c\": 19.0,\n        \"mintemp_c\": 16.4,\n        \"condition\": \"Patchy rain nearby\",\n        \"chance_of_rain\": 78,\n        \"uv\": 5.0\n      }\n    }\n    ```"
+                    }
+                ]
+            },
+            "3": {
+                "api": "TripadvisorSearchLocation",
+                "handles": "Retrieves geoId for Sydney",
+                "input_vars": [
+                    {
+                        "name": "location_query",
+                        "parameter": [
+                            "query"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Search query for Sydney",
+                        "value": "Sydney",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "location_geoId",
+                        "description": "Geo ID for Sydney",
+                        "used_by": [
+                            {
+                                "panel": 1,
+                                "step": 4
+                            }
+                        ],
+                        "value": "3323314"
+                    }
+                ]
+            },
+            "4": {
+                "api": "TripadvisorSearchRestaurants",
+                "handles": "Searches for recommended restaurants in Sydney",
+                "input_vars": [
+                    {
+                        "name": "location_geoId",
+                        "parameter": [
+                            "locationId"
+                        ],
+                        "type": "string",
+                        "source": "API_Output (Panel 1, Step 3)",
+                        "description": "Geo ID for Sydney",
+                        "value": "3323314",
+                        "dependencies": [
+                            {
+                                "panel": 1,
+                                "step": 3
+                            }
+                        ]
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "recommended_restaurants",
+                        "description": "List of recommended restaurants in Sydney",
+                        "used_by": [],
+                        "value": "```json\n    [\n      {\n        \"name\": \"Bacar Restaurant & Bar\",\n        \"averageRating\": 4,\n        \"userReviewCount\": 249,\n        \"status\": \"Open now\",\n        \"priceTag\": \"$$$$\",\n        \"menuUrl\": \"https://www.pullmansydneyolympicpark.com.au/en/restaurants-and-bars/bacar-restaurant-sydney.html\",\n        \"cuisine\": [\"Australian\"],\n        \"heroImgUrl\": \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/14/0e/71/e4/bacar-restaurant-bar.jpg?w=2000&h=1300&s=1\",\n        \"reviewSnippet\": {\n          \"text\": \"The staff at the Pullman are so polite and friendly and the food was great...\",\n          \"url\": \"https://www.tripadvisor.com/ShowUserReviews-g3323314-d1177099-r773632906-Bacar_Restaurant_Bar-Sydney_Olympic_Park_Auburn_Greater_Sydney_New_South_Wales.html\"\n        }\n      },\n      {\n        \"name\": \"Hi Thai Restaurant\",\n        \"averageRating\": 4,\n        \"userReviewCount\": 210,\n        \"status\": \"Open now\",\n        \"priceTag\": \"$$ - $$$\",\n        \"menuUrl\": \"http://hithai.com.au/our-menu/\",\n        \"cuisine\": [\"Asian\", \"Thai\"],\n        \"heroImgUrl\": \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0b/10/5d/b2/img-20160428-141317-largejpg.jpg?w=700&h=700&s=1\",\n        \"reviewSnippet\": {\n          \"text\": \"Visited Hi-Thai with a large group (20+) and service was fast despite there...\",\n          \"url\": \"https://www.tripadvisor.com/ShowUserReviews-g3323314-d5111436-r658317881-Hi_Thai_Restaurant-Sydney_Olympic_Park_Auburn_Greater_Sydney_New_South_Wales.html\"\n        }\n      },\n      {\n        \"name\": \"Abattoir Blues\",\n        \"averageRating\": 4,\n        \"userReviewCount\": 142,\n        \"status\": \"Closed now\",\n        \"priceTag\": \"$$ - $$$\",\n        \"menuUrl\": \"https://www.mryum.com/abattoirblues/menu\",\n        \"cuisine\": [],\n        \"heroImgUrl\": \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2b/2c/a4/94/speciality-house-roasted.jpg?w=1200&h=1200&s=1\",\n        \"reviewSnippet\": {\n          \"text\": \"Situated in the heart of the Olympic Park precinct is this great eatery where...\",\n          \"url\": \"https://www.tripadvisor.com/ShowUserReviews-g3323314-d4402705-r722649704-Abattoir_Blues-Sydney_Olympic_Park_Auburn_Greater_Sydney_New_South_Wales.html\"\n        }\n      },\n      {\n        \"name\": \"Thai Palate\",\n        \"averageRating\": 4.5,\n        \"userReviewCount\": 87,\n        \"priceTag\": \"$$ - $$$\",\n        \"menuUrl\": \"http://thaipalate.com.au/menu.php\",\n        \"cuisine\": [\"Asian\", \"Thai\"],\n        \"heroImgUrl\": \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/16/58/6d/75/photo0jpg.jpg?w=2000&h=1500&s=1\",\n        \"reviewSnippet\": {\n          \"text\": \"The food always taste so good and the customer service is amazing. Will...\",\n          \"url\": \"https://www.tripadvisor.com/ShowUserReviews-g3323314-d10134716-r717556238-Thai_Palate-Sydney_Olympic_Park_Auburn_Greater_Sydney_New_South_Wales.html\"\n        }\n      },\n      {\n        \"name\": \"Piccolo Roma\",\n        \"averageRating\": 4,\n        \"userReviewCount\": 181,\n        \"status\": \"Open now\",\n        \"priceTag\": \"$$ - $$$\",\n        \"cuisine\": [\"Italian\", \"Pizza\"],\n        \"heroImgUrl\": \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/19/de/1b/d1/photo2jpg.jpg?w=2000&h=1500&s=1\",\n        \"reviewSnippet\": {\n          \"text\": \"Friendly staff. Food was great & reasonably priced. No coffee available after...\",\n          \"url\": \"https://www.tripadvisor.com/ShowUserReviews-g3323314-d2554748-r786268245-Piccolo_Roma-Sydney_Olympic_Park_Auburn_Greater_Sydney_New_South_Wales.html\"\n        }\n      }\n    ]\n    ```"
+                    }
+                ]
+            },
+            "5": {
+                "api": "Perplexity",
+                "handles": "Gathers information on activities and attractions in Sydney",
+                "input_vars": [
+                    {
+                        "name": "activities_query",
+                        "parameter": [
+                            "query"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Query for activities and attractions in Sydney",
+                        "value": "Activities and attractions in Sydney for a young AI Security Researcher",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "activities_info",
+                        "description": "Information on activities and attractions in Sydney",
+                        "used_by": [],
+                        "value": "```json\n    {\n      \"AI and Cybersecurity Events\": [\n        {\n          \"Event\": \"Ignite On Tour Sydney 2024\",\n          \"Description\": \"Focused on cybersecurity for the AI era, organized by Palo Alto Networks.\"\n        },\n        {\n          \"Event\": \"Workshops and Conferences at Macquarie University\",\n          \"Description\": \"Covers topics such as AI-enabled security, big data analytics, and intelligence-led policing.\"\n        },\n        {\n          \"Event\": \"AI and Machine Learning Workshops\",\n          \"Description\": \"Includes 'Artificial Intelligence / Machine Learning 3 Days Workshop' and 'Algorythm / Empower your profession with AI'.\"\n        }\n      ],\n      \"Research Centers and Institutions\": [\n        {\n          \"Center\": \"Sydney Artificial Intelligence Centre\",\n          \"Description\": \"Dedicated to advancing AI research at the University of Sydney.\"\n        }\n      ],\n      \"Unique Attractions and Experiences\": [\n        {\n          \"Attraction\": \"'Forgotten Songs' Sound Sculpture\",\n          \"Description\": \"A unique sound installation related to data and sound analysis.\"\n        },\n        {\n          \"Attraction\": \"Thylacine Taxidermy and Other Unusual Attractions\",\n          \"Description\": \"Offers a glimpse into Sydney's quirky side.\"\n        }\n      ],\n      \"Networking Opportunities\": [\n        {\n          \"Event\": \"IT Social Sydney\",\n          \"Description\": \"Brings together professionals in data, technology, cybersecurity, and IT.\"\n        }\n      ],\n      \"Educational and Cultural Experiences\": [\n        {\n          \"Experience\": \"Royal Botanic Gardens, Sydney\",\n          \"Description\": \"A peaceful spot offering a contrast to technology.\"\n        },\n        {\n          \"Experience\": \"Aboriginal Food and Culture\",\n          \"Description\": \"Experience traditional 'bush tucker' dishes.\"\n        }\n      ]\n    }\n    ```"
                     }
                 ]
             }

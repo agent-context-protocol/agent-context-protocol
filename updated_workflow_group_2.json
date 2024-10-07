@@ -1,26 +1,28 @@
 {
     "2": {
         "2": {
-            "panel_description": "Provide weather forecast for Chicago from October 10th to October 15th.",
+            "panel_description": "Provide a list of available hotels in Machu Picchu for the dates October 15th to 20th, 2024.",
             "steps": {
                 "1": {
                     "api": "Perplexity",
-                    "handles": "Retrieves weather forecast for Chicago for specified dates",
+                    "handles": "Searches for hotel options in Machu Picchu for the specified dates.",
                     "input_vars": [
                         {
-                            "name": "query_forecast_data",
-                            "parameter": "query",
+                            "name": "hotel_search_query",
+                            "parameter": [
+                                "query"
+                            ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to get weather forecast for Chicago from October 10th to October 15th",
-                            "value": "Weather forecast for Chicago from October 10th to October 15th",
+                            "description": "Query to find hotel options in Machu Picchu from October 15th to October 20th, 2024.",
+                            "value": "Find hotel options in Machu Picchu from October 15th to October 20th, 2024.",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "chicago_weather_forecast",
-                            "description": "Weather forecast for Chicago for specified dates",
+                            "name": "hotel_options",
+                            "description": "List of available hotels in Machu Picchu",
                             "used_by": []
                         }
                     ]

@@ -1,78 +1,64 @@
 {
     "3": {
-        "panel_description": "Retrieve hotel options in Chicago for specified dates.",
+        "panel_description": "List top-rated restaurants in Vancouver with delivery services.",
         "steps": {
             "1": {
                 "api": "TripadvisorSearchLocation",
-                "handles": "Retrieves geoId for Chicago",
+                "handles": "Retrieves geoId for Vancouver",
                 "input_vars": [
                     {
                         "name": "location_query",
-                        "parameter": "query",
+                        "parameter": [
+                            "query"
+                        ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Search query for Chicago",
-                        "value": "Chicago",
+                        "description": "Search query for Vancouver",
+                        "value": "Vancouver",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "location_geoId",
-                        "description": "Geo ID for Chicago",
+                        "name": "vancouver_geoId",
+                        "description": "GeoId for Vancouver",
                         "used_by": [
                             {
                                 "panel": 3,
                                 "step": 2
                             }
                         ],
-                        "value": "35805"
+                        "value": "154943"
                     }
                 ]
             },
             "2": {
-                "api": "TripadvisorSearchHotels",
-                "handles": "Retrieves hotel options using geoId",
+                "api": "TripadvisorSearchRestaurants",
+                "handles": "Searches for restaurants with delivery",
                 "input_vars": [
                     {
-                        "name": "location_geoId",
-                        "parameter": "geoId",
+                        "name": "vancouver_geoId",
+                        "parameter": [
+                            "locationId"
+                        ],
                         "type": "string",
                         "source": "API_Output (Panel 3, Step 1)",
-                        "description": "Geo ID for Chicago",
-                        "value": "35805",
+                        "description": "GeoId for Vancouver",
+                        "value": "154943",
                         "dependencies": [
                             {
                                 "panel": 3,
                                 "step": 1
                             }
                         ]
-                    },
-                    {
-                        "name": "check_in_date",
-                        "parameter": "checkIn",
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Check-in date",
-                        "value": "2024-10-10",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "check_out_date",
-                        "parameter": "checkOut",
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Check-out date",
-                        "value": "2024-10-15",
-                        "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "hotel_options_chicago",
-                        "description": "List of available hotels in Chicago",
+                        "name": "restaurants_with_delivery",
+                        "description": "List of top-rated restaurants with delivery options",
                         "used_by": [],
-                        "value": "```json\n    [\n      {\n        \"title\": \"The Blackstone, Autograph Collection\",\n        \"location\": \"Downtown / The Loop\",\n        \"rating\": 4.5,\n        \"reviews\": \"2,935\",\n        \"price\": \"$723\",\n        \"details\": \"Free cancellation \u2022 Reserve now, pay at stay\",\n        \"provider\": \"Booking.com\",\n        \"link\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=35114445&geo=841981&from=HotelDateSearch_Hotels&slot=1&matchID=1&oos=0&cnt=1&silo=47212&bucket=995258&nrank=1&crank=1&clt=SLMM&ttype=SponsoredMobileMeta&tm=307970517&managed=false&capped=false&gosox=mG_NRyap2SyPT34vYBrK6h-YTiWMn9QOrmIg-a_J_MbDzNQTKmSH_8ORiRn1gjv-FTBs5HL5K2eZhcfG3KARzY0JQ3sDZDTy6nC6RFGhsuiRqs0787sw6-L84qQLZWKPzom7N7xIg9r8VYbwpzEMqF1LK-8Juayx6LBOcEdWQmAhwZM3zRQMVqoSiOW2TDYT3f5-bjS6QxG8YSAoyk7icuxji-5Dkq5IZK2He5jyMDm5YaCJHuAxakmtfPZ2IOVLqpPQSActRw6Os63fv94AuA&priceShown=722&pm=AI&hac=AVAILABLE&mbl=MEET&mbldelta=0&rq=P&rate=615.0000&taxesRate=107.0200&feesRate=0&fees=107.0200&cur=USD&adults=1&child_rm_ages=&inDay=10&outDay=15&rdex=RDEX_a15c82fa0b718ae48a738f8f092cb56&rooms=1&inMonth=10&inYear=2024&outMonth=10&outYear=2024&auid=e59c5a0c-915b-4c69-8636-a2424936ae9d&def_d=true&bld=L_5,D_6,G_1,W_4,U_1,C_241010,T_12&bh=true&cs=1ae36b837ebbaf313836c1657e0a7c220&ik=773bcfeaf4a9453996ade8c7b68af5c1&aok=61ee9d844bc84d24867f4b2279d2c39c&tp=APS-Hotels&pageLocId=35805&area=Spons%7CSpons_Meta_Pref\"\n      },\n      {\n        \"title\": \"Swissotel Chicago\",\n        \"location\": \"Downtown / The Loop\",\n        \"rating\": 4.5,\n        \"reviews\": \"6,829\",\n        \"price\": \"$638\",\n        \"details\": \"Free cancellation \u2022 Reserve now, pay at stay\",\n        \"provider\": \"Booking.com\",\n        \"link\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=32448176&geo=114581&from=HotelDateSearch_Hotels&slot=1&matchID=1&oos=0&cnt=7&silo=10476&bucket=902999&nrank=1&crank=1&clt=M&ttype=MobileCR&tm=307970517&managed=false&capped=false&gosox=6vS60O_HgkBSaY7nhOEtdD_ZjUIvFgpEDJN1lcSPpCQfmE4ljJ_UDq5iIPmvyfzGDrABLAgrkm1j-FCdgAK9JFQwKJkrhD0K8M-kiFbZVqWNCUN7A2Q08upwukRRobLoGJbQdoaQYeoKlOBlpKXyutdiXvMKDpntYKkQ069GSZMf6Vkx7EZPzOsTe_iM_rpxZh5E5MOv-tSynoEyUq4QkGJ50vpp3V6gb_xJGRUPw3kjg1X0CimbTDwTF9nJFudx1dPZ3VPtaDRaSQtDHeZpeieqjlLxlYZLvW3SuRGZmsQ&priceShown=637&pm=AI&hac=AVAILABLE&mbl=LOSE&mbldelta=5400&rq=P&rate=517.7500&taxesRate=90.0900&feesRate=29.3500&fees=119.4400&cur=USD&adults=1&child_rm_ages=&inDay=10&outDay=15&rdex=RDEX_26e8bc1514411ca6a9025f000d4c7e79&rooms=1&inMonth=10&inYear=2024&outMonth=10&outYear=2024&auid=e90b2200-aee7-4a22-94db-c0f6aa18fec3&def_d=true&bld=L_5,D_6,G_1,W_4,U_1,C_241010,T_12&bh=true&cs=1d0e55d741080619cba1d2529b5590a0b&ik=773bcfeaf4a9453996ade8c7b68af5c1&aok=6bc3e8b31610407681ccff0d79632522&tp=APS-Hotels&pageLocId=35805\"\n      },\n      {\n        \"title\": \"The Royal Sonesta Chicago River North\",\n        \"location\": \"Near North Side\",\n        \"rating\": 4.5,\n        \"reviews\": \"3,539\",\n        \"price\": \"$533\",\n        \"details\": \"Free cancellation \u2022 Reserve now, pay at stay\",\n        \"provider\": \"Booking.com\",\n        \"link\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=33400293&geo=1566945&from=HotelDateSearch_Hotels&slot=1&matchID=1&oos=0&cnt=5&silo=10476&bucket=902999&nrank=1&crank=1&clt=M&ttype=MobileCR&tm=307970517&managed=false&capped=false&gosox=6vS60O_HgkBSaY7nhOEtdD_ZjUIvFgpEDJN1lcSPpCQfmE4ljJ_UDq5iIPmvyfzGVWLObS4NCXVtZuV4Zpqf6y2_zdjj7HGuvs4_ECLcdk6NCUN7A2Q08upwukRRobLosUX9CoS3ZVJaCCUuQski4ZF4Xm2A1z3Wml3Dwmr10dtuTIvJ5wZaAibn3AlHrSb5SkPdipmLZLlHmT39wnk_u1pI69GrjPPHLqPIb-9ZRAgjg1X0CimbTDwTF9nJFudx1dPZ3VPtaDRaSQtDHeZpeieqjlLxlYZLvW3SuRGZmsQ&priceShown=533&pm=AI&hac=AVAILABLE&mbl=LOSE&mbldelta=6700&rq=P&rate=426.4000&taxesRate=74.1900&feesRate=32.0000&fees=106.1900&cur=USD&adults=1&child_rm_ages=&inDay=10&outDay=15&rdex=RDEX_57f21f6a1d98800b13a9de7cfe44653&rooms=1&inMonth=10&inYear=2024&outMonth=10&outYear=2024&auid=85200907-a503-40ec-8e3d-07e9ed8f6e29&def_d=true&bld=L_5,D_6,G_1,W_4,U_1,C_241010,T_12&bh=true&cs=1f64693cc92afea657c930dd3a360f3d6&ik=773bcfeaf4a9453996ade8c7b68af5c1&aok=c1efef17b85144eda92fef27e27d1dac&tp=APS-Hotels&pageLocId=35805\"\n      },\n      {\n        \"title\": \"Virgin Hotels Chicago\",\n        \"location\": \"Downtown / The Loop\",\n        \"rating\": 4.5,\n        \"reviews\": \"3,603\",\n        \"price\": \"$518\",\n        \"details\": \"Free cancellation \u2022 Reserve now, pay at stay\",\n        \"provider\": \"Booking.com\",\n        \"link\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=65056708&geo=6883336&from=HotelDateSearch_Hotels&slot=1&matchID=1&oos=0&cnt=5&silo=10476&bucket=902999&nrank=1&crank=1&clt=M&ttype=MobileCR&tm=307970517&managed=false&capped=false&gosox=6vS60O_HgkBSaY7nhOEtdD_ZjUIvFgpEDJN1lcSPpCQfmE4ljJ_UDq5iIPmvyfzGyZeSt6FGfOoePtaAVLCL9pcD1bxKhFnyGdeiCqUWA3qNCUN7A2Q08upwukRRobLomIlUpCpeg7H6HFZ03SS_ZPpbZ9lu68uuBliCUMSmKdh28aJqabdlj5lLAcP9ZJqWd1lPKztknjB_jVd770iZqWJ50vpp3V6gb_xJGRUPw3kjg1X0CimbTDwTF9nJFudx1dPZ3VPtaDRaSQtDHeZpeieqjlLxlYZLvW3SuRGZmsQ&priceShown=518&pm=AI&hac=AVAILABLE&mbl=MEET&mbldelta=0&rq=ML&rate=416.1600&taxesRate=76.7600&feesRate=25.0000&fees=101.7600&cur=USD&adults=1&child_rm_ages=&inDay=10&outDay=15&rdex=RDEX_13e1cebc86aa124eddc5a00d217dc848&rooms=1&inMonth=10&inYear=2024&outMonth=10&outYear=2024&auid=a61cb0c9-0291-4163-9d20-e3134b6f68b4&def_d=true&bld=L_5,D_6,G_1,W_4,U_1,C_241010,T_12&bh=true&cs=14539d93a12be4ff1d03e2da3c3e9f2c5&ik=773bcfeaf4a9453996ade8c7b68af5c1&aok=582f1be447b6441e84d66c9f59dc082d&tp=APS-Hotels&pageLocId=35805\"\n      },\n      {\n        \"title\": \"Holiday Inn & Suites Chicago-Downtown, an IHG hotel\",\n        \"location\": \"West Side\",\n        \"rating\": 4,\n        \"reviews\": \"998\",\n        \"price\": \"$413\",\n        \"details\": \"Free cancellation \u2022 Reserve now, pay at stay\",\n        \"provider\": \"Booking.com\",\n        \"link\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=32501587&geo=90969&from=HotelDateSearch_Hotels&slot=1&matchID=1&oos=0&cnt=5&silo=10476&bucket=902999&nrank=1&crank=1&clt=M&ttype=MobileCR&tm=307970517&managed=false&capped=false&gosox=6vS60O_HgkBSaY7nhOEtdD_ZjUIvFgpEDJN1lcSPpCQfmE4ljJ_UDq5iIPmvyfzGQ91tX9U-jreHQQXFOkwyZpsf56Q4HxcI1Verjm9J6DiNCUN7A2Q08upwukRRobLoc6YQphxOswtz3Jk_km5Bp3nEX_JllJuCOfmL2ovcbCkTivSIZ8b23DbDeizz2p4OkmIjloNbmQzwyaEMu19V5GVc6-0tRLxrm0EIslr9fNvsY4vuQ5KuSGSth3uY8jA5uWGgiR7gMWpJrXz2diDlS6qT0EgHLUcOjrOt37_eALg&priceShown=412&pm=AI&hac=AVAILABLE&mbl=MEET&mbldelta=0&rq=P&rate=342.8000&taxesRate=59.6500&feesRate=10.0000&fees=69.6500&cur=USD&adults=1&child_rm_ages=&inDay=10&outDay=15&rdex=RDEX_53bb27e1b93eb5c0b2dbb15f6c0f44f&rooms=1&inMonth=10&inYear=2024&outMonth=10&outYear=2024&auid=a861e85b-7192-42f5-8262-ad24586690f3&def_d=true&bld=L_5,D_6,G_1,W_4,U_1,C_241010,T_12&bh=true&cs=1acf4cd15385dee3c0101a1c7d10b2537&ik=773bcfeaf4a9453996ade8c7b68af5c1&aok=49090d9c1de844a7a25546ccb4f04083&tp=APS-Hotels&pageLocId=35805\"\n      }\n    ]\n    ```"
+                        "value": "```json\n    [\n      {\n        \"name\": \"Cora Breakfast & Lunch\",\n        \"averageRating\": 4.5,\n        \"userReviewCount\": 719,\n        \"priceTag\": \"$$ - $$$\",\n        \"establishmentTypeAndCuisineTags\": [\"Cafe\", \"Canadian\"],\n        \"heroImgUrl\": \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/10/85/0a/a1/20170831-093122-largejpg.jpg?w=4000&h=3000&s=1\",\n        \"reviewSnippet\": {\n          \"reviewText\": \"Cora was near another restaurant where we had eaten a breakfast so we decided...\",\n          \"reviewUrl\": \"https://www.tripadvisor.com/ShowUserReviews-g154943-d10145567-r684360041-Cora_Breakfast_Lunch-Vancouver_British_Columbia.html\"\n        }\n      }\n    ]\n    ```"
                     }
                 ]
             }

@@ -49,6 +49,7 @@ The Interpreter Module interacts with the Translator Module through a structured
 1. **Initial Panel Requests**: 
    - After analyzing the user query and context, send panel creation requests to the Translator Module.
    - Each request should be in the format specified in the Output Format section below.
+   - Please keep the panel descriptions comprehensive to clearly give it context of what is expected out of it.
 
 2. **Iterative Communication**:
    - The Translator Module can ask for help after the initialization of panels. These requests will be in the following format:

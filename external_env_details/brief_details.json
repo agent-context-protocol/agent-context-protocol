@@ -34,6 +34,12 @@
   },
   "WeatherAPI.com_Forecast_Weather_API": {
     "Use": "This API fetches weather forecasts for a specified location, including options for the number of forecast days and specific languages."
+  },
+  "SkyScrapperFlightSearch": {
+    "Use": "This API retrieves available flights for a given route by providing details like origin and destination airports, travel dates, and optional filters like cabin class and carriers. skyId from SkyScrapperSearchAirport is required for this to run."
+  },
+  "SkyScrapperSearchAirport": {
+    "Use": "This API searches for airports by location name, returning airport details like the name and unique airport identifier (skyId)."
   }
  
 }

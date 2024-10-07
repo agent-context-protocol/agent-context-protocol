@@ -85,6 +85,7 @@ API Response:
 7. Filling in the Output_Variables and Dependent_Input_Variables:
    - Try to include all the important information about the output in the respective output variables or the dependent input variables. For example, if you are mentioning quantities, then include their units.
    - Ensure the extracted values contain all the context needed to be understandable and complete.
+   - Completely extract the important information from the api output and fill in the output variables fully. Do not miss out on important parts of the api output.
 
 ### Important Guidelines:
 
@@ -122,6 +123,7 @@ API Response:
 - Raise errors appropriately and provide clear explanations when necessary.
 - Include important information like units or additional context based on API documentation, so that it is easy to understand.
 - Try to include all the important information about the output in the respective output variables or the dependent input variables such that the extracted value contains all the context.
+- Completely extract the important information from the api output and fill in the output variables fully. Do not miss out on important parts of the api output.
 
 ### Output Format (Strictly follow this):
 

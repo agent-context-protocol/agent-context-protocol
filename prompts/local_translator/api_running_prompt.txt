@@ -40,6 +40,7 @@ API Documentation:
    - API Endpoint URL: Combine the base URL with the specific endpoint path and integrate any parameters into the URL as needed. In case we are handling a Python function instead, then the URL should just be the function name.
    - Headers: Include all required headers, such as `Authorization` tokens and `Content-Type`, according to the API documentation. In case we are handling a Python function instead, then Headers should be empty.
    - Request Body: If the API requires a body, construct it in valid JSON format, ensuring that all required parameters are included. Handle dynamic values from the input variables (e.g., `vacation_spots_list`) correctly. In case we are handling a Python function instead, then the Body will contain the parameters of the Python function in a JSON format.
+   - We have to strictly try and keep the number of API requests under 5. If there are more then priortize and only make the API requests for top 5 according to relevance and priorty.
 
 3. Output the Finalized API Request:
    - The output should be strictly structured under two main sections:
@@ -92,6 +93,7 @@ API Documentation:
   - Preference for Multiple API Requests:
     - Even if the API allows multiple inputs in a single request, you should only give everything at once if there is no other way.
     - Prefer breaking down the task into multiple API requests whenever possible to achieve more accurate and relevant results.
+    - But we have to strictly ensure and keep the number of API requests under 5. If there are more then priortize and only make the API requests for top 5 according to relevance and priorty.
 
   - Executing Multiple API Requests:
     - For each input value, construct a separate $$API_REQUEST$$ and execute them one after the other.
@@ -117,6 +119,7 @@ API Documentation:
 ### Your Goal:
 
 - Finalize a validated API request that is ready for execution.
+- Keep the number of API request under 5. If more are there then priortize and call upto 5 API requests.
 - Ensure strict adherence to the output format and avoid any changes in structure.
 - Always only output the $$CHAIN_OF_THOUGHT$$ and $$API_REQUEST$$ without any other details before or after.
 - Construct the API URL, headers, and body to get a response that is as concise as possible while still obtaining the necessary information to answer the question.
@@ -154,6 +157,7 @@ $$CHAIN_OF_THOUGHT$$
   - Limiting Output:
     - See if the API has parameters to limit the output, like `page` and `pageSize`.
     - If yes, set `pageSize` to less than 15 and `page` to 1 or as appropriate.
+    - Keep the number of API request under 5. If more are there then priortize and call upto 5 API requests.
 
 $$API_REQUEST$$
 
@@ -279,6 +283,7 @@ Limiting Output:
 
 - The API does not provide parameters like `page` or `pageSize` for limiting output in the current weather endpoint.
 - We will proceed with the default response for each city.
+- We are calling less than 5 API requests which is valid.
 
 Dependencies:
 
@@ -560,6 +565,7 @@ Determining Single vs. Multiple API Requests:
 
 - The API documentation advises to break down queries and not ask for too much information in one search.
 - Therefore, we will execute individual API requests for each vacation spot to ensure accurate and concise responses.
+- We are keeping the number of API requests below 5 by getting latitude and longitude data of multiple cities at once.
 
 Method & Function Name:
 

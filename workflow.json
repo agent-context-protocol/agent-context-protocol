@@ -1,26 +1,155 @@
 {
     "1": {
         "1": {
-            "panel_description": "Retrieve current weather information for Los Angeles.",
+            "panel_description": "Create a detailed itinerary for a trip to Sydney from October 15th to October 20th, 2024, based on the weather forecast.",
             "steps": {
                 "1": {
-                    "api": "WeatherAPI.com_Realtime_Weather_Api",
-                    "handles": "Fetches current weather data for Los Angeles",
+                    "api": "Perplexity",
+                    "handles": "Fetches latitude and longitude for Sydney",
                     "input_vars": [
                         {
-                            "name": "city_name",
-                            "parameter": "q",
+                            "name": "query_sydney_coordinates",
+                            "parameter": [
+                                "query"
+                            ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "City name for weather query",
-                            "value": "Los Angeles",
+                            "description": "Query to find latitude and longitude of Sydney",
+                            "value": "What is the latitude and longitude of Sydney?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "current_weather_la",
-                            "description": "Current weather details for Los Angeles",
+                            "name": "sydney_coordinates",
+                            "description": "Latitude and longitude of Sydney",
+                            "used_by": [
+                                {
+                                    "panel": 1,
+                                    "step": 2
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "WeatherAPI.com_Forecast_Weather_API",
+                    "handles": "Fetches weather forecast for Sydney",
+                    "input_vars": [
+                        {
+                            "name": "sydney_coordinates",
+                            "parameter": [
+                                "q"
+                            ],
+                            "type": "string",
+                            "source": "API_Output (Panel 1, Step 1)",
+                            "description": "Latitude and longitude of Sydney",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "panel": 1,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "forecast_dates",
+                            "parameter": [
+                                "dt"
+                            ],
+                            "type": "date",
+                            "source": "LLM_Generated",
+                            "description": "Dates for the weather forecast",
+                            "value": "[\"2024-10-15\", \"2024-10-16\", \"2024-10-17\", \"2024-10-18\", \"2024-10-19\", \"2024-10-20\"]",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "weather_forecast",
+                            "description": "Weather forecast for Sydney",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "TripadvisorSearchLocation",
+                    "handles": "Retrieves geoId for Sydney",
+                    "input_vars": [
+                        {
+                            "name": "location_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Search query for Sydney",
+                            "value": "Sydney",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "location_geoId",
+                            "description": "Geo ID for Sydney",
+                            "used_by": [
+                                {
+                                    "panel": 1,
+                                    "step": 4
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "4": {
+                    "api": "TripadvisorSearchRestaurants",
+                    "handles": "Searches for recommended restaurants in Sydney",
+                    "input_vars": [
+                        {
+                            "name": "location_geoId",
+                            "parameter": [
+                                "locationId"
+                            ],
+                            "type": "string",
+                            "source": "API_Output (Panel 1, Step 3)",
+                            "description": "Geo ID for Sydney",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "panel": 1,
+                                    "step": 3
+                                }
+                            ]
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "recommended_restaurants",
+                            "description": "List of recommended restaurants in Sydney",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "5": {
+                    "api": "Perplexity",
+                    "handles": "Gathers information on activities and attractions in Sydney",
+                    "input_vars": [
+                        {
+                            "name": "activities_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query for activities and attractions in Sydney",
+                            "value": "Activities and attractions in Sydney for a young AI Security Researcher",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "activities_info",
+                            "description": "Information on activities and attractions in Sydney",
                             "used_by": []
                         }
                     ]
@@ -30,67 +159,31 @@
     },
     "2": {
         "2": {
-            "panel_description": "Provide weather forecast for Chicago from October 10th to October 15th, 2024.",
-            "steps": {
-                "1": {
-                    "api": "WeatherAPI.com_Forecast_Weather_API",
-                    "handles": "Fetches weather forecast for Chicago",
-                    "input_vars": [
-                        {
-                            "name": "forecast_city_name",
-                            "parameter": "q",
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "City name for weather forecast",
-                            "value": "Chicago",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "forecast_dates",
-                            "parameter": "dt",
-                            "type": "date",
-                            "source": "LLM_Generated",
-                            "description": "Dates for weather forecast",
-                            "value": "[\"2024-10-10\", \"2024-10-11\", \"2024-10-12\", \"2024-10-13\", \"2024-10-14\", \"2024-10-15\"]",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "weather_forecast_chicago",
-                            "description": "Weather forecast for Chicago for specified dates",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        }
-    },
-    "3": {
-        "3": {
-            "panel_description": "Retrieve hotel options in Chicago for specified dates.",
+            "panel_description": "Provide a list of recommended hotels in Sydney for the stay from October 15th to October 20th, 2024.",
             "steps": {
                 "1": {
                     "api": "TripadvisorSearchLocation",
-                    "handles": "Retrieves geoId for Chicago",
+                    "handles": "Retrieves geoId for Sydney",
                     "input_vars": [
                         {
                             "name": "location_query",
-                            "parameter": "query",
+                            "parameter": [
+                                "query"
+                            ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Search query for Chicago",
-                            "value": "Chicago",
+                            "description": "Search query for Sydney",
+                            "value": "Sydney",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
                             "name": "location_geoId",
-                            "description": "Geo ID for Chicago",
+                            "description": "Geo ID for Sydney",
                             "used_by": [
                                 {
-                                    "panel": 3,
+                                    "panel": 2,
                                     "step": 2
                                 }
                             ]
@@ -103,41 +196,47 @@
                     "input_vars": [
                         {
                             "name": "location_geoId",
-                            "parameter": "geoId",
+                            "parameter": [
+                                "geoId"
+                            ],
                             "type": "string",
-                            "source": "API_Output (Panel 3, Step 1)",
-                            "description": "Geo ID for Chicago",
+                            "source": "API_Output (Panel 2, Step 1)",
+                            "description": "Geo ID for Sydney",
                             "value": "None",
                             "dependencies": [
                                 {
-                                    "panel": 3,
+                                    "panel": 2,
                                     "step": 1
                                 }
                             ]
                         },
                         {
                             "name": "check_in_date",
-                            "parameter": "checkIn",
+                            "parameter": [
+                                "checkIn"
+                            ],
                             "type": "string",
                             "source": "LLM_Generated",
                             "description": "Check-in date",
-                            "value": "2024-10-10",
+                            "value": "2024-10-15",
                             "dependencies": []
                         },
                         {
                             "name": "check_out_date",
-                            "parameter": "checkOut",
+                            "parameter": [
+                                "checkOut"
+                            ],
                             "type": "string",
                             "source": "LLM_Generated",
                             "description": "Check-out date",
-                            "value": "2024-10-15",
+                            "value": "2024-10-20",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "hotel_options_chicago",
-                            "description": "List of available hotels in Chicago",
+                            "name": "hotel_options",
+                            "description": "List of available hotels in Sydney",
                             "used_by": []
                         }
                     ]

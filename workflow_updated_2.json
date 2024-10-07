@@ -1,36 +1,86 @@
 {
     "2": {
-        "panel_description": "Provide weather forecast for Chicago from October 10th to October 15th, 2024.",
+        "panel_description": "Provide a list of recommended hotels in Sydney for the stay from October 15th to October 20th, 2024.",
         "steps": {
             "1": {
-                "api": "WeatherAPI.com_Forecast_Weather_API",
-                "handles": "Fetches weather forecast for Chicago",
+                "api": "TripadvisorSearchLocation",
+                "handles": "Retrieves geoId for Sydney",
                 "input_vars": [
                     {
-                        "name": "forecast_city_name",
-                        "parameter": "q",
+                        "name": "location_query",
+                        "parameter": [
+                            "query"
+                        ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "City name for weather forecast",
-                        "value": "Chicago",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "forecast_dates",
-                        "parameter": "dt",
-                        "type": "date",
-                        "source": "LLM_Generated",
-                        "description": "Dates for weather forecast",
-                        "value": "[\"2024-10-10\", \"2024-10-11\", \"2024-10-12\", \"2024-10-13\", \"2024-10-14\", \"2024-10-15\"]",
+                        "description": "Search query for Sydney",
+                        "value": "Sydney",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "weather_forecast_chicago",
-                        "description": "Weather forecast for Chicago for specified dates",
+                        "name": "location_geoId",
+                        "description": "Geo ID for Sydney",
+                        "used_by": [
+                            {
+                                "panel": 2,
+                                "step": 2
+                            }
+                        ],
+                        "value": "3323314"
+                    }
+                ]
+            },
+            "2": {
+                "api": "TripadvisorSearchHotels",
+                "handles": "Retrieves hotel options using geoId",
+                "input_vars": [
+                    {
+                        "name": "location_geoId",
+                        "parameter": [
+                            "geoId"
+                        ],
+                        "type": "string",
+                        "source": "API_Output (Panel 2, Step 1)",
+                        "description": "Geo ID for Sydney",
+                        "value": "3323314",
+                        "dependencies": [
+                            {
+                                "panel": 2,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "check_in_date",
+                        "parameter": [
+                            "checkIn"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Check-in date",
+                        "value": "2024-10-15",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "check_out_date",
+                        "parameter": [
+                            "checkOut"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Check-out date",
+                        "value": "2024-10-20",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "hotel_options",
+                        "description": "List of available hotels in Sydney",
                         "used_by": [],
-                        "value": "```json\n    {\n      \"2024-10-10\": {\n        \"maxtemp_c\": 21.9,\n        \"mintemp_c\": 16.5,\n        \"condition\": \"Sunny\",\n        \"precip_mm\": 0.0,\n        \"wind_kph\": 14.4\n      },\n      \"2024-10-11\": {\n        \"maxtemp_c\": 24.3,\n        \"mintemp_c\": 15.2,\n        \"condition\": \"Sunny\",\n        \"precip_mm\": 0.0,\n        \"wind_kph\": 15.5\n      },\n      \"2024-10-12\": {\n        \"maxtemp_c\": 26.8,\n        \"mintemp_c\": 17.6,\n        \"condition\": \"Sunny\",\n        \"precip_mm\": 0.0,\n        \"wind_kph\": 19.8\n      },\n      \"2024-10-13\": {\n        \"maxtemp_c\": 25.4,\n        \"mintemp_c\": 17.5,\n        \"condition\": \"Patchy rain nearby\",\n        \"precip_mm\": 3.24,\n        \"wind_kph\": 22.3\n      },\n      \"2024-10-14\": {\n        \"maxtemp_c\": 16.4,\n        \"mintemp_c\": 15.1,\n        \"condition\": \"Patchy rain nearby\",\n        \"precip_mm\": 0.09,\n        \"wind_kph\": 23.4\n      },\n      \"2024-10-15\": {\n        \"maxtemp_c\": 20.2,\n        \"mintemp_c\": 13.8,\n        \"condition\": \"Sunny\",\n        \"precip_mm\": 0.0,\n        \"wind_kph\": 7.6\n      }\n    }\n    ```"
+                        "value": "```json\n    [\n      {\n        \"id\": \"256564\",\n        \"title\": \"ibis Sydney Olympic Park\",\n        \"rating\": 3.5,\n        \"reviews\": \"600\",\n        \"provider\": \"Booking.com\",\n        \"price\": \"$249\",\n        \"externalUrl\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=32468247&geo=256564\",\n        \"photos\": [\n          \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2c/0f/d2/82/exterior-view.jpg?w={width}&h={height}&s=1\",\n          \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2c/6c/e5/0e/barlounge.jpg?w={width}&h={height}&s=1\"\n        ]\n      },\n      {\n        \"id\": \"2272754\",\n        \"title\": \"Ibis Budget Sydney Olympic Park\",\n        \"rating\": 3,\n        \"reviews\": \"1,013\",\n        \"provider\": \"Booking.com\",\n        \"price\": \"$156\",\n        \"externalUrl\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=32456022&geo=2272754\",\n        \"photos\": [\n          \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1d/c3/4e/54/guest-room.jpg?w={width}&h={height}&s=1\",\n          \"https://dynamic-media-cdn.tripadvisor.com/media/photo-s/02/fe/e8/b0/ibis-budget-sydney-olympic.jpg?w={width}&h={height}&s=1\"\n        ]\n      },\n      {\n        \"id\": \"1142967\",\n        \"title\": \"Pullman at Sydney Olympic Park\",\n        \"rating\": 4.5,\n        \"reviews\": \"1,874\",\n        \"provider\": \"Vio.com\",\n        \"photos\": [\n          \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2c/76/a2/70/exterior-view.jpg?w={width}&h={height}&s=1\",\n          \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/01/5c/65/fe/pullman-at-sydney-olympic.jpg?w={width}&h={height}&s=1\"\n        ]\n      },\n      {\n        \"id\": \"256609\",\n        \"title\": \"Novotel Sydney Olympic Park\",\n        \"rating\": 4,\n        \"reviews\": \"1,531\",\n        \"provider\": \"MakeMyTrip\",\n        \"photos\": [\n          \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2b/4c/ed/64/exterior-view.jpg?w={width}&h={height}&s=1\",\n          \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/06/68/3a/cd/novotel-sydney-olympic.jpg?w={width}&h={height}&s=1\"\n        ]\n      },\n      {\n        \"id\": \"3568744\",\n        \"title\": \"Quest at Sydney Olympic Park\",\n        \"rating\": 3.5,\n        \"reviews\": \"1,453\",\n        \"provider\": \"Vio.com\",\n        \"photos\": [\n          \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2c/03/c6/3c/exterior.jpg?w={width}&h={height}&s=1\",\n          \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/05/39/d2/88/quest-at-sydney-olympic.jpg?w={width}&h={height}&s=1\"\n        ]\n      }\n    ]\n    ```"
                     }
                 ]
             }

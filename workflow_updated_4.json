@@ -1,82 +1,40 @@
 {
     "4": {
-        "panel_description": "Understand what generally causes null pointer errors in Java.",
+        "panel_description": "Provide a weather forecast for Paris.",
         "steps": {
             "1": {
-                "api": "Perplexity",
-                "handles": "Gathers general information about null pointer errors in Java",
+                "api": "WeatherAPI.com_Forecast_Weather_API",
+                "handles": "Fetches weather forecast for Paris",
                 "input_vars": [
                     {
-                        "name": "query_null_pointer",
-                        "parameter": "query",
+                        "name": "paris_forecast_query",
+                        "parameter": [
+                            "q"
+                        ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Query to understand null pointer errors in Java",
-                        "value": "What generally causes null pointer errors in Java?",
-                        "dependencies": []
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "null_pointer_info",
-                        "description": "General information about null pointer errors in Java",
-                        "used_by": [],
-                        "value": "\"In Java, `NullPointerException` occurs when a program attempts to use an object reference that has a `null` value. Here are some common scenarios that generally cause null pointer errors:\n\n    - **Calling Methods on a Null Object**: If you try to invoke a method on an object that is `null`, a `NullPointerException` will be thrown.\n    - **Accessing Null Object\u2019s Properties**: Trying to access or modify the fields of a `null` object will result in a `NullPointerException`.\n    - **Accessing Index Elements of Null Objects**: Attempting to access an index element of a `null` array or collection will also cause a `NullPointerException`.\n    - **Passing Null Parameters to Methods**: Passing `null` as an argument to a method that does not expect it can lead to a `NullPointerException`.\n    - **Incorrect Configuration or Dependency Injection**: In frameworks like Spring, incorrect configuration can lead to objects being `null`.\n    - **Using Synchronized on a Null Object**: Trying to synchronize on a `null` object will throw a `NullPointerException`.\n    - **Throwing Null as if it Were a Throwable Value**: Throwing `null` as if it were a `Throwable` value causes a `NullPointerException`.\n\n    To avoid these errors, ensure objects are properly initialized and perform null checks before accessing methods or properties.\""
-                    }
-                ]
-            },
-            "2": {
-                "api": "Stack_Exchange_Questions",
-                "handles": "Finds relevant questions on Stack Overflow",
-                "input_vars": [
-                    {
-                        "name": "site",
-                        "parameter": "site",
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "The Stack Exchange site to query",
-                        "value": "stackoverflow",
+                        "description": "Query for weather forecast in Paris",
+                        "value": "Paris",
                         "dependencies": []
                     },
                     {
-                        "name": "tags",
-                        "parameter": "tagged",
-                        "type": "string",
+                        "name": "forecast_days",
+                        "parameter": [
+                            "days"
+                        ],
+                        "type": "number",
                         "source": "LLM_Generated",
-                        "description": "Filter questions by tags",
-                        "value": "java;null-pointer",
+                        "description": "Number of forecast days",
+                        "value": "5",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "question_list",
-                        "description": "List of relevant questions on null pointer errors",
+                        "name": "weather_forecast_paris",
+                        "description": "Weather forecast for Paris from October 5th to October 10th, 2024",
                         "used_by": [],
-                        "value": "[\n      {\n        \"title\": \"Can't find @Nullable inside javax.annotation.*\",\n        \"link\": \"https://stackoverflow.com/questions/19030954/cant-find-nullable-inside-javax-annotation\",\n        \"is_answered\": true\n      },\n      {\n        \"title\": \"I keep getting NullPointerException on CashRegisterClass\",\n        \"link\": \"https://stackoverflow.com/questions/71548678/i-keep-getting-nullpointerexception-on-cashregisterclass\",\n        \"is_answered\": false\n      },\n      {\n        \"title\": \"Java Cannot read field \\\"scale\\\" because \\\"multiplicand\\\" is null\",\n        \"link\": \"https://stackoverflow.com/questions/69464857/java-cannot-read-field-scale-because-multiplicand-is-null\",\n        \"is_answered\": true\n      },\n      {\n        \"title\": \"Java filter NullPointer\",\n        \"link\": \"https://stackoverflow.com/questions/69159242/java-filter-nullpointer\",\n        \"is_answered\": true\n      },\n      {\n        \"title\": \"Where do static members live if not on the Heap?\",\n        \"link\": \"https://stackoverflow.com/questions/32145123/where-do-static-members-live-if-not-on-the-heap\",\n        \"is_answered\": true\n      },\n      {\n        \"title\": \"How to avoid null in Java method chain\",\n        \"link\": \"https://stackoverflow.com/questions/64447645/how-to-avoid-null-in-java-method-chain\",\n        \"is_answered\": true\n      },\n      {\n        \"title\": \"null argument java null pointer\",\n        \"link\": \"https://stackoverflow.com/questions/63329359/null-argument-java-null-pointer\",\n        \"is_answered\": true\n      },\n      {\n        \"title\": \"Null pointer exception even though nothing on the line is null\",\n        \"link\": \"https://stackoverflow.com/questions/62251077/null-pointer-exception-even-though-nothing-on-the-line-is-null\",\n        \"is_answered\": true\n      },\n      {\n        \"title\": \"Exception in thread \\\"main\\\" java.lang.NullPointerException error when calling a method to write a string into Excel sheet in JAVA\",\n        \"link\": \"https://stackoverflow.com/questions/61577339/exception-in-thread-main-java-lang-nullpointerexception-error-when-calling-a-m\",\n        \"is_answered\": true\n      },\n      {\n        \"title\": \"Newbie getting nullPointers all over the place\",\n        \"link\": \"https://stackoverflow.com/questions/59475004/newbie-getting-nullpointers-all-over-the-place\",\n        \"is_answered\": true\n      }\n    ]"
-                    }
-                ]
-            },
-            "3": {
-                "api": "Stack_Exchange_Answers",
-                "handles": "Fetches answers for the questions retrieved",
-                "input_vars": [
-                    {
-                        "name": "site",
-                        "parameter": "site",
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "The Stack Exchange site to query",
-                        "value": "stackoverflow",
-                        "dependencies": []
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "answer_list",
-                        "description": "List of answers for the questions on null pointer errors",
-                        "used_by": [],
-                        "value": "[\n      {\n        \"answer_id\": 54509134,\n        \"question_id\": 54508011,\n        \"is_accepted\": false,\n        \"score\": 2,\n        \"owner\": {\n          \"display_name\": \"mklement0\",\n          \"reputation\": 426723,\n          \"link\": \"https://stackoverflow.com/users/45375/mklement0\"\n        }\n      },\n      {\n        \"answer_id\": 79035350,\n        \"question_id\": 79034791,\n        \"is_accepted\": false,\n        \"score\": 0,\n        \"owner\": {\n          \"display_name\": \"Bademeister\",\n          \"reputation\": 768,\n          \"link\": \"https://stackoverflow.com/users/6803365/bademeister\"\n        }\n      },\n      {\n        \"answer_id\": 79035349,\n        \"question_id\": 18446538,\n        \"is_accepted\": false,\n        \"score\": 0,\n        \"owner\": {\n          \"display_name\": \"G\u00f6khan A\u00e7\u0131kgoz\",\n          \"reputation\": 1,\n          \"link\": \"https://stackoverflow.com/users/12971465/g\u00f6khan-a\u00e7\u0131kgoz\"\n        }\n      },\n      {\n        \"answer_id\": 79035362,\n        \"question_id\": 79035185,\n        \"is_accepted\": false,\n        \"score\": 0,\n        \"owner\": {\n          \"display_name\": \"user17732522\",\n          \"reputation\": 71607,\n          \"link\": \"https://stackoverflow.com/users/17732522/user17732522\"\n        }\n      },\n      {\n        \"answer_id\": 79035347,\n        \"question_id\": 79034893,\n        \"is_accepted\": false,\n        \"score\": 0,\n        \"owner\": {\n          \"display_name\": \"user27425627\",\n          \"reputation\": 224,\n          \"link\": \"https://stackoverflow.com/users/27425627/user27425627\"\n        }\n      }\n      // Additional answers can be added similarly\n    ]"
+                        "value": "```json\n    {\n      \"2024-10-07\": {\n        \"maxtemp_c\": 17.8,\n        \"mintemp_c\": 13.3,\n        \"condition\": \"Moderate rain\",\n        \"daily_chance_of_rain\": 91\n      },\n      \"2024-10-08\": {\n        \"maxtemp_c\": 20.0,\n        \"mintemp_c\": 13.1,\n        \"condition\": \"Patchy rain nearby\",\n        \"daily_chance_of_rain\": 88\n      },\n      \"2024-10-09\": {\n        \"maxtemp_c\": 18.5,\n        \"mintemp_c\": 13.3,\n        \"condition\": \"Heavy rain\",\n        \"daily_chance_of_rain\": 89\n      },\n      \"2024-10-10\": {\n        \"maxtemp_c\": 15.8,\n        \"mintemp_c\": 11.3,\n        \"condition\": \"Moderate rain\",\n        \"daily_chance_of_rain\": 84\n      },\n      \"2024-10-11\": {\n        \"maxtemp_c\": 12.6,\n        \"mintemp_c\": 9.1,\n        \"condition\": \"Patchy rain nearby\",\n        \"daily_chance_of_rain\": 84\n      }\n    }\n    ```"
                     }
                 ]
             }

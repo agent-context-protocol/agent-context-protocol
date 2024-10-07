@@ -25,21 +25,21 @@ Your Current Role is: WORKFLOW_CREATION_REQUEST
      - Important: If the input variable for the current step depends on the output from a previous step, the input variable name must be exactly the same as the output variable name (from which we will fill the input variable value) to ensure consistency.
      - Example for Issue 1:
        - Correct:
-         - Output Variable from Step 1: `location_data`
+         - Output Variable from Step 1: location_data
          - Input Variable for Step 2:
-           - Name: `location_data` (matches the output variable name)
-           - Source: `API_Output (Panel 1, Step 1)`
+           - Name: location_data (matches the output variable name)
+           - Source: API_Output (Panel 1, Step 1)
        - Incorrect:
-         - Output Variable from Step 1: `location_data`
+         - Output Variable from Step 1: location_data
          - Input Variable for Step 2:
-           - Name: `input_location` (different name)
-           - Source: `API_Output (Panel 1, Step 1)`
+           - Name: input_location (different name)
+           - Source: API_Output (Panel 1, Step 1)
 
    - Grouping Panels:
      - Based on the interdependencies, which panels should be in the same groups? If there is interdependency between panels, then they should be in the same group.
 
-   - Dependency Limitation:
-     - Ensure that each API depends on at most one previous API's output. If an API depends on outputs from more than one API, do not consider that workflow.
+   - Dependency Limitation and Panel Orders:
+     - Ensure that each API depends on at most one previous API's output. If an API depends on outputs from more than one API, do not consider that workflow. The dependency should be such that a panels step can only be dependent on a previous panels step output and not on a future panels step output. It is not necessary to follow the input panels order as that can be wrong.
 
 3. API Input Requirements:
    - Be sure to check and understand the API input requirements very carefully and their data types before proceeding to use them.
@@ -59,6 +59,7 @@ Your Current Role is: WORKFLOW_CREATION_REQUEST
 
 7. Keep the Workflow Minimal:
    - Since we need to run the whole workflow quickly, we should only perform important steps to build the panels.
+   - If a common api output is required by two or more panels then it would be best if they are in the same group. Do not call the same api for the same purpose multiple times in different groups.
    - Always choose the most straightforward, simple, and minimal workflow for each panel.
 
 
@@ -84,15 +85,15 @@ Your Current Role is: WORKFLOW_CREATION_REQUEST
   - Exception: If the input variable for the current step depends on the output from a previous step, the input variable name must be exactly the same as the output variable name to ensure consistency.
   - Example for Issue 1:
     - Correct:
-      - Output Variable from Step 1: `data_result`
+      - Output Variable from Step 1: data_result
       - Input Variable for Step 2:
-        - Name: `data_result` (matches the output variable name)
-        - Source: `API_Output (Panel X, Step Y)`
+        - Name: data_result (matches the output variable name)
+        - Source: API_Output (Panel X, Step Y)
     - Incorrect:
-      - Output Variable from Step 1: `data_result`
+      - Output Variable from Step 1: data_result
       - Input Variable for Step 2:
-        - Name: `result_data` (different name)
-        - Source: `API_Output (Panel X, Step Y)`
+        - Name: result_data (different name)
+        - Source: API_Output (Panel X, Step Y)
 
 - Source Field of Input Variables:
   - In the Source field of input variables, you have two options:
@@ -106,14 +107,14 @@ Your Current Role is: WORKFLOW_CREATION_REQUEST
        - Example for Issue 3:
          - Correct:
            - Input Variable:
-             - Name: `search_query`
-             - Source: `LLM_Generated`
-             - Value: `"Best vacation spots in India"`
+             - Name: search_query
+             - Source: LLM_Generated
+             - Value: "Best vacation spots in India"
          - Incorrect:
            - Input Variable:
-             - Name: `search_query`
-             - Source: `LLM_Generated`
-             - Value: `Result from previous step output_variable`
+             - Name: search_query
+             - Source: LLM_Generated
+             - Value: Result from previous step output_variable
 
     2. API_Output (Panel X, Step X):
        - Use when the variable depends on the output of a previous API call.
@@ -137,8 +138,9 @@ Your Current Role is: WORKFLOW_CREATION_REQUEST
 
 - Workflow Efficiency:
   - Since we have to run all the panels quickly in a time-sensitive manner, you should try to make the workflow minimal, simple, and straightforward.
+  - Ensure that if a common api output is required by two or more panels then it would be best if they are in the same group. It would be inefficient to call the same api for the same purpose multiple times in different groups.
 
-- Do not use  in your output strictly.
+- Do not use ** or ` or # in your output strictly.
 
 
 
@@ -149,6 +151,9 @@ Your Current Role is: WORKFLOW_CREATION_REQUEST
 
 2. Interpreter's Panel Requests:
    - You will receive requests from the Interpreter detailing the number of panels to be created and the specific information each panel should display.
+
+3. Each panels details:
+   - For each panel you will be provided with the panel details. While keeping the details in consideration only you have to make the workflow.
 
 3. API List:
    - For each panel, you will be provided with a list of available APIs and their descriptions. Your task is to select the most appropriate APIs for each panel and create a workflow with that.
@@ -175,13 +180,11 @@ Description of APIs:
 
 [Description of APIs]
 
-
-
-### Your Output Format (Strictly follow this, first CHAIN_OF_THOUGHT and then WORKFLOW. Do not use  in your output strictly.):
+### Your Output Format (Strictly follow this, first CHAIN_OF_THOUGHT and then WORKFLOW. Do not use ** or ` or # in your output strictly.):
 
 $$CHAIN_OF_THOUGHT$$
 
-For each group and panel, first provide your chain of thought, explaining your reasoning in determining the APIs to use, their parameters, types of the parameters, the flow, any interdependencies, and how groups should be formed. Ensure that each API depends on at most one previous API's output. Variable names should strictly be unique for all the variables in the workflow (across panels in a group). Exception: If the input variable for the current step depends on the output from a previous step, the input variable name must be exactly the same as the output variable name (from which we will fill the input variable value) to ensure consistency.
+For each group and panel, first provide your chain of thought, explaining your reasoning in determining the APIs to use, their parameters, types of the parameters, the flow, any interdependencies, and how groups should be formed. Ensure that each API depends on at most one previous API's output. Variable names should strictly be unique for all the variables in the workflow (across panels in a group). Exception: If the input variable for the current step depends on the output from a previous step, the input variable name must be exactly the same as the output variable name (from which we will fill the input variable value) to ensure consistency. The dependency should be such that a panels step can only be dependent on a previous panels step output and not on a future panels step output. It is not necessary to follow the input panels order as that can be wrong.
 
 $$WORKFLOW$$
 
@@ -223,31 +226,37 @@ Step [Step Number]
 Query: "What top 5 cities in usa? what is weather and news there? What does reddit say about them? What are some good restaurants there?"
 
 Interpreter's Panel Requests:
-1. Panel 1: Top 5 Cities in USA Overview
+1. Panel 1: Top 5 Cities in the USA
+Details: Display a list of the top 5 cities in the USA. Provide a brief overview of each city, including key attractions and general information.
 List of Relevant APIs:
    - TripadvisorSearchLocation
    - Perplexity
 
-2. Panel 2: Weather in Top 5 Cities
+2. Panel 2: Weather Information for Top 5 Cities
+Details: Show real-time weather information for the top 5 cities in the USA. Include temperature, weather conditions, and any relevant weather alerts.
 List of Relevant APIs:
    - WeatherAPI.com_Realtime_Weather_Api
    - WeatherAPI.com_Forecast_Weather_API
    - Perplexity
 
 3. Panel 3: News in Top 5 Cities
+Details: Provide the latest news articles related to the top 5 cities in the USA. Include headlines, brief summaries, and links to full articles.
 List of Relevant APIs:
    - NewsAPISearchByKeyWord
    - Perplexity
 
 4. Panel 4: Reddit Discussions on Top 5 Cities
+Details: Retrieve top Reddit posts discussing the top 5 cities in the USA. Include post titles, brief descriptions, and links to the discussions.
 List of Relevant APIs:
    - RedditTopPostsBySubreddit
    - Perplexity
 
 5. Panel 5: Top Restaurants in Top 5 Cities
+Details: List the top-rated restaurants in the top 5 cities in the USA. Include restaurant names, ratings, reviews, and links to more details.
 List of Relevant APIs:
    - TripadvisorSearchRestaurants
    - Perplexity
+
 
 Description of APIs:
 
@@ -259,36 +268,46 @@ $$CHAIN_OF_THOUGHT$$
 
 Panel 1: Top 5 Cities in USA Overview
 
+- Understanding Panel Details: 
+  -We need to find what are the top 5 cities in the USA, the country.
+
 - API Selection:
   - We need to identify the top 5 cities in the USA. Perplexity is suitable for retrieving this information by synthesizing data from multiple sources.
-  - To get specific location details like `geoId` for each city, we'll use TripadvisorSearchLocation.
-    - Note: TripadvisorSearchLocation is only reliable for obtaining `geoId` and not longitude or latitude, and that too for well-known cities.
+  - To get specific location details like geoId for each city, we'll use TripadvisorSearchLocation.
+    - Note: TripadvisorSearchLocation is only reliable for obtaining geoId and not longitude or latitude, and that too for well-known cities.
 
 - Input Parameters:
   - Perplexity:
-    - `query` (string): Requires a search query. We'll use "What are the top 5 cities in the USA?".
+    - For Perplexity we have to consider these required input parameters  ['query']
+    - query (string): Requires a search query. We'll use "What are the top 5 cities in the USA?".
   - TripadvisorSearchLocation:
-    - `query` (string): Requires city names. We'll input the list of cities obtained from Perplexity.
+    - For TripadvisorSearchLocation we have to consider these required input parameters  {'query': {'type': 'string', 'description': 'Search query for location (e.g., city name)'}}
+    - query (string): Requires city names. We'll input the list of cities obtained from Perplexity.
 
 - Source of Inputs:
   - Perplexity:
-    - `query`: LLM_Generated based on the user's query.
+    - query: LLM_Generated based on the user's query.
   - TripadvisorSearchLocation:
-    - `query`: API_Output (Panel 1, Step 1), using `top_cities_list` from Perplexity's output.
+    - query: API_Output (Panel 1, Step 1), using top_cities_list from Perplexity's output.
 
 - Workflow Flow:
   - Step 1: Use Perplexity to get the list of the top 5 cities.
-  - Step 2: Use TripadvisorSearchLocation to obtain `geoId` details for each city.
+  - Step 2: Use TripadvisorSearchLocation to obtain geoId details for each city.
     - Acknowledging that this API is only reliable for well-known cities.
 
 - Variable Naming:
-  - Input variable name for Step 1: `query_top_cities`
-  - Output variable name for Step 1: `top_cities_list`.
-  - Input variable name for Step 2: `top_cities_list` (matches the output variable name).
-  - Output variable name for Step 2: `city_geoID_details`
+  - Input variable name for Step 1: query_top_cities
+  - Output variable name for Step 1: top_cities_list.
+  - Input variable name for Step 2: top_cities_list (matches the output variable name).
+  - Output variable name for Step 2: city_geoID_details
+
+- Validating if what i have thought till now is correct: Yes it is correct.
 
 
 Panel 2: Weather in Top 5 Cities
+
+- Understanding Panel Details: 
+  -We need to find what is the weather in the top 5 cities in the USA, which we found in the panel 1.
 
 - API Selection:
   - WeatherAPI.com_Realtime_Weather_Api may not always return accurate results with city name queries.
@@ -297,31 +316,79 @@ Panel 2: Weather in Top 5 Cities
 
 - Input Parameters:
   - Perplexity:
-    - `query` (string): Queries to find latitude and longitude for each city we got from Panel 1, Step 1.
+    - For Perplexity we have to consider these required input parameters  ['query']
+    - query (string): Queries to find latitude and longitude for each city we got from Panel 1, Step 1.
   - WeatherAPI.com_Realtime_Weather_Api:
-    - `q` (string): Latitude and longitude in the format "lat,lon".
+    - For WeatherAPI.com_Realtime_Weather_Api we have to consider these required input parameters  {'q': {'type': 'String', 'description': 'Query parameter based on which data is sent back. It could be one of the following: Latitude and Longitude (Decimal degree) e.g: q=48.8567,2.3508, city name e.g.: q=Paris, US zip e.g: q=10001, UK postcode e.g: q=SW1, Canada postal code e.g: q=G2J, metar:<metar_code> e.g: q=metar:EGLL, iata:<3 digit airport code> e.g: q=iata:DXB, auto:ip for IP lookup, IP address (IPv4 and IPv6 supported) e.g: q=100.0.0.1'}}
+    - q (string): Latitude and longitude in the format "lat,lon".
 
 - Source of Inputs:
   - Perplexity:
-    - `query`: API_Output, (Panel 1, Step 1), using top_cities_list
+    - query: API_Output, (Panel 1, Step 1), using top_cities_list
   - WeatherAPI.com_Realtime_Weather_Api:
-    - `q`: API_Output (Panel 2, Step 1), using `city_coordinates`.
+    - q: API_Output (Panel 2, Step 1), using city_coordinates.
 
 - Workflow Flow:
   - Step 1: Use Perplexity to find the latitude and longitude of each city.
   - Step 2: Use WeatherAPI.com_Realtime_Weather_Api with these coordinates to fetch real-time weather data.
 
 - Interdependencies:
-  - Step 2 depends on Step 1 (`city_coordinates`).
+  - Step 2 depends on Step 1 (city_coordinates) . Dependency is on the current panels step output.
 
 - Variable Naming:
   - Input variable name for Step 1: top_cities_list (matching the output variable name from Panel 1, Step 1).
-  - Output variable name for Step 1: `latitude_data` and `longitude_data`.
-  - Input variable name for Step 2: `latitude_data` and `longitude_data` (matching the output variable name from Panel 2, Step 1).
-  - Out variable name for Step 2: `realtime_weather`
+  - Output variable name for Step 1: latitude_data and longitude_data.
+  - Input variable name for Step 2: latitude and longitude (matching the output variable name from Panel 2, Step 1).
+  - Out variable name for Step 2: realtime_weather
+
+- Validating if what i have thought till now is correct: No, i named the input varialble names wrongly for step 2, it should match the output variable names of step 1 since they are dependent on it.
+
+Rectifying the mistake:
+
+Panel 2: Weather in Top 5 Cities
+
+- Understanding Panel Details: 
+  -We need to find what is the weather in the top 5 cities in the USA, which we found in the panel 1.
+
+- API Selection:
+  - WeatherAPI.com_Realtime_Weather_Api may not always return accurate results with city name queries.
+  - Therefore, we'll use Perplexity to find the latitude and longitude of each city.
+  - We'll then use WeatherAPI.com_Realtime_Weather_Api with these coordinates to fetch accurate weather data.
+
+- Input Parameters:
+  - Perplexity:
+    - For Perplexity we have to consider these required input parameters : ['query']
+    - query (string): Queries to find latitude and longitude for each city we got from Panel 1, Step 1.
+  - WeatherAPI.com_Realtime_Weather_Api:
+    - For WeatherAPI.com_Realtime_Weather_Api we have to consider these required input parameters:  {'q': {'type': 'String', 'description': 'Query parameter based on which data is sent back. It could be one of the following: Latitude and Longitude (Decimal degree) e.g: q=48.8567,2.3508, city name e.g.: q=Paris, US zip e.g: q=10001, UK postcode e.g: q=SW1, Canada postal code e.g: q=G2J, metar:<metar_code> e.g: q=metar:EGLL, iata:<3 digit airport code> e.g: q=iata:DXB, auto:ip for IP lookup, IP address (IPv4 and IPv6 supported) e.g: q=100.0.0.1'}}
+    - q (string): Latitude and longitude in the format "lat,lon".
+
+- Source of Inputs:
+  - Perplexity:
+    - query: API_Output, (Panel 1, Step 1), using top_cities_list
+  - WeatherAPI.com_Realtime_Weather_Api:
+    - q: API_Output (Panel 2, Step 1), using city_coordinates.
+
+- Workflow Flow:
+  - Step 1: Use Perplexity to find the latitude and longitude of each city.
+  - Step 2: Use WeatherAPI.com_Realtime_Weather_Api with these coordinates to fetch real-time weather data.
+
+- Interdependencies:
+  - Step 2 depends on Step 1 (city_coordinates) . Dependency is on the current panels step output.
+
+- Variable Naming:
+  - Input variable name for Step 1: top_cities_list (matching the output variable name from Panel 1, Step 1).
+  - Output variable name for Step 1: latitude_data and longitude_data.
+  - Input variable name for Step 2: latitude_data and longitude_data (matching the output variable name from Panel 2, Step 1).
+  - Out variable name for Step 2: realtime_weather
+
+- Validating if what i have thought till now is correct: Yes it is correct.
 
 
 Panel 3: News in Top 5 Cities
+
+- Understanding Panel Details: 
+  -We need to find what is the news in the top 5 cities in the USA, which we found in panel 1.
 
 - API Selection:
   - To fetch news articles, we'll use NewsAPISearchByKeyWord.
@@ -329,27 +396,33 @@ Panel 3: News in Top 5 Cities
 
 - Input Parameters:
   - NewsAPISearchByKeyWord:
-    - `query` (string): City names.
-    - `language` (string): We'll set this to "en".
-    - `region` (string): We'll set this to "US".
+    - For NewsAPISearchByKeyWord there are no required input parameters. But for our purpose we will give the following parameters.
+      - query (string): City names.
+      - language (string): We'll set this to "en".
+      - region (string): We'll set this to "US".
 
 - Source of Inputs:
-  - `query`: API_Output (Panel 1, Step 1), using `top_cities_list`.
-  - `language`: LLM_Generated, value "en".
-  - `region`: LLM_Generated, value "US".
+  - query: API_Output (Panel 1, Step 1), using top_cities_list.
+  - language: LLM_Generated, value "en".
+  - region: LLM_Generated, value "US".
 
 - Workflow Flow:
   - Step 1: Use NewsAPI to retrieve news articles for each city.
 
 - Interdependencies:
-  - Depends on Panel 1, Step 1 for city names.
+  - Depends on Panel 1, Step 1 for city names. Dependency is on the output from a previous panels step which is valid.
 
 - Variable Naming:
-  - Input variable name for Step 1: `top_cities_list`, matching the output from Panel 1, Step 1.
-  - Output variable name for Step 1: `news_articles`
+  - Input variable name for Step 1: top_cities_list, matching the output from Panel 1, Step 1.
+  - Output variable name for Step 1: news_articles
+
+- Validating if what i have thought till now is correct: Yes it is correct.
 
 
 Panel 4: Reddit Discussions on Top 5 Cities
+
+- Understanding Panel Details: 
+  -We need to find what is the top reddit discussions in the top 5 cities in the USA, which we found in the panel 1.
 
 - API Selection:
   - To find relevant subreddits, we'll use Perplexity.
@@ -357,66 +430,78 @@ Panel 4: Reddit Discussions on Top 5 Cities
 
 - Input Parameters:
   - Perplexity:
-    - `query` (string): Queries to find subreddits for each city.
+    - For Perplexity we have to consider these required input parameters : ['query']
+    - query (string): Queries to find subreddits for each city.
   - RedditTopPostsBySubreddit:
-    - `subreddit` (string): Subreddit names.
-    - `time` (string): We'll set this to "day".
+    - For RedditTopPostsBySubreddit we have to consider these required input parameters: {'subreddit': {'type': 'String', 'description': "The subreddit name for which to fetch top posts. Only the subreddit name should be provided, 'r/' prefix is invalid."}, 'time': {'type': 'String', 'description': 'The time period for which to fetch top posts.'}}
+    - subreddit (string): Subreddit names.
+    - time (string): We'll set this to "day".
 
 - Source of Inputs:
   - Perplexity:
-    - `query`: API_Output (Panel 1, Step 1)., using city names from top_cities_list
+    - query: API_Output (Panel 1, Step 1)., using city names from top_cities_list
   - RedditTopPostsBySubreddit:
-    - `subreddit`: API_Output (Panel 4, Step 1), using `subreddits`.
-    - `time`: LLM_Generated, value "day".
+    - subreddit: API_Output (Panel 4, Step 1), using subreddits.
+    - time: LLM_Generated, value "day".
 
 - Workflow Flow:
   - Step 1: Use Perplexity to find subreddits related to each city.
   - Step 2: Use Reddit API to fetch top posts from these subreddits.
 
 - Interdependencies:
-  - Step 2 depends on Step 1 (`subreddits`).
-  - Perplexity in Step 1 uses city names from Panel 1, Step 1.
+  - Step 2 depends on Step 1 (subreddits).
+  - Perplexity in Step 1 uses city names from Panel 1, Step 1. Dependency is on the output from a previous panels step which is valid.
 
 - Variable Naming:
-  - Input variable name for Step 1: `top_cities_list`
-  - Output variable name for Step 1: `subreddits`.
-  - Input variable name for Step 2: `subreddits`.
-  - Output variable name for Step 2: `reddit_posts`
+  - Input variable name for Step 1: top_cities_list
+  - Output variable name for Step 1: subreddits.
+  - Input variable name for Step 2: subreddits.
+  - Output variable name for Step 2: reddit_posts
+
+- Validating if what i have thought till now is correct: Yes it is correct.
 
 
 Panel 5: Top Restaurants in Top 5 Cities
 
+- Understanding Panel Details: 
+  -We need to find what are the top restaurants in the top 5 cities in the USA, which we found in the panel 1.
+
 - API Selection:
-  - We'll use TripadvisorSearchRestaurants to find top restaurants using `geoId`.
+  - We'll use TripadvisorSearchRestaurants to find top restaurants using geoId.
 
 - Input Parameters:
   - TripadvisorSearchRestaurants:
-    - `locationId` (string): `geoId` of each city.
+    - For TripadvisorSearchRestaurants we have to consider these required input parameters: {'locationId': {'type': 'string', 'description': 'location geoId of a place.'}}
+    - locationId (string): geoId of each city.
 
 - Source of Inputs:
-  - `locationId`: API_Output (Panel 1, Step 2), using `city_geoID_details`.
+  - locationId: API_Output (Panel 1, Step 2), using city_geoID_details.
 
 - Workflow Flow:
   - Step 1: Use the Tripadvisor API to get top restaurants for each city.
 
 - Interdependencies:
-  - Depends on Panel 1, Step 2 for `geoId`.
+  - Depends on Panel 1, Step 2 for geoId. Dependency is on the output from a previous panels step which is valid.
 
 - Variable Naming:
-  - Input variable name for Step 1: `city_geoID_details`, matching the output from Panel 1, Step 2.
-  - Output variable name for Step 1: `top_restaurants`
+  - Input variable name for Step 1: city_geoID_details, matching the output from Panel 1, Step 2.
+  - Output variable name for Step 1: top_restaurants
+
+- Validating if what i have thought till now is correct: Yes it is correct.
 
 
 Grouping Panels and Interdependencies
 
 - All panels depend on outputs from Panel 1. Therefore, we will place all panels in Group 1.
 - Ensured that each API depends on at most one previous API's output.
+- Ensured that dependencies are on the output from a previous panels for all such panel steps.
 - Input variables that depend on previous outputs have matching names to maintain consistency.
 
 Workflow Efficiency
 
 - Kept the workflow minimal by:
   - Avoiding unnecessary APIs (e.g., not using Perplexity where not essential).
+  - Avoided calling the same api for same purpose multiple times by keeping such panels in the same group and sharing the api output with other panels.
   - Using city names directly when possible.
   - Limiting each panel to essential steps only.
 
@@ -606,44 +691,52 @@ $$CHAIN_OF_THOUGHT$$
 
 Panel 1: Hotel Options in New York City
 
+- Understanding Panel Details: 
+  -We need to find hotel options in New York City from 10th october 2024 to 12th october 2024.
+
 - API Selection:
   - To find hotel options in New York City for the specified dates.
-  - TripadvisorSearchLocation: To obtain the `geoId` for New York City.
-    - Note: TripadvisorSearchLocation is reliable for obtaining `geoId` for well-known locations, and not longitude or latitude.
-  - TripadvisorSearchHotels: To retrieve hotel options using the `geoId` and the specified dates.
+  - TripadvisorSearchLocation: To obtain the geoId for New York City.
+    - Note: TripadvisorSearchLocation is reliable for obtaining geoId for well-known locations, and not longitude or latitude.
+  - TripadvisorSearchHotels: To retrieve hotel options using the geoId and the specified dates.
   - Perplexity: Not necessary here since we can obtain all required data using Tripadvisor APIs, keeping the workflow minimal.
 
 - Input Parameters:
   - TripadvisorSearchLocation:
-    - `query` (string): The location name to search for.
+    - For TripadvisorSearchLocation we have to consider these required input parameters:  {'query': {'type': 'string', 'description': 'Search query for location (e.g., city name)'}}
+    - query (string): The location name to search for.
   - TripadvisorSearchHotels:
-    - `geoId` (string): The `geoId` obtained from TripadvisorSearchLocation.
-    - `checkIn` (string): The check-in date in YYYY-MM-DD format.
-    - `checkOut` (string): The check-out date in YYYY-MM-DD format.
+    - For TripadvisorSearchHotels we have to consider these required input parameters: {'geoId': {'type': 'string', 'description': 'Geo ID of the location retrieved from the Search Location API.'}, 'checkIn': {'type': 'string', 'description': 'Check-in date. Format: YYYY-MM-DD'}, 'checkOut': {'type': 'string', 'description': 'Check-out date. Format: YYYY-MM-DD'}}
+    - geoId (string): The geoId obtained from TripadvisorSearchLocation.
+    - checkIn (string): The check-in date in YYYY-MM-DD format.
+    - checkOut (string): The check-out date in YYYY-MM-DD format.
 
 - Source of Inputs:
   - TripadvisorSearchLocation:
-    - `query`: LLM_Generated, value `"New York City"`, extracted from the user's query.
+    - query: LLM_Generated, value "New York City", extracted from the user's query.
   - TripadvisorSearchHotels:
-    - `geoId`: API_Output (Panel 1, Step 1), output `location_geoId` from TripadvisorSearchLocation.
-    - `checkIn`: LLM_Generated, value `"2024-10-10"`, extracted from the user's query.
-    - `checkOut`: LLM_Generated, value `"2024-10-12"`, extracted from the user's query.
+    - geoId: API_Output (Panel 1, Step 1), output location_geoId from TripadvisorSearchLocation.
+    - checkIn: LLM_Generated, value "2024-10-10", extracted from the user's query.
+    - checkOut: LLM_Generated, value "2024-10-12", extracted from the user's query.
 
 - Workflow Flow:
-  - Step 1: Use TripadvisorSearchLocation to get the `geoId` for New York City.
-  - Step 2: Use TripadvisorSearchHotels with the `geoId` and dates to retrieve hotel options.
+  - Step 1: Use TripadvisorSearchLocation to get the geoId for New York City.
+  - Step 2: Use TripadvisorSearchHotels with the geoId and dates to retrieve hotel options.
 
 - Interdependencies:
-  - Step 2 depends on Step 1 for the `geoId` (`location_geoId`).
-  - The input variable `location_geoId` in Step 2 must match the output variable name from Step 1.
+  - Step 2 depends on Step 1 for the geoId (location_geoId). Dependency is on the current panels step output which is valid.
+  - The input variable location_geoId in Step 2 must match the output variable name from Step 1.
 
 - Variable Naming:
-  - Input variable name for Step 1: `location_query`
-  - Output variable name for Step 1: `location_geoId`.
-  - Input variable name for Step 2: `location_geoId` (matching the output variable name), `check_in_date`, `check_out_date`.
-  - Output variable name for Step 2: `hotel_options`.
+  - Input variable name for Step 1: location_query
+  - Output variable name for Step 1: location_geoId.
+  - Input variable name for Step 2: location_geoId (matching the output variable name), check_in_date, check_out_date.
+  - Output variable name for Step 2: hotel_options.
 
 Panel 2: Weather Forecast for New York City
+
+- Understanding Panel Details: 
+  -We need to get the weather details in New York City from 10th october 2024 to 12th october 2024.
 
 - API Selection:
   - To provide the weather forecast for New York City for the specified dates.
@@ -652,31 +745,33 @@ Panel 2: Weather Forecast for New York City
 
 - Input Parameters:
   - Perplexity:
-    - `query` (string): A query to obtain the latitude and longitude of New York City.
+    - For Perplexity we have to consider these required input parameters: ['query']
+    - query (string): A query to obtain the latitude and longitude of New York City.
   - WeatherAPI.com_Forecast_Weather_API:
-    - `q` (string): The latitude and longitude in "lat,lon" format.
-    - `dt` (date): Specific dates for which the forecast is required.
+    - For WeatherAPI.com_Forecast_Weather_API we have to consider these required input parameters:{'q': {'type': 'String', 'description': 'Query parameter based on which data is sent back. It could be one of the following: Latitude and Longitude (Decimal degree) e.g: q=48.8567,2.3508, city name e.g.: q=Paris, US zip e.g: q=10001, UK postcode e.g: q=SW1, Canada postal code e.g: q=G2J, metar:<metar_code> e.g: q=metar:EGLL, iata:<3 digit airport code> e.g: q=iata:DXB, auto:ip for IP lookup, IP address (IPv4 and IPv6 supported) e.g: q=100.0.0.1'}}
+    - q (string): The latitude and longitude in "lat,lon" format.
+    - dt (date): Specific dates for which the forecast is required.
 
 - Source of Inputs:
   - Perplexity:
-    - `query`: LLM_Generated, value `"What is the latitude and longitude of New York City?"`, inferred from the user's query.
+    - query: LLM_Generated, value "What is the latitude and longitude of New York City?", inferred from the user's query.
   - WeatherAPI.com_Forecast_Weather_API:
-    - `q`: API_Output (Panel 2, Step 1), output `nyc_coordinates` from Perplexity.
-    - `dt`: LLM_Generated, value `["2024-10-10", "2024-10-11", "2024-10-12"]`, extracted from the user's query.
+    - q: API_Output (Panel 2, Step 1), output nyc_coordinates from Perplexity.
+    - dt: LLM_Generated, value ["2024-10-10", "2024-10-11", "2024-10-12"], extracted from the user's query.
 
 - Workflow Flow:
   - Step 1: Use Perplexity to obtain the latitude and longitude of New York City.
   - Step 2: Use WeatherAPI.com_Forecast_Weather_API with the coordinates and dates to fetch the weather forecast.
 
 - Interdependencies:
-  - Step 2 depends on Step 1 for the coordinates (`nyc_coordinates`).
-  - The input variable `nyc_coordinates` in Step 2 must match the output variable name from Step 1.
+  - Step 2 depends on Step 1 for the coordinates (nyc_coordinates). Dependency is on the current panels step output which is valid.
+  - The input variable nyc_coordinates in Step 2 must match the output variable name from Step 1.
 
 - Variable Naming:
-  - Input variable name for Step 1: `query_nyc_coordinates`
-  - Output variable for Step 1: `nyc_coordinates`.
-  - Input variable name for Step 2: `nyc_coordinates` (matching the output variable name), `forecast_dates`.
-  - Output variable name for Step 2: `weather_forecast`
+  - Input variable name for Step 1: query_nyc_coordinates
+  - Output variable for Step 1: nyc_coordinates.
+  - Input variable name for Step 2: nyc_coordinates (matching the output variable name), forecast_dates.
+  - Output variable name for Step 2: weather_forecast
 
 Grouping Panels and Interdependencies
 
@@ -694,6 +789,7 @@ Workflow Efficiency
 
 - Kept the workflow minimal by:
   - Using only necessary APIs.
+  - Avoided calling the same api for same purpose multiple times by keeping such panels in the same group and sharing the api output with other panels.
   - Avoiding unnecessary steps like additional Perplexity calls.
   - Extracting dates directly from the user's query without additional processing.
 
@@ -709,7 +805,7 @@ Workflow Steps:
 
 Step 1
 - API: TripadvisorSearchLocation
-- Handles: Retrieves `geoId` for New York City
+- Handles: Retrieves geoId for New York City
 - Input Variables:
   - Name: location_query
     - Parameter: query
@@ -723,7 +819,7 @@ Step 1
 
 Step 2
 - API: TripadvisorSearchHotels
-- Handles: Retrieves hotel options using `geoId`
+- Handles: Retrieves hotel options using geoId
 - Input Variables:
   - Name: location_geoId
     - Parameter: geoId
@@ -820,18 +916,19 @@ Panel 1: News in the Netherlands
   - The user's query is "What is the news in Netherlands?"
   - We can directly use the NewsAPISearchByKeyWord API to fetch news articles related to the Netherlands.
   - Perplexity is not necessary here since we can use the country name directly as the search query.
-  - We should avoid using the `region` parameter in the NewsAPI if we are unsure about the exact region code or if it might limit the results in unintended ways.
+  - We should avoid using the region parameter in the NewsAPI if we are unsure about the exact region code or if it might limit the results in unintended ways.
 
 - Input Parameters:
   - NewsAPISearchByKeyWord:
-    - `query` (string): The keyword or phrase to search for in news articles.
-    - `language` (string): The language of the news articles. This is optional but can be set to "en" for English.
-    - `region` (string): The region or country code. Since we are not sure about the correct region code for the Netherlands in the API, it's best to omit this parameter to ensure we don't miss relevant articles.
+    - For NewsAPISearchByKeyWord there are no required input parameters. But for our purpose we will give the following parameters.
+      - query (string): The keyword or phrase to search for in news articles.
+      - language (string): The language of the news articles. This is optional but can be set to "en" for English.
+      - region (string): The region or country code. Since we are not sure about the correct region code for the Netherlands in the API, it's best to omit this parameter to ensure we don't miss relevant articles.
 
 - Source of Inputs:
-  - `query`: LLM_Generated, value `"Netherlands"`, directly extracted from the user's query.
-  - `language`: LLM_Generated, value `"en"`, assuming the user wants news articles in English.
-  - We will not use the `region` parameter to avoid potential issues with incorrect or restrictive region codes.
+  - query: LLM_Generated, value "Netherlands", directly extracted from the user's query.
+  - language: LLM_Generated, value "en", assuming the user wants news articles in English.
+  - We will not use the region parameter to avoid potential issues with incorrect or restrictive region codes.
 
 - Workflow Flow:
   - Step 1: Use NewsAPISearchByKeyWord to fetch recent news articles about the Netherlands using the keyword and language parameters.
@@ -841,10 +938,10 @@ Panel 1: News in the Netherlands
 
 - Variable Naming:
   - Input Variables:
-    - `news_query` (for the `query` parameter)
-    - `news_language` (for the `language` parameter)
+    - news_query (for the query parameter)
+    - news_language (for the language parameter)
   - Output Variables:
-    - `news_articles`
+    - news_articles
 
 - Grouping Panels and Interdependencies:
   - Since there's only one panel, it will be placed in Group 1.
@@ -855,7 +952,7 @@ Panel 1: News in the Netherlands
 
 - Workflow Efficiency:
   - The workflow is minimal and straightforward, using only one API call.
-  - By avoiding unnecessary parameters like `region`, we reduce the risk of errors and ensure we retrieve the most comprehensive set of news articles.
+  - By avoiding unnecessary parameters like region, we reduce the risk of errors and ensure we retrieve the most comprehensive set of news articles.
 
 
 $$WORKFLOW$$
@@ -878,3 +975,571 @@ $$WORKFLOW$$
 - Output Variables:
   - Name: news_articles
     - Description: News articles for Netherlands
+
+
+#### Example 4:
+
+Query: "Identify upcoming music festivals worldwide over the next three months (currently it is October 2024) and their exact dates, find affordable flights to these destinations from New York, and check recent Reddit threads for attendee experiences or tips."
+
+Interpreter's Panel Requests:
+1. Panel 1: Upcoming Music Festivals Worldwide
+Details: Display a list of upcoming music festivals worldwide over the next three months, including their exact dates and locations. The panel should provide a brief description of each festival and any notable artists or events associated with them.
+List of Relevant APIs:
+   - Perplexity
+
+2. Panel 2: Affordable Flights to Music Festival Destinations
+Details: Find and display affordable flights from New York to the destinations of the identified music festivals. Include details such as airlines, prices, and travel dates. Ensure the flights align with the festival dates.
+List of Relevant APIs:
+   - SkyScrapperFlightSearch
+   - SkyScrapperSearchAirport
+   - Perplexity
+
+3. Panel 3: Reddit Threads on Music Festival Experiences
+Details: Retrieve and display recent Reddit threads discussing attendee experiences or tips for the identified music festivals. Include the top posts with user comments and ratings.
+List of Relevant APIs:
+   - RedditTopPostsBySubreddit
+   - Perplexity
+
+Description of APIs:
+
+[Will be given to you]
+
+Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+Panel 1: Upcoming Music Festivals Worldwide
+
+- Understanding Panel Details:
+  - The panel aims to display a list of upcoming music festivals worldwide over the next three months (October 2024 to December 2024), including their exact dates, locations, descriptions, and notable artists.
+
+- API Selection:
+  - Perplexity: To retrieve and synthesize up-to-date information on upcoming music festivals worldwide, including all required details.
+
+- Input Parameters:
+  - Perplexity requires the parameter query (string): The user's question or search term.
+
+- Source of Inputs:
+  - query_music_festivals: LLM_Generated, value: "List upcoming music festivals worldwide from October 2024 to December 2024 with exact dates, locations, descriptions, and notable artists."
+
+- Workflow Flow:
+  - Step 1: Use Perplexity to obtain information on upcoming music festivals over the next three months.
+
+- Interdependencies:
+  - Since this is the first panel and a single-step workflow, there are no interdependencies with other panels or steps.
+
+- Variable Naming:
+  - Input Variable:
+    - query_music_festivals (for parameter query)
+  - Output Variable:
+    - music_festivals_list
+
+- Validation:
+  - Perplexity requires only the query parameter.
+  - Variable names are unique and match those in the updated workflow.
+  - The workflow is minimal and efficient.
+
+Panel 2: Affordable Flights to Music Festival Destinations
+
+- Understanding Panel Details:
+  - The panel aims to find and display affordable flights from New York to the destinations of the identified music festivals.
+  - Include details such as airlines, prices, and travel dates, ensuring the flights align with the festival dates.
+
+- API Selection:
+  - Perplexity: To extract festival locations and dates from the music_festivals_list obtained in Panel 1.
+  - SkyScrapperSearchAirport: To find airport details (skyIds and entityIds) for New York and festival destinations.
+  - SkyScrapperFlightSearch: To search for flights using the airport details and dates.
+
+- Input Parameters:
+  - Perplexity (Step 1):
+    - Requires parameter query (string): We'll input music_festivals_list to extract locations and dates.
+  - SkyScrapperSearchAirport (Step 2 and Step 3):
+    - Requires parameter query (string): Name of the location where the airport is situated.
+  - SkyScrapperFlightSearch (Step 4):
+    - Requires parameters:
+      - originSkyId (string)
+      - destinationSkyId (string)
+      - originEntityId (string)
+      - destinationEntityId (string)
+      - date (string): Departure or travel date in YYYY-MM-DD format.
+
+- Source of Inputs:
+  - Step 1:
+    - music_festivals_list: API_Output (Panel 1, Step 1)
+  - Step 2:
+    - origin_location_query: LLM_Generated, value: "New York"
+  - Step 3:
+    - festival_locations_dates: API_Output (Panel 2, Step 1)
+  - Step 4:
+    - nyc_airport_details: API_Output (Panel 2, Step 2)
+    - festival_airport_details: API_Output (Panel 2, Step 3)
+    - festival_locations_dates: API_Output (Panel 2, Step 1)
+
+- Workflow Flow:
+  - Step 1: Use Perplexity to extract festival locations and dates from music_festivals_list.
+  - Step 2: Use SkyScrapperSearchAirport to get airport details for New York.
+  - Step 3: Use SkyScrapperSearchAirport to get airport details for each festival destination.
+  - Step 4: Use SkyScrapperFlightSearch to find affordable flights using the airport details and festival dates.
+
+- Interdependencies:
+  - Step 2 depends on LLM_Generated input.
+  - Step 3 depends on Step 1 (festival_locations_dates).
+  - Step 4 depends on Step 2 (nyc_airport_details), Step 3 (festival_airport_details), and Step 1 (festival_locations_dates).
+  - Each API depends on at most one previous API's output per input variable.
+  - Input variable names that depend on previous outputs match the output variable names to ensure consistency.
+
+- Variable Naming:
+  - Input Variables:
+    - Step 1:
+      - music_festivals_list (from Panel 1, Step 1)
+    - Step 2:
+      - origin_location_query (LLM_Generated)
+    - Step 3:
+      - festival_locations_dates (from Panel 2, Step 1)
+    - Step 4:
+      - nyc_airport_details (from Panel 2, Step 2)
+      - festival_airport_details (from Panel 2, Step 3)
+      - festival_locations_dates (from Panel 2, Step 1)
+  - Output Variable:
+    - festival_locations_dates
+    - flight_options
+
+- Validation:
+  - Each API depends on at most one previous API's output per input variable.
+  - Variable names are unique and match those in the updated workflow.
+  - The workflow complies with dependency limitations.
+
+Panel 3: Reddit Threads on Music Festival Experiences
+
+- Understanding Panel Details:
+  - Retrieve and display recent Reddit threads discussing attendee experiences or tips for the identified music festivals.
+  - Include top posts with user comments and ratings.
+
+- API Selection:
+  - Perplexity: To identify relevant subreddits or search terms for each music festival.
+  - RedditTopPostsBySubreddit: To fetch top Reddit posts from relevant subreddits.
+
+- Input Parameters:
+  - Perplexity (Step 1):
+    - Requires parameter query (string): We'll input music_festivals_list to find relevant subreddits.
+  - RedditTopPostsBySubreddit (Step 2):
+    - Requires parameters:
+      - subreddit (string): The subreddit name.
+      - time (string): The time period for which to fetch top posts.
+
+- Source of Inputs:
+  - Step 1:
+    - festival_locations_dates: API_Output (Panel 1, Step 1)
+  - Step 2:
+    - festival_subreddits: API_Output (Panel 3, Step 1)
+    - time_period: LLM_Generated, value: "month"
+
+- Workflow Flow:
+  - Step 1: Use Perplexity to identify relevant subreddits or search terms for each music festival.
+  - Step 2: Use RedditTopPostsBySubreddit to retrieve top posts from the identified subreddits.
+
+- Interdependencies:
+  - Step 1 depends on Panel 1, Step 1 (music_festivals_list).
+  - Step 2 depends on Step 1 (festival_subreddits).
+  - Input variable names that depend on previous outputs match the output variable names to ensure consistency.
+
+- Variable Naming:
+  - Input Variables:
+    - Step 1:
+      - music_festivals_list (from Panel 1, Step 1)
+    - Step 2:
+      - festival_subreddits (from Panel 3, Step 1)
+      - time_period (LLM_Generated)
+  - Output Variable:
+    - festival_subreddits
+    - reddit_posts
+
+- Validation:
+  - Each API depends on at most one previous API's output per input variable.
+  - Variable names are unique and match those in the updated workflow.
+  - The workflow is minimal and efficient.
+
+---
+
+Grouping Panels and Interdependencies
+
+- Panels 1, 2, and 3 are interdependent:
+  - Panel 2 depends on Panel 1 for music_festivals_list.
+  - Panel 3 depends on Panel 1 for music_festivals_list.
+- Therefore, all panels are placed in Group 1.
+
+Dependency Limitation and Workflow Adjustments
+
+- Ensured that each API input depends on at most one previous API's output.
+- Adjusted variable names to match the output variable names in the updated workflow provided.
+- Avoided multiple dependencies for any single API input.
+
+Workflow Efficiency
+
+- Kept the workflow minimal by:
+  - Using only necessary APIs.
+  - Ensuring data flows efficiently between steps.
+  - Matching variable names to maintain consistency and avoid errors.
+
+$$WORKFLOW$$
+
+Group 1:
+
+Workflow for Panel 1:
+
+Panel Description: Identify upcoming music festivals worldwide over the next three months.
+
+Workflow Steps:
+
+Step 1
+
+- API: Perplexity
+- Handles: Retrieves upcoming music festivals with exact dates, locations, descriptions, and notable artists.
+- Input Variables:
+  - Name: query_music_festivals
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query to find upcoming music festivals worldwide from October 2024 to December 2024.
+    - Value: "List upcoming music festivals worldwide from October 2024 to December 2024 with exact dates, locations, descriptions, and notable artists."
+- Output Variables:
+  - Name: music_festivals_list
+    - Description: List of upcoming music festivals with dates, locations, descriptions, and notable artists.
+
+Workflow for Panel 2:
+
+Panel Description: Find affordable flights from New York to music festival destinations.
+
+Workflow Steps:
+
+Step 1
+
+- API: Perplexity
+- Handles: Extracts festival locations and dates from music_festivals_list.
+- Input Variables:
+  - Name: music_festivals_list
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: List of music festivals to extract locations and dates.
+    - Value: None
+- Output Variables:
+  - Name: festival_locations_dates
+    - Description: Extracted locations and dates of the festivals.
+
+Step 2
+
+- API: SkyScrapperSearchAirport
+- Handles: Retrieves airport details for New York.
+- Input Variables:
+  - Name: origin_location_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Location name for airport search.
+    - Value: "New York"
+- Output Variables:
+  - Name: nyc_airport_details
+    - Description: Airport details for New York (originSkyId, originEntityId).
+
+Step 3
+
+- API: SkyScrapperSearchAirport
+- Handles: Retrieves airport details for festival destinations.
+- Input Variables:
+  - Name: festival_locations_dates
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: Festival locations for airport search.
+    - Value: None
+- Output Variables:
+  - Name: festival_airport_details
+    - Description: Airport details for festival destinations (destinationSkyId, destinationEntityId).
+
+Step 4
+
+- API: SkyScrapperFlightSearch
+- Handles: Finds affordable flights using airport details and festival dates.
+- Input Variables:
+  - Name: nyc_airport_details
+    - Parameter: originSkyId, originEntityId
+    - Type: string
+    - Source: API_Output (Panel 2, Step 2)
+    - Description: Airport details of New York for flight search.
+    - Value: None
+  - Name: festival_airport_details
+    - Parameter: destinationSkyId, destinationEntityId
+    - Type: string
+    - Source: API_Output (Panel 2, Step 3)
+    - Description: Airport details of festival destinations for flight search.
+    - Value: None
+  - Name: festival_locations_dates
+    - Parameter: date
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: Dates of the music festivals.
+    - Value: None
+- Output Variables:
+  - Name: flight_options
+    - Description: Affordable flight options to festival destinations.
+
+Workflow for Panel 3:
+
+Panel Description: Retrieve Reddit threads on music festival experiences.
+
+Workflow Steps:
+
+Step 1
+
+- API: Perplexity
+- Handles: Identifies relevant subreddits or search terms for each festival.
+- Input Variables:
+  - Name: music_festivals_list
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: Names of music festivals to find relevant subreddits.
+    - Value: None
+- Output Variables:
+  - Name: festival_subreddits
+    - Description: Relevant subreddits or search terms for each festival.
+
+Step 2
+
+- API: RedditTopPostsBySubreddit
+- Handles: Fetches top posts from relevant subreddits.
+- Input Variables:
+  - Name: festival_subreddits
+    - Parameter: subreddit
+    - Type: string
+    - Source: API_Output (Panel 3, Step 1)
+    - Description: Subreddits identified by Perplexity.
+    - Value: None
+  - Name: time_period
+    - Parameter: time
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Time period for top posts.
+    - Value: "month"
+- Output Variables:
+  - Name: reddit_posts
+    - Description: Top Reddit posts for each festival.
+
+#### Example 5:
+
+Query: "what are some 3 popular sci-fi books also provide their rating on Goodreads ratings, and find news articles about any that have been or will be adapted into movies or TV series."
+
+Interpreter's Panel Requests:
+1. Panel 1: Popular Sci-Fi Books with Goodreads Ratings
+Details: Display a list of popular science fiction books along with their ratings from Goodreads. Include details such as the book title, author, and average rating.
+List of Relevant APIs:
+   - Goodreads_Search_Book_By_Keyword
+   - Perplexity
+
+2. Panel 2: News Articles on Sci-Fi Book Adaptations
+Details: Find and display news articles about science fiction books that have been or will be adapted into movies or TV series. Include article titles, publication dates, and a brief summary.
+List of Relevant APIs:
+   - NewsAPISearchByKeyWord
+   - Perplexity
+
+Description of APIs:
+
+[Will be given to you]
+
+Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+$$CHAIN_OF_THOUGHT$$
+
+Panel 1: Popular Sci-Fi Books with Goodreads Ratings
+
+- Understanding Panel Details:
+  - The panel aims to display a list of 3 popular science fiction books along with their ratings from Goodreads.
+  - Details to include: book title, author, average rating.
+
+- API Selection:
+  - Perplexity: To retrieve a list of 3 popular sci-fi books.
+    - Reasoning: The Goodreads_Search_Book_By_Keyword API requires specific keywords or book titles to search effectively.
+    - We cannot use general terms like "popular sci-fi books" as the keyword parameter in the Goodreads API; it won't yield meaningful results.
+    - Therefore, we first need to obtain specific book titles using Perplexity.
+  - Goodreads_Search_Book_By_Keyword: To get the Goodreads ratings and details for the specific books obtained from Perplexity.
+
+- Input Parameters:
+  - Perplexity:
+    - Requires parameter query (string): A query to find 3 popular sci-fi books.
+  - Goodreads_Search_Book_By_Keyword:
+    - keyword (string): The specific book titles obtained from Perplexity.
+
+- Source of Inputs:
+  - Perplexity:
+    - query: LLM_Generated, value: "List 3 popular science fiction books."
+  - Goodreads_Search_Book_By_Keyword:
+    - For Goodreads_Search_Book_By_Keyword we have to consider these required input parameters: {'keyword': {'type': 'String', 'description': 'Search term or keyword to look up books.'}}
+    - keyword: API_Output (Panel 1, Step 1), output sci_fi_books_list from Perplexity.
+
+- Workflow Flow:
+  - Step 1: Use Perplexity to obtain a list of 3 popular sci-fi books.
+  - Step 2: Use Goodreads_Search_Book_By_Keyword to retrieve ratings and details for each book obtained in Step 1.
+
+- Interdependencies:
+  - Step 2 depends on Step 1 for the sci_fi_books_list.
+  - The input variable sci_fi_books_list in Step 2 must match the output variable name from Step 1.
+
+- Variable Naming:
+  - Input Variable for Step 1:
+    - Name: query_sci_fi_books (for parameter query)
+  - Output Variable for Step 1:
+    - Name: sci_fi_books_list
+  - Input Variable for Step 2:
+    - Name: sci_fi_books_list (matching the output from Step 1)
+  - Output Variable for Step 2:
+    - Name: goodreads_ratings
+
+- Validation:
+  - The Goodreads_Search_Book_By_Keyword API requires specific book titles or keywords.
+  - Using general terms like "popular sci-fi books" as the keyword may not return accurate results from goodreads api directly.
+  - Therefore, obtaining specific book titles from Perplexity is necessary for effective use of the Goodreads API.
+
+Panel 2: News Articles on Sci-Fi Book Adaptations
+
+- Understanding Panel Details:
+  - The panel aims to find and display news articles about sci-fi books that have been or will be adapted into movies or TV series.
+  - Include article titles, publication dates, and brief summaries.
+
+- API Selection:
+  - Perplexity: To identify which sci-fi books from the list have been or will be adapted into movies or TV series.
+  - NewsAPISearchByKeyWord: To find news articles about these adaptations.
+
+- Input Parameters:
+  - Perplexity:
+    - Requires parameter query (string): A query to find adaptations of books from sci_fi_books_list.
+  - NewsAPISearchByKeyWord:
+    - For NewsAPISearchByKeyWord there are no required input parameters. But for our purpose we will give the following parameters.
+    - query (string): Keywords related to the identified adaptations.
+    - language (string): Set to "en" for English articles.
+
+- Source of Inputs:
+  - Perplexity:
+    - query: API_Output (Panel 1, Step 1), using sci_fi_books_list to find adaptation information.
+  - NewsAPISearchByKeyWord:
+    - query: API_Output (Panel 2, Step 1), output adaptation_keywords from Perplexity.
+    - language: LLM_Generated, value: "en"
+
+- Workflow Flow:
+  - Step 1: Use Perplexity to identify which books have been adapted and generate keywords for searching news articles.
+  - Step 2: Use NewsAPISearchByKeyWord to find news articles about these adaptations.
+
+- Interdependencies:
+  - Step 1 depends on Panel 1, Step 1 for sci_fi_books_list.
+  - Step 2 depends on Step 1 for adaptation_keywords.
+
+- Variable Naming:
+  - Input Variable for Step 1:
+    - Name: sci_fi_books_list (from Panel 1, Step 1)
+  - Output Variable for Step 1:
+    - Name: adaptation_keywords
+  - Input Variables for Step 2:
+    - Name: adaptation_keywords (matching the output from Step 1)
+    - Name: news_language
+  - Output Variable for Step 2:
+    - Name: news_articles
+
+- Validation:
+  - Using specific adaptation keywords improves the relevance of news articles retrieved.
+  - Setting the language parameter to "en" ensures articles are in English.
+
+- Potential Issues in the Workflow:
+  - In Panel 2, Step 1, the Value field for sci_fi_books_list is set to None, which is appropriate since it depends on the output from Panel 1, Step 1.
+  - The variable names are consistent with the dependencies and follow the guidelines.
+
+Grouping Panels and Interdependencies
+
+- Both panels are interdependent:
+  - Panel 2 depends on Panel 1 for sci_fi_books_list.
+- Therefore, both panels should be placed in Group 1.
+
+Dependency Limitation
+
+- Ensured that each API depends on at most one previous API's output.
+- Input variables that depend on previous outputs have matching names to maintain consistency.
+
+Workflow Efficiency
+
+- Kept the workflow minimal by:
+  - Using only necessary APIs.
+  - Avoiding unnecessary API calls.
+  - Ensuring data flows efficiently between steps.
+
+$$WORKFLOW$$
+
+Group 1:
+
+Workflow for Panel 1:
+
+Panel Description: Display a list of 3 popular science fiction books along with their ratings from Goodreads.
+
+Workflow Steps:
+
+Step 1
+- API: Perplexity
+- Handles: Look for 3 popular science fiction books
+- Input Variables:
+  - Name: query_sci_books
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: List of 3 popular sci-fi books
+    - Value: None
+- Output Variables:
+  - Name: sci_fi_books_list
+    - Description: Keywords related to sci-fi book adaptations.
+
+Step 2
+- API: Goodreads_Search_Book_By_Keyword
+- Handles: Retrieves popular sci-fi books ratings on goodreads.
+- Input Variables:
+  - Name: sci_fi_books_list
+    - Parameter: keyword
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: popular sci-fi books to search on goodreads.
+    - Value: None
+- Output Variables:
+  - Name: goodreads_ratings
+    - Description: Ratings and more information about popular sci-fi books retrieved from Perplexity in step 1.
+
+Workflow for Panel 2:
+
+Panel Description: Find news articles about sci-fi books adapted into movies or TV series.
+
+Workflow Steps:
+
+Step 1
+- API: Perplexity
+- Handles: Identifies sci-fi books adapted into movies or TV series.
+- Input Variables:
+  - Name: sci_fi_books_list
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: List of sci-fi books to find adaptations.
+    - Value: None
+- Output Variables:
+  - Name: adaptation_keywords
+    - Description: Keywords related to sci-fi book adaptations.
+
+Step 2
+- API: NewsAPISearchByKeyWord
+- Handles: Finds news articles about sci-fi book adaptations.
+- Input Variables:
+  - Name: adaptation_keywords
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: Keywords for searching news articles on adaptations.
+    - Value: None
+- Output Variables:
+  - Name: news_articles
+    - Description: News articles about sci-fi book adaptations.
