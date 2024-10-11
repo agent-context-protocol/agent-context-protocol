@@ -30,9 +30,9 @@ class InterpreterNode(BaseNode):
 
     def setup(self):
         if self.user_query:
-            initial_message = fetch_user_data(self.personal_json, self.user_query)
-            print('User Context: ',initial_message)
-            self.chat_history.append({"role": "user", "content": initial_message})
+            # initial_message = fetch_user_data(self.personal_json, self.user_query)
+            # print('User Context: ',initial_message)
+            self.chat_history.append({"role": "user", "content": f'''User Query: {self.user_query}'''})
             available_api_string = self.create_available_api_string()
             print("available_api_string : ",available_api_string)
             self.chat_history.append({"role": "user", "content": available_api_string})
@@ -43,14 +43,14 @@ class InterpreterNode(BaseNode):
 
     def modify_message(self, message):
         # Define the JSON-like strings
-        json_strings = message.split('---Done---')[:-1]
+        json_strings = message.split('---Done---')[1:-1]
         panels_list = []
         for json_string in json_strings:
             panel = json.loads(json_string)
             instance_id = panel["instance_id"]
             panels_list.append(update_interpreter_with_similar_apis(panel))
 
-        return panels_list
+        return panels_list 
     
 '''
 Still Need to implement how the communication between interpreter and the translator will be handled after the initial setup.
