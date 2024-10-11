@@ -688,6 +688,7 @@ class MainTranslatorNode(BaseNode):
             if parsed_updated_workflow['chosen_action'] == "DROP_PANEL":
                 # Acquire the lock only when modifying shared resources
                 async with self.lock:
+
                     local_translator_object.drop = True
                 print('Sent Request to Drop Panel')
 
