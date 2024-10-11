@@ -1,27 +1,75 @@
 {
     "1": {
-        "panel_description": "Retrieve current weather information for Los Angeles.",
+        "panel_description": "Summarize the most popular discussions from the fitness community for October 2024.",
         "steps": {
             "1": {
-                "api": "WeatherAPI.com_Realtime_Weather_Api",
-                "handles": "Fetches current weather data for Los Angeles",
+                "api": "RedditTopPostsBySubreddit",
+                "handles": "Retrieves top posts from the fitness subreddit.",
                 "input_vars": [
                     {
-                        "name": "city_name",
-                        "parameter": "q",
+                        "name": "subreddit_name",
+                        "parameter": [
+                            "subreddit"
+                        ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "City name for weather query",
-                        "value": "Los Angeles",
+                        "description": "Name of the subreddit to fetch top posts.",
+                        "value": "fitness",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "time_period",
+                        "parameter": [
+                            "time"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Time period for fetching top posts.",
+                        "value": "month",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "current_weather_la",
-                        "description": "Current weather details for Los Angeles",
+                        "name": "top_posts",
+                        "description": "Top posts from the fitness subreddit.",
+                        "used_by": [
+                            {
+                                "panel": 1,
+                                "step": 2
+                            }
+                        ],
+                        "value": "```json\n    [\n      {\n        \"title\": \"Rant Wednesday\",\n        \"author\": \"AutoModerator\",\n        \"upvote_ratio\": 0.94,\n        \"score\": 86,\n        \"num_comments\": 399,\n        \"url\": \"https://www.reddit.com/r/Fitness/comments/1fozxll/rant_wednesday/\"\n      },\n      {\n        \"title\": \"Gym Story Saturday\",\n        \"author\": \"FGC_Valhalla\",\n        \"upvote_ratio\": 0.92,\n        \"score\": 85,\n        \"num_comments\": 108,\n        \"url\": \"https://www.reddit.com/r/Fitness/comments/1fr841f/gym_story_saturday/\"\n      },\n      {\n        \"title\": \"Tri-Annual Protein Megathread\",\n        \"author\": \"AutoModerator\",\n        \"upvote_ratio\": 0.89,\n        \"score\": 82,\n        \"num_comments\": 147,\n        \"url\": \"https://www.reddit.com/r/Fitness/comments/1fqoet1/triannual_protein_megathread/\"\n      },\n      {\n        \"title\": \"Moronic Monday - Your weekly stupid questions thread\",\n        \"author\": \"cdingo\",\n        \"upvote_ratio\": 0.93,\n        \"score\": 52,\n        \"num_comments\": 519,\n        \"url\": \"https://www.reddit.com/r/Fitness/comments/1fhyfgb/moronic_monday_your_weekly_stupid_questions_thread/\"\n      },\n      {\n        \"title\": \"Physique Phriday\",\n        \"author\": \"AutoModerator\",\n        \"upvote_ratio\": 0.85,\n        \"score\": 46,\n        \"num_comments\": 88,\n        \"url\": \"https://www.reddit.com/r/Fitness/comments/1fl7k9m/physique_phriday/\"\n      }\n    ]\n    ```"
+                    }
+                ]
+            },
+            "2": {
+                "api": "Perplexity",
+                "handles": "Synthesizes information from top posts.",
+                "input_vars": [
+                    {
+                        "name": "top_posts",
+                        "parameter": [
+                            "query"
+                        ],
+                        "type": "string",
+                        "source": "API_Output (Panel 1, Step 1)",
+                        "description": "Top posts to synthesize information.",
+                        "value": "\"Rant Wednesday by AutoModerator, Gym Story Saturday by FGC_Valhalla, Tri-Annual Protein Megathread by AutoModerator, Moronic Monday by cdingo, Physique Phriday by AutoModerator\"",
+                        "dependencies": [
+                            {
+                                "panel": 1,
+                                "step": 1
+                            }
+                        ]
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "discussion_summary",
+                        "description": "Summary of popular discussions.",
                         "used_by": [],
-                        "value": "```json\n    {\n      \"location\": {\n        \"name\": \"Los Angeles\",\n        \"region\": \"California\",\n        \"country\": \"United States of America\",\n        \"latitude\": 34.0522,\n        \"longitude\": -118.2428,\n        \"timezone\": \"America/Los_Angeles\",\n        \"localtime\": \"2024-10-04 09:17\"\n      },\n      \"current_weather\": {\n        \"temperature_c\": 22.1,\n        \"temperature_f\": 71.8,\n        \"condition\": \"Sunny\",\n        \"wind_speed_mph\": 2.2,\n        \"wind_speed_kph\": 3.6,\n        \"wind_direction\": \"SW\",\n        \"humidity\": 65,\n        \"pressure_mb\": 1015.0,\n        \"pressure_in\": 29.96,\n        \"precipitation_mm\": 0.0,\n        \"precipitation_in\": 0.0,\n        \"feels_like_c\": 24.6,\n        \"feels_like_f\": 76.2,\n        \"visibility_km\": 16.0,\n        \"visibility_miles\": 9.0,\n        \"uv_index\": 6.0\n      }\n    }\n    ```"
+                        "value": "- **Rant Wednesday**: A community initiative on r/networking for users to vent frustrations and share challenges related to networking, fostering a supportive environment.\n    - **Gym Story Saturday**: A personal fitness journey shared by FGC_Valhalla on r/Fitness, highlighting significant weight loss and a motivating encounter at the gym.\n    - **Tri-Annual Protein Megathread**: A discussion on r/Fitness about favorite protein brands, user experiences, and recommendations, serving as a resource for choosing protein supplements.\n    - **Moronic Monday**: A weekly event on r/Fitness for asking fitness-related questions without judgment, promoting a supportive and informative community.\n    - **Physique Phriday**: A thread on r/Fitness for posting physique pictures to receive constructive critiques and support, aimed at helping members improve their fitness."
                     }
                 ]
             }

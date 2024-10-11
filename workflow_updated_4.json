@@ -1,82 +1,40 @@
 {
     "4": {
-        "panel_description": "Understand what generally causes null pointer errors in Java.",
+        "panel_description": "Explore popular discussions on mindfulness from Reddit.",
         "steps": {
             "1": {
-                "api": "Perplexity",
-                "handles": "Gathers general information about null pointer errors in Java",
+                "api": "RedditTopPostsBySubreddit",
+                "handles": "Retrieves top posts from the subreddit 'mindfulness'.",
                 "input_vars": [
                     {
-                        "name": "query_null_pointer",
-                        "parameter": "query",
+                        "name": "subreddit_mindfulness",
+                        "parameter": [
+                            "subreddit"
+                        ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Query to understand null pointer errors in Java",
-                        "value": "What generally causes null pointer errors in Java?",
-                        "dependencies": []
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "null_pointer_info",
-                        "description": "General information about null pointer errors in Java",
-                        "used_by": [],
-                        "value": "\"In Java, `NullPointerException` occurs when a program attempts to use an object reference that has a `null` value. Here are some common scenarios that generally cause null pointer errors:\n\n    - **Calling Methods on a Null Object**: If you try to invoke a method on an object that is `null`, a `NullPointerException` will be thrown.\n    - **Accessing Null Object\u2019s Properties**: Trying to access or modify the fields of a `null` object will result in a `NullPointerException`.\n    - **Accessing Index Elements of Null Objects**: Attempting to access an index element of a `null` array or collection will also cause a `NullPointerException`.\n    - **Passing Null Parameters to Methods**: Passing `null` as an argument to a method that does not expect it can lead to a `NullPointerException`.\n    - **Incorrect Configuration or Dependency Injection**: In frameworks like Spring, incorrect configuration can lead to objects being `null`.\n    - **Using Synchronized on a Null Object**: Trying to synchronize on a `null` object will throw a `NullPointerException`.\n    - **Throwing Null as if it Were a Throwable Value**: Throwing `null` as if it were a `Throwable` value causes a `NullPointerException`.\n\n    To avoid these errors, ensure objects are properly initialized and perform null checks before accessing methods or properties.\""
-                    }
-                ]
-            },
-            "2": {
-                "api": "Stack_Exchange_Questions",
-                "handles": "Finds relevant questions on Stack Overflow",
-                "input_vars": [
-                    {
-                        "name": "site",
-                        "parameter": "site",
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "The Stack Exchange site to query",
-                        "value": "stackoverflow",
+                        "description": "Subreddit name for mindfulness discussions.",
+                        "value": "mindfulness",
                         "dependencies": []
                     },
                     {
-                        "name": "tags",
-                        "parameter": "tagged",
+                        "name": "time_period",
+                        "parameter": [
+                            "time"
+                        ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Filter questions by tags",
-                        "value": "java;null-pointer",
+                        "description": "Time period for fetching top posts.",
+                        "value": "month",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "question_list",
-                        "description": "List of relevant questions on null pointer errors",
+                        "name": "reddit_discussions",
+                        "description": "Popular discussions on mindfulness from Reddit.",
                         "used_by": [],
-                        "value": "[\n      {\n        \"title\": \"Can't find @Nullable inside javax.annotation.*\",\n        \"link\": \"https://stackoverflow.com/questions/19030954/cant-find-nullable-inside-javax-annotation\",\n        \"is_answered\": true\n      },\n      {\n        \"title\": \"I keep getting NullPointerException on CashRegisterClass\",\n        \"link\": \"https://stackoverflow.com/questions/71548678/i-keep-getting-nullpointerexception-on-cashregisterclass\",\n        \"is_answered\": false\n      },\n      {\n        \"title\": \"Java Cannot read field \\\"scale\\\" because \\\"multiplicand\\\" is null\",\n        \"link\": \"https://stackoverflow.com/questions/69464857/java-cannot-read-field-scale-because-multiplicand-is-null\",\n        \"is_answered\": true\n      },\n      {\n        \"title\": \"Java filter NullPointer\",\n        \"link\": \"https://stackoverflow.com/questions/69159242/java-filter-nullpointer\",\n        \"is_answered\": true\n      },\n      {\n        \"title\": \"Where do static members live if not on the Heap?\",\n        \"link\": \"https://stackoverflow.com/questions/32145123/where-do-static-members-live-if-not-on-the-heap\",\n        \"is_answered\": true\n      },\n      {\n        \"title\": \"How to avoid null in Java method chain\",\n        \"link\": \"https://stackoverflow.com/questions/64447645/how-to-avoid-null-in-java-method-chain\",\n        \"is_answered\": true\n      },\n      {\n        \"title\": \"null argument java null pointer\",\n        \"link\": \"https://stackoverflow.com/questions/63329359/null-argument-java-null-pointer\",\n        \"is_answered\": true\n      },\n      {\n        \"title\": \"Null pointer exception even though nothing on the line is null\",\n        \"link\": \"https://stackoverflow.com/questions/62251077/null-pointer-exception-even-though-nothing-on-the-line-is-null\",\n        \"is_answered\": true\n      },\n      {\n        \"title\": \"Exception in thread \\\"main\\\" java.lang.NullPointerException error when calling a method to write a string into Excel sheet in JAVA\",\n        \"link\": \"https://stackoverflow.com/questions/61577339/exception-in-thread-main-java-lang-nullpointerexception-error-when-calling-a-m\",\n        \"is_answered\": true\n      },\n      {\n        \"title\": \"Newbie getting nullPointers all over the place\",\n        \"link\": \"https://stackoverflow.com/questions/59475004/newbie-getting-nullpointers-all-over-the-place\",\n        \"is_answered\": true\n      }\n    ]"
-                    }
-                ]
-            },
-            "3": {
-                "api": "Stack_Exchange_Answers",
-                "handles": "Fetches answers for the questions retrieved",
-                "input_vars": [
-                    {
-                        "name": "site",
-                        "parameter": "site",
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "The Stack Exchange site to query",
-                        "value": "stackoverflow",
-                        "dependencies": []
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "answer_list",
-                        "description": "List of answers for the questions on null pointer errors",
-                        "used_by": [],
-                        "value": "[\n      {\n        \"answer_id\": 54509134,\n        \"question_id\": 54508011,\n        \"is_accepted\": false,\n        \"score\": 2,\n        \"owner\": {\n          \"display_name\": \"mklement0\",\n          \"reputation\": 426723,\n          \"link\": \"https://stackoverflow.com/users/45375/mklement0\"\n        }\n      },\n      {\n        \"answer_id\": 79035350,\n        \"question_id\": 79034791,\n        \"is_accepted\": false,\n        \"score\": 0,\n        \"owner\": {\n          \"display_name\": \"Bademeister\",\n          \"reputation\": 768,\n          \"link\": \"https://stackoverflow.com/users/6803365/bademeister\"\n        }\n      },\n      {\n        \"answer_id\": 79035349,\n        \"question_id\": 18446538,\n        \"is_accepted\": false,\n        \"score\": 0,\n        \"owner\": {\n          \"display_name\": \"G\u00f6khan A\u00e7\u0131kgoz\",\n          \"reputation\": 1,\n          \"link\": \"https://stackoverflow.com/users/12971465/g\u00f6khan-a\u00e7\u0131kgoz\"\n        }\n      },\n      {\n        \"answer_id\": 79035362,\n        \"question_id\": 79035185,\n        \"is_accepted\": false,\n        \"score\": 0,\n        \"owner\": {\n          \"display_name\": \"user17732522\",\n          \"reputation\": 71607,\n          \"link\": \"https://stackoverflow.com/users/17732522/user17732522\"\n        }\n      },\n      {\n        \"answer_id\": 79035347,\n        \"question_id\": 79034893,\n        \"is_accepted\": false,\n        \"score\": 0,\n        \"owner\": {\n          \"display_name\": \"user27425627\",\n          \"reputation\": 224,\n          \"link\": \"https://stackoverflow.com/users/27425627/user27425627\"\n        }\n      }\n      // Additional answers can be added similarly\n    ]"
+                        "value": "```json\n    [\n      {\n        \"title\": \"Learning to be present\",\n        \"author\": \"EngineeringApart8239\",\n        \"summary\": \"A post about enjoying the moment and being present.\",\n        \"link\": \"https://i.redd.it/yt0wb7wnlyod1.jpeg\"\n      },\n      {\n        \"title\": \"I saw this at the end of a video the other day and it stuck with me\",\n        \"author\": \"Disastrous-Release86\",\n        \"summary\": \"A reflection on a memorable video moment.\",\n        \"link\": \"https://i.redd.it/genu076706sd1.jpeg\"\n      },\n      {\n        \"title\": \"An illustrated guide to mindfulness meditation\",\n        \"author\": \"wisdomperception\",\n        \"summary\": \"A visual guide to meditation practices.\",\n        \"link\": \"https://i.redd.it/nwwrlbsy7eod1.jpeg\"\n      },\n      {\n        \"title\": \"I did 5-6 hours a day of yoga and meditation for 3 years - this is what I learned\",\n        \"author\": \"Rich_Shock_7206\",\n        \"summary\": \"Insights from extensive yoga and meditation practice.\",\n        \"link\": \"https://www.reddit.com/r/Mindfulness/comments/1ftrrdd/i_did_56_hours_a_day_of_yoga_and_meditation_for_3/\"\n      },\n      {\n        \"title\": \"Meditated for 44 days in a row\",\n        \"author\": \"InfamousFisherman573\",\n        \"summary\": \"Personal achievement in maintaining a meditation routine.\",\n        \"link\": \"https://i.redd.it/k9wqnrrbk7pd1.jpeg\"\n      },\n      {\n        \"title\": \"Your phone is the thief of your destiny\",\n        \"author\": \"wonder-magic\",\n        \"summary\": \"Discusses the impact of phone distractions on personal growth.\",\n        \"link\": \"https://www.reddit.com/r/Mindfulness/comments/1fr663l/your_phone_is_the_thief_of_your_destiny/\"\n      },\n      {\n        \"title\": \"A passage from 'You Are Here' written by Thich Nhat Hanh\",\n        \"author\": \"cheese_stack\",\n        \"summary\": \"Excerpt from a book on mindfulness.\",\n        \"link\": \"https://i.redd.it/9fgrdg2j4rtd1.png\"\n      },\n      {\n        \"title\": \"You have the right to enjoy life even without achievements \ud83c\udf38\",\n        \"author\": \"happy_neets\",\n        \"summary\": \"Encouragement to find joy without needing achievements.\",\n        \"link\": \"https://www.reddit.com/r/Mindfulness/comments/1fhjfxq/you_have_the_right_to_enjoy_life_even_without/\"\n      },\n      {\n        \"title\": \"You Are Enough \ud83d\udc96\",\n        \"author\": \"happy_neets\",\n        \"summary\": \"Affirmation of self-worth and value.\",\n        \"link\": \"https://www.reddit.com/r/Mindfulness/comments/1fvg3v9/you_are_enough/\"\n      },\n      {\n        \"title\": \"You Are Not Losing at Life \ud83c\udf31\",\n        \"author\": \"happy_neets\",\n        \"summary\": \"Reassurance that life is not a race and personal growth is unique.\",\n        \"link\": \"https://www.reddit.com/r/Mindfulness/comments/1flk8zx/you_are_not_losing_at_life/\"\n      },\n      {\n        \"title\": \"Enjoy the flow of life\",\n        \"author\": \"taankster\",\n        \"summary\": \"A reminder to pause and appreciate life's beauty.\",\n        \"link\": \"https://i.redd.it/dg30qt68vnsd1.jpeg\"\n      },\n      {\n        \"title\": \"Let go, free your mind.\",\n        \"author\": \"EngineeringApart8239\",\n        \"summary\": \"Encouragement to release mental burdens.\",\n        \"link\": \"https://i.redd.it/gogbav675upd1.jpeg\"\n      },\n      {\n        \"title\": \"Power of now: by Eckhart Tolle\",\n        \"author\": \"Kooky_Researcher_862\",\n        \"summary\": \"Praise for a book on mindfulness and spirituality.\",\n        \"link\": \"https://www.reddit.com/r/Mindfulness/comments/1fog3ew/power_of_now_by_eckhart_tolle/\"\n      },\n      {\n        \"title\": \"I've meditated every day this month so far!!\",\n        \"author\": \"OkJelly7192\",\n        \"summary\": \"Celebrating a month-long meditation streak.\",\n        \"link\": \"https://i.redd.it/sjb8aems1jtd1.jpeg\"\n      },\n      {\n        \"title\": \"\u00bfwhat is the book that everyone should have read? \u2764\ufe0f\",\n        \"author\": \"LocksmithNo7974\",\n        \"summary\": \"A query about essential reading on mindfulness.\",\n        \"link\": \"https://i.redd.it/gijpsiculesd1.jpeg\"\n      },\n      {\n        \"title\": \"You're not lazy, unmotivated, or undisciplined. You procrastinate because...\",\n        \"author\": \"scaramouche123\",\n        \"summary\": \"Explores procrastination as an emotional issue and offers solutions.\",\n        \"link\": \"https://www.reddit.com/r/Mindfulness/comments/1fezqj3/youre_not_lazy_unmotivated_or_undisciplined_you/\"\n      },\n      {\n        \"title\": \"1 minute mindfulness\",\n        \"author\": \"EngineeringApart8239\",\n        \"summary\": \"A quick mindfulness exercise.\",\n        \"link\": \"https://i.redd.it/7w3au58dudpd1.png\"\n      },\n      {\n        \"title\": \"I love you\ud83e\udd7a\",\n        \"author\": \"happy_neets\",\n        \"summary\": \"Words of comfort and love for those feeling lonely.\",\n        \"link\": \"https://www.reddit.com/r/Mindfulness/comments/1fxss6l/i_love_you/\"\n      }\n    ]\n    ```"
                     }
                 ]
             }

@@ -1,0 +1,67 @@
+{
+    "5": {
+        "panel_description": "Suggest popular restaurants in Sydney.",
+        "steps": {
+            "1": {
+                "api": "TripadvisorSearchLocation",
+                "handles": "Retrieves geoID for Sydney",
+                "input_vars": [
+                    {
+                        "name": "location_query",
+                        "parameter": [
+                            "query"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Search query for Sydney",
+                        "value": "Sydney",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "location_geoId",
+                        "description": "Geo ID for Sydney",
+                        "used_by": [
+                            {
+                                "panel": 5,
+                                "step": 2
+                            }
+                        ],
+                        "value": "3323314"
+                    }
+                ]
+            },
+            "2": {
+                "api": "TripadvisorSearchRestaurants",
+                "handles": "Finds dining options in Sydney",
+                "input_vars": [
+                    {
+                        "name": "location_geoId",
+                        "parameter": [
+                            "locationId"
+                        ],
+                        "type": "string",
+                        "source": "API_Output (Panel 5, Step 1)",
+                        "description": "Geo ID for Sydney",
+                        "value": "3323314",
+                        "dependencies": [
+                            {
+                                "panel": 5,
+                                "step": 1
+                            }
+                        ]
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "dining_options",
+                        "description": "List of popular restaurants in Sydney",
+                        "used_by": [],
+                        "value": "```json\n    [\n      {\n        \"name\": \"Bacar Restaurant & Bar\",\n        \"averageRating\": 4,\n        \"userReviewCount\": 249,\n        \"status\": \"Open now\",\n        \"priceTag\": \"$$$$\",\n        \"menuUrl\": \"https://www.pullmansydneyolympicpark.com.au/en/restaurants-and-bars/bacar-restaurant-sydney.html\",\n        \"cuisine\": [\"Australian\"],\n        \"offers\": {\n          \"hasReservation\": true,\n          \"reservationUrl\": \"https://www.tripadvisor.com/Restaurant_Review-g3323314-d1177099-Reviews-Bacar_Restaurant_Bar-Sydney_Olympic_Park_Auburn_Greater_Sydney_New_South_Wales\"\n        },\n        \"image\": \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/14/0e/71/e4/bacar-restaurant-bar.jpg?w=2000&h=1300&s=1\",\n        \"reviews\": [\n          {\n            \"text\": \"The staff at the Pullman are so polite and friendly and the food was great...\",\n            \"url\": \"https://www.tripadvisor.com/ShowUserReviews-g3323314-d1177099-r773632906-Bacar_Restaurant_Bar-Sydney_Olympic_Park_Auburn_Greater_Sydney_New_South_Wales.html\"\n          }\n        ]\n      },\n      {\n        \"name\": \"Hi Thai Restaurant\",\n        \"averageRating\": 4,\n        \"userReviewCount\": 210,\n        \"status\": \"Open now\",\n        \"priceTag\": \"$$ - $$$\",\n        \"menuUrl\": \"http://hithai.com.au/our-menu/\",\n        \"cuisine\": [\"Asian\", \"Thai\"],\n        \"image\": \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0b/10/5d/b2/img-20160428-141317-largejpg.jpg?w=700&h=700&s=1\",\n        \"reviews\": [\n          {\n            \"text\": \"Visited Hi-Thai with a large group (20+) and service was fast despite there...\",\n            \"url\": \"https://www.tripadvisor.com/ShowUserReviews-g3323314-d5111436-r658317881-Hi_Thai_Restaurant-Sydney_Olympic_Park_Auburn_Greater_Sydney_New_South_Wales.html\"\n          }\n        ]\n      },\n      {\n        \"name\": \"Abattoir Blues\",\n        \"averageRating\": 4,\n        \"userReviewCount\": 142,\n        \"status\": \"Closed now\",\n        \"priceTag\": \"$$ - $$$\",\n        \"menuUrl\": \"https://www.mryum.com/abattoirblues/menu\",\n        \"offers\": {\n          \"hasReservation\": true,\n          \"reservationUrl\": \"https://www.tripadvisor.com/Restaurant_Review-g3323314-d4402705-Reviews-Abattoir_Blues-Sydney_Olympic_Park_Auburn_Greater_Sydney_New_South_Wales\"\n        },\n        \"image\": \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2b/2c/a4/94/speciality-house-roasted.jpg?w=1200&h=1200&s=1\",\n        \"reviews\": [\n          {\n            \"text\": \"Situated in the heart of the Olympic Park precinct is this great eatery where...\",\n            \"url\": \"https://www.tripadvisor.com/ShowUserReviews-g3323314-d4402705-r722649704-Abattoir_Blues-Sydney_Olympic_Park_Auburn_Greater_Sydney_New_South_Wales.html\"\n          }\n        ]\n      },\n      {\n        \"name\": \"Thai Palate\",\n        \"averageRating\": 4.5,\n        \"userReviewCount\": 87,\n        \"priceTag\": \"$$ - $$$\",\n        \"menuUrl\": \"http://thaipalate.com.au/menu.php\",\n        \"cuisine\": [\"Asian\", \"Thai\"],\n        \"image\": \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/16/58/6d/75/photo0jpg.jpg?w=2000&h=1500&s=1\",\n        \"reviews\": [\n          {\n            \"text\": \"The food always taste so good and the customer service is amazing. Will...\",\n            \"url\": \"https://www.tripadvisor.com/ShowUserReviews-g3323314-d10134716-r717556238-Thai_Palate-Sydney_Olympic_Park_Auburn_Greater_Sydney_New_South_Wales.html\"\n          }\n        ]\n      },\n      {\n        \"name\": \"Piccolo Roma\",\n        \"averageRating\": 4,\n        \"userReviewCount\": 181,\n        \"status\": \"Open now\",\n        \"priceTag\": \"$$ - $$$\",\n        \"cuisine\": [\"Italian\", \"Pizza\"],\n        \"offers\": {\n          \"hasDelivery\": true,\n          \"deliveryUrl\": \"https://www.tripadvisor.com/Restaurant_Review-g3323314-d2554748-Reviews-Piccolo_Roma-Sydney_Olympic_Park_Auburn_Greater_Sydney_New_South_Wales\"\n        },\n        \"image\": \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/19/de/1b/d1/photo2jpg.jpg?w=2000&h=1500&s=1\",\n        \"reviews\": [\n          {\n            \"text\": \"Friendly staff. Food was great...\",\n            \"url\": \"https://www.tripadvisor.com/ShowUserReviews-g3323314-d2554748-r786268245-Piccolo_Roma-Sydney_Olympic_Park_Auburn_Greater_Sydney_New_South_Wales.html\"\n          }\n        ]\n      }\n    ]\n    ```"
+                    }
+                ]
+            }
+        }
+    }
+}

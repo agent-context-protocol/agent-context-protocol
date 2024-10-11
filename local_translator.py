@@ -362,7 +362,7 @@ class LocalTranslatorNode(BaseNode):
     
 
     # for making the string including the whole workflow with filled in values of the output variables. We send this for getting the user readable output
-    def make_final_workflow_with_output_values(self, workflow_dict):
+    def make_final_workflow_with_output_values(self, workflow_dict, panels_list):
         # Initialize the formatted result string
         result = []
         
@@ -374,6 +374,7 @@ class LocalTranslatorNode(BaseNode):
         result.append("Please make user readable output for this workflow:\n")
         result.append("Workflow:")
         result.append(f"Panel Description: {panel_description}")
+        result.append(f"Panel Details: {panels_list[self.panel_no-1]['request']['description']}")
         result.append("\nWorkflow Steps:")
         
         # Iterate through each step and build the formatted input
@@ -411,6 +412,96 @@ class LocalTranslatorNode(BaseNode):
     ###################################################################
     # ALL THE PARSING FUNCTIONS WILL BE HERE
 
+    # def parse_api_request(self, text):
+    #     # Initialize the result dictionary
+    #     result = {
+    #         'chain_of_thought': '',
+    #         'api_requests': []
+    #     }
+        
+    #     # First, split the text by $$CHAIN_OF_THOUGHT$$
+    #     cot_sections = re.split(r"\$\$CHAIN_OF_THOUGHT\$\$", text)
+        
+    #     if len(cot_sections) != 2:
+    #         raise ValueError("The text must contain one $$CHAIN_OF_THOUGHT$$ section.")
+        
+    #     # cot_sections[0]: text before $$CHAIN_OF_THOUGHT$$ (likely empty)
+    #     # cot_sections[1]: chain_of_thought and the rest
+        
+    #     # Now, from cot_sections[1], split off the chain_of_thought and the $$API_REQUEST$$ sections
+    #     parts_after_cot = re.split(r"\$\$API_REQUEST\$\$", cot_sections[1])
+        
+    #     # The chain_of_thought is the first part
+    #     result['chain_of_thought'] = parts_after_cot[0].strip()
+        
+    #     # The rest are the API_REQUEST sections
+    #     api_request_sections = parts_after_cot[1:]
+
+    #     api_request_error_bool = False
+        
+    #     # Process each API_REQUEST section
+    #     for api_request_text in api_request_sections:
+    #         api_request_text = api_request_text.strip()
+            
+    #         # Initialize a dictionary to hold the API request details
+    #         api_request = {}
+            
+    #         # Check for error response
+    #         if 'STATUS_CODE' in api_request_text and 'ERROR_EXPLANATION' in api_request_text:
+    #             # Extract status code and error explanation
+    #             status_match = re.search(r"STATUS_CODE\s+(\d+)\s+(.*)", api_request_text)
+    #             error_match = re.search(r"ERROR_EXPLANATION\s*-\s*(.*)", api_request_text, re.DOTALL)
+    #             if status_match and error_match:
+    #                 api_request['status_code'] = int(status_match.group(1).strip())
+    #                 api_request['status_text'] = status_match.group(2).strip()
+    #                 api_request['error_explanation'] = error_match.group(1).strip()
+    #                 api_request_error_bool = True
+    #                 return api_request_error_bool, api_request
+    #             else:
+    #                 raise ValueError("Error response format is incorrect.")
+    #         else:
+    #             # Extract method and URL
+    #             endpoint_match = re.search(
+    #                 r"API_ENDPOINT\s+Method:\s*(GET|POST|PUT|PATCH|DELETE|FUNCTION)\s+URL:\s*(\S+)",
+    #                 api_request_text
+    #             )
+    #             if endpoint_match:
+    #                 api_request['method'] = endpoint_match.group(1).strip()
+    #                 api_request['url'] = endpoint_match.group(2).strip()
+    #             else:
+    #                 raise ValueError("API_ENDPOINT section is missing or improperly formatted.")
+                
+    #             # If method is FUNCTION, set headers to empty
+    #             if api_request['method'] == 'FUNCTION':
+    #                 api_request['headers'] = {}
+    #             else:
+    #                 # Extract headers
+    #                 headers_match = re.search(r"HEADERS\s*(\{\s*\}|\{.*?\})", api_request_text, re.DOTALL)
+    #                 if headers_match:
+    #                     headers_str = headers_match.group(1).strip()
+    #                     try:
+    #                         api_request['headers'] = json.loads(headers_str)
+    #                     except json.JSONDecodeError:
+    #                         api_request['headers'] = {}
+    #                 else:
+    #                     api_request['headers'] = {}
+                
+    #             # Extract body
+    #             body_match = re.search(r"BODY\s*(\{\s*\}|\{.*?\})", api_request_text, re.DOTALL)
+    #             if body_match:
+    #                 body_str = body_match.group(1).strip()
+    #                 try:
+    #                     api_request['body'] = json.loads(body_str)
+    #                 except json.JSONDecodeError:
+    #                     api_request['body'] = {}
+    #             else:
+    #                 api_request['body'] = {}
+            
+    #         # Append the api_request to the result list
+    #         result['api_requests'].append(api_request)
+        
+    #     return api_request_error_bool, result
+
     def parse_api_request(self, text):
         # Initialize the result dictionary
         result = {
@@ -445,15 +536,25 @@ class LocalTranslatorNode(BaseNode):
             # Initialize a dictionary to hold the API request details
             api_request = {}
             
-            # Check for error response
             if 'STATUS_CODE' in api_request_text and 'ERROR_EXPLANATION' in api_request_text:
-                # Extract status code and error explanation
-                status_match = re.search(r"STATUS_CODE\s+(\d+)\s+(.*)", api_request_text)
-                error_match = re.search(r"ERROR_EXPLANATION\s*-\s*(.*)", api_request_text, re.DOTALL)
+                # Extract status code and error explanation with improved regex patterns
+                status_match = re.search(
+                    r"STATUS_CODE\s*[\r\n]+(\d+)\s+([A-Z_]+)",
+                    api_request_text,
+                    re.IGNORECASE
+                )
+                error_match = re.search(
+                    r"ERROR_EXPLANATION\s*[\r\n]+([\s\S]+)",
+                    api_request_text,
+                    re.IGNORECASE
+                )
                 if status_match and error_match:
                     api_request['status_code'] = int(status_match.group(1).strip())
                     api_request['status_text'] = status_match.group(2).strip()
-                    api_request['error_explanation'] = error_match.group(1).strip()
+                    # Clean up the error explanation by removing any leading hyphens or bullets
+                    error_explanation = error_match.group(1).strip()
+                    error_explanation = re.sub(r'^[-\*\s]+', '', error_explanation, flags=re.MULTILINE)
+                    api_request['error_explanation'] = error_explanation
                     api_request_error_bool = True
                     return api_request_error_bool, api_request
                 else:
@@ -470,23 +571,19 @@ class LocalTranslatorNode(BaseNode):
                 else:
                     raise ValueError("API_ENDPOINT section is missing or improperly formatted.")
                 
-                # If method is FUNCTION, set headers to empty
-                if api_request['method'] == 'FUNCTION':
-                    api_request['headers'] = {}
-                else:
-                    # Extract headers
-                    headers_match = re.search(r"HEADERS\s*(\{\s*\}|\{.*?\})", api_request_text, re.DOTALL)
-                    if headers_match:
-                        headers_str = headers_match.group(1).strip()
-                        try:
-                            api_request['headers'] = json.loads(headers_str)
-                        except json.JSONDecodeError:
-                            api_request['headers'] = {}
-                    else:
+                # Extract headers
+                headers_match = re.search(r"HEADERS\s*(\{\s*\}|\{.*?\})?", api_request_text, re.DOTALL)
+                if headers_match and headers_match.group(1):
+                    headers_str = headers_match.group(1).strip()
+                    try:
+                        api_request['headers'] = json.loads(headers_str)
+                    except json.JSONDecodeError:
                         api_request['headers'] = {}
+                else:
+                    api_request['headers'] = {}
                 
                 # Extract body
-                body_match = re.search(r"BODY\s*(\{\s*\}|\{.*?\})", api_request_text, re.DOTALL)
+                body_match = re.search(r"BODY\s*(\{.*\})", api_request_text, re.DOTALL)
                 if body_match:
                     body_str = body_match.group(1).strip()
                     try:
@@ -844,8 +941,7 @@ class LocalTranslatorNode(BaseNode):
         return num_tokens
 
     ###################################################################
-
-    async def wait_for_response(self, timeout=60):
+    async def wait_for_response(self, timeout=600):
         start_time = time.time()
         while not (self.drop or self.modify):
             if time.time() - start_time > timeout:
@@ -913,7 +1009,7 @@ class LocalTranslatorNode(BaseNode):
                 api_running_error_counter = 0
                 parse_error_bool = False
                 api_success_bool = False
-                while not run_success and api_input_error_counter < 5 and api_running_error_counter < 5:
+                while not run_success and api_input_error_counter < 5 and api_running_error_counter < 3:
                     # preparing the input to the api
                     api_input_error_counter += 1
                     try:
@@ -936,57 +1032,35 @@ class LocalTranslatorNode(BaseNode):
 
                     # running the api
                     api_running_error_counter += 1
-                    # try:
-                    for api_req_i in range(len(parsed_api_request['api_requests'])):
-                        if parsed_api_request['api_requests'][api_req_i]['method'] == "FUNCTION":
-                            api_success_bool, api_output = self.function_call(step['api'], parsed_api_request['api_requests'][api_req_i]['body'])
-                        else:
-                            api_success_bool, api_output = self.requests_func(parsed_api_request['api_requests'][api_req_i]['method'], parsed_api_request['api_requests'][api_req_i]['url'], parsed_api_request['api_requests'][api_req_i]['headers'], parsed_api_request['api_requests'][api_req_i]['body'])
-
-                        # if api_output is too big then we will summarize here itslef else it would take a lot of context
-                        # _ = tiktoken.get_encoding("cl100k_base")
-                        print("num of tokens : ",self.num_tokens_from_string(f"{api_output}"))
-                        if self.num_tokens_from_string(f"{api_output}") > 10000:
-                            llm_input_api_output_summarize = self.prepare_input_for_api_output_summarize(api_output, self.panel_no, step_no)
-                            print("llm_input_api_output_summarize : ",llm_input_api_output_summarize)
-                            self.chat_history.append({"role": "user", "content": llm_input_api_output_summarize })
-                            llm_output_api_output_summarize = self.generate()
-                            # remove the last two chat history
-                            self.chat_history.pop()
-                            self.chat_history.pop()
-                            # assign llm_output_api_output_summarize to api_output
-                            api_output = llm_output_api_output_summarize
-                            print("after summarize num of tokens : ",self.num_tokens_from_string(f"{api_output}"))
-
-                        # if its a 4xx error then we can retry as it is possible that llm made a wrong api request
-                        if not api_success_bool and api_output["status_code"]/100 == 4:
-                            # error handling part here
-                            print("\napi_output : ",api_output)
-                            raise ValueError(f"api_output : {api_output}")
-                        # apart from 4xx errors we should just call the main translator for assistance
-                        if not api_success_bool:
-                            assistance_request_bool = True
-                            assistance_error_dict = api_output
-                            break
-                        
-                        api_outputs_list.append(api_output)
-
-                    run_success = True
-                    # except Exception as e:
-                    #     error_message = f'There was an error while running the API, please rectify based on this error message, only output the CHAIN_OF_THOUGHT and API_REQUEST without any other details before or after.:\n {str(e)}' 
-                    #     self.chat_history.append({"role": "user", "content": error_message})
-                    #     print("api running error_message : ",error_message)
-                    #     api_outputs_list = []
                     try:
                         for api_req_i in range(len(parsed_api_request['api_requests'])):
                             if parsed_api_request['api_requests'][api_req_i]['method'] == "FUNCTION":
                                 api_success_bool, api_output = self.function_call(step['api'], parsed_api_request['api_requests'][api_req_i]['body'])
                             else:
                                 api_success_bool, api_output = self.requests_func(parsed_api_request['api_requests'][api_req_i]['method'], parsed_api_request['api_requests'][api_req_i]['url'], parsed_api_request['api_requests'][api_req_i]['headers'], parsed_api_request['api_requests'][api_req_i]['body'])
+
+                            # if api_output is too big then we will summarize here itslef else it would take a lot of context
+                            # _ = tiktoken.get_encoding("cl100k_base")
+                            if len(str(api_output)) > 80000:
+                                print("Earlier character length was more than 80000, to be precisely it was: ",len(str(api_output)))
+                                api_output = str(api_output)[:80000]
+                                print("After the length became: ", len(str(api_output)))
+                            print("num of tokens : ",self.num_tokens_from_string(f"{api_output}"))
+                            if self.num_tokens_from_string(f"{api_output}") > 10000:
+                                llm_input_api_output_summarize = self.prepare_input_for_api_output_summarize(api_output, self.panel_no, step_no)
+                                print("llm_input_api_output_summarize : ",llm_input_api_output_summarize)
+                                self.chat_history.append({"role": "user", "content": llm_input_api_output_summarize })
+                                llm_output_api_output_summarize = self.generate()
+                                # remove the last two chat history
+                                self.chat_history.pop()
+                                self.chat_history.pop()
+                                # assign llm_output_api_output_summarize to api_output
+                                api_output = llm_output_api_output_summarize
+                                print("after summarize num of tokens : ",self.num_tokens_from_string(f"{api_output}"))
+
                             # if its a 4xx error then we can retry as it is possible that llm made a wrong api request
-                            if not api_success_bool and api_output["status_code"]/100 == 4:
+                            if not api_success_bool: # and int(api_output["status_code"])/100 == 4:
                                 # error handling part here
-                                # print("\napi_output : ",api_output)
                                 raise ValueError(f"api_output : {api_output}")
                             # apart from 4xx errors we should just call the main translator for assistance
                             if not api_success_bool:
@@ -998,9 +1072,10 @@ class LocalTranslatorNode(BaseNode):
 
                         run_success = True
                     except Exception as e:
-                        error_message = f'There was an error while running the API, please rectify based on this error message, only output the CHAIN_OF_THOUGHT and API_REQUEST without any other details before or after.:\n {str(e)}' 
+                        error_message = f'There was an error while running the API, please rectify based on this error message, only output the CHAIN_OF_THOUGHT and API_REQUEST without any other details before or after. Carefully review the api call and its documentation to identify and then rectify it.:\n {str(e)}' 
                         self.chat_history.append({"role": "user", "content": error_message})
-                        # print("api running error_message : ",error_message)
+                        print("api running error_message : ",error_message)
+
                         api_outputs_list = []
 
                 if assistance_request_bool:
@@ -1036,8 +1111,9 @@ class LocalTranslatorNode(BaseNode):
                             assistance_request_bool =  True
                             assistance_error_dict = api_parsed_output
                             break
-                        self.group_workflow = api_parsed_output
-                        # print("api_parsed_output : ",self.group_workflow)
+
+                        print("api_parsed_output : ",api_parsed_output)
+
                         run_success = True
                     except Exception as e:
                         error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT and API_RESPONSE without any other details before or after.:\n {str(e)}' 
@@ -1110,11 +1186,14 @@ class LocalTranslatorNode(BaseNode):
                     raise ValueError("Something is going wrong with the llm or the parsing function in status_update send with assistance request. It is not an expected kind of error.")
 
                 await self.main_translator.communicate(parsed_status_update, self.panel_no, self)
+                print("\nafter self.main_translator.communicate(parsed_status_update, self.panel_no, self)")
                 try:
                     await self.wait_for_response()
                 except TimeoutError:
                     print(f"Timeout waiting for response from MainTranslator for panel {self.panel_no}")
                     return None
+                
+                print("after try and timeout")
 
                 if self.drop:
                     return None
@@ -1137,7 +1216,7 @@ class LocalTranslatorNode(BaseNode):
             'output' : 'This Panel Was Dropped'
         }
 
-        final_workflow_with_values = self.make_final_workflow_with_output_values(self.group_workflow)
+        final_workflow_with_values = self.make_final_workflow_with_output_values(self.group_workflow, self.main_translator.panels_list)
         self.chat_history.append({"role": "user", "content": self.user_readable_output_prompt})
         self.chat_history.append({"role": "user", "content": final_workflow_with_values})
         output = self.generate()

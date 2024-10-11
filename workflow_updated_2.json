@@ -1,36 +1,29 @@
 {
     "2": {
-        "panel_description": "Provide weather forecast for Chicago from October 10th to October 15th, 2024.",
+        "panel_description": "Provide the current weather in Los Angeles.",
         "steps": {
             "1": {
-                "api": "WeatherAPI.com_Forecast_Weather_API",
-                "handles": "Fetches weather forecast for Chicago",
+                "api": "WeatherAPI.com_Realtime_Weather_Api",
+                "handles": "Retrieves current weather data for Los Angeles.",
                 "input_vars": [
                     {
-                        "name": "forecast_city_name",
-                        "parameter": "q",
+                        "name": "city_name",
+                        "parameter": [
+                            "q"
+                        ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "City name for weather forecast",
-                        "value": "Chicago",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "forecast_dates",
-                        "parameter": "dt",
-                        "type": "date",
-                        "source": "LLM_Generated",
-                        "description": "Dates for weather forecast",
-                        "value": "[\"2024-10-10\", \"2024-10-11\", \"2024-10-12\", \"2024-10-13\", \"2024-10-14\", \"2024-10-15\"]",
+                        "description": "City name for weather data.",
+                        "value": "Los Angeles",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "weather_forecast_chicago",
-                        "description": "Weather forecast for Chicago for specified dates",
+                        "name": "current_weather",
+                        "description": "Current weather in Los Angeles.",
                         "used_by": [],
-                        "value": "```json\n    {\n      \"2024-10-10\": {\n        \"maxtemp_c\": 21.9,\n        \"mintemp_c\": 16.5,\n        \"condition\": \"Sunny\",\n        \"precip_mm\": 0.0,\n        \"wind_kph\": 14.4\n      },\n      \"2024-10-11\": {\n        \"maxtemp_c\": 24.3,\n        \"mintemp_c\": 15.2,\n        \"condition\": \"Sunny\",\n        \"precip_mm\": 0.0,\n        \"wind_kph\": 15.5\n      },\n      \"2024-10-12\": {\n        \"maxtemp_c\": 26.8,\n        \"mintemp_c\": 17.6,\n        \"condition\": \"Sunny\",\n        \"precip_mm\": 0.0,\n        \"wind_kph\": 19.8\n      },\n      \"2024-10-13\": {\n        \"maxtemp_c\": 25.4,\n        \"mintemp_c\": 17.5,\n        \"condition\": \"Patchy rain nearby\",\n        \"precip_mm\": 3.24,\n        \"wind_kph\": 22.3\n      },\n      \"2024-10-14\": {\n        \"maxtemp_c\": 16.4,\n        \"mintemp_c\": 15.1,\n        \"condition\": \"Patchy rain nearby\",\n        \"precip_mm\": 0.09,\n        \"wind_kph\": 23.4\n      },\n      \"2024-10-15\": {\n        \"maxtemp_c\": 20.2,\n        \"mintemp_c\": 13.8,\n        \"condition\": \"Sunny\",\n        \"precip_mm\": 0.0,\n        \"wind_kph\": 7.6\n      }\n    }\n    ```"
+                        "value": "```json\n    {\n      \"location\": {\n        \"name\": \"Los Angeles\",\n        \"region\": \"California\",\n        \"country\": \"United States of America\",\n        \"latitude\": 34.0522,\n        \"longitude\": -118.2428,\n        \"timezone\": \"America/Los_Angeles\",\n        \"localtime\": \"2024-10-11 02:54\"\n      },\n      \"current\": {\n        \"temperature_c\": 18.3,\n        \"temperature_f\": 64.9,\n        \"condition\": \"Clear\",\n        \"wind_speed_mph\": 2.2,\n        \"wind_speed_kph\": 3.6,\n        \"wind_direction\": \"SW\",\n        \"humidity\": 73,\n        \"pressure_mb\": 1016.0,\n        \"pressure_in\": 30.01,\n        \"precipitation_mm\": 0.0,\n        \"precipitation_in\": 0.0,\n        \"visibility_km\": 16.0,\n        \"visibility_miles\": 9.0,\n        \"uv_index\": 0.0\n      }\n    }\n    ```"
                     }
                 ]
             }

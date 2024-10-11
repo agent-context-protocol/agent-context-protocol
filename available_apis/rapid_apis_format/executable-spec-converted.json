@@ -67,14 +67,7 @@
                 "type": "string",
                 "description": "Sort By. Default value: best",
                 "allowed_values": [
-                    "best",
-                    "price_high",
-                    "cheapest",
-                    "fastest",
-                    "outbound_take_off_time",
-                    "outbound_landing_time",
-                    "return_take_off_time",
-                    "return_landing_time"
+                    "best", "price_high", "price_low", "fastest", "outbound_take_off_time", "outbound_landing_time", "return_take_off_time", "return_landing_time"
                 ],
                 "required": false
             },
@@ -300,7 +293,7 @@
     },
     "TripadvisorSearchLocation": {
         "name": "TripadvisorSearchLocation",
-        "description": "Search for locations using a query string.",
+        "description": "Search for locations using a query string and returns details like geoID of locations in TripAdvisor database, which is useful for other TripAdvisor APIs. It is only reliable for well known locations and cities, countries, and is unreliable in terms of providing latititude and longitude. The geoID retrieved from this API is only relevant for TripAdvisor APIs.",
         "method": "GET",
         "endpoint": "/api/v1/hotels/searchLocation",
         "host": "tripadvisor16.p.rapidapi.com",
@@ -328,11 +321,11 @@
             },
             "latitude": {
                 "type": "float",
-                "description": "The latitude of the location"
+                "description": "The latitude of the location. This output is unreliable and might not come for some locations."
             },
             "longitude": {
                 "type": "float",
-                "description": "The longitude of the location"
+                "description": "The longitude of the location. This output is unreliable and might not come for some locations."
             }
         }
     },
@@ -692,7 +685,7 @@
         "query_parameters": {
             "query": {
                 "type": "string",
-                "description": "Search query for the topic (e.g., climate change)",
+                "description": "Search query for the topic (e.g., climate change). For best results keywords should be brief and not be lengthy.",
                 "required": false
             },
             "language": {
@@ -702,7 +695,7 @@
             },
             "region": {
                 "type": "string",
-                "description": "Region for the search results (e.g., 'US', 'GB', 'CA')",
+                "description": "Region for the search results (e.g., 'US', 'GB', 'CA'). It is only limited to countries and continenents or cities.",
                 "required": false
             }
         },
@@ -756,7 +749,7 @@
         "query_parameters": {
             "subreddit": {
                 "type": "String",
-                "description": "The subreddit for which to fetch top posts.",
+                "description": "The subreddit name for which to fetch top posts. Only the subreddit name should be provided, 'r/' prefix is invalid.",
                 "required": true
             },
             "time": {
@@ -1998,7 +1991,7 @@
     },
     "Goodreads_Search_Book_By_Keyword": {
         "name": "Goodreads_Search_Book_By_Keyword",
-        "description": "Searches for books based on a specified keyword.",
+        "description": "Searches for books based on a specified keyword related to the book and its authors content only. General keyword searches do not provide meaningful reponses.",
         "method": "GET",
         "endpoint": "/searchBooks",
         "host": "goodreads12.p.rapidapi.com",
@@ -2077,7 +2070,7 @@
     },
     "Goodreads_Search_Quotes_By_Keyword": {
         "name": "Goodreads_Search_Quotes_By_Keyword",
-        "description": "Searches for quotes based on a specified keyword.",
+        "description": "Searches for quotes based on a specified keyword related to the quotes content only. General keyword searches do not provide meaningful reponses.",
         "method": "GET",
         "endpoint": "/searchQuotes",
         "host": "goodreads12.p.rapidapi.com",
@@ -2119,7 +2112,7 @@
     },
     "Goodreads_Get_Authors_Books": {
         "name": "Goodreads_Get_Authors_Books",
-        "description": "Retrieves books authored by a specific author.",
+        "description": "Retrieves books authored by a specific author. General keyword searches do not provide meaningful reponses.",
         "method": "GET",
         "endpoint": "/getAuthorBooks",
         "host": "goodreads12.p.rapidapi.com",
@@ -2127,7 +2120,7 @@
         "query_parameters": {
             "authorID": {
                 "type": "String",
-                "description": "ID of the author whose books are to be retrieved. Can be obtained through other endpoints.",
+                "description": "ID of the author whose books are to be retrieved. Can be obtained through other GoodReads API endpoints.",
                 "required": true
             }
         },
@@ -2193,7 +2186,7 @@
     },
     "WeatherAPI.com_Realtime_Weather_Api": {
         "name": "WeatherAPI.com_Realtime_Weather_Api",
-        "description": "Fetch real-time weather information based on various query parameters.",
+        "description": "Fetch real-time weather information based on various query parameters. For best results provide latitude and longitude as other form of information can be ambiguous.",
         "method": "GET",
         "endpoint": "/current.json",
         "host": "weatherapi-com.p.rapidapi.com",
@@ -2252,7 +2245,7 @@
     },
     "WeatherAPI.com_Time_Zone_API": {
         "name": "WeatherAPI.com_Time_Zone_API",
-        "description": "Fetch time zone information based on various query parameters.",
+        "description": "Fetch time zone information based on various query parameters. For best results provide latitude and longitude as other form of information can be ambiguous.",
         "method": "GET",
         "endpoint": "/timezone.json",
         "host": "weatherapi-com.p.rapidapi.com",
@@ -2307,7 +2300,7 @@
     },
     "WeatherAPI.com_Forecast_Weather_API": {
         "name": "WeatherAPI.com_Forecast_Weather_API",
-        "description": "Fetch forecast weather information based on various query parameters.",
+        "description": "Fetch forecast weather information based on various query parameters. For best results provide latitude and longitude as other form of information can be ambiguous.",
         "method": "GET",
         "endpoint": "/forecast.json",
         "host": "weatherapi-com.p.rapidapi.com",

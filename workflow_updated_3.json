@@ -1,78 +1,75 @@
 {
     "3": {
-        "panel_description": "Retrieve hotel options in Chicago for specified dates.",
+        "panel_description": "Provide news articles related to fitness trends in October 2024.",
         "steps": {
             "1": {
-                "api": "TripadvisorSearchLocation",
-                "handles": "Retrieves geoId for Chicago",
+                "api": "NewsAPISearchByKeyWord",
+                "handles": "Finds news articles related to fitness trends.",
                 "input_vars": [
                     {
-                        "name": "location_query",
-                        "parameter": "query",
+                        "name": "news_query",
+                        "parameter": [
+                            "query"
+                        ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Search query for Chicago",
-                        "value": "Chicago",
+                        "description": "Keywords for searching news articles.",
+                        "value": "fitness trends October 2024",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "language",
+                        "parameter": [
+                            "language"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Language for news articles.",
+                        "value": "en",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "location_geoId",
-                        "description": "Geo ID for Chicago",
+                        "name": "news_articles",
+                        "description": "News articles related to fitness trends.",
                         "used_by": [
                             {
                                 "panel": 3,
                                 "step": 2
                             }
                         ],
-                        "value": "35805"
+                        "value": "```json\n    [\n        {\n            \"title\": \"At-home Fitness Equipment Market Size, Share and Trends 2024 to 2034\",\n            \"publisher\": \"Precedence Research\",\n            \"link\": \"https://www.precedenceresearch.com/at-home-fitness-equipment-market\",\n            \"preview\": \"The at-home fitness equipment market size was estimated at USD 9.34 billion in 2024 and is predicted to hit around 20.56 billion by 2034.\"\n        },\n        {\n            \"title\": \"Anime, Manga and Fitness: See the Toy Trends Spielwarenmesse Has Its Eyes On\",\n            \"publisher\": \"Gifts & Decorative Accessories\",\n            \"link\": \"https://www.giftsanddec.com/trending-gifts/anime-manga-and-fitness-see-the-toy-trends-spielwarenmesse-has-its-eyes-on/\",\n            \"preview\": \"Anime and fitness are taking over the toy world \u2013 at least according to the international trend committee and the Spielwarenmesse team.\"\n        },\n        {\n            \"title\": \"Rucking: The Fitness Trend Ramping Up Your Walks\",\n            \"publisher\": \"MSN\",\n            \"link\": \"https://www.msn.com/en-ie/health/other/rucking-the-fitness-trend-ramping-up-your-walks/ar-AA1oosMV\",\n            \"preview\": \"Walking boosts cardiovascular fitness, clears the mind and strengthens bones. Rucking enhances these benefits.\"\n        },\n        {\n            \"title\": \"Social media leaves Brits 'confused' about nutrition and wellness trends\",\n            \"publisher\": \"The Mirror\",\n            \"link\": \"https://www.mirror.co.uk/news/health/fitness-trends-chessie-king-health-33852686\",\n            \"preview\": \"A poll of 2000 active adults revealed baffling wellness fads of 2024 - including bum sunbathing, vaping vitamins.\"\n        },\n        {\n            \"title\": \"Dare you try the cult fitness trend? - 1 Oct 2024 - Grazia Magazine\",\n            \"publisher\": \"Readly\",\n            \"link\": \"https://gb.readly.com/magazines/grazia/2024-10-01/66fa45e8abd7587c88408bd8\",\n            \"preview\": \"Tickets sell out faster than Glastonbury and participants are moved to (euphoric) tears. Verity Clark reports on the exercise phenomenon.\"\n        },\n        {\n            \"title\": \"What is Winter Arc, the viral TikTok self-improvement trend?\",\n            \"publisher\": \"Women's Health UK\",\n            \"link\": \"https://www.womenshealthmag.com/uk/health/a62509582/winter-arc/\",\n            \"preview\": \"TikTok trend Winter Arc is taking over social media. Starting on 1 October, you have three months to improve your fitness, diet.\"\n        },\n        {\n            \"title\": \"Brits struggle to know 'where to turn' for wellness advice online\",\n            \"publisher\": \"Daily Star\",\n            \"link\": \"https://www.dailystar.co.uk/diet-fitness/fitness-trends-chessie-king-wellness-33853034\",\n            \"preview\": \"A study of 2000 adults found the most confusing wellness trends of 2024, including 'bum sunbathing' and wellness vaping.\"\n        },\n        {\n            \"title\": \"5 Unexpected Benefits of Walking Backward\",\n            \"publisher\": \"Health Essentials\",\n            \"link\": \"https://health.clevelandclinic.org/benefits-of-walking-backwards\",\n            \"preview\": \"Backward walking burns more calories than forward walking, boosts mental health, improves posture and cross-trains different muscles.\"\n        },\n        {\n            \"title\": \"The trends defining the $1.8 trillion global wellness market in 2024\",\n            \"publisher\": \"McKinsey\",\n            \"link\": \"https://www.mckinsey.com/industries/consumer-packaged-goods/our-insights/the-trends-defining-the-1-point-8-trillion-dollar-global-wellness-market-in-2024\",\n            \"preview\": \"McKinsey's latest Future of Wellness research examines the top trends shaping the health and consumer wellness industry in 2024 and beyond.\"\n        },\n        {\n            \"title\": \"Top Wellness Trends of 2024 and Predictions for 2025\",\n            \"publisher\": \"Dr. Axe\",\n            \"link\": \"https://draxe.com/health/wellness-trends-2024/\",\n            \"preview\": \"The wellness trends of 2024 highlight a shift toward personalized, holistic and sustainable wellness practices.\"\n        }\n    ]\n    ```"
                     }
                 ]
             },
             "2": {
-                "api": "TripadvisorSearchHotels",
-                "handles": "Retrieves hotel options using geoId",
+                "api": "Perplexity",
+                "handles": "Synthesizes information from news articles.",
                 "input_vars": [
                     {
-                        "name": "location_geoId",
-                        "parameter": "geoId",
+                        "name": "news_articles",
+                        "parameter": [
+                            "query"
+                        ],
                         "type": "string",
                         "source": "API_Output (Panel 3, Step 1)",
-                        "description": "Geo ID for Chicago",
-                        "value": "35805",
+                        "description": "News articles to synthesize information.",
+                        "value": "```json\n    [\n        {\n            \"title\": \"At-home Fitness Equipment Market Size, Share and Trends 2024 to 2034\",\n            \"publisher\": \"Precedence Research\",\n            \"link\": \"https://www.precedenceresearch.com/at-home-fitness-equipment-market\",\n            \"preview\": \"The at-home fitness equipment market size was estimated at USD 9.34 billion in 2024 and is predicted to hit around 20.56 billion by 2034.\"\n        },\n        {\n            \"title\": \"Anime, Manga and Fitness: See the Toy Trends Spielwarenmesse Has Its Eyes On\",\n            \"publisher\": \"Gifts & Decorative Accessories\",\n            \"link\": \"https://www.giftsanddec.com/trending-gifts/anime-manga-and-fitness-see-the-toy-trends-spielwarenmesse-has-its-eyes-on/\",\n            \"preview\": \"Anime and fitness are taking over the toy world \u2013 at least according to the international trend committee and the Spielwarenmesse team.\"\n        },\n        {\n            \"title\": \"Rucking: The Fitness Trend Ramping Up Your Walks\",\n            \"publisher\": \"MSN\",\n            \"link\": \"https://www.msn.com/en-ie/health/other/rucking-the-fitness-trend-ramping-up-your-walks/ar-AA1oosMV\",\n            \"preview\": \"Walking boosts cardiovascular fitness, clears the mind and strengthens bones. Rucking enhances these benefits.\"\n        },\n        {\n            \"title\": \"Social media leaves Brits 'confused' about nutrition and wellness trends\",\n            \"publisher\": \"The Mirror\",\n            \"link\": \"https://www.mirror.co.uk/news/health/fitness-trends-chessie-king-health-33852686\",\n            \"preview\": \"A poll of 2000 active adults revealed baffling wellness fads of 2024 - including bum sunbathing, vaping vitamins.\"\n        },\n        {\n            \"title\": \"Dare you try the cult fitness trend? - 1 Oct 2024 - Grazia Magazine\",\n            \"publisher\": \"Readly\",\n            \"link\": \"https://gb.readly.com/magazines/grazia/2024-10-01/66fa45e8abd7587c88408bd8\",\n            \"preview\": \"Tickets sell out faster than Glastonbury and participants are moved to (euphoric) tears. Verity Clark reports on the exercise phenomenon.\"\n        },\n        {\n            \"title\": \"What is Winter Arc, the viral TikTok self-improvement trend?\",\n            \"publisher\": \"Women's Health UK\",\n            \"link\": \"https://www.womenshealthmag.com/uk/health/a62509582/winter-arc/\",\n            \"preview\": \"TikTok trend Winter Arc is taking over social media. Starting on 1 October, you have three months to improve your fitness, diet.\"\n        },\n        {\n            \"title\": \"Brits struggle to know 'where to turn' for wellness advice online\",\n            \"publisher\": \"Daily Star\",\n            \"link\": \"https://www.dailystar.co.uk/diet-fitness/fitness-trends-chessie-king-wellness-33853034\",\n            \"preview\": \"A study of 2000 adults found the most confusing wellness trends of 2024, including 'bum sunbathing' and wellness vaping.\"\n        },\n        {\n            \"title\": \"5 Unexpected Benefits of Walking Backward\",\n            \"publisher\": \"Health Essentials\",\n            \"link\": \"https://health.clevelandclinic.org/benefits-of-walking-backwards\",\n            \"preview\": \"Backward walking burns more calories than forward walking, boosts mental health, improves posture and cross-trains different muscles.\"\n        },\n        {\n            \"title\": \"The trends defining the $1.8 trillion global wellness market in 2024\",\n            \"publisher\": \"McKinsey\",\n            \"link\": \"https://www.mckinsey.com/industries/consumer-packaged-goods/our-insights/the-trends-defining-the-1-point-8-trillion-dollar-global-wellness-market-in-2024\",\n            \"preview\": \"McKinsey's latest Future of Wellness research examines the top trends shaping the health and consumer wellness industry in 2024 and beyond.\"\n        },\n        {\n            \"title\": \"Top Wellness Trends of 2024 and Predictions for 2025\",\n            \"publisher\": \"Dr. Axe\",\n            \"link\": \"https://draxe.com/health/wellness-trends-2024/\",\n            \"preview\": \"The wellness trends of 2024 highlight a shift toward personalized, holistic and sustainable wellness practices.\"\n        }\n    ]\n    ```",
                         "dependencies": [
                             {
                                 "panel": 3,
                                 "step": 1
                             }
                         ]
-                    },
-                    {
-                        "name": "check_in_date",
-                        "parameter": "checkIn",
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Check-in date",
-                        "value": "2024-10-10",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "check_out_date",
-                        "parameter": "checkOut",
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Check-out date",
-                        "value": "2024-10-15",
-                        "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "hotel_options_chicago",
-                        "description": "List of available hotels in Chicago",
+                        "name": "news_summary",
+                        "description": "Summary of fitness news highlights.",
                         "used_by": [],
-                        "value": "```json\n    [\n      {\n        \"title\": \"The Blackstone, Autograph Collection\",\n        \"location\": \"Downtown / The Loop\",\n        \"rating\": 4.5,\n        \"reviews\": \"2,935\",\n        \"price\": \"$723\",\n        \"details\": \"Free cancellation \u2022 Reserve now, pay at stay\",\n        \"provider\": \"Booking.com\",\n        \"link\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=35114445&geo=841981&from=HotelDateSearch_Hotels&slot=1&matchID=1&oos=0&cnt=1&silo=47212&bucket=995258&nrank=1&crank=1&clt=SLMM&ttype=SponsoredMobileMeta&tm=307970517&managed=false&capped=false&gosox=mG_NRyap2SyPT34vYBrK6h-YTiWMn9QOrmIg-a_J_MbDzNQTKmSH_8ORiRn1gjv-FTBs5HL5K2eZhcfG3KARzY0JQ3sDZDTy6nC6RFGhsuiRqs0787sw6-L84qQLZWKPzom7N7xIg9r8VYbwpzEMqF1LK-8Juayx6LBOcEdWQmAhwZM3zRQMVqoSiOW2TDYT3f5-bjS6QxG8YSAoyk7icuxji-5Dkq5IZK2He5jyMDm5YaCJHuAxakmtfPZ2IOVLqpPQSActRw6Os63fv94AuA&priceShown=722&pm=AI&hac=AVAILABLE&mbl=MEET&mbldelta=0&rq=P&rate=615.0000&taxesRate=107.0200&feesRate=0&fees=107.0200&cur=USD&adults=1&child_rm_ages=&inDay=10&outDay=15&rdex=RDEX_a15c82fa0b718ae48a738f8f092cb56&rooms=1&inMonth=10&inYear=2024&outMonth=10&outYear=2024&auid=e59c5a0c-915b-4c69-8636-a2424936ae9d&def_d=true&bld=L_5,D_6,G_1,W_4,U_1,C_241010,T_12&bh=true&cs=1ae36b837ebbaf313836c1657e0a7c220&ik=773bcfeaf4a9453996ade8c7b68af5c1&aok=61ee9d844bc84d24867f4b2279d2c39c&tp=APS-Hotels&pageLocId=35805&area=Spons%7CSpons_Meta_Pref\"\n      },\n      {\n        \"title\": \"Swissotel Chicago\",\n        \"location\": \"Downtown / The Loop\",\n        \"rating\": 4.5,\n        \"reviews\": \"6,829\",\n        \"price\": \"$638\",\n        \"details\": \"Free cancellation \u2022 Reserve now, pay at stay\",\n        \"provider\": \"Booking.com\",\n        \"link\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=32448176&geo=114581&from=HotelDateSearch_Hotels&slot=1&matchID=1&oos=0&cnt=7&silo=10476&bucket=902999&nrank=1&crank=1&clt=M&ttype=MobileCR&tm=307970517&managed=false&capped=false&gosox=6vS60O_HgkBSaY7nhOEtdD_ZjUIvFgpEDJN1lcSPpCQfmE4ljJ_UDq5iIPmvyfzGDrABLAgrkm1j-FCdgAK9JFQwKJkrhD0K8M-kiFbZVqWNCUN7A2Q08upwukRRobLoGJbQdoaQYeoKlOBlpKXyutdiXvMKDpntYKkQ069GSZMf6Vkx7EZPzOsTe_iM_rpxZh5E5MOv-tSynoEyUq4QkGJ50vpp3V6gb_xJGRUPw3kjg1X0CimbTDwTF9nJFudx1dPZ3VPtaDRaSQtDHeZpeieqjlLxlYZLvW3SuRGZmsQ&priceShown=637&pm=AI&hac=AVAILABLE&mbl=LOSE&mbldelta=5400&rq=P&rate=517.7500&taxesRate=90.0900&feesRate=29.3500&fees=119.4400&cur=USD&adults=1&child_rm_ages=&inDay=10&outDay=15&rdex=RDEX_26e8bc1514411ca6a9025f000d4c7e79&rooms=1&inMonth=10&inYear=2024&outMonth=10&outYear=2024&auid=e90b2200-aee7-4a22-94db-c0f6aa18fec3&def_d=true&bld=L_5,D_6,G_1,W_4,U_1,C_241010,T_12&bh=true&cs=1d0e55d741080619cba1d2529b5590a0b&ik=773bcfeaf4a9453996ade8c7b68af5c1&aok=6bc3e8b31610407681ccff0d79632522&tp=APS-Hotels&pageLocId=35805\"\n      },\n      {\n        \"title\": \"The Royal Sonesta Chicago River North\",\n        \"location\": \"Near North Side\",\n        \"rating\": 4.5,\n        \"reviews\": \"3,539\",\n        \"price\": \"$533\",\n        \"details\": \"Free cancellation \u2022 Reserve now, pay at stay\",\n        \"provider\": \"Booking.com\",\n        \"link\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=33400293&geo=1566945&from=HotelDateSearch_Hotels&slot=1&matchID=1&oos=0&cnt=5&silo=10476&bucket=902999&nrank=1&crank=1&clt=M&ttype=MobileCR&tm=307970517&managed=false&capped=false&gosox=6vS60O_HgkBSaY7nhOEtdD_ZjUIvFgpEDJN1lcSPpCQfmE4ljJ_UDq5iIPmvyfzGVWLObS4NCXVtZuV4Zpqf6y2_zdjj7HGuvs4_ECLcdk6NCUN7A2Q08upwukRRobLosUX9CoS3ZVJaCCUuQski4ZF4Xm2A1z3Wml3Dwmr10dtuTIvJ5wZaAibn3AlHrSb5SkPdipmLZLlHmT39wnk_u1pI69GrjPPHLqPIb-9ZRAgjg1X0CimbTDwTF9nJFudx1dPZ3VPtaDRaSQtDHeZpeieqjlLxlYZLvW3SuRGZmsQ&priceShown=533&pm=AI&hac=AVAILABLE&mbl=LOSE&mbldelta=6700&rq=P&rate=426.4000&taxesRate=74.1900&feesRate=32.0000&fees=106.1900&cur=USD&adults=1&child_rm_ages=&inDay=10&outDay=15&rdex=RDEX_57f21f6a1d98800b13a9de7cfe44653&rooms=1&inMonth=10&inYear=2024&outMonth=10&outYear=2024&auid=85200907-a503-40ec-8e3d-07e9ed8f6e29&def_d=true&bld=L_5,D_6,G_1,W_4,U_1,C_241010,T_12&bh=true&cs=1f64693cc92afea657c930dd3a360f3d6&ik=773bcfeaf4a9453996ade8c7b68af5c1&aok=c1efef17b85144eda92fef27e27d1dac&tp=APS-Hotels&pageLocId=35805\"\n      },\n      {\n        \"title\": \"Virgin Hotels Chicago\",\n        \"location\": \"Downtown / The Loop\",\n        \"rating\": 4.5,\n        \"reviews\": \"3,603\",\n        \"price\": \"$518\",\n        \"details\": \"Free cancellation \u2022 Reserve now, pay at stay\",\n        \"provider\": \"Booking.com\",\n        \"link\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=65056708&geo=6883336&from=HotelDateSearch_Hotels&slot=1&matchID=1&oos=0&cnt=5&silo=10476&bucket=902999&nrank=1&crank=1&clt=M&ttype=MobileCR&tm=307970517&managed=false&capped=false&gosox=6vS60O_HgkBSaY7nhOEtdD_ZjUIvFgpEDJN1lcSPpCQfmE4ljJ_UDq5iIPmvyfzGyZeSt6FGfOoePtaAVLCL9pcD1bxKhFnyGdeiCqUWA3qNCUN7A2Q08upwukRRobLomIlUpCpeg7H6HFZ03SS_ZPpbZ9lu68uuBliCUMSmKdh28aJqabdlj5lLAcP9ZJqWd1lPKztknjB_jVd770iZqWJ50vpp3V6gb_xJGRUPw3kjg1X0CimbTDwTF9nJFudx1dPZ3VPtaDRaSQtDHeZpeieqjlLxlYZLvW3SuRGZmsQ&priceShown=518&pm=AI&hac=AVAILABLE&mbl=MEET&mbldelta=0&rq=ML&rate=416.1600&taxesRate=76.7600&feesRate=25.0000&fees=101.7600&cur=USD&adults=1&child_rm_ages=&inDay=10&outDay=15&rdex=RDEX_13e1cebc86aa124eddc5a00d217dc848&rooms=1&inMonth=10&inYear=2024&outMonth=10&outYear=2024&auid=a61cb0c9-0291-4163-9d20-e3134b6f68b4&def_d=true&bld=L_5,D_6,G_1,W_4,U_1,C_241010,T_12&bh=true&cs=14539d93a12be4ff1d03e2da3c3e9f2c5&ik=773bcfeaf4a9453996ade8c7b68af5c1&aok=582f1be447b6441e84d66c9f59dc082d&tp=APS-Hotels&pageLocId=35805\"\n      },\n      {\n        \"title\": \"Holiday Inn & Suites Chicago-Downtown, an IHG hotel\",\n        \"location\": \"West Side\",\n        \"rating\": 4,\n        \"reviews\": \"998\",\n        \"price\": \"$413\",\n        \"details\": \"Free cancellation \u2022 Reserve now, pay at stay\",\n        \"provider\": \"Booking.com\",\n        \"link\": \"https://www.tripadvisor.in/Commerce?p=BookingCom&src=32501587&geo=90969&from=HotelDateSearch_Hotels&slot=1&matchID=1&oos=0&cnt=5&silo=10476&bucket=902999&nrank=1&crank=1&clt=M&ttype=MobileCR&tm=307970517&managed=false&capped=false&gosox=6vS60O_HgkBSaY7nhOEtdD_ZjUIvFgpEDJN1lcSPpCQfmE4ljJ_UDq5iIPmvyfzGQ91tX9U-jreHQQXFOkwyZpsf56Q4HxcI1Verjm9J6DiNCUN7A2Q08upwukRRobLoc6YQphxOswtz3Jk_km5Bp3nEX_JllJuCOfmL2ovcbCkTivSIZ8b23DbDeizz2p4OkmIjloNbmQzwyaEMu19V5GVc6-0tRLxrm0EIslr9fNvsY4vuQ5KuSGSth3uY8jA5uWGgiR7gMWpJrXz2diDlS6qT0EgHLUcOjrOt37_eALg&priceShown=412&pm=AI&hac=AVAILABLE&mbl=MEET&mbldelta=0&rq=P&rate=342.8000&taxesRate=59.6500&feesRate=10.0000&fees=69.6500&cur=USD&adults=1&child_rm_ages=&inDay=10&outDay=15&rdex=RDEX_53bb27e1b93eb5c0b2dbb15f6c0f44f&rooms=1&inMonth=10&inYear=2024&outMonth=10&outYear=2024&auid=a861e85b-7192-42f5-8262-ad24586690f3&def_d=true&bld=L_5,D_6,G_1,W_4,U_1,C_241010,T_12&bh=true&cs=1acf4cd15385dee3c0101a1c7d10b2537&ik=773bcfeaf4a9453996ade8c7b68af5c1&aok=49090d9c1de844a7a25546ccb4f04083&tp=APS-Hotels&pageLocId=35805\"\n      }\n    ]\n    ```"
+                        "value": "\"1. **At-home Fitness Equipment Market**: The market is projected to grow from $8.6 billion in 2023 to $21.4 billion by 2035, driven by health awareness and technological innovations.\n     2. **Rucking**: A fitness trend involving walking with a weighted backpack, offering cardiovascular and mental health benefits.\n     3. **Global Wellness Market**: Expected to reach $1.8 trillion in 2024, with a focus on personalized, science-backed solutions and technological integration.\n     4. **Top Wellness Trends**: Emphasis on personalized nutrition, mental health, holistic fitness, and sustainable wellness practices.\n     5. **Winter Arc**: A viral TikTok trend focusing on personal development and goal achievement over a three-month period.\""
                     }
                 ]
             }

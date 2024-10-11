@@ -1,0 +1,38 @@
+{
+    "5": {
+        "4": {
+            "panel_description": "Provide general travel tips or recent news about Sydney.",
+            "steps": {
+                "1": {
+                    "api": "Perplexity",
+                    "handles": "Gathers travel tips and recent news about travel in Sydney",
+                    "input_vars": [
+                        {
+                            "name": "travel_news_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query for travel tips and recent news about Sydney",
+                            "value": "Travel tips and recent news about travel in Sydney.",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "travel_tips",
+                            "description": "General travel tips for Sydney",
+                            "used_by": []
+                        },
+                        {
+                            "name": "travel_news",
+                            "description": "Recent news articles about travel in Sydney",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

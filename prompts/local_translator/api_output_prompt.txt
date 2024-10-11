@@ -85,6 +85,7 @@ API Response:
 7. Filling in the Output_Variables and Dependent_Input_Variables:
    - Try to include all the important information about the output in the respective output variables or the dependent input variables. For example, if you are mentioning quantities, then include their units.
    - Ensure the extracted values contain all the context needed to be understandable and complete.
+   - Completely extract the important information from the api output and fill in the output variables fully. Do not miss out on important parts of the api output.
 
 ### Important Guidelines:
 
@@ -122,6 +123,7 @@ API Response:
 - Raise errors appropriately and provide clear explanations when necessary.
 - Include important information like units or additional context based on API documentation, so that it is easy to understand.
 - Try to include all the important information about the output in the respective output variables or the dependent input variables such that the extracted value contains all the context.
+- Completely extract the important information from the api output and fill in the output variables fully. Do not miss out on important parts of the api output.
 
 ### Output Format (Strictly follow this):
 
@@ -809,3 +811,69 @@ Output_Variables
         }
       },
     }
+
+#### Example 6: Incorrect Information
+
+Input:
+
+Current Step Details:
+
+- API: WeatherAPI.com_Realtime_Weather_Api
+- Handles: Fetches real-time weather data for the capital city.
+- Input Variables:
+  - Name: capital_city_name
+    - Parameter: ['q']
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: The name of the capital city.
+    - Value: ""Washington, D.C.""
+- Output Variables:
+  - Name: capital_weather
+    - Description: Current weather information for the capital city.
+
+Dependent Input Variables Step Details:
+
+Panel 3, Step 1:
+- API: Perplexity
+- Handles: Suggests activities based on the weather.
+- Input Variables:
+  - Name: capital_weather
+    - Parameter: ['query']
+    - Type: string
+    - Source: API_Output (Panel 2, Step 2)
+    - Description: Current weather information for the capital city.
+    - Value: None
+
+API Response 0:
+
+{'location': {'name': 'Washington', 'region': '', 'country': 'Aruba', 'lat': 12.55, 'lon': -70.0333, 'tz_id': 'America/Aruba', 'localtime_epoch': 1728358222, 'localtime': '2024-10-07 23:30'}, 'current': {'last_updated_epoch': 1728358200, 'last_updated': '2024-10-07 23:30', 'temp_c': 29.3, 'temp_f': 84.7, 'is_day': 0, 'condition': {'text': 'Partly cloudy', 'icon': '//cdn.weatherapi.com/weather/64x64/night/116.png', 'code': 1003}, 'wind_mph': 8.3, 'wind_kph': 13.3, 'wind_degree': 70, 'wind_dir': 'ENE', 'pressure_mb': 1010.0, 'pressure_in': 29.83, 'precip_mm': 0.0, 'precip_in': 0.0, 'humidity': 75, 'cloud': 25, 'feelslike_c': 33.7, 'feelslike_f': 92.6, 'windchill_c': 29.1, 'windchill_f': 84.4, 'heatindex_c': 33.2, 'heatindex_f': 91.8, 'dewpoint_c': 23.3, 'dewpoint_f': 74.0, 'vis_km': 10.0, 'vis_miles': 6.0, 'uv': 1.0, 'gust_mph': 11.6, 'gust_kph': 18.7}}
+
+Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+Step 1: Evaluate the API Response
+
+-The API response provides real-time weather data for “Washington.” However, upon examining the location details, the country is listed as “Aruba” instead of “USA.”
+- We expected the weather for Washington, D.C., USA, as per the input variable “capital_city_name,” but the API returned data for a location in a completely different country.
+
+Step 2: Assess Dependencies
+
+- There are dependent steps that rely on the correct weather data for Washington, D.C., specifically in the USA. Since the country is wrong in the API response, it will mislead the dependent steps, which require accurate weather conditions for suggesting relevant activities.
+
+Step 3: Decide on Error Handling
+
+- Although we generally avoid raising errors unless the discrepancy is significant, in this case, the API has returned weather information for an entirely different country. This makes the data completely inaccurate for our purposes.
+- Given that the issue is not a minor difference (like a wrong time or small temperature variance), but a country mismatch, it severely impacts the dependent steps’ ability to provide accurate results.
+- As per the guidelines, when the API response contains entirely wrong information, we raise error code 605 WRONG_INFORMATION.
+- Therefore, in this case, we will raise the error because the response is unrelated to the intended input location, Washington, D.C., USA.
+
+$$API_RESPONSE$$
+
+Status_Code
+
+605 WRONG_INFORMATION
+
+Error_Explanation
+
+The API response is wrong as it does gave us the weather for Washington in country Aruba, but we wanted the weather in Washington DC, USA

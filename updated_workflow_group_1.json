@@ -1,26 +1,28 @@
 {
     "1": {
-        "2": {
-            "panel_description": "Provide weather and news for each vacation spot.",
+        "1": {
+            "panel_description": "Display a list of open-air restaurants in San Diego.",
             "steps": {
                 "1": {
                     "api": "Perplexity",
-                    "handles": "Fetches news articles for each vacation spot",
+                    "handles": "Searches for open-air restaurants in San Diego.",
                     "input_vars": [
                         {
-                            "name": "news_query",
-                            "parameter": "query",
+                            "name": "restaurant_search_query",
+                            "parameter": [
+                                "query"
+                            ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Vacation spot names for news search",
-                            "value": "News about Rome, Italy; Venice, Italy; Prague, Czech Republic; Dubrovnik, Croatia; Budapest, Hungary",
+                            "description": "Query to find open-air restaurants in San Diego with details such as name, rating, and reviews.",
+                            "value": "List open-air restaurants in San Diego with details such as name, rating, and reviews.",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "news_articles",
-                            "description": "News articles for each vacation spot",
+                            "name": "open_air_restaurants",
+                            "description": "List of open-air restaurants in San Diego.",
                             "used_by": []
                         }
                     ]

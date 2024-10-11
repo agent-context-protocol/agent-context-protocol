@@ -1,26 +1,73 @@
 {
     "1": {
         "1": {
-            "panel_description": "Retrieve current weather information for Los Angeles.",
+            "panel_description": "Summarize the most popular discussions from the fitness community for October 2024.",
             "steps": {
                 "1": {
-                    "api": "WeatherAPI.com_Realtime_Weather_Api",
-                    "handles": "Fetches current weather data for Los Angeles",
+                    "api": "RedditTopPostsBySubreddit",
+                    "handles": "Retrieves top posts from the fitness subreddit.",
                     "input_vars": [
                         {
-                            "name": "city_name",
-                            "parameter": "q",
+                            "name": "subreddit_name",
+                            "parameter": [
+                                "subreddit"
+                            ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "City name for weather query",
-                            "value": "Los Angeles",
+                            "description": "Name of the subreddit to fetch top posts.",
+                            "value": "fitness",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "time_period",
+                            "parameter": [
+                                "time"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Time period for fetching top posts.",
+                            "value": "month",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "current_weather_la",
-                            "description": "Current weather details for Los Angeles",
+                            "name": "top_posts",
+                            "description": "Top posts from the fitness subreddit.",
+                            "used_by": [
+                                {
+                                    "panel": 1,
+                                    "step": 2
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "Perplexity",
+                    "handles": "Synthesizes information from top posts.",
+                    "input_vars": [
+                        {
+                            "name": "top_posts",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "API_Output (Panel 1, Step 1)",
+                            "description": "Top posts to synthesize information.",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "panel": 1,
+                                    "step": 1
+                                }
+                            ]
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "discussion_summary",
+                            "description": "Summary of popular discussions.",
                             "used_by": []
                         }
                     ]
@@ -30,35 +77,28 @@
     },
     "2": {
         "2": {
-            "panel_description": "Provide weather forecast for Chicago from October 10th to October 15th, 2024.",
+            "panel_description": "Provide the current weather in Los Angeles.",
             "steps": {
                 "1": {
-                    "api": "WeatherAPI.com_Forecast_Weather_API",
-                    "handles": "Fetches weather forecast for Chicago",
+                    "api": "WeatherAPI.com_Realtime_Weather_Api",
+                    "handles": "Retrieves current weather data for Los Angeles.",
                     "input_vars": [
                         {
-                            "name": "forecast_city_name",
-                            "parameter": "q",
+                            "name": "city_name",
+                            "parameter": [
+                                "q"
+                            ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "City name for weather forecast",
-                            "value": "Chicago",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "forecast_dates",
-                            "parameter": "dt",
-                            "type": "date",
-                            "source": "LLM_Generated",
-                            "description": "Dates for weather forecast",
-                            "value": "[\"2024-10-10\", \"2024-10-11\", \"2024-10-12\", \"2024-10-13\", \"2024-10-14\", \"2024-10-15\"]",
+                            "description": "City name for weather data.",
+                            "value": "Los Angeles",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "weather_forecast_chicago",
-                            "description": "Weather forecast for Chicago for specified dates",
+                            "name": "current_weather",
+                            "description": "Current weather in Los Angeles.",
                             "used_by": []
                         }
                     ]
@@ -68,26 +108,39 @@
     },
     "3": {
         "3": {
-            "panel_description": "Retrieve hotel options in Chicago for specified dates.",
+            "panel_description": "Provide news articles related to fitness trends in October 2024.",
             "steps": {
                 "1": {
-                    "api": "TripadvisorSearchLocation",
-                    "handles": "Retrieves geoId for Chicago",
+                    "api": "NewsAPISearchByKeyWord",
+                    "handles": "Finds news articles related to fitness trends.",
                     "input_vars": [
                         {
-                            "name": "location_query",
-                            "parameter": "query",
+                            "name": "news_query",
+                            "parameter": [
+                                "query"
+                            ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Search query for Chicago",
-                            "value": "Chicago",
+                            "description": "Keywords for searching news articles.",
+                            "value": "fitness trends October 2024",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "language",
+                            "parameter": [
+                                "language"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Language for news articles.",
+                            "value": "en",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "location_geoId",
-                            "description": "Geo ID for Chicago",
+                            "name": "news_articles",
+                            "description": "News articles related to fitness trends.",
                             "used_by": [
                                 {
                                     "panel": 3,
@@ -98,15 +151,17 @@
                     ]
                 },
                 "2": {
-                    "api": "TripadvisorSearchHotels",
-                    "handles": "Retrieves hotel options using geoId",
+                    "api": "Perplexity",
+                    "handles": "Synthesizes information from news articles.",
                     "input_vars": [
                         {
-                            "name": "location_geoId",
-                            "parameter": "geoId",
+                            "name": "news_articles",
+                            "parameter": [
+                                "query"
+                            ],
                             "type": "string",
                             "source": "API_Output (Panel 3, Step 1)",
-                            "description": "Geo ID for Chicago",
+                            "description": "News articles to synthesize information.",
                             "value": "None",
                             "dependencies": [
                                 {
@@ -114,30 +169,12 @@
                                     "step": 1
                                 }
                             ]
-                        },
-                        {
-                            "name": "check_in_date",
-                            "parameter": "checkIn",
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Check-in date",
-                            "value": "2024-10-10",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "check_out_date",
-                            "parameter": "checkOut",
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Check-out date",
-                            "value": "2024-10-15",
-                            "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "hotel_options_chicago",
-                            "description": "List of available hotels in Chicago",
+                            "name": "news_summary",
+                            "description": "Summary of fitness news highlights.",
                             "used_by": []
                         }
                     ]

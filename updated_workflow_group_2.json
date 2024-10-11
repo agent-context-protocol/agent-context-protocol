@@ -1,26 +1,39 @@
 {
     "2": {
         "2": {
-            "panel_description": "Provide weather forecast for Chicago from October 10th to October 15th.",
+            "panel_description": "Provide the weather forecast for San Diego on 11th October.",
             "steps": {
                 "1": {
-                    "api": "Perplexity",
-                    "handles": "Retrieves weather forecast for Chicago for specified dates",
+                    "api": "WeatherAPI.com_Forecast_Weather_API",
+                    "handles": "Fetches the weather forecast for San Diego on 11th October.",
                     "input_vars": [
                         {
-                            "name": "query_forecast_data",
-                            "parameter": "query",
+                            "name": "city_name",
+                            "parameter": [
+                                "q"
+                            ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to get weather forecast for Chicago from October 10th to October 15th",
-                            "value": "Weather forecast for Chicago from October 10th to October 15th",
+                            "description": "City name for weather forecast.",
+                            "value": "San Diego",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "forecast_date",
+                            "parameter": [
+                                "dt"
+                            ],
+                            "type": "date",
+                            "source": "LLM_Generated",
+                            "description": "Date for the weather forecast.",
+                            "value": "2023-10-11",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "chicago_weather_forecast",
-                            "description": "Weather forecast for Chicago for specified dates",
+                            "name": "weather_forecast",
+                            "description": "Weather forecast for San Diego on 11th October.",
                             "used_by": []
                         }
                     ]
