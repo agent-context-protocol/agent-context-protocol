@@ -1,28 +1,28 @@
 {
     "3": {
         "3": {
-            "panel_description": "Search for available hotels in Paris.",
+            "panel_description": "Display recent news articles related to dining in San Diego.",
             "steps": {
                 "1": {
                     "api": "Perplexity",
-                    "handles": "Searches for hotel options in Paris for the specified dates.",
+                    "handles": "Searches for recent dining news in San Diego.",
                     "input_vars": [
                         {
-                            "name": "hotel_search_query",
+                            "name": "news_search_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to find hotel options in Paris from October 5th to October 10th, 2024.",
-                            "value": "Find hotel options in Paris from October 5th to October 10th, 2024.",
+                            "description": "Query to find recent dining news in San Diego.",
+                            "value": "Recent dining news in San Diego.",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "hotel_options",
-                            "description": "List of available hotels in Paris.",
+                            "name": "dining_news",
+                            "description": "Recent news articles about dining in San Diego.",
                             "used_by": []
                         }
                     ]

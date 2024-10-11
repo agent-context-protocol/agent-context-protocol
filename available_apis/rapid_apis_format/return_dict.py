@@ -34,7 +34,7 @@ def create_rapid_apis_dict(json_file):
 
     return rapid_apis_dict
 
-def create_required_params_dict(json_file):
+def create_required_params_dict(json_file, required_params_bool = False):
     # Load the dictionary of dictionaries from the JSON file
     with open(json_file, 'r') as file:
         apis_data = json.load(file)
@@ -56,7 +56,7 @@ def create_required_params_dict(json_file):
         else:
             raise ValueError("The only options are path_parameters and query_parameters.")
         for param, param_details in api_details[query_path_name].items():
-            if param_details.get("required"):
+            if not required_params_bool or param_details.get("required"):
             # if param_details["required"]:
                 required_params[param] = {
                     "type": param_details["type"],
@@ -73,4 +73,6 @@ def create_required_params_dict(json_file):
 json_file = './available_apis/rapid_apis_format/executable-spec-converted.json'
 # json_file = 'executable-spec-converted.json'
 RAPID_APIS_DICT = create_rapid_apis_dict(json_file)
-RAPID_REQD_PARAMS_DICT = create_required_params_dict(json_file)
+RAPID_REQD_PARAMS_DICT = create_required_params_dict(json_file, True)
+RAPID_PARAMS_DICT = create_required_params_dict(json_file)
+print("RAPID_PARAMS_DICT:",RAPID_PARAMS_DICT)

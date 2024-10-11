@@ -43,11 +43,13 @@ As the Main Translator Agent in the STATUS_ASSISTANCE_REQUEST role, your primary
      - Each API should depend on at most one previous API's output.
      - Variable names should be unique across the entire workflow.
      - Ensure that the whole workflow for the entire group inlcuding all the panels is rewritten.
+     - We cannot use the knoweldge from the status update and error assistance of failed workflow to pre-fill our input variables in the new workflow you create.
 
 ### Important Guidelines:
 
 - Inputs Provided:
 
+  - Panel Details and Relevant APIs
   - Group Workflow: The current workflow for the panel that needs review.
   - Available API Descriptions: Details of the APIs you can use in the workflow.
   - Status Update and Assistance Request: Information about the error encountered and any relevant context.
@@ -78,6 +80,7 @@ As the Main Translator Agent in the STATUS_ASSISTANCE_REQUEST role, your primary
     - Ensure that the workflow is for this group only, and more than one group should not be present.
     - Ensure that the whole workflow for the entire group inlcuding all the panels is rewritten.
     - Keep in mind the error encountered and address it in your new workflow.
+    - We cannot use the knoweldge from the status update and error assistance of failed workflow to pre-fill our input variables in the new workflow you create.
 
   - Use of Perplexity:
     - Only include Perplexity as an API if necessary to fulfill missing information that cannot be obtained otherwise.
@@ -234,7 +237,7 @@ $$CHAIN_OF_THOUGHT$$
   - DROP: Discard the panel, but this would not fulfill the user's request to find hotel options in Dubrovnik.
   - I choose to MODIFY the workflow to meet the panel's objectives.
 
-- Reminder to myself that we have to rewrite the whole groups workflow and not only the updated part.
+- Reminder to myself that we have to rewrite the whole groups workflow and not only the updated part. And we have to start from scratch and cannot use information from failed panel to fill in out input parameters.
 
 - Modification Strategy:
 
@@ -438,7 +441,7 @@ $$CHAIN_OF_THOUGHT$$
     - Cons: Adds an extra API call, increasing complexity and time.
   - Considering the need for a minimal and time-efficient workflow, I will proceed with Option 1.
 
-- Reminder to myself that we have to rewrite the whole groups workflow and not only the updated part.
+- Reminder to myself that we have to rewrite the whole groups workflow and not only the updated part. And we have to start from scratch and cannot use information from failed panel to fill in out input parameters.
 
 - Updated Workflow Planning:
 

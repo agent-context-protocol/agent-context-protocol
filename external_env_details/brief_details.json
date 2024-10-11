@@ -3,13 +3,13 @@
     "Use": "As a web search engine to retrieve and synthesize information from multiple sources into a single, concise response."
   },
   "TripadvisorSearchLocation": {
-    "Use": "This API is used to search for location details (like a city or region) based on a query string, providing results like the locations name, type, and geographic coordinates."
+    "Use": "This API is used to search for location details (like a city or region) based on a query string, providing results limited to locations name, type, and geoID which is used by other TripAdvisor APIs."
   },
   "TripadvisorSearchHotels": {
-    "Use": "This API retrieves available hotels in a specified location (using the Geo ID) along with their details like price, rating, and amenities for a given check-in and check-out date."
+    "Use": "This API retrieves available hotels in a specified location (using the Geo ID retrieved from TripadvisorSearchLocation) along with their details like price, rating, and amenities for a given check-in and check-out date."
   },
   "TripadvisorSearchRestaurants": {
-    "Use": "API is used to search for restaurants in a specific location by providing a locations geoId, returning details such as restaurant name, rating, reviews, and other relevant information."
+    "Use": "API is used to search for restaurants in a specific location by providing a locations geoId (geoID retrieved from TripadvisorSearchLocation), returning details such as restaurant name, rating, reviews, and other relevant information."
   },
   "NewsAPISearchByKeyWord": {
     "Use": "API allows you to search for news articles on specific topics by providing a search query and optional filters like language and region."

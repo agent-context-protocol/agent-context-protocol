@@ -22,5 +22,9 @@ FUNCTION_APIS_FUNCTION_DICT = {
 # }
 
 FUNCTION_APIS_REQD_PARAMS_DICT = {
-    "Perplexity": ["query"],
+    "Perplexity": {"query": {"type": "string"}},
+}
+
+FUNCTION_APIS_PARAMS_DICT = {
+    "Perplexity": {"query": {"type": "string"}, "preplexity_ai_key": {"type": "string"}}
 }

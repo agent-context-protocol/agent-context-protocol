@@ -1,28 +1,39 @@
 {
     "1": {
         "1": {
-            "panel_description": "Create a detailed itinerary for a trip to Sydney from October 15th to October 20th, 2024, based on the weather forecast.",
+            "panel_description": "Summarize the most popular discussions from the fitness community for October 2024.",
             "steps": {
                 "1": {
-                    "api": "Perplexity",
-                    "handles": "Fetches latitude and longitude for Sydney",
+                    "api": "RedditTopPostsBySubreddit",
+                    "handles": "Retrieves top posts from the fitness subreddit.",
                     "input_vars": [
                         {
-                            "name": "query_sydney_coordinates",
+                            "name": "subreddit_name",
                             "parameter": [
-                                "query"
+                                "subreddit"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to find latitude and longitude of Sydney",
-                            "value": "What is the latitude and longitude of Sydney?",
+                            "description": "Name of the subreddit to fetch top posts.",
+                            "value": "fitness",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "time_period",
+                            "parameter": [
+                                "time"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Time period for fetching top posts.",
+                            "value": "month",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "sydney_coordinates",
-                            "description": "Latitude and longitude of Sydney",
+                            "name": "top_posts",
+                            "description": "Top posts from the fitness subreddit.",
                             "used_by": [
                                 {
                                     "panel": 1,
@@ -33,17 +44,17 @@
                     ]
                 },
                 "2": {
-                    "api": "WeatherAPI.com_Forecast_Weather_API",
-                    "handles": "Fetches weather forecast for Sydney",
+                    "api": "Perplexity",
+                    "handles": "Synthesizes information from top posts.",
                     "input_vars": [
                         {
-                            "name": "sydney_coordinates",
+                            "name": "top_posts",
                             "parameter": [
-                                "q"
+                                "query"
                             ],
                             "type": "string",
                             "source": "API_Output (Panel 1, Step 1)",
-                            "description": "Latitude and longitude of Sydney",
+                            "description": "Top posts to synthesize information.",
                             "value": "None",
                             "dependencies": [
                                 {
@@ -51,105 +62,12 @@
                                     "step": 1
                                 }
                             ]
-                        },
-                        {
-                            "name": "forecast_dates",
-                            "parameter": [
-                                "dt"
-                            ],
-                            "type": "date",
-                            "source": "LLM_Generated",
-                            "description": "Dates for the weather forecast",
-                            "value": "[\"2024-10-15\", \"2024-10-16\", \"2024-10-17\", \"2024-10-18\", \"2024-10-19\", \"2024-10-20\"]",
-                            "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "weather_forecast",
-                            "description": "Weather forecast for Sydney",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "3": {
-                    "api": "TripadvisorSearchLocation",
-                    "handles": "Retrieves geoId for Sydney",
-                    "input_vars": [
-                        {
-                            "name": "location_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Search query for Sydney",
-                            "value": "Sydney",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "location_geoId",
-                            "description": "Geo ID for Sydney",
-                            "used_by": [
-                                {
-                                    "panel": 1,
-                                    "step": 4
-                                }
-                            ]
-                        }
-                    ]
-                },
-                "4": {
-                    "api": "TripadvisorSearchRestaurants",
-                    "handles": "Searches for recommended restaurants in Sydney",
-                    "input_vars": [
-                        {
-                            "name": "location_geoId",
-                            "parameter": [
-                                "locationId"
-                            ],
-                            "type": "string",
-                            "source": "API_Output (Panel 1, Step 3)",
-                            "description": "Geo ID for Sydney",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 1,
-                                    "step": 3
-                                }
-                            ]
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "recommended_restaurants",
-                            "description": "List of recommended restaurants in Sydney",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "5": {
-                    "api": "Perplexity",
-                    "handles": "Gathers information on activities and attractions in Sydney",
-                    "input_vars": [
-                        {
-                            "name": "activities_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query for activities and attractions in Sydney",
-                            "value": "Activities and attractions in Sydney for a young AI Security Researcher",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "activities_info",
-                            "description": "Information on activities and attractions in Sydney",
+                            "name": "discussion_summary",
+                            "description": "Summary of popular discussions.",
                             "used_by": []
                         }
                     ]
@@ -159,31 +77,73 @@
     },
     "2": {
         "2": {
-            "panel_description": "Provide a list of recommended hotels in Sydney for the stay from October 15th to October 20th, 2024.",
+            "panel_description": "Provide the current weather in Los Angeles.",
             "steps": {
                 "1": {
-                    "api": "TripadvisorSearchLocation",
-                    "handles": "Retrieves geoId for Sydney",
+                    "api": "WeatherAPI.com_Realtime_Weather_Api",
+                    "handles": "Retrieves current weather data for Los Angeles.",
                     "input_vars": [
                         {
-                            "name": "location_query",
+                            "name": "city_name",
                             "parameter": [
-                                "query"
+                                "q"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Search query for Sydney",
-                            "value": "Sydney",
+                            "description": "City name for weather data.",
+                            "value": "Los Angeles",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "location_geoId",
-                            "description": "Geo ID for Sydney",
+                            "name": "current_weather",
+                            "description": "Current weather in Los Angeles.",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "3": {
+        "3": {
+            "panel_description": "Provide news articles related to fitness trends in October 2024.",
+            "steps": {
+                "1": {
+                    "api": "NewsAPISearchByKeyWord",
+                    "handles": "Finds news articles related to fitness trends.",
+                    "input_vars": [
+                        {
+                            "name": "news_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Keywords for searching news articles.",
+                            "value": "fitness trends October 2024",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "language",
+                            "parameter": [
+                                "language"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Language for news articles.",
+                            "value": "en",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "news_articles",
+                            "description": "News articles related to fitness trends.",
                             "used_by": [
                                 {
-                                    "panel": 2,
+                                    "panel": 3,
                                     "step": 2
                                 }
                             ]
@@ -191,52 +151,30 @@
                     ]
                 },
                 "2": {
-                    "api": "TripadvisorSearchHotels",
-                    "handles": "Retrieves hotel options using geoId",
+                    "api": "Perplexity",
+                    "handles": "Synthesizes information from news articles.",
                     "input_vars": [
                         {
-                            "name": "location_geoId",
+                            "name": "news_articles",
                             "parameter": [
-                                "geoId"
+                                "query"
                             ],
                             "type": "string",
-                            "source": "API_Output (Panel 2, Step 1)",
-                            "description": "Geo ID for Sydney",
+                            "source": "API_Output (Panel 3, Step 1)",
+                            "description": "News articles to synthesize information.",
                             "value": "None",
                             "dependencies": [
                                 {
-                                    "panel": 2,
+                                    "panel": 3,
                                     "step": 1
                                 }
                             ]
-                        },
-                        {
-                            "name": "check_in_date",
-                            "parameter": [
-                                "checkIn"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Check-in date",
-                            "value": "2024-10-15",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "check_out_date",
-                            "parameter": [
-                                "checkOut"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Check-out date",
-                            "value": "2024-10-20",
-                            "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "hotel_options",
-                            "description": "List of available hotels in Sydney",
+                            "name": "news_summary",
+                            "description": "Summary of fitness news highlights.",
                             "used_by": []
                         }
                     ]

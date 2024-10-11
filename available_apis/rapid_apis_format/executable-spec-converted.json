@@ -293,7 +293,7 @@
     },
     "TripadvisorSearchLocation": {
         "name": "TripadvisorSearchLocation",
-        "description": "Search for locations using a query string. It is only reliable for well known locations and cities, countries. The geoID retrieved from this API is only relevant for TripAdvisor APIs. This API is unreliable in terms of providing latititude and longitude.",
+        "description": "Search for locations using a query string and returns details like geoID of locations in TripAdvisor database, which is useful for other TripAdvisor APIs. It is only reliable for well known locations and cities, countries, and is unreliable in terms of providing latititude and longitude. The geoID retrieved from this API is only relevant for TripAdvisor APIs.",
         "method": "GET",
         "endpoint": "/api/v1/hotels/searchLocation",
         "host": "tripadvisor16.p.rapidapi.com",
@@ -2186,7 +2186,7 @@
     },
     "WeatherAPI.com_Realtime_Weather_Api": {
         "name": "WeatherAPI.com_Realtime_Weather_Api",
-        "description": "Fetch real-time weather information based on various query parameters. For best results provide latitude and longitude.",
+        "description": "Fetch real-time weather information based on various query parameters. For best results provide latitude and longitude as other form of information can be ambiguous.",
         "method": "GET",
         "endpoint": "/current.json",
         "host": "weatherapi-com.p.rapidapi.com",
@@ -2245,7 +2245,7 @@
     },
     "WeatherAPI.com_Time_Zone_API": {
         "name": "WeatherAPI.com_Time_Zone_API",
-        "description": "Fetch time zone information based on various query parameters. For best results provide latitude and longitude.",
+        "description": "Fetch time zone information based on various query parameters. For best results provide latitude and longitude as other form of information can be ambiguous.",
         "method": "GET",
         "endpoint": "/timezone.json",
         "host": "weatherapi-com.p.rapidapi.com",
@@ -2300,7 +2300,7 @@
     },
     "WeatherAPI.com_Forecast_Weather_API": {
         "name": "WeatherAPI.com_Forecast_Weather_API",
-        "description": "Fetch forecast weather information based on various query parameters. For best results provide latitude and longitude.",
+        "description": "Fetch forecast weather information based on various query parameters. For best results provide latitude and longitude as other form of information can be ambiguous.",
         "method": "GET",
         "endpoint": "/forecast.json",
         "host": "weatherapi-com.p.rapidapi.com",

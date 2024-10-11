@@ -535,15 +535,25 @@ class LocalTranslatorNode(BaseNode):
             # Initialize a dictionary to hold the API request details
             api_request = {}
             
-            # Check for error response
             if 'STATUS_CODE' in api_request_text and 'ERROR_EXPLANATION' in api_request_text:
-                # Extract status code and error explanation
-                status_match = re.search(r"STATUS_CODE\s+(\d+)\s+(.*)", api_request_text)
-                error_match = re.search(r"ERROR_EXPLANATION\s*-\s*(.*)", api_request_text, re.DOTALL)
+                # Extract status code and error explanation with improved regex patterns
+                status_match = re.search(
+                    r"STATUS_CODE\s*[\r\n]+(\d+)\s+([A-Z_]+)",
+                    api_request_text,
+                    re.IGNORECASE
+                )
+                error_match = re.search(
+                    r"ERROR_EXPLANATION\s*[\r\n]+([\s\S]+)",
+                    api_request_text,
+                    re.IGNORECASE
+                )
                 if status_match and error_match:
                     api_request['status_code'] = int(status_match.group(1).strip())
                     api_request['status_text'] = status_match.group(2).strip()
-                    api_request['error_explanation'] = error_match.group(1).strip()
+                    # Clean up the error explanation by removing any leading hyphens or bullets
+                    error_explanation = error_match.group(1).strip()
+                    error_explanation = re.sub(r'^[-\*\s]+', '', error_explanation, flags=re.MULTILINE)
+                    api_request['error_explanation'] = error_explanation
                     api_request_error_bool = True
                     return api_request_error_bool, api_request
                 else:
@@ -930,7 +940,7 @@ class LocalTranslatorNode(BaseNode):
         return num_tokens
 
     ###################################################################
-    async def wait_for_response(self, timeout=200):
+    async def wait_for_response(self, timeout=600):
         start_time = time.time()
         while not (self.drop or self.modify):
             if time.time() - start_time > timeout:

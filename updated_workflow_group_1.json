@@ -1,97 +1,28 @@
 {
     "1": {
         "1": {
-            "panel_description": "Create a detailed itinerary for a trip to Machu Picchu from October 15th to 20th, 2024, based on the weather.",
+            "panel_description": "Display a list of open-air restaurants in San Diego.",
             "steps": {
                 "1": {
                     "api": "Perplexity",
-                    "handles": "Obtains latitude and longitude for Machu Picchu",
+                    "handles": "Searches for open-air restaurants in San Diego.",
                     "input_vars": [
                         {
-                            "name": "query_coordinates",
+                            "name": "restaurant_search_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to find the latitude and longitude of Machu Picchu",
-                            "value": "What are the latitude and longitude of Machu Picchu?",
+                            "description": "Query to find open-air restaurants in San Diego with details such as name, rating, and reviews.",
+                            "value": "List open-air restaurants in San Diego with details such as name, rating, and reviews.",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "coordinates",
-                            "description": "Latitude and longitude of Machu Picchu",
-                            "used_by": [
-                                {
-                                    "panel": 1,
-                                    "step": 2
-                                }
-                            ]
-                        }
-                    ]
-                },
-                "2": {
-                    "api": "WeatherAPI.com_Forecast_Weather_API",
-                    "handles": "Fetches weather forecast for Machu Picchu",
-                    "input_vars": [
-                        {
-                            "name": "coordinates",
-                            "parameter": [
-                                "q"
-                            ],
-                            "type": "string",
-                            "source": "API_Output (Panel 1, Step 1)",
-                            "description": "Coordinates for Machu Picchu",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 1,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "forecast_dates",
-                            "parameter": [
-                                "dt"
-                            ],
-                            "type": "date",
-                            "source": "LLM_Generated",
-                            "description": "Forecast dates",
-                            "value": "[\"2024-10-15\", \"2024-10-16\", \"2024-10-17\", \"2024-10-18\", \"2024-10-19\", \"2024-10-20\"]",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "weather_forecast",
-                            "description": "Weather forecast for Machu Picchu",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "3": {
-                    "api": "Perplexity",
-                    "handles": "Gathers travel options, activities, and sightseeing recommendations",
-                    "input_vars": [
-                        {
-                            "name": "query_itinerary",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query for travel options, activities, and sightseeing in Machu Picchu",
-                            "value": "Travel options, activities, and sightseeing in Machu Picchu.",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "itinerary_details",
-                            "description": "Travel options, activities, and sightseeing recommendations",
+                            "name": "open_air_restaurants",
+                            "description": "List of open-air restaurants in San Diego.",
                             "used_by": []
                         }
                     ]

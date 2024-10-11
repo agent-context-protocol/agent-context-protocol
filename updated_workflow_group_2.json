@@ -1,28 +1,39 @@
 {
     "2": {
         "2": {
-            "panel_description": "Provide a list of available hotels in Machu Picchu for the dates October 15th to 20th, 2024.",
+            "panel_description": "Provide the weather forecast for San Diego on 11th October.",
             "steps": {
                 "1": {
-                    "api": "Perplexity",
-                    "handles": "Searches for hotel options in Machu Picchu for the specified dates.",
+                    "api": "WeatherAPI.com_Forecast_Weather_API",
+                    "handles": "Fetches the weather forecast for San Diego on 11th October.",
                     "input_vars": [
                         {
-                            "name": "hotel_search_query",
+                            "name": "city_name",
                             "parameter": [
-                                "query"
+                                "q"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to find hotel options in Machu Picchu from October 15th to October 20th, 2024.",
-                            "value": "Find hotel options in Machu Picchu from October 15th to October 20th, 2024.",
+                            "description": "City name for weather forecast.",
+                            "value": "San Diego",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "forecast_date",
+                            "parameter": [
+                                "dt"
+                            ],
+                            "type": "date",
+                            "source": "LLM_Generated",
+                            "description": "Date for the weather forecast.",
+                            "value": "2023-10-11",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "hotel_options",
-                            "description": "List of available hotels in Machu Picchu",
+                            "name": "weather_forecast",
+                            "description": "Weather forecast for San Diego on 11th October.",
                             "used_by": []
                         }
                     ]

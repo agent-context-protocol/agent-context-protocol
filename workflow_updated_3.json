@@ -1,50 +1,61 @@
 {
     "3": {
-        "panel_description": "List top-rated restaurants in Vancouver with delivery services.",
+        "panel_description": "Provide news articles related to fitness trends in October 2024.",
         "steps": {
             "1": {
-                "api": "TripadvisorSearchLocation",
-                "handles": "Retrieves geoId for Vancouver",
+                "api": "NewsAPISearchByKeyWord",
+                "handles": "Finds news articles related to fitness trends.",
                 "input_vars": [
                     {
-                        "name": "location_query",
+                        "name": "news_query",
                         "parameter": [
                             "query"
                         ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Search query for Vancouver",
-                        "value": "Vancouver",
+                        "description": "Keywords for searching news articles.",
+                        "value": "fitness trends October 2024",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "language",
+                        "parameter": [
+                            "language"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Language for news articles.",
+                        "value": "en",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "vancouver_geoId",
-                        "description": "GeoId for Vancouver",
+                        "name": "news_articles",
+                        "description": "News articles related to fitness trends.",
                         "used_by": [
                             {
                                 "panel": 3,
                                 "step": 2
                             }
                         ],
-                        "value": "154943"
+                        "value": "```json\n    [\n        {\n            \"title\": \"At-home Fitness Equipment Market Size, Share and Trends 2024 to 2034\",\n            \"publisher\": \"Precedence Research\",\n            \"link\": \"https://www.precedenceresearch.com/at-home-fitness-equipment-market\",\n            \"preview\": \"The at-home fitness equipment market size was estimated at USD 9.34 billion in 2024 and is predicted to hit around 20.56 billion by 2034.\"\n        },\n        {\n            \"title\": \"Anime, Manga and Fitness: See the Toy Trends Spielwarenmesse Has Its Eyes On\",\n            \"publisher\": \"Gifts & Decorative Accessories\",\n            \"link\": \"https://www.giftsanddec.com/trending-gifts/anime-manga-and-fitness-see-the-toy-trends-spielwarenmesse-has-its-eyes-on/\",\n            \"preview\": \"Anime and fitness are taking over the toy world \u2013 at least according to the international trend committee and the Spielwarenmesse team.\"\n        },\n        {\n            \"title\": \"Rucking: The Fitness Trend Ramping Up Your Walks\",\n            \"publisher\": \"MSN\",\n            \"link\": \"https://www.msn.com/en-ie/health/other/rucking-the-fitness-trend-ramping-up-your-walks/ar-AA1oosMV\",\n            \"preview\": \"Walking boosts cardiovascular fitness, clears the mind and strengthens bones. Rucking enhances these benefits.\"\n        },\n        {\n            \"title\": \"Social media leaves Brits 'confused' about nutrition and wellness trends\",\n            \"publisher\": \"The Mirror\",\n            \"link\": \"https://www.mirror.co.uk/news/health/fitness-trends-chessie-king-health-33852686\",\n            \"preview\": \"A poll of 2000 active adults revealed baffling wellness fads of 2024 - including bum sunbathing, vaping vitamins.\"\n        },\n        {\n            \"title\": \"Dare you try the cult fitness trend? - 1 Oct 2024 - Grazia Magazine\",\n            \"publisher\": \"Readly\",\n            \"link\": \"https://gb.readly.com/magazines/grazia/2024-10-01/66fa45e8abd7587c88408bd8\",\n            \"preview\": \"Tickets sell out faster than Glastonbury and participants are moved to (euphoric) tears. Verity Clark reports on the exercise phenomenon.\"\n        },\n        {\n            \"title\": \"What is Winter Arc, the viral TikTok self-improvement trend?\",\n            \"publisher\": \"Women's Health UK\",\n            \"link\": \"https://www.womenshealthmag.com/uk/health/a62509582/winter-arc/\",\n            \"preview\": \"TikTok trend Winter Arc is taking over social media. Starting on 1 October, you have three months to improve your fitness, diet.\"\n        },\n        {\n            \"title\": \"Brits struggle to know 'where to turn' for wellness advice online\",\n            \"publisher\": \"Daily Star\",\n            \"link\": \"https://www.dailystar.co.uk/diet-fitness/fitness-trends-chessie-king-wellness-33853034\",\n            \"preview\": \"A study of 2000 adults found the most confusing wellness trends of 2024, including 'bum sunbathing' and wellness vaping.\"\n        },\n        {\n            \"title\": \"5 Unexpected Benefits of Walking Backward\",\n            \"publisher\": \"Health Essentials\",\n            \"link\": \"https://health.clevelandclinic.org/benefits-of-walking-backwards\",\n            \"preview\": \"Backward walking burns more calories than forward walking, boosts mental health, improves posture and cross-trains different muscles.\"\n        },\n        {\n            \"title\": \"The trends defining the $1.8 trillion global wellness market in 2024\",\n            \"publisher\": \"McKinsey\",\n            \"link\": \"https://www.mckinsey.com/industries/consumer-packaged-goods/our-insights/the-trends-defining-the-1-point-8-trillion-dollar-global-wellness-market-in-2024\",\n            \"preview\": \"McKinsey's latest Future of Wellness research examines the top trends shaping the health and consumer wellness industry in 2024 and beyond.\"\n        },\n        {\n            \"title\": \"Top Wellness Trends of 2024 and Predictions for 2025\",\n            \"publisher\": \"Dr. Axe\",\n            \"link\": \"https://draxe.com/health/wellness-trends-2024/\",\n            \"preview\": \"The wellness trends of 2024 highlight a shift toward personalized, holistic and sustainable wellness practices.\"\n        }\n    ]\n    ```"
                     }
                 ]
             },
             "2": {
-                "api": "TripadvisorSearchRestaurants",
-                "handles": "Searches for restaurants with delivery",
+                "api": "Perplexity",
+                "handles": "Synthesizes information from news articles.",
                 "input_vars": [
                     {
-                        "name": "vancouver_geoId",
+                        "name": "news_articles",
                         "parameter": [
-                            "locationId"
+                            "query"
                         ],
                         "type": "string",
                         "source": "API_Output (Panel 3, Step 1)",
-                        "description": "GeoId for Vancouver",
-                        "value": "154943",
+                        "description": "News articles to synthesize information.",
+                        "value": "```json\n    [\n        {\n            \"title\": \"At-home Fitness Equipment Market Size, Share and Trends 2024 to 2034\",\n            \"publisher\": \"Precedence Research\",\n            \"link\": \"https://www.precedenceresearch.com/at-home-fitness-equipment-market\",\n            \"preview\": \"The at-home fitness equipment market size was estimated at USD 9.34 billion in 2024 and is predicted to hit around 20.56 billion by 2034.\"\n        },\n        {\n            \"title\": \"Anime, Manga and Fitness: See the Toy Trends Spielwarenmesse Has Its Eyes On\",\n            \"publisher\": \"Gifts & Decorative Accessories\",\n            \"link\": \"https://www.giftsanddec.com/trending-gifts/anime-manga-and-fitness-see-the-toy-trends-spielwarenmesse-has-its-eyes-on/\",\n            \"preview\": \"Anime and fitness are taking over the toy world \u2013 at least according to the international trend committee and the Spielwarenmesse team.\"\n        },\n        {\n            \"title\": \"Rucking: The Fitness Trend Ramping Up Your Walks\",\n            \"publisher\": \"MSN\",\n            \"link\": \"https://www.msn.com/en-ie/health/other/rucking-the-fitness-trend-ramping-up-your-walks/ar-AA1oosMV\",\n            \"preview\": \"Walking boosts cardiovascular fitness, clears the mind and strengthens bones. Rucking enhances these benefits.\"\n        },\n        {\n            \"title\": \"Social media leaves Brits 'confused' about nutrition and wellness trends\",\n            \"publisher\": \"The Mirror\",\n            \"link\": \"https://www.mirror.co.uk/news/health/fitness-trends-chessie-king-health-33852686\",\n            \"preview\": \"A poll of 2000 active adults revealed baffling wellness fads of 2024 - including bum sunbathing, vaping vitamins.\"\n        },\n        {\n            \"title\": \"Dare you try the cult fitness trend? - 1 Oct 2024 - Grazia Magazine\",\n            \"publisher\": \"Readly\",\n            \"link\": \"https://gb.readly.com/magazines/grazia/2024-10-01/66fa45e8abd7587c88408bd8\",\n            \"preview\": \"Tickets sell out faster than Glastonbury and participants are moved to (euphoric) tears. Verity Clark reports on the exercise phenomenon.\"\n        },\n        {\n            \"title\": \"What is Winter Arc, the viral TikTok self-improvement trend?\",\n            \"publisher\": \"Women's Health UK\",\n            \"link\": \"https://www.womenshealthmag.com/uk/health/a62509582/winter-arc/\",\n            \"preview\": \"TikTok trend Winter Arc is taking over social media. Starting on 1 October, you have three months to improve your fitness, diet.\"\n        },\n        {\n            \"title\": \"Brits struggle to know 'where to turn' for wellness advice online\",\n            \"publisher\": \"Daily Star\",\n            \"link\": \"https://www.dailystar.co.uk/diet-fitness/fitness-trends-chessie-king-wellness-33853034\",\n            \"preview\": \"A study of 2000 adults found the most confusing wellness trends of 2024, including 'bum sunbathing' and wellness vaping.\"\n        },\n        {\n            \"title\": \"5 Unexpected Benefits of Walking Backward\",\n            \"publisher\": \"Health Essentials\",\n            \"link\": \"https://health.clevelandclinic.org/benefits-of-walking-backwards\",\n            \"preview\": \"Backward walking burns more calories than forward walking, boosts mental health, improves posture and cross-trains different muscles.\"\n        },\n        {\n            \"title\": \"The trends defining the $1.8 trillion global wellness market in 2024\",\n            \"publisher\": \"McKinsey\",\n            \"link\": \"https://www.mckinsey.com/industries/consumer-packaged-goods/our-insights/the-trends-defining-the-1-point-8-trillion-dollar-global-wellness-market-in-2024\",\n            \"preview\": \"McKinsey's latest Future of Wellness research examines the top trends shaping the health and consumer wellness industry in 2024 and beyond.\"\n        },\n        {\n            \"title\": \"Top Wellness Trends of 2024 and Predictions for 2025\",\n            \"publisher\": \"Dr. Axe\",\n            \"link\": \"https://draxe.com/health/wellness-trends-2024/\",\n            \"preview\": \"The wellness trends of 2024 highlight a shift toward personalized, holistic and sustainable wellness practices.\"\n        }\n    ]\n    ```",
                         "dependencies": [
                             {
                                 "panel": 3,
@@ -55,10 +66,10 @@
                 ],
                 "output_vars": [
                     {
-                        "name": "restaurants_with_delivery",
-                        "description": "List of top-rated restaurants with delivery options",
+                        "name": "news_summary",
+                        "description": "Summary of fitness news highlights.",
                         "used_by": [],
-                        "value": "```json\n    [\n      {\n        \"name\": \"Cora Breakfast & Lunch\",\n        \"averageRating\": 4.5,\n        \"userReviewCount\": 719,\n        \"priceTag\": \"$$ - $$$\",\n        \"establishmentTypeAndCuisineTags\": [\"Cafe\", \"Canadian\"],\n        \"heroImgUrl\": \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/10/85/0a/a1/20170831-093122-largejpg.jpg?w=4000&h=3000&s=1\",\n        \"reviewSnippet\": {\n          \"reviewText\": \"Cora was near another restaurant where we had eaten a breakfast so we decided...\",\n          \"reviewUrl\": \"https://www.tripadvisor.com/ShowUserReviews-g154943-d10145567-r684360041-Cora_Breakfast_Lunch-Vancouver_British_Columbia.html\"\n        }\n      }\n    ]\n    ```"
+                        "value": "\"1. **At-home Fitness Equipment Market**: The market is projected to grow from $8.6 billion in 2023 to $21.4 billion by 2035, driven by health awareness and technological innovations.\n     2. **Rucking**: A fitness trend involving walking with a weighted backpack, offering cardiovascular and mental health benefits.\n     3. **Global Wellness Market**: Expected to reach $1.8 trillion in 2024, with a focus on personalized, science-backed solutions and technological integration.\n     4. **Top Wellness Trends**: Emphasis on personalized nutrition, mental health, holistic fitness, and sustainable wellness practices.\n     5. **Winter Arc**: A viral TikTok trend focusing on personal development and goal achievement over a three-month period.\""
                     }
                 ]
             }

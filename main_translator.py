@@ -2,8 +2,8 @@ from base import BaseNode
 import re
 import json
 import asyncio
-from available_apis.rapid_apis_format.return_dict import RAPID_APIS_DICT, RAPID_REQD_PARAMS_DICT
-from available_apis.function_format.return_dict import FUNCTION_APIS_DOCUMENTATION_DICT, FUNCTION_APIS_REQD_PARAMS_DICT
+from available_apis.rapid_apis_format.return_dict import RAPID_APIS_DICT, RAPID_REQD_PARAMS_DICT, RAPID_PARAMS_DICT
+from available_apis.function_format.return_dict import FUNCTION_APIS_DOCUMENTATION_DICT, FUNCTION_APIS_REQD_PARAMS_DICT, FUNCTION_APIS_PARAMS_DICT
 
 class MainTranslatorNode(BaseNode):
     def __init__(self, node_name, system_prompt = None):
@@ -28,7 +28,7 @@ class MainTranslatorNode(BaseNode):
     ########################
     # ALL THE PARSING FUNCTIONS WILL BE HERE
 
-    def parse_main_translator_workflow(self, text, restrict_one_group = False):
+    def parse_main_translator_workflow(self, text, restrict_one_group = False, modified_workflow_bool = False):
         # First, split the text into CHAIN_OF_THOUGHT and WORKFLOW sections
         sections = re.split(r"\$\$WORKFLOW\$\$", text)
         if len(sections) != 2:
@@ -61,7 +61,7 @@ class MainTranslatorNode(BaseNode):
 
             group_lines = group_content.strip().split('\n')
             panels_in_group = []
-            interdependencies_found = False
+            panel_interdependencies_found = False
 
             j = 0
             while j < len(group_lines):
@@ -143,9 +143,9 @@ class MainTranslatorNode(BaseNode):
                                     if current_step['api'] in RAPID_REQD_PARAMS_DICT:
                                         reqd_params_for_this_api = list(RAPID_REQD_PARAMS_DICT[current_step['api']].keys())
                                     elif current_step['api'] in FUNCTION_APIS_REQD_PARAMS_DICT:
-                                        reqd_params_for_this_api = FUNCTION_APIS_REQD_PARAMS_DICT[current_step['api']]
-                                    else:
-                                        raise ValueError(f"Invalid API Name {current_step['api']}. Please provide a valid api name.")
+                                        reqd_params_for_this_api = list(FUNCTION_APIS_REQD_PARAMS_DICT[current_step['api']].keys())
+                                    elif current_step['api'] not in RAPID_PARAMS_DICT or current_step['api'] not in FUNCTION_APIS_PARAMS_DICT:
+                                        raise ValueError(f"Invalid API Name {current_step['api']}, there is no such API name. Please use a valid api name.")
                                     print(f"current_step['api']: {current_step['api']} reqd_params_for_this_api : {reqd_params_for_this_api}")
                                     j += 1
                                 elif line.startswith("- Handles:"):
@@ -177,6 +177,13 @@ class MainTranslatorNode(BaseNode):
                                                 
                                                 # Split the parameters by comma and strip whitespace
                                                 parameters = [param.strip() for param in param_str.split(",") if param.strip()]
+
+                                                for param_ in parameters:
+                                                    if current_step['api'] in RAPID_PARAMS_DICT and param_ not in RAPID_PARAMS_DICT[current_step['api']]:
+                                                        raise ValueError(f"Given parameter name {param_} is invalid parameter for API {current_step['api']}, there is no such parameter for this API. The valid parameters for this api are {RAPID_PARAMS_DICT[current_step['api']]}.")
+                                                    elif current_step['api'] in FUNCTION_APIS_PARAMS_DICT and param_ not in FUNCTION_APIS_PARAMS_DICT[current_step['api']]:
+                                                        raise ValueError(f"Given parameter name {param_} is invalid parameter for API {current_step['api']}, there is no such parameter for this API. Please use a valid parameter for this API {FUNCTION_APIS_PARAMS_DICT[current_step['api']]}.")
+                                                    
                                                 
                                                 # Assign the list of parameters to input_var['parameter']
                                                 input_var['parameter'] = parameters
@@ -237,9 +244,10 @@ class MainTranslatorNode(BaseNode):
                                                 # match = re.search(r"Panel (\d+), Step (\d+)", input_var['source'])
                                                 match = re.fullmatch(r"API_Output\s*\(Panel\s+(\d+),\s*Step\s+(\d+)\)", input_var['source'])
                                                 if match:
-                                                    interdependencies_found = True
                                                     dependent_panel = int(match.group(1))
                                                     dependent_step = int(match.group(2))
+                                                    # checking if panel interdependencie are present and using or to propogate it if it ever becomes true
+                                                    panel_interdependencies_found = not(dependent_panel == panel_id) or panel_interdependencies_found
                                                     input_var['dependencies'].append({
                                                         "panel": dependent_panel,
                                                         "step": dependent_step
@@ -270,7 +278,7 @@ class MainTranslatorNode(BaseNode):
                                                         else:
                                                             raise ValueError(f"Panel {dependent_panel} not found in Group {current_group}. The interdependencies should be between panels of the same group, if this interdependency is valid then please put them in the same group.")
                                                 else:
-                                                    raise ValueError(f"Invalid source format for dependencies in Panel {panel_id}, Step {step_counter}")
+                                                    raise ValueError(f"Invalid source format for dependencies in Panel {panel_id}, Step {step_counter}.")
                                             current_step['input_vars'].append(input_var)
                                         else:
                                             j += 1  # Skip any lines that are not input variables
@@ -322,9 +330,9 @@ class MainTranslatorNode(BaseNode):
                 else:
                     j += 1  # Skip any lines outside of recognized blocks
 
-            # Check for interdependencies
-            if len(panels_in_group) > 1 and not interdependencies_found:
-                raise ValueError(f"No interdependencies found in Group {current_group} despite having multiple panels.")
+            # Check for interdependencies. If we are modifying then we cant update panels in the group, so lets allow if there are no interdependencies but still they are in the same group
+            if not(modified_workflow_bool) and len(panels_in_group) > 1 and not panel_interdependencies_found:
+                raise ValueError(f"Not all panels have interdependencies in Group {current_group}. Please put them in different groups if no interdependencies are there.")
 
         # Return the chain_of_thought and workflows
         return chain_of_thought, workflows
@@ -367,7 +375,7 @@ class MainTranslatorNode(BaseNode):
             full_workflow_text = f"{dummy_chain_of_thought}\n$$WORKFLOW$$\n{workflow_text}"
 
             # Call the existing workflow parser and save the parsed workflow
-            _, result['workflow'] = self.parse_main_translator_workflow(full_workflow_text)
+            _, result['workflow'] = self.parse_main_translator_workflow(full_workflow_text, modified_workflow_bool = True)
 
         return result
 
@@ -441,6 +449,14 @@ class MainTranslatorNode(BaseNode):
     
     def make_input_status_update(self, group_workflow_dict, group_no, status_update_dict):
         result = []
+
+        # # Add the panel descriptions along with the relevant API names
+        # for panel_no in list(group_workflow_dict.keys()):
+        #     panel = self.panels_list[panel_no]
+        #     # print("panellllll : ",panel)
+        #     formatted_string += f"{panel['instance_id']}. Panel {panel['instance_id']}: {panel['panel_description']}\n"
+        #     formatted_string += f"Details: {panel['request']['description']}"
+        #     formatted_string += "\nList of Relevant APIs:\n"
 
         # Add Group Workflow header
         result.append(f"Group Workflow:\n")
@@ -528,7 +544,7 @@ class MainTranslatorNode(BaseNode):
                 _, workflow_dict = self.parse_main_translator_workflow(llm_response_workflow)
                 run_success = True
             except Exception as e:
-                error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT and WORKFLOW without any other details before or after. Additionaly inlcude in your CHAIN_OF_THOUGHT about what went wrong and rectify it basded on the given information:\n {str(e)}' 
+                error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT and WORKFLOW without any other details before or after. Additionaly inlcude in your CHAIN_OF_THOUGHT about what went wrong in the format and rectify it basded on the given information:\n {str(e)}' 
                 self.chat_history.append({"role": "user", "content": error_message})
                 print("error_message : ",error_message)
             
@@ -567,7 +583,7 @@ class MainTranslatorNode(BaseNode):
     #             print(f"Processing update from Local Translator {local_translator_id}")
 
     #             # Simulate some processing time
-    #             # await asyncio.sleep(2)
+    #             await asyncio.sleep(1)
 
     #             status_assistance_llm_input = self.make_input_status_update(local_translator_object.group_workflow, local_translator_object.group_id, status_update_dict)
 
@@ -657,11 +673,7 @@ class MainTranslatorNode(BaseNode):
                     parsed_updated_workflow = self.parse_status_assistance_output(updated_workflow)
                     run_success = True
                 except Exception as e:
-                    error_message = (
-                        f'The format of the output is incorrect. Please rectify based on this error message, '
-                        f'only output the CHAIN_OF_THOUGHT, CHOSEN_ACTION, and/or WORKFLOW without any other details '
-                        f'before or after:\n {str(e)}'
-                    )
+                    error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT, CHOSEN_ACTION and/or WORKFLOW without any other details before or after. Additionaly inlcude in your CHAIN_OF_THOUGHT about what went wrong in the format and rectify it basded on the given information:\n {str(e)}' 
                     self.chat_history.append({"role": "user", "content": error_message})
                     print("error_message:", error_message)
 
@@ -700,7 +712,7 @@ class MainTranslatorNode(BaseNode):
             print(f"Finished processing update from Local Translator {local_translator_id}")
             
             # Yield control to other tasks
-            await asyncio.sleep(0)  # Use sleep(0) to yield control without delay
+            await asyncio.sleep(0.1)  # Use sleep(0) to yield control without delay
 
     def save_and_load_workflow(self, group_id, workflow):
         # Save the workflow to a file

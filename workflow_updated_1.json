@@ -1,160 +1,75 @@
 {
     "1": {
-        "panel_description": "Create a detailed itinerary for a trip to Sydney from October 15th to October 20th, 2024, based on the weather forecast.",
+        "panel_description": "Summarize the most popular discussions from the fitness community for October 2024.",
         "steps": {
             "1": {
-                "api": "Perplexity",
-                "handles": "Fetches latitude and longitude for Sydney",
+                "api": "RedditTopPostsBySubreddit",
+                "handles": "Retrieves top posts from the fitness subreddit.",
                 "input_vars": [
                     {
-                        "name": "query_sydney_coordinates",
+                        "name": "subreddit_name",
                         "parameter": [
-                            "query"
+                            "subreddit"
                         ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Query to find latitude and longitude of Sydney",
-                        "value": "What is the latitude and longitude of Sydney?",
+                        "description": "Name of the subreddit to fetch top posts.",
+                        "value": "fitness",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "time_period",
+                        "parameter": [
+                            "time"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Time period for fetching top posts.",
+                        "value": "month",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "sydney_coordinates",
-                        "description": "Latitude and longitude of Sydney",
+                        "name": "top_posts",
+                        "description": "Top posts from the fitness subreddit.",
                         "used_by": [
                             {
                                 "panel": 1,
                                 "step": 2
                             }
                         ],
-                        "value": "\"-33.86785,151.20732\""
+                        "value": "```json\n    [\n      {\n        \"title\": \"Rant Wednesday\",\n        \"author\": \"AutoModerator\",\n        \"upvote_ratio\": 0.94,\n        \"score\": 86,\n        \"num_comments\": 399,\n        \"url\": \"https://www.reddit.com/r/Fitness/comments/1fozxll/rant_wednesday/\"\n      },\n      {\n        \"title\": \"Gym Story Saturday\",\n        \"author\": \"FGC_Valhalla\",\n        \"upvote_ratio\": 0.92,\n        \"score\": 85,\n        \"num_comments\": 108,\n        \"url\": \"https://www.reddit.com/r/Fitness/comments/1fr841f/gym_story_saturday/\"\n      },\n      {\n        \"title\": \"Tri-Annual Protein Megathread\",\n        \"author\": \"AutoModerator\",\n        \"upvote_ratio\": 0.89,\n        \"score\": 82,\n        \"num_comments\": 147,\n        \"url\": \"https://www.reddit.com/r/Fitness/comments/1fqoet1/triannual_protein_megathread/\"\n      },\n      {\n        \"title\": \"Moronic Monday - Your weekly stupid questions thread\",\n        \"author\": \"cdingo\",\n        \"upvote_ratio\": 0.93,\n        \"score\": 52,\n        \"num_comments\": 519,\n        \"url\": \"https://www.reddit.com/r/Fitness/comments/1fhyfgb/moronic_monday_your_weekly_stupid_questions_thread/\"\n      },\n      {\n        \"title\": \"Physique Phriday\",\n        \"author\": \"AutoModerator\",\n        \"upvote_ratio\": 0.85,\n        \"score\": 46,\n        \"num_comments\": 88,\n        \"url\": \"https://www.reddit.com/r/Fitness/comments/1fl7k9m/physique_phriday/\"\n      }\n    ]\n    ```"
                     }
                 ]
             },
             "2": {
-                "api": "WeatherAPI.com_Forecast_Weather_API",
-                "handles": "Fetches weather forecast for Sydney",
+                "api": "Perplexity",
+                "handles": "Synthesizes information from top posts.",
                 "input_vars": [
                     {
-                        "name": "sydney_coordinates",
+                        "name": "top_posts",
                         "parameter": [
-                            "q"
+                            "query"
                         ],
                         "type": "string",
                         "source": "API_Output (Panel 1, Step 1)",
-                        "description": "Latitude and longitude of Sydney",
-                        "value": "\"-33.86785,151.20732\"",
+                        "description": "Top posts to synthesize information.",
+                        "value": "\"Rant Wednesday by AutoModerator, Gym Story Saturday by FGC_Valhalla, Tri-Annual Protein Megathread by AutoModerator, Moronic Monday by cdingo, Physique Phriday by AutoModerator\"",
                         "dependencies": [
                             {
                                 "panel": 1,
                                 "step": 1
                             }
                         ]
-                    },
-                    {
-                        "name": "forecast_dates",
-                        "parameter": [
-                            "dt"
-                        ],
-                        "type": "date",
-                        "source": "LLM_Generated",
-                        "description": "Dates for the weather forecast",
-                        "value": "[\"2024-10-15\", \"2024-10-16\", \"2024-10-17\", \"2024-10-18\", \"2024-10-19\", \"2024-10-20\"]",
-                        "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "weather_forecast",
-                        "description": "Weather forecast for Sydney",
+                        "name": "discussion_summary",
+                        "description": "Summary of popular discussions.",
                         "used_by": [],
-                        "value": "```json\n    {\n      \"2024-10-15\": {\n        \"maxtemp_c\": 19.9,\n        \"mintemp_c\": 13.8,\n        \"condition\": \"Patchy rain nearby\",\n        \"chance_of_rain\": 88,\n        \"uv\": 5.0\n      },\n      \"2024-10-16\": {\n        \"maxtemp_c\": 19.6,\n        \"mintemp_c\": 15.8,\n        \"condition\": \"Patchy rain nearby\",\n        \"chance_of_rain\": 84,\n        \"uv\": 5.0\n      },\n      \"2024-10-17\": {\n        \"maxtemp_c\": 21.7,\n        \"mintemp_c\": 16.1,\n        \"condition\": \"Patchy rain nearby\",\n        \"chance_of_rain\": 83,\n        \"uv\": 5.0\n      },\n      \"2024-10-18\": {\n        \"maxtemp_c\": 20.5,\n        \"mintemp_c\": 16.4,\n        \"condition\": \"Patchy rain nearby\",\n        \"chance_of_rain\": 85,\n        \"uv\": 5.0\n      },\n      \"2024-10-19\": {\n        \"maxtemp_c\": 19.0,\n        \"mintemp_c\": 16.4,\n        \"condition\": \"Patchy rain nearby\",\n        \"chance_of_rain\": 78,\n        \"uv\": 5.0\n      }\n    }\n    ```"
-                    }
-                ]
-            },
-            "3": {
-                "api": "TripadvisorSearchLocation",
-                "handles": "Retrieves geoId for Sydney",
-                "input_vars": [
-                    {
-                        "name": "location_query",
-                        "parameter": [
-                            "query"
-                        ],
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Search query for Sydney",
-                        "value": "Sydney",
-                        "dependencies": []
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "location_geoId",
-                        "description": "Geo ID for Sydney",
-                        "used_by": [
-                            {
-                                "panel": 1,
-                                "step": 4
-                            }
-                        ],
-                        "value": "3323314"
-                    }
-                ]
-            },
-            "4": {
-                "api": "TripadvisorSearchRestaurants",
-                "handles": "Searches for recommended restaurants in Sydney",
-                "input_vars": [
-                    {
-                        "name": "location_geoId",
-                        "parameter": [
-                            "locationId"
-                        ],
-                        "type": "string",
-                        "source": "API_Output (Panel 1, Step 3)",
-                        "description": "Geo ID for Sydney",
-                        "value": "3323314",
-                        "dependencies": [
-                            {
-                                "panel": 1,
-                                "step": 3
-                            }
-                        ]
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "recommended_restaurants",
-                        "description": "List of recommended restaurants in Sydney",
-                        "used_by": [],
-                        "value": "```json\n    [\n      {\n        \"name\": \"Bacar Restaurant & Bar\",\n        \"averageRating\": 4,\n        \"userReviewCount\": 249,\n        \"status\": \"Open now\",\n        \"priceTag\": \"$$$$\",\n        \"menuUrl\": \"https://www.pullmansydneyolympicpark.com.au/en/restaurants-and-bars/bacar-restaurant-sydney.html\",\n        \"cuisine\": [\"Australian\"],\n        \"heroImgUrl\": \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/14/0e/71/e4/bacar-restaurant-bar.jpg?w=2000&h=1300&s=1\",\n        \"reviewSnippet\": {\n          \"text\": \"The staff at the Pullman are so polite and friendly and the food was great...\",\n          \"url\": \"https://www.tripadvisor.com/ShowUserReviews-g3323314-d1177099-r773632906-Bacar_Restaurant_Bar-Sydney_Olympic_Park_Auburn_Greater_Sydney_New_South_Wales.html\"\n        }\n      },\n      {\n        \"name\": \"Hi Thai Restaurant\",\n        \"averageRating\": 4,\n        \"userReviewCount\": 210,\n        \"status\": \"Open now\",\n        \"priceTag\": \"$$ - $$$\",\n        \"menuUrl\": \"http://hithai.com.au/our-menu/\",\n        \"cuisine\": [\"Asian\", \"Thai\"],\n        \"heroImgUrl\": \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0b/10/5d/b2/img-20160428-141317-largejpg.jpg?w=700&h=700&s=1\",\n        \"reviewSnippet\": {\n          \"text\": \"Visited Hi-Thai with a large group (20+) and service was fast despite there...\",\n          \"url\": \"https://www.tripadvisor.com/ShowUserReviews-g3323314-d5111436-r658317881-Hi_Thai_Restaurant-Sydney_Olympic_Park_Auburn_Greater_Sydney_New_South_Wales.html\"\n        }\n      },\n      {\n        \"name\": \"Abattoir Blues\",\n        \"averageRating\": 4,\n        \"userReviewCount\": 142,\n        \"status\": \"Closed now\",\n        \"priceTag\": \"$$ - $$$\",\n        \"menuUrl\": \"https://www.mryum.com/abattoirblues/menu\",\n        \"cuisine\": [],\n        \"heroImgUrl\": \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2b/2c/a4/94/speciality-house-roasted.jpg?w=1200&h=1200&s=1\",\n        \"reviewSnippet\": {\n          \"text\": \"Situated in the heart of the Olympic Park precinct is this great eatery where...\",\n          \"url\": \"https://www.tripadvisor.com/ShowUserReviews-g3323314-d4402705-r722649704-Abattoir_Blues-Sydney_Olympic_Park_Auburn_Greater_Sydney_New_South_Wales.html\"\n        }\n      },\n      {\n        \"name\": \"Thai Palate\",\n        \"averageRating\": 4.5,\n        \"userReviewCount\": 87,\n        \"priceTag\": \"$$ - $$$\",\n        \"menuUrl\": \"http://thaipalate.com.au/menu.php\",\n        \"cuisine\": [\"Asian\", \"Thai\"],\n        \"heroImgUrl\": \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/16/58/6d/75/photo0jpg.jpg?w=2000&h=1500&s=1\",\n        \"reviewSnippet\": {\n          \"text\": \"The food always taste so good and the customer service is amazing. Will...\",\n          \"url\": \"https://www.tripadvisor.com/ShowUserReviews-g3323314-d10134716-r717556238-Thai_Palate-Sydney_Olympic_Park_Auburn_Greater_Sydney_New_South_Wales.html\"\n        }\n      },\n      {\n        \"name\": \"Piccolo Roma\",\n        \"averageRating\": 4,\n        \"userReviewCount\": 181,\n        \"status\": \"Open now\",\n        \"priceTag\": \"$$ - $$$\",\n        \"cuisine\": [\"Italian\", \"Pizza\"],\n        \"heroImgUrl\": \"https://dynamic-media-cdn.tripadvisor.com/media/photo-o/19/de/1b/d1/photo2jpg.jpg?w=2000&h=1500&s=1\",\n        \"reviewSnippet\": {\n          \"text\": \"Friendly staff. Food was great & reasonably priced. No coffee available after...\",\n          \"url\": \"https://www.tripadvisor.com/ShowUserReviews-g3323314-d2554748-r786268245-Piccolo_Roma-Sydney_Olympic_Park_Auburn_Greater_Sydney_New_South_Wales.html\"\n        }\n      }\n    ]\n    ```"
-                    }
-                ]
-            },
-            "5": {
-                "api": "Perplexity",
-                "handles": "Gathers information on activities and attractions in Sydney",
-                "input_vars": [
-                    {
-                        "name": "activities_query",
-                        "parameter": [
-                            "query"
-                        ],
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Query for activities and attractions in Sydney",
-                        "value": "Activities and attractions in Sydney for a young AI Security Researcher",
-                        "dependencies": []
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "activities_info",
-                        "description": "Information on activities and attractions in Sydney",
-                        "used_by": [],
-                        "value": "```json\n    {\n      \"AI and Cybersecurity Events\": [\n        {\n          \"Event\": \"Ignite On Tour Sydney 2024\",\n          \"Description\": \"Focused on cybersecurity for the AI era, organized by Palo Alto Networks.\"\n        },\n        {\n          \"Event\": \"Workshops and Conferences at Macquarie University\",\n          \"Description\": \"Covers topics such as AI-enabled security, big data analytics, and intelligence-led policing.\"\n        },\n        {\n          \"Event\": \"AI and Machine Learning Workshops\",\n          \"Description\": \"Includes 'Artificial Intelligence / Machine Learning 3 Days Workshop' and 'Algorythm / Empower your profession with AI'.\"\n        }\n      ],\n      \"Research Centers and Institutions\": [\n        {\n          \"Center\": \"Sydney Artificial Intelligence Centre\",\n          \"Description\": \"Dedicated to advancing AI research at the University of Sydney.\"\n        }\n      ],\n      \"Unique Attractions and Experiences\": [\n        {\n          \"Attraction\": \"'Forgotten Songs' Sound Sculpture\",\n          \"Description\": \"A unique sound installation related to data and sound analysis.\"\n        },\n        {\n          \"Attraction\": \"Thylacine Taxidermy and Other Unusual Attractions\",\n          \"Description\": \"Offers a glimpse into Sydney's quirky side.\"\n        }\n      ],\n      \"Networking Opportunities\": [\n        {\n          \"Event\": \"IT Social Sydney\",\n          \"Description\": \"Brings together professionals in data, technology, cybersecurity, and IT.\"\n        }\n      ],\n      \"Educational and Cultural Experiences\": [\n        {\n          \"Experience\": \"Royal Botanic Gardens, Sydney\",\n          \"Description\": \"A peaceful spot offering a contrast to technology.\"\n        },\n        {\n          \"Experience\": \"Aboriginal Food and Culture\",\n          \"Description\": \"Experience traditional 'bush tucker' dishes.\"\n        }\n      ]\n    }\n    ```"
+                        "value": "- **Rant Wednesday**: A community initiative on r/networking for users to vent frustrations and share challenges related to networking, fostering a supportive environment.\n    - **Gym Story Saturday**: A personal fitness journey shared by FGC_Valhalla on r/Fitness, highlighting significant weight loss and a motivating encounter at the gym.\n    - **Tri-Annual Protein Megathread**: A discussion on r/Fitness about favorite protein brands, user experiences, and recommendations, serving as a resource for choosing protein supplements.\n    - **Moronic Monday**: A weekly event on r/Fitness for asking fitness-related questions without judgment, promoting a supportive and informative community.\n    - **Physique Phriday**: A thread on r/Fitness for posting physique pictures to receive constructive critiques and support, aimed at helping members improve their fitness."
                     }
                 ]
             }
