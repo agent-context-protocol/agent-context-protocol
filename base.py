@@ -1,12 +1,14 @@
 from openai import OpenAI
-from openai import AzureOpenAI
+from openai import AsyncAzureOpenAI, AzureOpenAI
 import os
 from dotenv import load_dotenv
+import asyncio
 
 # Load environment variables from .env file
 load_dotenv()
 
 # client = OpenAI()
+client_async = AsyncAzureOpenAI()
 client = AzureOpenAI()
 
 
@@ -17,6 +19,23 @@ class BaseNode:
         self.system_prompt = system_prompt
         if self.system_prompt:
             self.chat_history.append({"role": "system", "content": self.system_prompt})        
+
+    async def async_generate(self):
+        try:
+            task = asyncio.create_task(client_async.chat.completions.create(
+                model="gpt-4o-2024-08-06",
+                messages=self.chat_history,
+                temperature=0
+            ))
+
+            completion = await task
+
+            output = completion.choices[0].message.content
+            self.chat_history.append({"role": "assistant", "content": output})
+            return output
+        except Exception as e:
+            print(f"Error in generate: {str(e)}")
+            raise
 
     def generate(self):
         completion = client.chat.completions.create(

@@ -101,7 +101,7 @@ class Manager:
                     await self.modify_group(translator.group_workflow, group_id)
                     break
                         # return None
-                group_results[translator.panel_no] =translator.get_results()
+                group_results[translator.panel_no] = translator.get_results()
                 # except Exception as e:
                 #     print(f"Error in translator {translator.panel_no}: {str(e)}")
 
@@ -151,6 +151,7 @@ class MainOrchestrator:
         communication_manager = Manager(workflow, self.main_translator, self.local_translator_system_prompt)
         
         # Modify the Manager to yield results as groups complete
+        # await communication_manager.run()
         async for group_id, group_results in communication_manager.run():
             yield group_id, group_results
 
@@ -158,7 +159,7 @@ class MainOrchestrator:
 
 async def main():
     orchestrator = MainOrchestrator()
-    await orchestrator.run("what is the weather in seattle, usa")
+    await orchestrator.run("what is the weather in seattle, usa", '')
     # await orchestrator.run("what is the weather in seattle, usa. Also what are the best spots to visit in seattle?")
     # await orchestrator.run("tell me top 30 vacation spots in europe and current weather there no illustrations")
     # await orchestrator.run("What are the top 5 most rainy areas in the world?.")

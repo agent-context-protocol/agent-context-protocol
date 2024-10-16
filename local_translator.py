@@ -1013,7 +1013,7 @@ class LocalTranslatorNode(BaseNode):
                     # preparing the input to the api
                     api_input_error_counter += 1
                     try:
-                        api_request_llm = self.generate()
+                        api_request_llm = await self.async_generate()
                         # print("api_request_llm : ",api_request_llm)
                         parse_error_bool, parsed_api_request = self.parse_api_request(api_request_llm)
                         if parse_error_bool:
@@ -1050,7 +1050,7 @@ class LocalTranslatorNode(BaseNode):
                                 llm_input_api_output_summarize = self.prepare_input_for_api_output_summarize(api_output, self.panel_no, step_no)
                                 print("llm_input_api_output_summarize : ",llm_input_api_output_summarize)
                                 self.chat_history.append({"role": "user", "content": llm_input_api_output_summarize })
-                                llm_output_api_output_summarize = self.generate()
+                                llm_output_api_output_summarize = await self.async_generate()
                                 # remove the last two chat history
                                 self.chat_history.pop()
                                 self.chat_history.pop()
@@ -1102,7 +1102,7 @@ class LocalTranslatorNode(BaseNode):
                 while not run_success and counter < 5:
                     counter += 1
                     try:
-                        api_output_llm_output = self.generate()
+                        api_output_llm_output = await self.async_generate()
                         # print("\napi_output_llm_output : ",api_output_llm_output)
                         api_parsed_output = self.parse_and_store_api_response(api_output_llm_output, self.panel_no, step_no)
                         # if a 6xx error was raised then status_code key will be there in api_parsed_output
@@ -1144,7 +1144,7 @@ class LocalTranslatorNode(BaseNode):
                 while not run_success and counter < 5:
                     counter += 1
                     try:
-                        status_update = self.generate()
+                        status_update = await self.async_generate()
                         print("\nstatus_update : ",status_update)
                         parsed_status_update = self.parse_status_assistance_input(status_update)
                         print("\parsed_status_update : ",parsed_status_update)
@@ -1172,7 +1172,7 @@ class LocalTranslatorNode(BaseNode):
                 while not run_success and counter < 5:
                     counter += 1
                     try:
-                        status_update = self.generate()
+                        status_update = await self.async_generate()
                         print("\nstatus_update : ",status_update)
                         parsed_status_update = self.parse_status_assistance_input(status_update)
                         print("\nparsed_status_update : ",parsed_status_update)

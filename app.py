@@ -12,7 +12,7 @@ def load_css():
         /* Grid styling */
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* Create three equal columns */
+            grid-template-columns: repeat(2, 1fr); /* Two columns */
             gap: 20px;
             padding: 10px;
         }
@@ -23,7 +23,6 @@ def load_css():
             border-radius: 8px;
             text-align: left;
             box-shadow: none;
-            height: auto;
             font-size: 16px;
             cursor: default;
         }
@@ -70,8 +69,26 @@ def load_css():
             background: #555;
         }
 
+        /* Panel max height with scrollable content */
+        .scrollable-panel {
+            width: 100%;  /* Take up 100% of the column width */
+            max-height: 500px;  /* Set maximum height */
+            padding: 20px;
+            border: 2px solid white;
+            border-radius: 10px;
+            background-color: black;
+            color: white;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);  
+            overflow-y: auto;  /* Scrollable when content exceeds max height */
+        }
+
+        /* Ensure headings and paragraphs are white */
+        .scrollable-panel h3, .scrollable-panel h4, .scrollable-panel p {
+            color: white;
+        }
         </style>
     """, unsafe_allow_html=True)
+
 
 class StreamlitOrchestrator:
     def __init__(self):
@@ -80,12 +97,9 @@ class StreamlitOrchestrator:
         self.group_placeholders = {}
         self.panels = []
 
-    # Function to create group sections with minimal panel layout
     def create_group_sections(self, workflow):
-        # Panels will hold information about each group and its translators
         panels = []
 
-        # Iterate through the workflow dictionary and collect panel information
         for group_id in workflow.keys():
             for translator_id in workflow[group_id].keys():
                 panels.append({
@@ -94,10 +108,9 @@ class StreamlitOrchestrator:
                     'panel_description' : workflow[group_id][translator_id]['panel_description']}
                 )
 
-        # Create a grid layout to hold the panels
         grid = []
         for i in range(len(panels)//2 + 1):
-            cols = st.columns(2)  # Create two columns per row
+            cols = st.columns(2)  # Fixed 2 columns per row
             grid_row = []
             
             for j in range(2):
@@ -106,26 +119,25 @@ class StreamlitOrchestrator:
             grid.append(grid_row)
 
         self.group_placeholders = grid
-
         self.panels = panels
 
-        # Apply the custom CSS class to style the panels with black background and white text
+        # Apply the custom CSS for scrollable panels
         st.markdown("""
             <style>
-            .fixed-panel {
-                width: 100%;  /* Take up 100% of the column width (i.e., half the page) */
-                height: 500px; /* Allow height to adjust dynamically based on content */
+            .scrollable-panel {
+                width: 100%;
+                max-height: 300px; /* Set max height */
                 padding: 20px;
-                border: 2px solid white;  /* White boundary */
-                border-radius: 10px;  /* Rounded corners */
-                background-color: black; /* Black background */
-                color: white; /* White text */
-                box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);  /* Optional shadow */
+                border: 2px solid white;
+                border-radius: 10px;
+                background-color: black;
+                color: white;
+                box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+                overflow-y: auto;  /* Enable vertical scrolling */
             }
 
-            /* Ensure headings and paragraphs are white */
-            .fixed-panel h3, .fixed-panel h4, .fixed-panel p {
-                color: white; /* White text for headings and paragraph */
+            .scrollable-panel h3, .scrollable-panel h4, .scrollable-panel p {
+                color: white;
             }
             </style>
         """, unsafe_allow_html=True)
@@ -135,10 +147,10 @@ class StreamlitOrchestrator:
             i = (int(panel['panel_id']) - 1)//2  # Determine the row index
             j = (int(panel['panel_id']) - 1)%2   # Determine the column index
             
-            # Populate the markdown with fixed-size sections, black background, and white text
+            # Populate the markdown with scrollable sections
             grid[i][j].markdown(
                 f'''
-                <div class="fixed-panel">
+                <div class="scrollable-panel">
                     <h3>Group {panel['group_id']}</h3>
                     <h4>Panel {panel['panel_id']}</h4>
                     <p>{panel['panel_description']}</p>
@@ -147,23 +159,23 @@ class StreamlitOrchestrator:
                 unsafe_allow_html=True
             )
 
-        # st.markdown('<div class="grid-container">', unsafe_allow_html=True)
-        # for group_id, group in workflow.items():
-        #     group_description = f"Group {group_id}"  # Group number
-
-        #     # Create a panel for each group with no extra box styling
-        #     with st.container():
-        #         st.write(f"### {group_description}")  # Display the group number
-                
-        #         # Iterate through each panel within the group and display the descriptions
-        #         for panel_id, panel_info in group.items():
-        #             panel_description = panel_info["panel_description"]
-        #             st.write(f"**Panel {panel_id}**: {panel_description}")
-                    
-        #             # Store placeholders for each panel to update later
-        #             self.group_placeholders[str(group_id)] = st.empty()
-                    
-        # st.markdown('</div>', unsafe_allow_html=True)
+    def update_group_section(self, group_id, group_results):
+        for panel_id, panel_result in group_results.items():
+            i = (int(panel_id) - 1)//2  # Determine the row index
+            j = (int(panel_id) - 1)%2   # Determine the column index
+            
+            # Populate the markdown with scrollable content when updating
+            self.group_placeholders[i][j].markdown(
+                f'''
+                <div class="scrollable-panel">
+                    <h3>Group {group_id}</h3>
+                    <h4>Panel {panel_id}</h4>
+                    <p>{self.panels[int(panel_id)-1]['panel_description']}</p>
+                    <p>{panel_result['output']}</p>
+                </div>
+                ''', 
+                unsafe_allow_html=True
+            )
 
     async def run_orchestrator(self, user_query, workflow):
         # Display the group panels
@@ -174,72 +186,6 @@ class StreamlitOrchestrator:
             self.output[group_id] = group_results
             # Update the group as completed
             self.update_group_section(group_id, group_results)
-
-    # Function to update the group panel and display results
-    def update_group_section(self, group_id, group_results):
-        st.markdown("""
-            <style>
-            .completed-panel {
-                width: 100%;  /* Take up 100% of the column width (i.e., half the page) */
-                height: 500px; /* Fixed height to allow scrolling */
-                padding: 20px;
-                border: 2px solid white;  /* White boundary */
-                border-radius: 10px;  /* Rounded corners */
-                background-color: black; /* Black background */
-                color: white; /* White text */
-                box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);  /* Optional shadow */
-                overflow-y: auto; /* Enable vertical scrolling */
-            }
-
-            /* Ensure headings and paragraphs are white */
-            .completed-panel h3, .completed-panel h4, .completed-panel p {
-                color: white; /* White text for headings and paragraph */
-            }
-            
-            /* Optional: Customize the scrollbar */
-            .completed-panel::-webkit-scrollbar {
-                width: 8px;
-            }
-
-            .completed-panel::-webkit-scrollbar-thumb {
-                background-color: #888; 
-                border-radius: 10px;
-            }
-
-            .completed-panel::-webkit-scrollbar-thumb:hover {
-                background-color: #555; 
-            }
-
-            </style>
-        """, unsafe_allow_html=True)
-        
-        for panel_id, panel_result in group_results.items():
-            i = (int(panel_id) - 1)//2  # Determine the row index
-            j = (int(panel_id) - 1)%2   # Determine the column index
-            
-            # Populate the markdown with fixed-size sections, black background, and white text
-            self.group_placeholders[i][j].markdown(
-                f'''
-                <div class="completed-panel">
-                    <h3>Group {group_id}</h3>
-                    <h4>Panel {panel_id}</h4>
-                    <p>{self.panels[int(panel_id)-1]['panel_description']}</p>
-                    <p>{panel_result['output']}</p>
-                </div>
-                ''', 
-                unsafe_allow_html=True
-            )
-
-
-        # with self.group_placeholders[group_id].container():
-        #     # st.write(f"#### Group {group_id} (Completed)")
-        #     # Create an expander for showing the outputs
-        #     with st.expander(f"View Results for Group {group_id}"):
-        #         for panel_id, panel_result in group_results.items():
-        #             st.markdown(f"**Panel {panel_id}**: {panel_result['panel_description']}")
-        #             # st.write("**Output:**")
-        #             st.write(panel_result['output'])
-        #             st.write("---")
 
 async def main():
     # Load custom CSS
