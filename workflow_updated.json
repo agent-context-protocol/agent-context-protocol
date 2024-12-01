@@ -1,0 +1,53 @@
+{
+    "2": {
+        "panel_description": "Retrieve and display top answers for C++ questions on Stack Exchange.",
+        "steps": {
+            "1": {
+                "api": "Perplexity",
+                "handles": "Gathers general information about top answers for C++ questions",
+                "input_vars": [
+                    {
+                        "name": "query_top_cpp_answers",
+                        "parameter": "query",
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Query to get general information about top answers for C++ questions",
+                        "value": "Top answers for C++ questions on Stack Exchange",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "general_top_answers_info",
+                        "description": "General information about top answers for C++ questions",
+                        "used_by": [],
+                        "value": "\"When looking for top answers to C++ questions on Stack Overflow, here are some of the most highly voted and informative questions and answers:\n    1. **Why is Processing a Sorted Array Faster Than Processing an Unsorted Array?** - This question addresses the performance difference between processing sorted and unsorted arrays. The answer explains that sorting can significantly speed up subsequent operations, such as searching or iterating, due to the predictable order of the data. An example measurement by Bjarne Stroustrup is provided, showing that processing a sorted array can be several times faster than an unsorted one.\n    2. **What is the '-->' Operator in C/C++?** - This question clarifies the confusion around the `-->` operator, which is not actually an operator but a trick of syntax. The answer explains how the code `if (p-->m == 0) f(p);` is interpreted, highlighting that it is a combination of the decrement operator and the greater-than operator, not a single `-->` operator.\n    3. **The Definitive C++ Book Guide and List** - This highly voted question seeks recommendations for good C++ books. The answers provide a list of highly regarded books, emphasizing that there is no single definitive list due to varying needs and backgrounds of programmers. Bjarne Stroustrup also weighs in on the importance of using up-to-date and reliable resources.\n    4. **Differences Between Pointer and Reference Variables** - This question explains the key differences between pointer variables and reference variables in C++. The answers detail how pointers can be reassigned, can be null, and require dereferencing, whereas references must be initialized at the time of creation, cannot be null, and do not require dereferencing.\n    5. **What Does the `explicit` Keyword Mean?** - The `explicit` keyword in C++ is discussed in this question. The answers explain that `explicit` is used to prevent implicit conversions, ensuring that only explicit conversions are allowed, which can help avoid unintended type conversions and improve code clarity.\n    6. **Problems with Using `using namespace std;`** - This question addresses the common practice of using `using namespace std;` and why it is generally advised against. The answers explain that this can lead to naming conflicts and pollute the global namespace, recommending the use of `std::` prefixes instead.\n    7. **Iterating Over Words in a String** - For iterating over words in a string, the answers suggest using `std::istringstream` or `std::string` along with iterators or loops to split the string into individual words.\n    8. **Setting, Clearing, and Toggling a Single Bit** - This question provides methods for setting, clearing, and toggling individual bits in an integer. The answers include examples using bitwise operators such as `&`, `|`, and `^` to perform these operations.\n    9. **When to Use `static_cast`, `dynamic_cast`, `const_cast`, and `reinterpret_cast`** - The proper uses of different cast operators in C++ are explained here. The answers detail the scenarios in which each type of cast should be used, helping to avoid common casting mistakes.\n    10. **Difference Between `#include <filename>` and `#include \"filename\"`** - This question clarifies the difference between using angle brackets and quotes in include directives. The answers explain that angle brackets are typically used for system headers, while quotes are used for local headers, affecting how the compiler searches for the included files.\n    These questions and their answers represent some of the most valuable and frequently referenced information on C++ on Stack Overflow.\""
+                    }
+                ]
+            },
+            "2": {
+                "api": "Stack_Exchange_Answers",
+                "handles": "Retrieves top answers for C++ questions from Stack Exchange",
+                "input_vars": [
+                    {
+                        "name": "site",
+                        "parameter": "site",
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "The Stack Exchange site to query",
+                        "value": "stackoverflow",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "top_cpp_answers_list",
+                        "description": "List of top answers for C++ questions from Stack Exchange",
+                        "used_by": [],
+                        "value": "[\n      {\n        \"answer_id\": 79013042,\n        \"question_id\": 79009772,\n        \"owner\": \"Jason T Szabo\",\n        \"score\": 0\n      },\n      {\n        \"answer_id\": 79013041,\n        \"question_id\": 79012155,\n        \"owner\": \"Sweeper\",\n        \"score\": 0\n      },\n      {\n        \"answer_id\": 79013039,\n        \"question_id\": 50705226,\n        \"owner\": \"Gary\",\n        \"score\": 0\n      },\n      {\n        \"answer_id\": 79013037,\n        \"question_id\": 2561998,\n        \"owner\": \"angularconsulting.au\",\n        \"score\": 0\n      },\n      {\n        \"answer_id\": 79013036,\n        \"question_id\": 79006778,\n        \"owner\": \"Bonnacon\",\n        \"score\": 0\n      },\n      {\n        \"answer_id\": 79013034,\n        \"question_id\": 79013025,\n        \"owner\": \"Michal\",\n        \"score\": 0\n      },\n      {\n        \"answer_id\": 79013019,\n        \"question_id\": 79012707,\n        \"owner\": \"K J\",\n        \"score\": 0\n      },\n      {\n        \"answer_id\": 79013031,\n        \"question_id\": 79012077,\n        \"owner\": \"user3309300\",\n        \"score\": 0\n      },\n      {\n        \"answer_id\": 79012843,\n        \"question_id\": 32597209,\n        \"owner\": \"qpit3a\",\n        \"score\": 0\n      },\n      {\n        \"answer_id\": 79013030,\n        \"question_id\": 56064907,\n        \"owner\": \"Adam Wildavsky\",\n        \"score\": 0\n      },\n      {\n        \"answer_id\": 79013024,\n        \"question_id\": 78663467,\n        \"owner\": \"Nephosi\",\n        \"score\": 0\n      },\n      {\n        \"answer_id\": 67305579,\n        \"question_id\": 67305353,\n        \"owner\": \"GlistenSTAR\",\n        \"score\": 2\n      },\n      {\n        \"answer_id\": 79013017,\n        \"question_id\": 78517471,\n        \"owner\": \"Amy\",\n        \"score\": 0\n      },\n      {\n        \"answer_id\": 77109781,\n        \"question_id\": 74346388,\n        \"owner\": \"GlistenSTAR\",\n        \"score\": 1\n      },\n      {\n        \"answer_id\": 79013016,\n        \"question_id\": 63019731,\n        \"owner\": \"MiguelMLR9\",\n        \"score\": 0\n      }\n    ]"
+                    }
+                ]
+            }
+        }
+    }
+}

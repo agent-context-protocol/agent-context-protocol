@@ -1,0 +1,182 @@
+{
+    "1": {
+        "1": {
+            "panel_description": "Search for books related to 'neuroscience advancements' and display book titles, authors, and ratings.",
+            "steps": {
+                "1": {
+                    "api": "Goodreads_Search_Book_By_Keyword",
+                    "handles": "Searches for books on neuroscience advancements.",
+                    "input_vars": [
+                        {
+                            "name": "book_keyword",
+                            "parameter": [
+                                "keyword"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Keyword for searching books on neuroscience advancements.",
+                            "value": "neuroscience advancements",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "book_details",
+                            "description": "Details of books related to neuroscience advancements.",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "2": {
+        "2": {
+            "panel_description": "Collect recent news articles on breakthroughs in neuroscience.",
+            "steps": {
+                "1": {
+                    "api": "NewsAPISearchByKeyWord",
+                    "handles": "Searches for recent news articles on neuroscience breakthroughs.",
+                    "input_vars": [
+                        {
+                            "name": "news_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Keyword for searching news articles on neuroscience breakthroughs.",
+                            "value": "neuroscience breakthroughs",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "news_language",
+                            "parameter": [
+                                "language"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Language for news articles.",
+                            "value": "en",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "news_articles",
+                            "description": "Recent news articles on neuroscience breakthroughs.",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "3": {
+        "3": {
+            "panel_description": "Provide a synthesized overview of recent advancements in neuroscience.",
+            "steps": {
+                "1": {
+                    "api": "Perplexity",
+                    "handles": "Provides an overview of recent advancements in neuroscience.",
+                    "input_vars": [
+                        {
+                            "name": "overview_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query for synthesizing information on neuroscience advancements.",
+                            "value": "recent advancements in neuroscience",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "neuroscience_overview",
+                            "description": "Overview of recent advancements in neuroscience.",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "4": {
+        "4": {
+            "panel_description": "Retrieve popular discussions on neuroscience advancements from relevant subreddits.",
+            "steps": {
+                "1": {
+                    "api": "Perplexity",
+                    "handles": "Identifies relevant subreddits for neuroscience advancements.",
+                    "input_vars": [
+                        {
+                            "name": "subreddit_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to find relevant subreddits for neuroscience advancements.",
+                            "value": "neuroscience advancements subreddits",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "subreddit_names",
+                            "description": "Relevant subreddits for neuroscience advancements.",
+                            "used_by": [
+                                {
+                                    "panel": 4,
+                                    "step": 2
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "RedditTopPostsBySubreddit",
+                    "handles": "Fetches top posts from relevant subreddits.",
+                    "input_vars": [
+                        {
+                            "name": "subreddit_names",
+                            "parameter": [
+                                "subreddit"
+                            ],
+                            "type": "string",
+                            "source": "API_Output (Panel 4, Step 1)",
+                            "description": "Subreddit names for fetching top posts.",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "panel": 4,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "time_period",
+                            "parameter": [
+                                "time"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Time period for top posts.",
+                            "value": "month",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "reddit_discussions",
+                            "description": "Popular discussions on neuroscience advancements.",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

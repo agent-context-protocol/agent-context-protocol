@@ -1,0 +1,33 @@
+# Ignore all PDF files
+*.pdf
+
+# Ignore specific JSON files
+workflow_updated_*.json
+updated_workflow_group_*.json
+generated_report_*.pdf
+
+# Ignore save_viz folder
+save_viz/
+
+# Ignore Python cache folders
+__pycache__/
+available_apis/function_format/__pycache__/
+available_apis/hardcoded_format/__pycache__/
+available_apis/openapi_format/__pycache__/
+available_apis/rapid_apis_format/__pycache__/
+available_apis/browser_tools/__pycache__/
+
+# Ignore .cache folder
+.cache/
+
+# Ignore coding folder
+coding/
+
+# Ignore GAIA directory
+GAIA/
+
+# Ignore specific file patterns
+llm_cache.sqlite
+*.sqlite
+*.db
+faiss_index.index

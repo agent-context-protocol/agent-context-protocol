@@ -1,0 +1,134 @@
+{
+    "user_query": "Assuming scientists in the famous youtube video The Thinking Machine (Artificial Intelligence in the 1960s) were interviewed the same year, what is the name of the scientist predicting the sooner thinking machines or robots? Answer using the format First name Last name",
+    "1": {
+        "1": {
+            "panel_description": "Identify the scientists featured in the YouTube video 'The Thinking Machine (Artificial Intelligence in the 1960s)'.",
+            "steps": {
+                "1": {
+                    "api": "BrowserTools",
+                    "handles": "Identifies the scientists featured in the video.",
+                    "input_vars": [
+                        {
+                            "name": "query_scientists_in_video",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to find the list of scientists featured in the video.",
+                            "value": "List of scientists featured in the YouTube video 'The Thinking Machine (Artificial Intelligence in the 1960s)'.",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "scientists_list",
+                            "description": "List of scientists featured in the video.",
+                            "used_by": [
+                                {
+                                    "panel": 2,
+                                    "step": 1
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "2": {
+            "panel_description": "Determine if any of the scientists identified in the previous panel were interviewed in the same year as the video.",
+            "steps": {
+                "1": {
+                    "api": "BrowserTools",
+                    "handles": "Determines if any of the scientists were interviewed in the same year as the video.",
+                    "input_vars": [
+                        {
+                            "name": "scientists_list",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "API_Output (Panel 1, Step 1)",
+                            "description": "List of scientists to check for interviews in the same year as the video.",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "panel": 1,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "query_interviewed_scientists",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to find interviews conducted in the same year as the video featuring these scientists.",
+                            "value": "Interviews conducted in the same year as 'The Thinking Machine (Artificial Intelligence in the 1960s)' featuring scientists from [scientists_list].",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "interviewed_scientists",
+                            "description": "List of scientists interviewed in the same year as the video.",
+                            "used_by": [
+                                {
+                                    "panel": 3,
+                                    "step": 1
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "3": {
+            "panel_description": "Identify which of the scientists, who were interviewed in the same year as the video, predicted the sooner arrival of thinking machines or robots.",
+            "steps": {
+                "1": {
+                    "api": "BrowserTools",
+                    "handles": "Identifies the scientist predicting the sooner arrival of thinking machines or robots.",
+                    "input_vars": [
+                        {
+                            "name": "interviewed_scientists",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "API_Output (Panel 2, Step 1)",
+                            "description": "List of interviewed scientists to check for predictions.",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "panel": 2,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "query_predicting_scientist",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to find the scientist predicting the sooner arrival of thinking machines or robots.",
+                            "value": "Scientist from [interviewed_scientists] predicting the sooner arrival of thinking machines or robots in interviews conducted in the same year as 'The Thinking Machine (Artificial Intelligence in the 1960s)'.",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "predicting_scientist",
+                            "description": "Name of the scientist predicting the sooner arrival of thinking machines or robots.",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
