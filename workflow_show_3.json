@@ -1,0 +1,140 @@
+{
+    "1": {
+        "1": {
+            "panel_description": "Display a list of currently open restaurants in New York City.",
+            "steps": {
+                "1": {
+                    "api": "TripadvisorSearchLocation",
+                    "handles": "Retrieves geoID for New York City",
+                    "input_vars": [
+                        {
+                            "name": "location_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Search query for New York City",
+                            "value": "New York City",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "location_geoId",
+                            "description": "Geo ID for New York City",
+                            "used_by": [
+                                {
+                                    "panel": 1,
+                                    "step": 2
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "TripadvisorSearchRestaurants",
+                    "handles": "Retrieves open restaurants using geoID",
+                    "input_vars": [
+                        {
+                            "name": "location_geoId",
+                            "parameter": [
+                                "locationId"
+                            ],
+                            "type": "string",
+                            "source": "API_Output (Panel 1, Step 1)",
+                            "description": "Geo ID for New York City",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "panel": 1,
+                                    "step": 1
+                                }
+                            ]
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "open_restaurants",
+                            "description": "List of currently open restaurants in New York City",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "2": {
+        "2": {
+            "panel_description": "Provide a clothing recommendation based on the current weather in New York City.",
+            "steps": {
+                "1": {
+                    "api": "WeatherAPI.com_Realtime_Weather_Api",
+                    "handles": "Fetches current weather in New York City",
+                    "input_vars": [
+                        {
+                            "name": "weather_query",
+                            "parameter": [
+                                "q"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query for current weather in New York City",
+                            "value": "New York City",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "current_weather",
+                            "description": "Current weather details for New York City",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "3": {
+        "3": {
+            "panel_description": "Display recent news articles related to dining and weather in New York City.",
+            "steps": {
+                "1": {
+                    "api": "NewsAPISearchByKeyWord",
+                    "handles": "Fetches news articles about dining and weather in New York City",
+                    "input_vars": [
+                        {
+                            "name": "news_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Keywords for searching news articles on dining and weather",
+                            "value": "Dining and weather in New York City",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "news_language",
+                            "parameter": [
+                                "language"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Language for news articles",
+                            "value": "en",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "news_articles",
+                            "description": "News articles about dining and weather in New York City",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

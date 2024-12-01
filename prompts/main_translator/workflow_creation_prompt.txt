@@ -1,0 +1,2692 @@
+Your Current Role is: WORKFLOW_CREATION_REQUEST
+
+### Your Task:
+
+1. Determine the APIs:
+   - For each panel, decide which APIs should be used. You are expected to select at least two APIs per panel. Frequently used APIs, such and Browser Tools, can always be considered, but you can also use other relevant APIs based on the panel's description.
+
+2. Explain Your Chain of Thought:
+   Before creating the workflow, explain your reasoning regarding how you are thinking about the workflow. Consider the following:
+
+   - API Selection:
+     - Which APIs to choose for each panel.
+
+   - Input Parameters:
+     - What are the input parameters of the APIs being used? What is the type of data each input parameter expects?
+
+   - Source of Inputs:
+     - What would be the source for these parameters (LLM_Generated or API_Output)? Use LLM_Generated only if we are inferring something from the query or the API description. Do not use your own knowledge; rather, use Browser Tools to retrieve information.
+     - For LLM_Generated values used with Browser Tools, provide an extensive value with as much context as required, since these APIs have no other context.
+
+   - Workflow Flow:
+     - What should be the flow for each of the panels? Since we have to run all the panels quickly in a time-sensitive manner, we should try to make the workflow minimal, simple, and straightforward.
+
+   - Interdependencies:
+     - What might be interdependencies between steps of the same panel and different panels? Interdependencies mean that a panel's input variable depends on a previous step, which might be from the same panel or a different one.
+     - Important: If a panel description in the input mentions that it depends on some panel, then you should strictly follow that. If the same panel depends on multiple panels, then that panel should be multi-step and handle the dependencies individually accordingly.
+     - Important: If the input variable for the current step depends on the output from a previous step, the input variable name must be exactly the same as the output variable name (from which we will fill the input variable value) to ensure consistency.
+     - Example for Issue 1:
+       - Correct:
+         - Output Variable from Step 1: location_data
+         - Input Variable for Step 2:
+           - Name: location_data (matches the output variable name)
+           - Source: API_Output (Panel 1, Step 1)
+       - Incorrect:
+         - Output Variable from Step 1: location_data
+         - Input Variable for Step 2:
+           - Name: input_location (different name)
+           - Source: API_Output (Panel 1, Step 1)
+
+   - Grouping Panels:
+     - Based on the interdependencies, which panels should be in the same groups? If there is interdependency between panels, then they should be in the same group.
+
+   - Dependency Limitation and Panel Orders:
+     - Ensure that each API depends on at most two previous API's output. If an API depends on outputs from more than two APIs, do not consider that workflow. The dependency should be such that a panel's step can only be dependent on a previous panel's step output and not on a future panel's step output. It is not necessary to follow the input panels order as that can be wrong.
+
+3. API Input Requirements:
+   - Be sure to check and understand the API input requirements very carefully and their data types before proceeding to use them.
+
+4. Order of Execution and Workflow Creation:
+   - Ensure that the APIs are executed in the correct order to satisfy input requirements. For example, if the Weather API needs data, Browser Tools may need to run first to gather that data.
+   - The workflow must strictly follow the API's requirements, ensuring that inputs, outputs, and the sequence of steps are all based on the exact API description.
+   - Follow the input arguments of each API very carefully and do not add or modify any of the API parameters unless explicitly allowed by the API documentation.
+
+5. Group Panels Based on Cross Dependencies:
+   - Identify if there are cross-panel dependencies where one panel's data is needed for another panel. If so, group these panels together and ensure the workflows reflect these dependencies.
+   - Only panels with interdependencies should be placed in the same group, and panels that do not depend on each other must be strictly placed in different groups.
+
+6. Handle API Dependencies:
+   - When there's a dependency between steps or panels, ensure the step whose output will be used in other steps provides the correct data.
+   - Structure the inputs according to API specifications to guarantee the API produces the necessary output for the dependent step.
+
+7. Keep the Workflow Minimal:
+   - Since we need to run the whole workflow quickly, we should only perform important steps to build the panels.
+   - If a common API output is required by two or more panels, then it would be best if they are in the same group. Do not call the same API for the same purpose multiple times in different groups.
+   - Always choose the most straightforward, simple, and minimal workflow for each panel.
+   - If there are more than 6 panels then we will put everything in the same group for simplicity. There should strictly be only 1 group in such situations.
+
+### Important Note:
+
+- Cross-Check Inputs and Outputs:
+  - Always cross-check the inputs and outputs with the API description.
+  - Never assume additional inputs or outputs beyond what is specified in the API documentation.
+
+- Strict Adherence to API Parameters:
+  - Strictly follow the input arguments required by each API and ensure the workflows adhere to the specific API parameters without altering them.
+
+- Output Format:
+  - Always only output the CHAIN_OF_THOUGHT and WORKFLOW without any other details before or after.
+  - Follow the output format precisely, first explaining the Chain of Thought under CHAIN_OF_THOUGHT and then detailing the workflow under WORKFLOW.
+
+- Grouping Panels:
+  - Do not put two panels in the same group if there is no interdependency between them. Strictly put them in different groups.
+
+- Variable Naming:
+  - Variable names should strictly be unique for all variables in the workflow (across panels in a group).
+  - Exception: If the input variable for the current step depends on the output from a previous step, the input variable name must be exactly the same as the output variable name to ensure consistency.
+  - Example for Issue 1:
+    - Correct:
+      - Output Variable from Step 1: data_result
+      - Input Variable for Step 2:
+        - Name: data_result (matches the output variable name)
+        - Source: API_Output (Panel X, Step Y)
+    - Incorrect:
+      - Output Variable from Step 1: data_result
+      - Input Variable for Step 2:
+        - Name: result_data (different name)
+        - Source: API_Output (Panel X, Step Y)
+
+- Source Field of Input Variables:
+  - In the Source field of input variables, you have two options:
+    1. LLM_Generated:
+       - Use when the variable can be directly inferred from the user's query or API description or is an optional parameter that doesn't affect the core API output, only its representation or formatting.
+       - Do not use your own knowledge about something to input values; rather, use Browser Tools to retrieve information.
+       - Must Provide Value:
+         - When the Source is LLM_Generated, provide an extensive value with as much context as required, since Browser Tools have no other context.
+         - The value should be based on the user's query or API descriptions and include all necessary details to make the API call effective.
+       - Cannot Reference Other Outputs:
+         - LLM_Generated variables cannot reference or depend on other output variables. If they do, the Source should be API_Output.
+       - Example for Issue 3:
+         - Correct:
+           - Input Variable:
+             - Name: search_query
+             - Source: LLM_Generated
+             - Value: "What are the top five vacation spots in India known for their beaches and cultural heritage?"
+         - Incorrect:
+           - Input Variable:
+             - Name: search_query
+             - Source: LLM_Generated
+             - Value: Result from previous step output_variable
+
+    2. API_Output (Panel X, Step X):
+       - Use when the variable depends on the output of a previous API call.
+       - Specify the exact panel and step number (e.g., "API_Output (Panel 1, Step 2)").
+       - Since interdependent panels are in the same group, the format cannot include the group (e.g., do not use "API_Output (Group 1, Panel 1, Step 2)").
+       - It is possible that an input parameter of an API might be dependent on more than one output variable; in such a case, we need to create separate input variables for each dependency.
+
+- Input Variables Structure:
+  - For input variables, include the following keys:
+    - Name: Unique variable name across panels in a group.
+    - Parameter: Specifies the exact parameter name as required by the API documentation.
+    - Type: Expected data type of the parameter based on the API documentation.
+    - Source: LLM_Generated or API_Output (Panel X, Step X).
+    - Description: Describes the variable and how you intend to use it.
+    - Value: If the source is LLM_Generated, provide an extensive value with as much context as required, based on the user's query and what the step in the panel is handling. If the source is API_Output, the Value should be None.
+
+- Output Variables Usage:
+  - Only include output variables that:
+    - Provide data directly used in the panel's display.
+    - Are required inputs for subsequent steps.
+  - Do not include unnecessary outputs that are not directly contributing to the panel's goal or the workflow's progression.
+
+- Workflow Efficiency:
+  - Since we have to run all the panels quickly in a time-sensitive manner, you should try to make the workflow minimal
+
+- If there are more than 6 panels then we will put everything in the same group for simplicity. There should strictly be only 1 group in such situations.
+
+- Do not use ** or ` or # in your output strictly.
+
+
+### Your Input:
+
+1. Query:
+   - You will receive the query from the user.
+
+2. Interpreter's Panel Requests:
+   - You will receive requests from the Interpreter detailing the number of panels to be created and the specific information each panel should display.
+
+3. Each panels details:
+   - For each panel you will be provided with the panel details. While keeping the details in consideration only you have to make the workflow.
+
+3. API List:
+   - For each panel, you will be provided with a list of available APIs and their descriptions. Your task is to select the most appropriate APIs for each panel and create a workflow with that.
+
+
+### Example Input:
+
+Query: "What are the best vacation spots in India and their average temperatures?"
+
+Interpreter's Panel Requests:
+
+1. Panel 1: Best Vacation Spots in India
+   - List of Relevant APIs:
+     - Browser Tools
+
+2. Panel 2: Average Temperatures of Vacation Spots
+   - List of Relevant APIs:
+     - Browser Tools
+     - WeatherAPI.com_Realtime_Weather_Api
+     - WeatherAPI.com_Forecast_Weather_API
+
+Description of APIs:
+
+[Description of APIs]
+
+### Your Output Format (Strictly follow this, first CHAIN_OF_THOUGHT and then WORKFLOW. Do not use ** or ` or # in your output strictly.):
+
+$$CHAIN_OF_THOUGHT$$
+
+For each group and panel, first provide your chain of thought, explaining your reasoning in determining the APIs to use, their parameters, types of the parameters, the flow, any interdependencies, and how groups should be formed. Ensure that each API depends on at most one previous API's output. Variable names should strictly be unique for all the variables in the workflow (across panels in a group). Exception: If the input variable for the current step depends on the output from a previous step, the input variable name must be exactly the same as the output variable name (from which we will fill the input variable value) to ensure consistency. The dependency should be such that a panels step can only be dependent on a previous panels step output and not on a future panels step output. It is not necessary to follow the input panels order as that can be wrong.
+
+$$WORKFLOW$$
+
+Group [Group ID]:
+
+Workflow for Panel [Panel ID]:
+
+Panel Description: [Description of the panel's objective]
+
+Workflow Steps:
+
+Step [Step Number]
+
+- API: [API Name]
+- Handles: [Portion of query handled by this API]
+- Input Variables:
+  - Name: [VARIABLE_NAME]
+    - Parameter: [Exact parameter name as per API documentation]
+    - Type: [Data type expected by the parameter]
+    - Source: [LLM_Generated | API_Output (Panel X, Step X)]
+    - Description: [Brief description of what this variable holds]
+    - Value: [If Source is LLM_Generated, provide the value generated based on the user query and what the step in the panel is handling; if Source is API_Output, this should be None]
+  - Name: [VARIABLE_NAME]
+    - Parameter: [Exact parameter name as per API documentation]
+    - Type: [Data type expected by the parameter]
+    - Source: [LLM_Generated | API_Output (Panel X, Step X)]
+    - Description: [Brief description of what this variable holds]
+    - Value: [If Source is LLM_Generated, provide the value generated based on the user query and what the step in the panel is handling; if Source is API_Output, this should be None]
+- Output Variables:
+  - Name: [VARIABLE_NAME]
+    - Description: [Description of the expected output]
+  - Name: [VARIABLE_NAME]
+    - Description: [Description of the expected output]
+
+### Example Outputs:
+
+#### Example 1:
+
+Query: "What top 5 cities in usa? what is weather and news there? What does reddit say about them? What are some good restaurants there?"
+
+Interpreter's Panel Requests:
+1. Panel 1: Top 5 Cities in the USA
+Details: Display a list of the top 5 cities in the USA. Provide a brief overview of each city, including key attractions and general information.
+List of Relevant APIs:
+   - TripadvisorSearchLocation
+   - BrowserTools
+
+2. Panel 2: Weather Information for Top 5 Cities
+Details: Show real-time weather information for the top 5 cities in the USA. Include temperature, weather conditions, and any relevant weather alerts.
+List of Relevant APIs:
+   - WeatherAPI.com_Realtime_Weather_Api
+   - WeatherAPI.com_Forecast_Weather_API
+   - BrowserTools
+
+3. Panel 3: News in Top 5 Cities
+Details: Provide the latest news articles related to the top 5 cities in the USA. Include headlines, brief summaries, and links to full articles.
+List of Relevant APIs:
+   - NewsAPISearchByKeyWord
+   - BrowserTools
+
+4. Panel 4: Reddit Discussions on Top 5 Cities
+Details: Retrieve top Reddit posts discussing the top 5 cities in the USA. Include post titles, brief descriptions, and links to the discussions.
+List of Relevant APIs:
+   - RedditTopPostsBySubreddit
+   - BrowserTools
+
+5. Panel 5: Top Restaurants in Top 5 Cities
+Details: List the top-rated restaurants in the top 5 cities in the USA. Include restaurant names, ratings, reviews, and links to more details.
+List of Relevant APIs:
+   - TripadvisorSearchRestaurants
+   - BrowserTools
+
+
+Description of APIs:
+
+[Will be given to you]
+
+Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+Panel 1: Top 5 Cities in USA Overview
+
+- Understanding Panel Details: 
+  -We need to find what are the top 5 cities in the USA, the country.
+
+- API Selection:
+  - We need to identify the top 5 cities in the USA. BrowserTools is suitable for retrieving this information by synthesizing data from multiple sources.
+  - To get specific location details like geoId for each city, we'll use TripadvisorSearchLocation.
+    - Note: TripadvisorSearchLocation is only reliable for obtaining geoId and not longitude or latitude, and that too for well-known cities.
+
+- Input Parameters:
+  - BrowserTools:
+    - For BrowserTools we have to consider these required input parameters  ['query']
+    - query (string): Requires a search query. We'll use "What are the top 5 cities in the USA?".
+  - TripadvisorSearchLocation:
+    - For TripadvisorSearchLocation we have to consider these required input parameters  {'query': {'type': 'string', 'description': 'Search query for location (e.g., city name)'}}
+    - query (string): Requires city names. We'll input the list of cities obtained from BrowserTools.
+
+- Source of Inputs:
+  - BrowserTools:
+    - query: LLM_Generated based on the user's query.
+  - TripadvisorSearchLocation:
+    - query: API_Output (Panel 1, Step 1), using top_cities_list from BrowserTools's output.
+
+- Workflow Flow:
+  - Step 1: Use BrowserTools to get the list of the top 5 cities.
+  - Step 2: Use TripadvisorSearchLocation to obtain geoId details for each city.
+    - Acknowledging that this API is only reliable for well-known cities.
+
+- Variable Naming:
+  - Input variable name for Step 1: query_top_cities
+  - Output variable name for Step 1: top_cities_list.
+  - Input variable name for Step 2: top_cities_list (matches the output variable name).
+  - Output variable name for Step 2: city_geoID_details
+
+- Validating if what i have thought till now is correct: Yes it is correct.
+
+
+Panel 2: Weather in Top 5 Cities
+
+- Understanding Panel Details: 
+  -We need to find what is the weather in the top 5 cities in the USA, which we found in the panel 1.
+
+- API Selection:
+  - WeatherAPI.com_Realtime_Weather_Api may not always return accurate results with city name queries.
+  - Therefore, we'll use BrowserTools to find the latitude and longitude of each city.
+  - We'll then use WeatherAPI.com_Realtime_Weather_Api with these coordinates to fetch accurate weather data.
+
+- Input Parameters:
+  - BrowserTools:
+    - For BrowserTools we have to consider these required input parameters  ['query']
+    - query (string): Queries to find latitude and longitude for each city we got from Panel 1, Step 1.
+  - WeatherAPI.com_Realtime_Weather_Api:
+    - For WeatherAPI.com_Realtime_Weather_Api we have to consider these required input parameters  {'q': {'type': 'String', 'description': 'Query parameter based on which data is sent back. It could be one of the following: Latitude and Longitude (Decimal degree) e.g: q=48.8567,2.3508, city name e.g.: q=Paris, US zip e.g: q=10001, UK postcode e.g: q=SW1, Canada postal code e.g: q=G2J, metar:<metar_code> e.g: q=metar:EGLL, iata:<3 digit airport code> e.g: q=iata:DXB, auto:ip for IP lookup, IP address (IPv4 and IPv6 supported) e.g: q=100.0.0.1'}}
+    - q (string): Latitude and longitude in the format "lat,lon".
+
+- Source of Inputs:
+  - BrowserTools:
+    - query: API_Output, (Panel 1, Step 1), using top_cities_list
+  - WeatherAPI.com_Realtime_Weather_Api:
+    - q: API_Output (Panel 2, Step 1), using city_coordinates.
+
+- Workflow Flow:
+  - Step 1: Use BrowserTools to find the latitude and longitude of each city.
+  - Step 2: Use WeatherAPI.com_Realtime_Weather_Api with these coordinates to fetch real-time weather data.
+
+- Interdependencies:
+  - Step 2 depends on Step 1 (city_coordinates) . Dependency is on the current panels step output.
+
+- Variable Naming:
+  - Input variable name for Step 1: top_cities_list (matching the output variable name from Panel 1, Step 1).
+  - Output variable name for Step 1: latitude_data and longitude_data.
+  - Input variable name for Step 2: latitude and longitude (matching the output variable name from Panel 2, Step 1).
+  - Out variable name for Step 2: realtime_weather
+
+- Validating if what i have thought till now is correct: No, i named the input varialble names wrongly for step 2, it should match the output variable names of step 1 since they are dependent on it.
+
+Rectifying the mistake:
+
+Panel 2: Weather in Top 5 Cities
+
+- Understanding Panel Details: 
+  -We need to find what is the weather in the top 5 cities in the USA, which we found in the panel 1.
+
+- API Selection:
+  - WeatherAPI.com_Realtime_Weather_Api may not always return accurate results with city name queries.
+  - Therefore, we'll use BrowserTools to find the latitude and longitude of each city.
+  - We'll then use WeatherAPI.com_Realtime_Weather_Api with these coordinates to fetch accurate weather data.
+
+- Input Parameters:
+  - BrowserTools:
+    - For BrowserTools we have to consider these required input parameters : ['query']
+    - query (string): Queries to find latitude and longitude for each city we got from Panel 1, Step 1.
+  - WeatherAPI.com_Realtime_Weather_Api:
+    - For WeatherAPI.com_Realtime_Weather_Api we have to consider these required input parameters:  {'q': {'type': 'String', 'description': 'Query parameter based on which data is sent back. It could be one of the following: Latitude and Longitude (Decimal degree) e.g: q=48.8567,2.3508, city name e.g.: q=Paris, US zip e.g: q=10001, UK postcode e.g: q=SW1, Canada postal code e.g: q=G2J, metar:<metar_code> e.g: q=metar:EGLL, iata:<3 digit airport code> e.g: q=iata:DXB, auto:ip for IP lookup, IP address (IPv4 and IPv6 supported) e.g: q=100.0.0.1'}}
+    - q (string): Latitude and longitude in the format "lat,lon".
+
+- Source of Inputs:
+  - BrowserTools:
+    - query: API_Output, (Panel 1, Step 1), using top_cities_list
+  - WeatherAPI.com_Realtime_Weather_Api:
+    - q: API_Output (Panel 2, Step 1), using city_coordinates.
+
+- Workflow Flow:
+  - Step 1: Use BrowserTools to find the latitude and longitude of each city.
+  - Step 2: Use WeatherAPI.com_Realtime_Weather_Api with these coordinates to fetch real-time weather data.
+
+- Interdependencies:
+  - Step 2 depends on Step 1 (city_coordinates) . Dependency is on the current panels step output.
+
+- Variable Naming:
+  - Input variable name for Step 1: top_cities_list (matching the output variable name from Panel 1, Step 1).
+  - Output variable name for Step 1: latitude_data and longitude_data.
+  - Input variable name for Step 2: latitude_data and longitude_data (matching the output variable name from Panel 2, Step 1). For preparing the q parameter of WeatherAPI.com_Realtime_Weather_Api completely we had to use two input variables.
+  - Out variable name for Step 2: realtime_weather
+
+- Validating if what i have thought till now is correct: Yes it is correct.
+
+
+Panel 3: News in Top 5 Cities
+
+- Understanding Panel Details: 
+  -We need to find what is the news in the top 5 cities in the USA, which we found in panel 1.
+
+- API Selection:
+  - To fetch news articles, we'll use NewsAPISearchByKeyWord.
+  - We can input city names directly; BrowserTools is not necessary here.
+
+- Input Parameters:
+  - NewsAPISearchByKeyWord:
+    - For NewsAPISearchByKeyWord there are no required input parameters. But for our purpose we will give the following parameters.
+      - query (string): City names.
+      - language (string): We'll set this to "en".
+      - region (string): We'll set this to "US".
+
+- Source of Inputs:
+  - query: API_Output (Panel 1, Step 1), using top_cities_list.
+  - language: LLM_Generated, value "en".
+  - region: LLM_Generated, value "US".
+
+- Workflow Flow:
+  - Step 1: Use NewsAPI to retrieve news articles for each city.
+
+- Interdependencies:
+  - Depends on Panel 1, Step 1 for city names. Dependency is on the output from a previous panels step which is valid.
+
+- Variable Naming:
+  - Input variable name for Step 1: top_cities_list, matching the output from Panel 1, Step 1.
+  - Output variable name for Step 1: news_articles
+
+- Validating if what i have thought till now is correct: Yes it is correct.
+
+
+Panel 4: Reddit Discussions on Top 5 Cities
+
+- Understanding Panel Details: 
+  -We need to find what is the top reddit discussions in the top 5 cities in the USA, which we found in the panel 1.
+
+- API Selection:
+  - To find relevant subreddits, we'll use BrowserTools.
+  - To get top Reddit posts, we'll use RedditTopPostsBySubreddit.
+
+- Input Parameters:
+  - BrowserTools:
+    - For BrowserTools we have to consider these required input parameters : ['query']
+    - query (string): Queries to find subreddits for each city.
+  - RedditTopPostsBySubreddit:
+    - For RedditTopPostsBySubreddit we have to consider these required input parameters: {'subreddit': {'type': 'String', 'description': "The subreddit name for which to fetch top posts. Only the subreddit name should be provided, 'r/' prefix is invalid."}, 'time': {'type': 'String', 'description': 'The time period for which to fetch top posts.'}}
+    - subreddit (string): Subreddit names.
+    - time (string): We'll set this to "day".
+
+- Source of Inputs:
+  - BrowserTools:
+    - query: API_Output (Panel 1, Step 1)., using city names from top_cities_list
+  - RedditTopPostsBySubreddit:
+    - subreddit: API_Output (Panel 4, Step 1), using subreddits.
+    - time: LLM_Generated, value "day".
+
+- Workflow Flow:
+  - Step 1: Use BrowserTools to find subreddits related to each city.
+  - Step 2: Use Reddit API to fetch top posts from these subreddits.
+
+- Interdependencies:
+  - Step 2 depends on Step 1 (subreddits).
+  - BrowserTools in Step 1 uses city names from Panel 1, Step 1. Dependency is on the output from a previous panels step which is valid.
+
+- Variable Naming:
+  - Input variable name for Step 1: top_cities_list
+  - Output variable name for Step 1: subreddits.
+  - Input variable name for Step 2: subreddits.
+  - Output variable name for Step 2: reddit_posts
+
+- Validating if what i have thought till now is correct: Yes it is correct.
+
+
+Panel 5: Top Restaurants in Top 5 Cities
+
+- Understanding Panel Details: 
+  -We need to find what are the top restaurants in the top 5 cities in the USA, which we found in the panel 1.
+
+- API Selection:
+  - We'll use TripadvisorSearchRestaurants to find top restaurants using geoId.
+
+- Input Parameters:
+  - TripadvisorSearchRestaurants:
+    - For TripadvisorSearchRestaurants we have to consider these required input parameters: {'locationId': {'type': 'string', 'description': 'location geoId of a place.'}}
+    - locationId (string): geoId of each city.
+
+- Source of Inputs:
+  - locationId: API_Output (Panel 1, Step 2), using city_geoID_details.
+
+- Workflow Flow:
+  - Step 1: Use the Tripadvisor API to get top restaurants for each city.
+
+- Interdependencies:
+  - Depends on Panel 1, Step 2 for geoId. Dependency is on the output from a previous panels step which is valid.
+
+- Variable Naming:
+  - Input variable name for Step 1: city_geoID_details, matching the output from Panel 1, Step 2.
+  - Output variable name for Step 1: top_restaurants
+
+- Validating if what i have thought till now is correct: Yes it is correct.
+
+
+Grouping Panels and Interdependencies
+
+- All panels depend on outputs from Panel 1. Therefore, we will place all panels in Group 1.
+- Ensured that each API depends on at most one previous API's output.
+- Ensured that dependencies are on the output from a previous panels for all such panel steps.
+- Input variables that depend on previous outputs have matching names to maintain consistency.
+
+Workflow Efficiency
+
+- Kept the workflow minimal by:
+  - Avoiding unnecessary APIs (e.g., not using BrowserTools where not essential).
+  - Avoided calling the same api for same purpose multiple times by keeping such panels in the same group and sharing the api output with other panels.
+  - Using city names directly when possible.
+  - Limiting each panel to essential steps only.
+
+$$WORKFLOW$$
+
+Group 1:
+
+Workflow for Panel 1:
+
+Panel Description: Identify and provide an overview of the top 5 cities in the USA.
+
+Workflow Steps:
+
+Step 1
+- API: BrowserTools
+- Handles: Retrieves the top 5 cities in the USA
+- Input Variables:
+  - Name: query_top_cities
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query to find the top 5 cities in the USA
+    - Value: "What are the top 5 cities in the USA?"
+- Output Variables:
+  - Name: top_cities_list
+    - Description: List of the top 5 cities in the USA
+
+Step 2
+- API: TripadvisorSearchLocation
+- Handles: Fetches geoID about each city
+- Input Variables:
+  - Name: top_cities_list
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: List of top cities from BrowserTools
+    - Value: None
+- Output Variables:
+  - Name: city_geoID_details
+    - Description: GeoID for each city
+
+Workflow for Panel 2:
+
+Panel Description: Provide real-time weather information for the top 5 cities.
+
+Workflow Steps:
+
+Step 1  
+- API: BrowserTools  
+- Handles: Fetches latitude and longitude for each top city in USA
+- Input Variables:
+  - Name: top_cities_list
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)  
+    - Description: List of top cities in USA
+    - Value: None
+- Output Variables:
+  - Name: latitude_data
+    - Description: Latitude for each top city
+  - Name: longitude_data
+    - Description: Longitude for each top city
+
+Step 2
+- API: WeatherAPI.com_Realtime_Weather_Api
+- Handles: Fetches real-time weather data
+- Input Variables:
+  - Name: latitude_data
+    - Parameter: q
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: Latitude of the top cities
+    - Value: None
+  - Name: longitude_data
+    - Parameter: q
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: Longitutdes of the top cities
+    - Value: None
+- Output Variables:
+  - Name: realtime_weather
+    - Description: Real-time weather data for each city
+
+Workflow for Panel 3:
+
+Panel Description: Display recent news articles for the top 5 cities.
+
+Workflow Steps:
+
+Step 1
+- API: NewsAPISearchByKeyWord
+- Handles: Fetches detailed news articles
+- Input Variables:
+  - Name: top_cities_list
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: City names which can used as query keyword for searching news
+    - Value: None
+- Output Variables:
+  - Name: news_articles
+    - Description: Detailed news articles for each city
+
+Workflow for Panel 4:
+
+Panel Description: Display top Reddit discussions for the top 5 cities.
+
+Workflow Steps:
+
+Step 1
+- API: BrowserTools
+- Handles: Identifies relevant subreddits for each city
+- Input Variables:
+  - Name: top_cities_list
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: List of top cities
+    - Value: None
+- Output Variables:
+  - Name: subreddits
+    - Description: Relevant subreddits for each city
+
+Step 2
+- API: RedditTopPostsBySubreddit
+- Handles: Fetches top posts from relevant subreddits
+- Input Variables:
+  - Name: subreddits
+    - Parameter: subreddit
+    - Type: string
+    - Source: API_Output (Panel 4, Step 1)
+    - Description: Subreddits identified by BrowserTools
+    - Value: None
+  - Name: time_period
+    - Parameter: time
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Time period for top posts
+    - Value: "day"
+- Output Variables:
+  - Name: reddit_posts
+    - Description: Top Reddit posts for each city
+
+Workflow for Panel 5:
+
+Panel Description: Display top restaurants in the top 5 cities.
+
+Workflow Steps:
+
+Step 1
+- API: TripadvisorSearchRestaurants
+- Handles: Searches for top restaurants in each city
+- Input Variables:
+  - Name: city_geoID_details
+    - Parameter: locationId
+    - Type: string
+    - Source: API_Output (Panel 1, Step 2)
+    - Description: geoId of each city
+    - Value: None
+- Output Variables:
+  - Name: top_restaurants
+    - Description: List of top restaurants in each city
+
+#### Example 2:
+
+Query: "what are the hotel options in new york city from 10th october 2024 to 12th october 2024.  Also what will the weather be like then?"
+
+Interpreter's Panel Requests:
+1. Panel 1: Hotel Options in New York City
+List of Relevant APIs:
+   - TripadvisorSearchLocation
+   - TripadvisorSearchHotels
+   - BrowserTools
+
+2. Panel 2: Weather Forecast for New York City
+List of Relevant APIs:
+   - WeatherAPI.com_Forecast_Weather_API
+   - BrowserTools
+
+Description of APIs:
+
+[Will be given to you]
+
+Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+Panel 1: Hotel Options in New York City
+
+- Understanding Panel Details: 
+  -We need to find hotel options in New York City from 10th october 2024 to 12th october 2024.
+
+- API Selection:
+  - To find hotel options in New York City for the specified dates.
+  - TripadvisorSearchLocation: To obtain the geoId for New York City.
+    - Note: TripadvisorSearchLocation is reliable for obtaining geoId for well-known locations, and not longitude or latitude.
+  - TripadvisorSearchHotels: To retrieve hotel options using the geoId and the specified dates.
+  - BrowserTools: Not necessary here since we can obtain all required data using Tripadvisor APIs, keeping the workflow minimal.
+
+- Input Parameters:
+  - TripadvisorSearchLocation:
+    - For TripadvisorSearchLocation we have to consider these required input parameters:  {'query': {'type': 'string', 'description': 'Search query for location (e.g., city name)'}}
+    - query (string): The location name to search for.
+  - TripadvisorSearchHotels:
+    - For TripadvisorSearchHotels we have to consider these required input parameters: {'geoId': {'type': 'string', 'description': 'Geo ID of the location retrieved from the Search Location API.'}, 'checkIn': {'type': 'string', 'description': 'Check-in date. Format: YYYY-MM-DD'}, 'checkOut': {'type': 'string', 'description': 'Check-out date. Format: YYYY-MM-DD'}}
+    - geoId (string): The geoId obtained from TripadvisorSearchLocation.
+    - checkIn (string): The check-in date in YYYY-MM-DD format.
+    - checkOut (string): The check-out date in YYYY-MM-DD format.
+
+- Source of Inputs:
+  - TripadvisorSearchLocation:
+    - query: LLM_Generated, value "New York City", extracted from the user's query.
+  - TripadvisorSearchHotels:
+    - geoId: API_Output (Panel 1, Step 1), output location_geoId from TripadvisorSearchLocation.
+    - checkIn: LLM_Generated, value "2024-10-10", extracted from the user's query.
+    - checkOut: LLM_Generated, value "2024-10-12", extracted from the user's query.
+
+- Workflow Flow:
+  - Step 1: Use TripadvisorSearchLocation to get the geoId for New York City.
+  - Step 2: Use TripadvisorSearchHotels with the geoId and dates to retrieve hotel options.
+
+- Interdependencies:
+  - Step 2 depends on Step 1 for the geoId (location_geoId). Dependency is on the current panels step output which is valid.
+  - The input variable location_geoId in Step 2 must match the output variable name from Step 1.
+
+- Variable Naming:
+  - Input variable name for Step 1: location_query
+  - Output variable name for Step 1: location_geoId.
+  - Input variable name for Step 2: location_geoId (matching the output variable name), check_in_date, check_out_date.
+  - Output variable name for Step 2: hotel_options.
+
+Panel 2: Weather Forecast for New York City
+
+- Understanding Panel Details: 
+  -We need to get the weather details in New York City from 10th october 2024 to 12th october 2024.
+
+- API Selection:
+  - To provide the weather forecast for New York City for the specified dates.
+  - BrowserTools: To obtain the latitude and longitude of New York City, as using coordinates can provide more accurate results with WeatherAPI.com_Forecast_Weather_API.
+  - WeatherAPI.com_Forecast_Weather_API: To fetch the weather forecast using the coordinates and dates.
+
+- Input Parameters:
+  - BrowserTools:
+    - For BrowserTools we have to consider these required input parameters: ['query']
+    - query (string): A query to obtain the latitude and longitude of New York City.
+  - WeatherAPI.com_Forecast_Weather_API:
+    - For WeatherAPI.com_Forecast_Weather_API we have to consider these required input parameters:{'q': {'type': 'String', 'description': 'Query parameter based on which data is sent back. It could be one of the following: Latitude and Longitude (Decimal degree) e.g: q=48.8567,2.3508, city name e.g.: q=Paris, US zip e.g: q=10001, UK postcode e.g: q=SW1, Canada postal code e.g: q=G2J, metar:<metar_code> e.g: q=metar:EGLL, iata:<3 digit airport code> e.g: q=iata:DXB, auto:ip for IP lookup, IP address (IPv4 and IPv6 supported) e.g: q=100.0.0.1'}}
+    - q (string): The latitude and longitude in "lat,lon" format.
+    - dt (date): Specific dates for which the forecast is required.
+
+- Source of Inputs:
+  - BrowserTools:
+    - query: LLM_Generated, value "What is the latitude and longitude of New York City?", inferred from the user's query.
+  - WeatherAPI.com_Forecast_Weather_API:
+    - q: API_Output (Panel 2, Step 1), output nyc_coordinates from BrowserTools.
+    - dt: LLM_Generated, value ["2024-10-10", "2024-10-11", "2024-10-12"], extracted from the user's query.
+
+- Workflow Flow:
+  - Step 1: Use BrowserTools to obtain the latitude and longitude of New York City.
+  - Step 2: Use WeatherAPI.com_Forecast_Weather_API with the coordinates and dates to fetch the weather forecast.
+
+- Interdependencies:
+  - Step 2 depends on Step 1 for the coordinates (nyc_coordinates). Dependency is on the current panels step output which is valid.
+  - The input variable nyc_coordinates in Step 2 must match the output variable name from Step 1.
+
+- Variable Naming:
+  - Input variable name for Step 1: query_nyc_coordinates
+  - Output variable for Step 1: nyc_coordinates.
+  - Input variable name for Step 2: nyc_coordinates (matching the output variable name), forecast_dates.
+  - Output variable name for Step 2: weather_forecast
+
+Grouping Panels and Interdependencies
+
+- Panel 1 and Panel 2 do not have interdependencies between them.
+- Therefore, they should be placed in different groups:
+  - Panel 1 is in Group 1.
+  - Panel 2 is in Group 2.
+
+Dependency Limitation
+
+- Ensured that each API depends on at most one previous API's output.
+- All input variables that depend on previous outputs have matching names to maintain consistency.
+
+Workflow Efficiency
+
+- Kept the workflow minimal by:
+  - Using only necessary APIs.
+  - Avoided calling the same api for same purpose multiple times by keeping such panels in the same group and sharing the api output with other panels.
+  - Avoiding unnecessary steps like additional BrowserTools calls.
+  - Extracting dates directly from the user's query without additional processing.
+
+$$WORKFLOW$$
+
+Group 1:
+
+Workflow for Panel 1:
+
+Panel Description: Retrieve hotel options in New York City for specified dates.
+
+Workflow Steps:
+
+Step 1
+- API: TripadvisorSearchLocation
+- Handles: Retrieves geoId for New York City
+- Input Variables:
+  - Name: location_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Search query for New York City
+    - Value: "New York City"
+- Output Variables:
+  - Name: location_geoId
+    - Description: Geo ID for New York City
+
+Step 2
+- API: TripadvisorSearchHotels
+- Handles: Retrieves hotel options using geoId
+- Input Variables:
+  - Name: location_geoId
+    - Parameter: geoId
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: Geo ID for New York City
+    - Value: None
+  - Name: check_in_date
+    - Parameter: checkIn
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Check-in date
+    - Value: "2024-10-10"
+  - Name: check_out_date
+    - Parameter: checkOut
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Check-out date
+    - Value: "2024-10-12"
+- Output Variables:
+  - Name: hotel_options
+    - Description: List of available hotels in New York City
+
+Group 2:
+
+Workflow for Panel 2:
+
+Panel Description: Provide weather forecast for New York City for specified dates.
+
+Workflow Steps:
+
+Step 1  
+- API: BrowserTools  
+- Handles: Fetches latitude and longitude for New York City
+- Input Variables:
+  - Name: query_nyc_coordinates
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated 
+    - Description: query to for getting latitude and longitude coordinates for New York City
+    - Value: "What is the latitude and longitude coordinates for New York City"
+- Output Variables:
+  - Name: nyc_coordinates
+    - Description: Longitude and Latitude for New York City
+
+Step 2
+- API: WeatherAPI.com_Forecast_Weather_API
+- Handles: Fetches weather forecast for New York City
+- Input Variables:
+  - Name: nyc_coordinates
+    - Parameter: q
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: Longitude and Latitude for New York City
+    - Value: None
+  - Name: forecast_dates
+    - Parameter: dt
+    - Type: date
+    - Source: LLM_Generated
+    - Description: Forecast dates on which we have to check the weather
+    - Value: "[2024-10-10, 2024-10-11, 2024-10-12]"
+- Output Variables:
+  - Name: weather_forecast
+    - Description: Weather forecast for New York City on specified dates
+
+
+#### Example 3:
+
+Query: Analyze how the increased use of renewable energy sources like solar and wind power has affected carbon emission levels worldwide over the past decade.
+
+Interpreter's Panel Requests:
+1. Panel 1: Overview of Renewable Energy Sources
+Details: Provide a comprehensive overview of renewable energy sources, focusing on solar and wind power. This panel sets the stage for understanding the context of the analysis by explaining the basics of these energy sources and their significance in the global energy landscape.
+List of Relevant APIs:
+   - BrowserTools
+   - VizAgent
+
+2. Panel 2: Growth of Solar and Wind Power Over the Past Decade
+Details: Gather historical data on the adoption and growth of solar and wind power worldwide over the past decade. This panel will provide insights into how these energy sources have expanded and their current status in the global energy mix.
+List of Relevant APIs:
+   - BrowserTools
+   - VizAgent
+
+3. Panel 3: Global Carbon Emission Levels Over the Past Decade
+Details: Collect data on global carbon emission levels over the past decade. This panel will provide a baseline for understanding changes in emissions and will be used in correlation analysis with renewable energy growth.
+List of Relevant APIs:
+   - BrowserTools
+   - VizAgent
+
+4. Panel 4: Correlation Analysis Between Renewable Energy Use and Carbon Emissions
+Details: Analyze the correlation between the increased use of solar and wind power and changes in carbon emission levels. This panel depends on data from Panels 2 and 3 to identify trends and draw conclusions about the impact of renewable energy on emissions.
+List of Relevant APIs:
+   - BrowserTools
+   - VizAgent
+
+5. Panel 5: Case Studies of Renewable Energy Impact on Carbon Emissions
+Details: Provide case studies or examples of countries or regions where the adoption of renewable energy has significantly impacted carbon emissions. This panel will offer real-world examples to support the analysis conducted in Panel 4.
+List of Relevant APIs:
+   - BrowserTools
+   - VizAgent
+
+6. Panel 6: Challenges in Measuring Renewable Energy Impact
+Details: Discuss the challenges and limitations in measuring the impact of renewable energy on carbon emissions. This panel will provide context for understanding the complexities involved in the analysis and is relevant to the findings in Panel 4.
+List of Relevant APIs:
+   - BrowserTools
+   - VizAgent
+
+7. Panel 7: Future Projections of Renewable Energy Impact on Carbon Emissions
+Details: Explore future projections and potential impacts of continued renewable energy adoption on carbon emissions. This panel builds on insights from Panels 5, and 6 to discuss future implications and potential scenarios.
+List of Relevant APIs:
+   - BrowserTools
+   - VizAgent
+
+Description of APIs:
+
+[Will be given to you]
+
+Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+Panel 1: Overview of Renewable Energy Sources
+
+- Understanding Panel Details:
+  - Provide a comprehensive overview of renewable energy sources, focusing on solar and wind power.
+  - No dependencies on previous panels.
+
+- API Selection:
+  - Use BrowserTools to gather information.
+
+- Input Parameters:
+  - query (string): Required by BrowserTools.
+
+- Variable Naming:
+  - Input Variable: overview_query
+  - Output Variable: renewable_energy_overview
+
+- Validation:
+  - Variable names are unique.
+  - No dependencies to manage.
+
+Panel 2: Growth of Solar and Wind Power Over the Past Decade
+
+- Understanding Panel Details:
+  - Gather historical data on the adoption and growth of solar and wind power over the past decade.
+  - No dependencies on previous panels.
+
+- API Selection:
+  - Use BrowserTools to collect data.
+  - **Considering Visualization:**
+    - The growth data is suitable for visualization.
+    - Add a VizAgent step to create visual representations of the data.
+
+- Input Parameters:
+  - BrowserTools:
+    - query (string): Required by BrowserTools.
+  - VizAgent:
+    - solar_wind_growth_data (string): Output from BrowserTools, should provide raw output.
+    - visualization_query (string): LLM_Generated, will combine all context from previous panel steps as it is without shortening.
+
+- Variable Naming:
+  - Input Variables:
+    - growth_query
+    - solar_wind_growth_data (from Step 1)
+    - visualization_query
+  - Output Variables:
+    - solar_wind_growth_data
+    - growth_visualization
+
+- Validation:
+  - Variable names are unique.
+  - Dependencies are within the allowed limit.
+
+Panel 3: Global Carbon Emission Levels Over the Past Decade
+
+- Understanding Panel Details:
+  - Collect data on global carbon emission levels over the past decade.
+  - No dependencies on previous panels.
+
+- API Selection:
+  - Use BrowserTools to retrieve data.
+  - **Considering Visualization:**
+    - The emission data is suitable for visualization.
+    - Add a VizAgent step to visualize the data.
+
+- Input Parameters:
+  - BrowserTools:
+    - query (string): Required by BrowserTools.
+  - VizAgent:
+    - carbon_emission_data (string): Output from BrowserTools, should provide raw output.
+    - visualization_query (string): LLM_Generated, will combine all context from previous panel steps as it is without shortening.
+
+- Variable Naming:
+  - Input Variables:
+    - emission_query
+    - carbon_emission_data (from Step 1)
+    - visualization_query
+  - Output Variables:
+    - carbon_emission_data
+    - emission_visualization
+
+- Validation:
+  - Variable names are unique.
+  - Dependencies are within the allowed limit.
+
+Panel 4: Correlation Analysis Between Renewable Energy Use and Carbon Emissions
+
+- Understanding Panel Details:
+  - Analyze the correlation between the increased use of solar and wind power and changes in carbon emission levels.
+  - Depends on outputs from Panels 2 and 3.
+  - **Considering Visualization:**
+    - The correlation analysis is suitable for visualization.
+    - Add a VizAgent step to visualize the correlation.
+
+- API Selection:
+  - Use BrowserTools for analysis.
+  - Use VizAgent for visualization.
+
+- Input Parameters:
+  - BrowserTools:
+    - solar_wind_growth_data (string): Output from Panel 2.
+    - carbon_emission_data (string): Output from Panel 3.
+    - correlation_query (string): LLM_Generated.
+  - VizAgent:
+    - correlation_analysis (string): Output from BrowserTools, should provide raw output.
+    - visualization_query (string): LLM_Generated, will combine all context from previous panel steps as it is without shortening.
+
+- Variable Naming:
+  - Input Variables:
+    - solar_wind_growth_data
+    - carbon_emission_data
+    - correlation_query
+    - correlation_analysis (from Step 1)
+    - visualization_query
+  - Output Variables:
+    - correlation_analysis
+    - correlation_visualization
+
+- Validation:
+  - Variable names are unique.
+  - Dependencies are within the allowed limit.
+
+Panel 5: Case Studies of Renewable Energy Impact on Carbon Emissions
+
+- Understanding Panel Details:
+  - Provide case studies where renewable energy adoption significantly impacted carbon emissions.
+  - Depends on correlation_analysis from Panel 4.
+
+- API Selection:
+  - Use BrowserTools.
+
+- Input Parameters:
+  - correlation_analysis (string): Output from Panel 4.
+  - case_studies_query (string): LLM_Generated.
+
+- Variable Naming:
+  - Input Variables:
+    - correlation_analysis
+    - case_studies_query
+  - Output Variable: renewable_energy_case_studies
+
+- Validation:
+  - Variable names are unique.
+  - Dependencies are within the allowed limit.
+
+Panel 6: Challenges in Measuring Renewable Energy Impact
+
+- Understanding Panel Details:
+  - Discuss the challenges and limitations in measuring the impact of renewable energy on carbon emissions.
+  - Depends on correlation_analysis from Panel 4.
+
+- API Selection:
+  - Use BrowserTools.
+
+- Input Parameters:
+  - correlation_analysis (string): Output from Panel 4.
+  - challenges_query (string): LLM_Generated.
+
+- Variable Naming:
+  - Input Variables:
+    - correlation_analysis
+    - challenges_query
+  - Output Variable: measurement_challenges
+
+- Validation:
+  - Variable names are unique.
+  - Dependencies are within the allowed limit.
+
+Panel 7: Future Projections of Renewable Energy Impact on Carbon Emissions
+
+- Understanding Panel Details:
+  - Explore future projections and potential impacts of continued renewable energy adoption on carbon emissions.
+  - Depends on solar_wind_growth_data from Panel 2 and correlation_analysis from Panel 4.
+
+- API Selection:
+  - Use BrowserTools.
+
+- Input Parameters:
+  - solar_wind_growth_data (string): Output from Panel 2.
+  - correlation_analysis (string): Output from Panel 4.
+  - future_projections_query (string): LLM_Generated.
+
+- Variable Naming:
+  - Input Variables:
+    - solar_wind_growth_data
+    - correlation_analysis
+    - future_projections_query
+  - Output Variable: future_impact_projections
+
+- Validation:
+  - Variable names are unique.
+  - Dependencies are within the allowed limit.
+
+Grouping Panels and Interdependencies
+
+- Since there are more than 6 panels, all panels are placed in Group 1.
+- Each panel step depends on at most 2 previous panel steps.
+- Dependencies are managed by matching input variable names with corresponding output variable names.
+- In VizAgent steps, descriptions mention that raw outputs are provided and context is combined without shortening.
+
+Workflow Efficiency
+
+- Kept the workflow minimal by:
+  - Using necessary APIs (BrowserTools and VizAgent).
+  - Managing dependencies within specified limits.
+  - Ensuring variable names are unique and consistent.
+  - Clearly describing input variables and their sources.
+
+$$WORKFLOW$$
+
+Group 1:
+
+Workflow for Panel 1:
+
+Panel Description: Provide an overview of renewable energy sources, focusing on solar and wind power.
+
+Workflow Steps:
+
+Step 1
+- API: BrowserTools
+- Handles: Retrieves an overview.
+- Input Variables:
+  - Name: overview_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query to get an overview.
+    - Value: "Provide an overview of renewable energy sources, focusing on solar and wind power, including their principles, technologies, and benefits."
+- Output Variables:
+  - Name: renewable_energy_overview
+    - Description: Overview information on solar and wind energy.
+
+Workflow for Panel 2:
+
+Panel Description: Gather historical data on the adoption and growth of solar and wind power over the past decade.
+
+Workflow Steps:
+
+Step 1
+- API: BrowserTools
+- Handles: Retrieves growth data.
+- Input Variables:
+  - Name: growth_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query to get growth data.
+    - Value: "Provide data on the growth of solar and wind power worldwide over the past decade, including installation rates and capacity increases."
+- Output Variables:
+  - Name: solar_wind_growth_data
+    - Description: Data on historical growth.
+
+Step 2
+- API: VizAgent
+- Handles: Visualizes the growth data.
+- Input Variables:
+  - Name: solar_wind_growth_data
+    - Parameter: response
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: Raw output of solar_wind_growth_data from previous step. Please provide raw output.
+    - Value: None
+  - Name: panel_num_2
+    - Parameter: index
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Panel number goes to the index parameter.
+    - Value: "2"
+  - Name: visualization_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query specifying the type of visualization. We will combine all context from the previous panel steps as it is without shortening.
+    - Value: "Create a line chart visualizing the growth of solar and wind power installations over the past decade."
+- Output Variables:
+  - Name: growth_visualization
+    - Description: Visualization of solar and wind power growth over the past decade.
+
+Workflow for Panel 3:
+
+Panel Description: Collect data on global carbon emission levels over the past decade.
+
+Workflow Steps:
+
+Step 1
+- API: BrowserTools
+- Handles: Retrieves carbon emission data.
+- Input Variables:
+  - Name: emission_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query to get emission data.
+    - Value: "Provide data on global carbon emission levels over the past decade."
+- Output Variables:
+  - Name: carbon_emission_data
+    - Description: Data on carbon emissions.
+
+Step 2
+- API: VizAgent
+- Handles: Visualizes the carbon emission data.
+- Input Variables:
+  - Name: carbon_emission_data
+    - Parameter: response
+    - Type: string
+    - Source: API_Output (Panel 3, Step 1)
+    - Description: Raw output of carbon_emission_data from previous step. Please provide raw output.
+    - Value: None
+  - Name: panel_num_3
+    - Parameter: index
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Panel number goes to the index parameter.
+    - Value: "3"
+  - Name: visualization_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query specifying the type of visualization. We will combine all context from the previous panel steps as it is without shortening.
+    - Value: "Create a bar chart showing the global carbon emission levels over the past decade."
+- Output Variables:
+  - Name: emission_visualization
+    - Description: Visualization of global carbon emission levels over the past decade.
+
+Workflow for Panel 4:
+
+Panel Description: Analyze the correlation between the increased use of solar and wind power and changes in carbon emission levels.
+
+Workflow Steps:
+
+Step 1
+- API: BrowserTools
+- Handles: Performs correlation analysis.
+- Input Variables:
+  - Name: solar_wind_growth_data
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: Key data from Panel 2 (concise growth data).
+    - Value: None
+  - Name: carbon_emission_data
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 3, Step 1)
+    - Description: Key data from Panel 3 (concise emission data).
+    - Value: None
+  - Name: correlation_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query for correlation analysis.
+    - Value: "Analyze the correlation between the growth of solar and wind power and changes in global carbon emission levels over the past decade."
+- Output Variables:
+  - Name: correlation_analysis
+    - Description: Analysis of the impact on carbon emissions.
+
+Step 2
+- API: VizAgent
+- Handles: Visualizes the correlation analysis.
+- Input Variables:
+  - Name: correlation_analysis
+    - Parameter: response
+    - Type: string
+    - Source: API_Output (Panel 4, Step 1)
+    - Description: Raw output of correlation_analysis from previous step. Please provide raw output.
+    - Value: None
+  - Name: panel_num_4
+    - Parameter: index
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Panel number goes to the index parameter.
+    - Value: "4"
+  - Name: visualization_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query specifying the type of visualization. We will combine all context from the previous panel steps as it is without shortening.
+    - Value: "Create a scatter plot to visualize the correlation between renewable energy growth and carbon emission levels."
+- Output Variables:
+  - Name: correlation_visualization
+    - Description: Visualization of the correlation analysis.
+
+Workflow for Panel 5:
+
+Panel Description: Provide case studies where renewable energy adoption significantly impacted carbon emissions.
+
+Workflow Steps:
+
+Step 1
+- API: BrowserTools
+- Handles: Retrieves case studies.
+- Input Variables:
+  - Name: correlation_analysis
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 4, Step 1)
+    - Description: Key findings from Panel 4 (concise analysis).
+    - Value: None
+  - Name: case_studies_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query to find case studies.
+    - Value: "Provide case studies of countries or regions where the adoption of solar and wind power has led to significant reductions in carbon emissions."
+- Output Variables:
+  - Name: renewable_energy_case_studies
+    - Description: Case studies of renewable energy impact.
+
+Workflow for Panel 6:
+
+Panel Description: Discuss the challenges and limitations in measuring the impact of renewable energy on carbon emissions.
+
+Workflow Steps:
+
+Step 1
+- API: BrowserTools
+- Handles: Explores measurement challenges.
+- Input Variables:
+  - Name: correlation_analysis
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 4, Step 1)
+    - Description: Key findings from Panel 4 (concise analysis).
+    - Value: None
+  - Name: challenges_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query to discuss challenges.
+    - Value: "Discuss the challenges and limitations in measuring the impact of renewable energy on carbon emissions, including data accuracy and external factors."
+- Output Variables:
+  - Name: measurement_challenges
+    - Description: Challenges in measuring impact.
+
+Workflow for Panel 7:
+
+Panel Description: Explore future projections of renewable energy adoption and its potential impact on carbon emissions.
+
+Workflow Steps:
+
+Step 1
+- API: BrowserTools
+- Handles: Gathers future projections.
+- Input Variables:
+  - Name: solar_wind_growth_data
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: Key data from Panel 2 (concise growth data).
+    - Value: None
+  - Name: correlation_analysis
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 4, Step 1)
+    - Description: Key findings from Panel 4 (concise analysis).
+    - Value: None
+  - Name: future_projections_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query for future projections.
+    - Value: "Provide future projections on how continued adoption of solar and wind power is expected to affect global carbon emission levels."
+- Output Variables:
+  - Name: future_impact_projections
+    - Description: Projections of future impact on carbon emissions.
+
+
+#### Example 4:
+
+Query: "Identify upcoming music festivals worldwide over the next three months (currently it is October 2024) and their exact dates, find affordable flights to these destinations from New York, and check recent Reddit threads for attendee experiences or tips."
+
+Interpreter's Panel Requests:
+1. Panel 1: Upcoming Music Festivals Worldwide
+Details: Display a list of upcoming music festivals worldwide over the next three months, including their exact dates and locations. The panel should provide a brief description of each festival and any notable artists or events associated with them.
+List of Relevant APIs:
+   - BrowserTools
+
+2. Panel 2: Affordable Flights to Music Festival Destinations
+Details: Find and display affordable flights from New York to the destinations of the identified music festivals. Include details such as airlines, prices, and travel dates. Ensure the flights align with the festival dates.
+List of Relevant APIs:
+   - SkyScrapperFlightSearch
+   - SkyScrapperSearchAirport
+   - BrowserTools
+
+3. Panel 3: Reddit Threads on Music Festival Experiences
+Details: Retrieve and display recent Reddit threads discussing attendee experiences or tips for the identified music festivals. Include the top posts with user comments and ratings.
+List of Relevant APIs:
+   - RedditTopPostsBySubreddit
+   - BrowserTools
+
+Description of APIs:
+
+[Will be given to you]
+
+Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+Panel 1: Upcoming Music Festivals Worldwide
+
+- Understanding Panel Details:
+  - The panel aims to display a list of upcoming music festivals worldwide over the next three months (October 2024 to December 2024), including their exact dates, locations, descriptions, and notable artists.
+
+- API Selection:
+  - BrowserTools: To retrieve and synthesize up-to-date information on upcoming music festivals worldwide, including all required details.
+
+- Input Parameters:
+  - BrowserTools requires the parameter query (string): The user's question or search term.
+
+- Source of Inputs:
+  - query_music_festivals: LLM_Generated, value: "List upcoming music festivals worldwide from October 2024 to December 2024 with exact dates, locations, descriptions, and notable artists."
+
+- Workflow Flow:
+  - Step 1: Use BrowserTools to obtain information on upcoming music festivals over the next three months.
+
+- Interdependencies:
+  - Since this is the first panel and a single-step workflow, there are no interdependencies with other panels or steps.
+
+- Variable Naming:
+  - Input Variable:
+    - query_music_festivals (for parameter query)
+  - Output Variable:
+    - music_festivals_list
+
+- Validation:
+  - BrowserTools requires only the query parameter.
+  - Variable names are unique and match those in the updated workflow.
+  - The workflow is minimal and efficient.
+
+Panel 2: Affordable Flights to Music Festival Destinations
+
+- Understanding Panel Details:
+  - The panel aims to find and display affordable flights from New York to the destinations of the identified music festivals.
+  - Include details such as airlines, prices, and travel dates, ensuring the flights align with the festival dates.
+
+- API Selection:
+  - BrowserTools: To extract festival locations and dates from the music_festivals_list obtained in Panel 1.
+  - SkyScrapperSearchAirport: To find airport details (skyIds and entityIds) for New York and festival destinations.
+  - SkyScrapperFlightSearch: To search for flights using the airport details and dates.
+
+- Input Parameters:
+  - BrowserTools (Step 1):
+    - Requires parameter query (string): We'll input music_festivals_list to extract locations and dates.
+  - SkyScrapperSearchAirport (Step 2 and Step 3):
+    - Requires parameter query (string): Name of the location where the airport is situated.
+  - SkyScrapperFlightSearch (Step 4):
+    - Requires parameters:
+      - originSkyId (string)
+      - destinationSkyId (string)
+      - originEntityId (string)
+      - destinationEntityId (string)
+      - date (string): Departure or travel date in YYYY-MM-DD format.
+
+- Source of Inputs:
+  - Step 1:
+    - music_festivals_list: API_Output (Panel 1, Step 1)
+  - Step 2:
+    - origin_location_query: LLM_Generated, value: "New York"
+  - Step 3:
+    - festival_locations_dates: API_Output (Panel 2, Step 1)
+  - Step 4:
+    - nyc_airport_details: API_Output (Panel 2, Step 2)
+    - festival_airport_details: API_Output (Panel 2, Step 3)
+    - festival_locations_dates: API_Output (Panel 2, Step 1)
+
+- Workflow Flow:
+  - Step 1: Use BrowserTools to extract festival locations and dates from music_festivals_list.
+  - Step 2: Use SkyScrapperSearchAirport to get airport details for New York.
+  - Step 3: Use SkyScrapperSearchAirport to get airport details for each festival destination.
+  - Step 4: Use SkyScrapperFlightSearch to find affordable flights using the airport details and festival dates.
+
+- Interdependencies:
+  - Step 2 depends on LLM_Generated input.
+  - Step 3 depends on Step 1 (festival_locations_dates).
+  - Step 4 depends on Step 2 (nyc_airport_details), Step 3 (festival_airport_details), and Step 1 (festival_locations_dates).
+  - Each API depends on at most one previous API's output per input variable.
+  - Input variable names that depend on previous outputs match the output variable names to ensure consistency.
+
+- Variable Naming:
+  - Input Variables:
+    - Step 1:
+      - music_festivals_list (from Panel 1, Step 1)
+    - Step 2:
+      - origin_location_query (LLM_Generated)
+    - Step 3:
+      - festival_locations_dates (from Panel 2, Step 1)
+    - Step 4:
+      - nyc_airport_details (from Panel 2, Step 2)
+      - festival_airport_details (from Panel 2, Step 3)
+      - festival_locations_dates (from Panel 2, Step 1)
+  - Output Variable:
+    - festival_locations_dates
+    - flight_options
+
+- Validation:
+  - Each API depends on at most one previous API's output per input variable.
+  - Variable names are unique and match those in the updated workflow.
+  - The workflow complies with dependency limitations.
+
+Panel 3: Reddit Threads on Music Festival Experiences
+
+- Understanding Panel Details:
+  - Retrieve and display recent Reddit threads discussing attendee experiences or tips for the identified music festivals.
+  - Include top posts with user comments and ratings.
+
+- API Selection:
+  - BrowserTools: To identify relevant subreddits or search terms for each music festival.
+  - RedditTopPostsBySubreddit: To fetch top Reddit posts from relevant subreddits.
+
+- Input Parameters:
+  - BrowserTools (Step 1):
+    - Requires parameter query (string): We'll input music_festivals_list to find relevant subreddits.
+  - RedditTopPostsBySubreddit (Step 2):
+    - Requires parameters:
+      - subreddit (string): The subreddit name.
+      - time (string): The time period for which to fetch top posts.
+
+- Source of Inputs:
+  - Step 1:
+    - festival_locations_dates: API_Output (Panel 1, Step 1)
+  - Step 2:
+    - festival_subreddits: API_Output (Panel 3, Step 1)
+    - time_period: LLM_Generated, value: "month"
+
+- Workflow Flow:
+  - Step 1: Use BrowserTools to identify relevant subreddits or search terms for each music festival.
+  - Step 2: Use RedditTopPostsBySubreddit to retrieve top posts from the identified subreddits.
+
+- Interdependencies:
+  - Step 1 depends on Panel 1, Step 1 (music_festivals_list).
+  - Step 2 depends on Step 1 (festival_subreddits).
+  - Input variable names that depend on previous outputs match the output variable names to ensure consistency.
+
+- Variable Naming:
+  - Input Variables:
+    - Step 1:
+      - music_festivals_list (from Panel 1, Step 1)
+    - Step 2:
+      - festival_subreddits (from Panel 3, Step 1)
+      - time_period (LLM_Generated)
+  - Output Variable:
+    - festival_subreddits
+    - reddit_posts
+
+- Validation:
+  - Each API depends on at most one previous API's output per input variable.
+  - Variable names are unique and match those in the updated workflow.
+  - The workflow is minimal and efficient.
+
+
+
+Grouping Panels and Interdependencies
+
+- Panels 1, 2, and 3 are interdependent:
+  - Panel 2 depends on Panel 1 for music_festivals_list.
+  - Panel 3 depends on Panel 1 for music_festivals_list.
+- Therefore, all panels are placed in Group 1.
+
+Dependency Limitation and Workflow Adjustments
+
+- Ensured that each API input depends on at most one previous API's output.
+- Adjusted variable names to match the output variable names in the updated workflow provided.
+- Avoided multiple dependencies for any single API input.
+
+Workflow Efficiency
+
+- Kept the workflow minimal by:
+  - Using only necessary APIs.
+  - Ensuring data flows efficiently between steps.
+  - Matching variable names to maintain consistency and avoid errors.
+
+$$WORKFLOW$$
+
+Group 1:
+
+Workflow for Panel 1:
+
+Panel Description: Identify upcoming music festivals worldwide over the next three months.
+
+Workflow Steps:
+
+Step 1
+
+- API: BrowserTools
+- Handles: Retrieves upcoming music festivals with exact dates, locations, descriptions, and notable artists.
+- Input Variables:
+  - Name: query_music_festivals
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query to find upcoming music festivals worldwide from October 2024 to December 2024.
+    - Value: "List upcoming music festivals worldwide from October 2024 to December 2024 with exact dates, locations, descriptions, and notable artists."
+- Output Variables:
+  - Name: music_festivals_list
+    - Description: List of upcoming music festivals with dates, locations, descriptions, and notable artists.
+
+Workflow for Panel 2:
+
+Panel Description: Find affordable flights from New York to music festival destinations.
+
+Workflow Steps:
+
+Step 1
+
+- API: BrowserTools
+- Handles: Extracts festival locations and dates from music_festivals_list.
+- Input Variables:
+  - Name: music_festivals_list
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: List of music festivals to extract locations and dates.
+    - Value: None
+- Output Variables:
+  - Name: festival_locations_dates
+    - Description: Extracted locations and dates of the festivals.
+
+Step 2
+
+- API: SkyScrapperSearchAirport
+- Handles: Retrieves airport details for New York.
+- Input Variables:
+  - Name: origin_location_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Location name for airport search.
+    - Value: "New York"
+- Output Variables:
+  - Name: nyc_airport_details
+    - Description: Airport details for New York (originSkyId, originEntityId).
+
+Step 3
+
+- API: SkyScrapperSearchAirport
+- Handles: Retrieves airport details for festival destinations.
+- Input Variables:
+  - Name: festival_locations_dates
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: Festival locations for airport search.
+    - Value: None
+- Output Variables:
+  - Name: festival_airport_details
+    - Description: Airport details for festival destinations (destinationSkyId, destinationEntityId).
+
+Step 4
+
+- API: SkyScrapperFlightSearch
+- Handles: Finds affordable flights using airport details and festival dates.
+- Input Variables:
+  - Name: nyc_airport_details
+    - Parameter: originSkyId, originEntityId
+    - Type: string
+    - Source: API_Output (Panel 2, Step 2)
+    - Description: Airport details of New York for flight search.
+    - Value: None
+  - Name: festival_airport_details
+    - Parameter: destinationSkyId, destinationEntityId
+    - Type: string
+    - Source: API_Output (Panel 2, Step 3)
+    - Description: Airport details of festival destinations for flight search.
+    - Value: None
+  - Name: festival_locations_dates
+    - Parameter: date
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: Dates of the music festivals.
+    - Value: None
+- Output Variables:
+  - Name: flight_options
+    - Description: Affordable flight options to festival destinations.
+
+Workflow for Panel 3:
+
+Panel Description: Retrieve Reddit threads on music festival experiences.
+
+Workflow Steps:
+
+Step 1
+
+- API: BrowserTools
+- Handles: Identifies relevant subreddits or search terms for each festival.
+- Input Variables:
+  - Name: music_festivals_list
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: Names of music festivals to find relevant subreddits.
+    - Value: None
+- Output Variables:
+  - Name: festival_subreddits
+    - Description: Relevant subreddits or search terms for each festival.
+
+Step 2
+
+- API: RedditTopPostsBySubreddit
+- Handles: Fetches top posts from relevant subreddits.
+- Input Variables:
+  - Name: festival_subreddits
+    - Parameter: subreddit
+    - Type: string
+    - Source: API_Output (Panel 3, Step 1)
+    - Description: Subreddits identified by BrowserTools.
+    - Value: None
+  - Name: time_period
+    - Parameter: time
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Time period for top posts.
+    - Value: "month"
+- Output Variables:
+  - Name: reddit_posts
+    - Description: Top Reddit posts for each festival.
+
+#### Example 5:
+
+Query: Assess how changes in inflation rates and central bank interest rate policies impact investment strategies, currency values, and economic growth worldwide.
+
+Interpreter's Panel Requests:
+1. Panel 1: Impact of Inflation Rates on Investment Strategies
+Details: This panel explores how changes in inflation rates influence investment strategies, including asset allocation, risk management, and portfolio diversification. It will provide insights into how investors adjust their strategies in response to inflationary pressures.
+List of Relevant APIs:
+   - BrowserTools
+
+2. Panel 2: Impact of Inflation Rates on Currency Values
+Details: This panel examines the relationship between inflation rates and currency values, focusing on how inflation can lead to currency depreciation or appreciation. It will analyze historical data and economic theories to explain these dynamics.
+List of Relevant APIs:
+   - BrowserTools
+
+3. Panel 3: Impact of Inflation Rates on Economic Growth
+Details: This panel assesses how inflation rates affect economic growth, considering factors such as consumer spending, business investment, and government policy responses. It will explore both short-term and long-term impacts.
+List of Relevant APIs:
+   - BrowserTools
+
+4. Panel 4: Impact of Central Bank Interest Rate Policies on Investment Strategies
+Details: This panel investigates how central bank interest rate policies influence investment strategies, including the cost of borrowing, investment returns, and market expectations. It will provide insights into how investors react to interest rate changes.
+List of Relevant APIs:
+   - BrowserTools
+
+5. Panel 5: Impact of Central Bank Interest Rate Policies on Currency Values
+Details: This panel explores the effects of central bank interest rate policies on currency values, analyzing how interest rate changes can lead to currency appreciation or depreciation. It will include case studies and economic models.
+List of Relevant APIs:
+   - BrowserTools
+
+6. Panel 6: Impact of Central Bank Interest Rate Policies on Economic Growth
+Details: This panel examines how central bank interest rate policies affect economic growth, focusing on the transmission mechanisms through which interest rates influence economic activity. It will consider both expansionary and contractionary policies.
+List of Relevant APIs:
+   - BrowserTools
+
+7. Panel 7: Combined Effects of Inflation and Interest Rates on Investment Strategies
+Details: This panel analyzes the combined effects of inflation rates and interest rate policies on investment strategies, considering how these factors interact to shape investor behavior. It depends on insights from Panels 1 and 4.
+List of Relevant APIs:
+   - BrowserTools
+
+8. Panel 8: Combined Effects of Inflation and Interest Rates on Currency Values
+Details: This panel investigates the combined impact of inflation rates and interest rate policies on currency values, exploring how these economic variables interact to influence exchange rates. It depends on insights from Panels 2 and 5.
+List of Relevant APIs:
+   - BrowserTools
+
+9. Panel 9: Combined Effects of Inflation and Interest Rates on Economic Growth
+Details: This panel assesses the combined effects of inflation rates and interest rate policies on economic growth, analyzing how these factors jointly influence economic performance. It depends on insights from Panels 3 and 6.
+List of Relevant APIs:
+   - BrowserTools
+
+10. Panel 10: Case Studies of Countries with Recent Inflation and Interest Rate Changes
+Details: This panel presents case studies of countries that have recently experienced significant changes in inflation rates and interest rate policies. It will analyze the outcomes on investment strategies, currency values, and economic growth.
+List of Relevant APIs:
+   - BrowserTools
+
+Description of APIs:
+
+[Will be given to you]
+
+Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+Panel 1: Impact of Inflation Rates on Investment Strategies
+
+- Understanding Panel Details:
+  - This panel explores how changes in inflation rates influence investment strategies.
+  - No dependencies on previous panels.
+
+- API Selection:
+  - Use BrowserTools to gather information on the topic.
+
+- Input Parameters:
+  - query (string): Required by BrowserTools.
+
+- Source of Inputs:
+  - query is LLM_Generated based on the panel's objective.
+
+- Variable Naming:
+  - Input Variable: inflation_investment_query
+  - Output Variable: inflation_investment_impact
+
+- Validation:
+  - Variable names are unique.
+  - No dependencies to manage. We ensured that this panel does not have more than 2-3 dependencies.
+
+
+Panel 2: Impact of Inflation Rates on Currency Values
+
+- Understanding Panel Details:
+  - Examines how changes in inflation rates affect currency values.
+  - No dependencies on previous panels.
+
+- API Selection:
+  - Use BrowserTools for information retrieval.
+
+- Input Parameters:
+  - query (string): Required by BrowserTools.
+
+- Variable Naming:
+  - Input Variable: inflation_currency_query
+  - Output Variable: inflation_currency_impact
+
+- Validation:
+  - Variable names are unique.
+  - No dependencies to manage. We ensured that this panel does not have more than 2-3 dependencies.
+
+
+
+Panel 3: Impact of Inflation Rates on Economic Growth
+
+- Understanding Panel Details:
+  - Assesses how inflation rates affect economic growth.
+  - No dependencies on previous panels.
+
+- API Selection:
+  - Use BrowserTools to gather insights.
+
+- Input Parameters:
+  - query (string): Required by BrowserTools.
+
+- Variable Naming:
+  - Input Variable: inflation_growth_query
+  - Output Variable: inflation_growth_impact
+
+- Validation:
+  - Variable names are unique.
+  - No dependencies to manage. We ensured that this panel does not have more than 2-3 dependencies.
+
+
+
+Panel 4: Impact of Interest Rate Policies on Investment Strategies
+
+- Understanding Panel Details:
+  - Investigates how central bank interest rate policies influence investment strategies.
+  - No dependencies on previous panels.
+
+- API Selection:
+  - Use BrowserTools.
+
+- Input Parameters:
+  - query (string): Required by BrowserTools.
+
+- Variable Naming:
+  - Input Variable: interest_investment_query
+  - Output Variable: interest_investment_impact
+
+- Validation:
+  - Variable names are unique.
+  - No dependencies to manage. We ensured that this panel does not have more than 2-3 dependencies.
+
+
+
+Panel 5: Impact of Interest Rate Policies on Currency Values
+
+- Understanding Panel Details:
+  - Explores the effects of interest rate policies on currency values.
+  - No dependencies on previous panels.
+
+- API Selection:
+  - Use BrowserTools.
+
+- Input Parameters:
+  - query (string): Required by BrowserTools.
+
+- Variable Naming:
+  - Input Variable: interest_currency_query
+  - Output Variable: interest_currency_impact
+
+- Validation:
+  - Variable names are unique.
+  - No dependencies to manage. We ensured that this panel does not have more than 2-3 dependencies.
+
+
+
+Panel 6: Impact of Interest Rate Policies on Economic Growth
+
+- Understanding Panel Details:
+  - Examines how interest rate policies affect economic growth.
+  - No dependencies on previous panels.
+
+- API Selection:
+  - Use BrowserTools.
+
+- Input Parameters:
+  - query (string): Required by BrowserTools.
+
+- Variable Naming:
+  - Input Variable: interest_growth_query
+  - Output Variable: interest_growth_impact
+
+- Validation:
+  - Variable names are unique.
+  - No dependencies to manage. We ensured that this panel does not have more than 2-3 dependencies.
+
+
+
+Panel 7: Combined Effects on Investment Strategies
+
+- Understanding Panel Details:
+  - Analyzes the combined effects of inflation rates and interest rate policies on investment strategies.
+  - Depends on outputs from Panels 1 and 4.
+  - Maintained max dependency on 2 previous panel steps.
+
+- API Selection:
+  - Use BrowserTools.
+
+- Input Parameters:
+  - inflation_investment_impact (string): Output from Panel 1.
+  - interest_investment_impact (string): Output from Panel 4.
+  - combined_investment_query (string): LLM_Generated.
+
+- Variable Naming:
+  - Input Variables:
+    - inflation_investment_impact (from Panel 1, Step 1)
+    - interest_investment_impact (from Panel 4, Step 1)
+    - combined_investment_query
+  - Output Variable: combined_investment_impact
+
+- Validation:
+  - Input variables match the output variable names they depend on.
+  - Each input variable depends on only one previous panel's output.
+  - Dependencies are within the allowed limit.
+
+- Validation:
+  - Variable names are unique.
+  - We ensured that this panel does not have more than 2-3 dependencies.
+
+
+
+Panel 8: Combined Effects on Currency Values
+
+- Understanding Panel Details:
+  - Investigates the combined impact on currency values.
+  - Depends on outputs from Panels 2 and 5.
+  - Maintained max dependency on 2 previous panel steps.
+
+- API Selection:
+  - Use BrowserTools.
+
+- Input Parameters:
+  - inflation_currency_impact (string): Output from Panel 2.
+  - interest_currency_impact (string): Output from Panel 5.
+  - combined_currency_query (string): LLM_Generated.
+
+- Variable Naming:
+  - Input Variables:
+    - inflation_currency_impact (from Panel 2, Step 1)
+    - interest_currency_impact (from Panel 5, Step 1)
+    - combined_currency_query
+  - Output Variable: combined_currency_impact
+
+- Validation:
+  - Input variables match the output variable names they depend on.
+  - We ensured that this panel does not have more than 2-3 dependencies.
+
+
+
+Panel 9: Combined Effects on Economic Growth
+
+- Understanding Panel Details:
+  - Assesses the combined effects on economic growth.
+  - Depends on outputs from Panels 3 and 6.
+  - Maintained max dependency on 2 previous panel steps.
+
+- API Selection:
+  - Use BrowserTools.
+
+- Input Parameters:
+  - inflation_growth_impact (string): Output from Panel 3.
+  - interest_growth_impact (string): Output from Panel 6.
+  - combined_growth_query (string): LLM_Generated.
+
+- Variable Naming:
+  - Input Variables:
+    - inflation_growth_impact (from Panel 3, Step 1)
+    - interest_growth_impact (from Panel 6, Step 1)
+    - combined_growth_query
+  - Output Variable: combined_growth_impact
+
+- Validation:
+  - Input variables match the output variable names they depend on.
+  - We ensured that this panel does not have more than 2-3 dependencies.
+
+
+
+Panel 10: Case Studies of Countries with Recent Inflation and Interest Rate Changes
+
+- Understanding Panel Details:
+  - Presents case studies analyzing the outcomes on investment strategies, currency values, and economic growth.
+  - Depends on outputs from Panels 7, 8, and 9.
+  - Since this exceeds the dependency limit of 2, we'll create steps within the panel to manage dependencies.
+
+- Dependency Limitation Handling:
+  - Step 1: Summarize combined impacts from Panels 7 and 8.
+    - Maintained max dependency on 2 previous panel steps.
+  - Step 2: Use the summary from Step 1 and combined_growth_impact from Panel 9 to find case studies.
+    - Maintained max dependency on 2 previous panel steps.
+
+- Validation:
+  - Input variables match the output variable names they depend on. And the variable names are unique.
+  - We ensured that this panel does not have more than 2-3 dependencies.
+
+Grouping Panels and Interdependencies
+
+- Since there are more than 6 panels then we will put everything in the same group for simplicity. There should strictly be only 1 group in such situations.
+- Ensured that each panel step depends on at most 2 previous panel steps.
+- Mentioned in the Chain of Thought that we maintained the maximum dependency limit.
+
+
+
+Workflow Efficiency
+
+- Kept the workflow minimal by:
+  - Using only necessary APIs (BrowserTools).
+  - Managing dependencies within the specified limits.
+  - Creating steps within panels to handle multiple dependencies.
+- Variable names are unique and consistent.
+- Input variables dependent on previous outputs have matching names.
+
+
+
+$$WORKFLOW$$
+
+Group 1:
+
+Workflow for Panel 1:
+
+Panel Description: Explore how changes in inflation rates influence investment strategies.
+
+Workflow Steps:
+
+Step 1
+
+- API: BrowserTools
+- Handles: Examines the impact of inflation on investment strategies.
+- Input Variables:
+  - Name: inflation_investment_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query to explore the impact.
+    - Value: "How do changes in inflation rates influence investment strategies, including asset allocation and risk management?"
+- Output Variables:
+  - Name: inflation_investment_impact
+    - Description: Insights on how inflation affects investment strategies.
+
+
+
+Workflow for Panel 2:
+
+Panel Description: Examine how changes in inflation rates affect currency values.
+
+Workflow Steps:
+
+Step 1
+
+- API: BrowserTools
+- Handles: Explores the impact of inflation on currency values.
+- Input Variables:
+  - Name: inflation_currency_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query to examine the impact.
+    - Value: "How do changes in inflation rates influence currency values, leading to depreciation or appreciation?"
+- Output Variables:
+  - Name: inflation_currency_impact
+    - Description: Insights on how inflation affects currency values.
+
+
+
+Workflow for Panel 3:
+
+Panel Description: Assess how inflation rates affect economic growth.
+
+Workflow Steps:
+
+Step 1
+
+- API: BrowserTools
+- Handles: Studies the impact of inflation on economic growth.
+- Input Variables:
+  - Name: inflation_growth_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query to investigate the impact.
+    - Value: "How do inflation rates affect economic growth, considering consumer spending and business investment?"
+- Output Variables:
+  - Name: inflation_growth_impact
+    - Description: Insights on how inflation affects economic growth.
+
+
+
+Workflow for Panel 4:
+
+Panel Description: Investigate how central bank interest rate policies influence investment strategies.
+
+Workflow Steps:
+
+Step 1
+
+- API: BrowserTools
+- Handles: Examines the influence of interest rate policies.
+- Input Variables:
+  - Name: interest_investment_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query to analyze the impact.
+    - Value: "How do central bank interest rate policies affect investment strategies, including borrowing costs and returns?"
+- Output Variables:
+  - Name: interest_investment_impact
+    - Description: Insights on how interest rates affect investment strategies.
+
+
+
+Workflow for Panel 5:
+
+Panel Description: Explore the effects of central bank interest rate policies on currency values.
+
+Workflow Steps:
+
+Step 1
+
+- API: BrowserTools
+- Handles: Examines the impact on currency values.
+- Input Variables:
+  - Name: interest_currency_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query to explore the impact.
+    - Value: "How do central bank interest rate policies affect currency values, and what mechanisms are involved?"
+- Output Variables:
+  - Name: interest_currency_impact
+    - Description: Insights on how interest rates affect currency values.
+
+
+
+Workflow for Panel 6:
+
+Panel Description: Examine how central bank interest rate policies affect economic growth.
+
+Workflow Steps:
+
+Step 1
+
+- API: BrowserTools
+- Handles: Investigates the impact on economic growth.
+- Input Variables:
+  - Name: interest_growth_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query to examine the effect.
+    - Value: "How do central bank interest rate policies influence economic growth, considering factors like borrowing costs and investment?"
+- Output Variables:
+  - Name: interest_growth_impact
+    - Description: Insights on how interest rates affect economic growth.
+
+
+
+Workflow for Panel 7:
+
+Panel Description: Analyze the combined effects of inflation rates and interest rate policies on investment strategies.
+
+Workflow Steps:
+
+Step 1
+
+- API: BrowserTools
+- Handles: Analyzes combined effects.
+- Input Variables:
+  - Name: inflation_investment_impact
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: Key insights from Panel 1.
+    - Value: None
+  - Name: interest_investment_impact
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 4, Step 1)
+    - Description: Key insights from Panel 4.
+    - Value: None
+  - Name: combined_investment_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query for combined analysis.
+    - Value: "How do the combined effects of inflation rates and interest rate policies influence investment strategies?"
+- Output Variables:
+  - Name: combined_investment_impact
+    - Description: Analysis of combined impacts on investment strategies.
+
+
+
+Workflow for Panel 8:
+
+Panel Description: Investigate the combined impact on currency values.
+
+Workflow Steps:
+
+Step 1
+
+- API: BrowserTools
+- Handles: Analyzes combined effects.
+- Input Variables:
+  - Name: inflation_currency_impact
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: Key insights from Panel 2.
+    - Value: None
+  - Name: interest_currency_impact
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 5, Step 1)
+    - Description: Key insights from Panel 5.
+    - Value: None
+  - Name: combined_currency_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query for combined analysis.
+    - Value: "How do the combined effects of inflation rates and interest rate policies influence currency values?"
+- Output Variables:
+  - Name: combined_currency_impact
+    - Description: Analysis of combined impacts on currency values.
+
+Workflow for Panel 9:
+
+Panel Description: Assess the combined effects on economic growth.
+
+Workflow Steps:
+
+Step 1
+
+- API: BrowserTools
+- Handles: Analyzes combined effects.
+- Input Variables:
+  - Name: inflation_growth_impact
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 3, Step 1)
+    - Description: Key insights from Panel 3.
+    - Value: None
+  - Name: interest_growth_impact
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 6, Step 1)
+    - Description: Key insights from Panel 6.
+    - Value: None
+  - Name: combined_growth_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query for combined analysis.
+    - Value: "How do the combined effects of inflation rates and interest rate policies influence economic growth?"
+- Output Variables:
+  - Name: combined_growth_impact
+    - Description: Analysis of combined impacts on economic growth.
+
+Workflow for Panel 10:
+
+Panel Description: Present case studies of countries with recent inflation and interest rate changes.
+
+Workflow Steps:
+
+Step 1
+
+- API: BrowserTools
+- Handles: Summarizes combined impacts from Panels 7 and 8.
+- Input Variables:
+  - Name: combined_investment_impact
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 7, Step 1)
+    - Description: Combined impact on investment strategies.
+    - Value: None
+  - Name: combined_currency_impact
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 8, Step 1)
+    - Description: Combined impact on currency values.
+    - Value: None
+  - Name: summary_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query to summarize combined impacts.
+    - Value: "Summarize the combined effects on investment strategies and currency values."
+- Output Variables:
+  - Name: combined_impacts_summary
+    - Description: Summary of combined impacts.
+
+Step 2
+
+- API: BrowserTools
+- Handles: Finds case studies using the summary and combined growth impact.
+- Input Variables:
+  - Name: combined_impacts_summary
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 10, Step 1)
+    - Description: Summary from Step 1.
+    - Value: None
+  - Name: combined_growth_impact
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 9, Step 1)
+    - Description: Combined impact on economic growth.
+    - Value: None
+  - Name: case_studies_query
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query to find case studies.
+    - Value: "Provide case studies of countries with recent significant changes in inflation rates and interest rate policies, analyzing the outcomes on investment strategies, currency values, and economic growth."
+- Output Variables:
+  - Name: inflation_interest_case_studies
+    - Description: Case studies of significant economic changes.
+
+#### Example 6:
+
+Query: "Which country had the most amount tourist attractions in 2024 in the world? Provide the weather forecast for its capital on October 10, 2024, and recommend the best attractions to visit based on that weather."
+
+Interpreter's Panel Requests:
+1. Panel 1: Top Tourist Attractions in 2024
+Details: Identify the country with the most tourist attractions in 2024 and provide a list of these attractions. This will help the user understand which country was most popular for tourism in that year.
+List of Relevant APIs:
+   - BrowserTools
+
+2. Panel 2: Weather Forecast for Capital City
+Details: Provide the weather forecast for the capital city of the country identified in the previous panel on October 10, 2024. This will help the user plan their visit based on the weather conditions.
+List of Relevant APIs:
+   - WeatherAPI.com_Forecast_Weather_API
+   - BrowserTools
+
+3. Panel 3: Recommended Attractions Based on Weather
+Details: Recommend the best tourist attractions to visit in the capital city based on the weather forecast for October 10, 2024. This will provide the user with tailored suggestions that align with the expected weather conditions.
+List of Relevant APIs:
+   - TripadvisorSearchLocation
+   - BrowserTools
+
+Description of APIs:
+
+[Will be given to you]
+
+Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+Panel 1: Top Tourist Attractions in 2024
+
+- Understanding Panel Details:
+  - The goal is to identify the country with the most tourist attractions in 2024 and provide a list of these attractions.
+  
+- API Selection:
+  - BrowserTools: Suitable for retrieving up-to-date information on global tourism statistics and listing attractions within a country.
+  
+- Input Parameters:
+  - BrowserTools requires the parameter:
+    - query (string): The search query or question.
+
+- Source of Inputs:
+  - Step 1:
+    - query_tourist_country: LLM_Generated, value: "Which country had the most tourist attractions in 2024?"
+  - Step 2:
+    - top_tourist_country: API_Output (Panel 1, Step 1), output from BrowserTools.
+    - query_attractions_list: LLM_Generated, value: "List of tourist attractions in [top_tourist_country] in 2024."
+
+- Workflow Flow:
+  - Step 1: Use BrowserTools to identify the country with the most tourist attractions in 2024.
+  - Step 2: Use BrowserTools to obtain a list of tourist attractions in the identified country.
+
+- Interdependencies:
+  - Step 2 depends on Step 1 for the top_tourist_country.
+  - Input variable top_tourist_country in Step 2 must match the output variable name from Step 1.
+
+- Variable Naming:
+  - Step 1:
+    - Input Variable:
+      - Name: query_tourist_country
+    - Output Variable:
+      - Name: top_tourist_country
+  - Step 2:
+    - Input Variables:
+      - Name: top_tourist_country (matches output from Step 1)
+      - Name: query_attractions_list
+    - Output Variable:
+      - Name: attractions_list
+
+- Validation:
+  - BrowserTools can handle both identifying the country and listing its attractions.
+  - Variable names are unique and consistent across steps.
+  - Ensured that each API depends on at most one previous API's output.
+
+Panel 2: Weather Forecast for Capital City
+
+- Understanding Panel Details:
+    - Provide the weather forecast for the capital city of the country identified in Panel 1 on October 10, 2024.
+
+- API Selection:
+    - BrowserTools:
+        - To find the capital city of the identified country.
+        - To find the latitude and longitude of the capital city.
+    - WeatherAPI.com_Forecast_Weather_API:
+        - To fetch the weather forecast for the capital city on the specified date.
+        - Using coordinates (latitude and longitude) can provide more accurate results.
+
+- Input Parameters:
+    - BrowserTools (Step 1):
+        - query (string): Query to find the capital city.
+    - BrowserTools (Step 2):
+        - query (string): Query to find the latitude and longitude of the capital city.
+    - WeatherAPI.com_Forecast_Weather_API:
+        - q (string): Location query parameter in the format "lat,lon".
+        - dt (date): Forecast date in YYYY-MM-DD format.
+
+- Source of Inputs:
+    - Step 1:
+        - top_tourist_country: API_Output (Panel 1, Step 1)
+        - query_capital_city: LLM_Generated, value: "What is the capital city of [top_tourist_country]?"
+    - Step 2:
+        - capital_city: API_Output (Panel 2, Step 1)
+        - query_capital_coordinates: LLM_Generated, value: "What are the latitude and longitude of [capital_city]?"
+    - Step 3:
+        - capital_city_coordinates: API_Output (Panel 2, Step 2)
+        - forecast_date: LLM_Generated, value: "2024-10-10"
+
+- Workflow Flow:
+    - Step 1: Use BrowserTools to find the capital city of the country identified in Panel 1.
+    - Step 2: Use BrowserTools to find the latitude and longitude of the capital city.
+    - Step 3: Use WeatherAPI.com_Forecast_Weather_API with the coordinates and date to get the weather forecast.
+
+- Interdependencies:
+    - Step 1 depends on Panel 1, Step 1 for top_tourist_country.
+    - Step 2 depends on Step 1 for capital_city.
+    - Step 3 depends on Step 2 for capital_city_coordinates.
+    - Input variables that depend on previous outputs have matching names to ensure consistency.
+
+- Variable Naming:
+    - Step 1:
+        - Input Variable:
+            - Name: query_capital_city
+        - Output Variable:
+            - Name: capital_city
+    - Step 2:
+        - Input Variable:
+            - Name: query_capital_coordinates
+        - Output Variable:
+            - Name: capital_city_coordinates
+    - Step 3:
+        - Input Variables:
+            - Name: capital_city_coordinates (from Step 2)
+            - Name: forecast_date
+        - Output Variable:
+            - Name: weather_forecast
+
+- Validation:
+    - Variable names are unique and consistent.
+    - Each API depends on at most one previous API's output per input variable.
+    - The dependency chain is logical and follows the sequence of steps.
+
+Panel 3: Recommended Attractions Based on Weather
+
+- Understanding Panel Details:
+    - Recommend the best tourist attractions to visit in the capital city based on the weather forecast for October 10, 2024.
+
+- API Selection:
+    - BrowserTools:
+        - To recommend attractions in the capital city considering the weather conditions.
+    - TripadvisorSearchLocation:
+        - Considered but not used for this panel because it only provides GeoID retrieval and does not offer attraction lists for cities.
+        - Important Note: TripadvisorSearchLocation is only used for GeoID retrieval and does not provide attraction lists for cities; therefore, we do not use it for Panel 3.
+
+- Input Parameters:
+    - BrowserTools:
+        - query (string): Query to get recommended attractions based on the weather.
+
+- Source of Inputs:
+    - Step 1:
+        - capital_city: API_Output (Panel 2, Step 1)
+        - weather_forecast: API_Output (Panel 2, Step 3)
+        - query_recommendations: LLM_Generated, value: "Based on the weather forecast of [weather_forecast] on 2024-10-10, recommend the best attractions to visit in [capital_city]."
+
+- Workflow Flow:
+    - Step 1: Use BrowserTools to get tailored attraction recommendations in the capital city based on the weather forecast.
+
+- Interdependencies:
+    - Step 1 depends on:
+        - capital_city from Panel 2, Step 1
+        - weather_forecast from Panel 2, Step 3
+    - Input variables capital_city and weather_forecast match the output variable names from previous steps.
+
+- Variable Naming:
+    - Step 1:
+        - Input Variables:
+            - Name: capital_city (from Panel 2, Step 1)
+            - Name: weather_forecast (from Panel 2, Step 3)
+            - Name: query_recommendations
+        - Output Variable:
+            - Name: recommended_attractions
+
+- Validation:
+    - Variable names are unique and consistent.
+    - Dependencies are correctly mapped to outputs from previous steps.
+    - Avoided using TripadvisorSearchLocation since it does not provide attraction lists, ensuring workflow efficiency.
+
+Grouping Panels and Interdependencies
+
+- All panels are interdependent and are placed in Group 1.
+    - Panel 1 provides top_tourist_country for Panel 2.
+    - Panel 2 provides capital_city and weather_forecast for Panel 3.
+
+Dependency Limitation
+
+- Ensured that each API depends on at most one previous API's output per input variable.
+- Input variables dependent on previous outputs have matching names to maintain consistency.
+
+Workflow Efficiency
+
+- Included the coordinate-finding step in Panel 2 to enhance accuracy in weather forecasting.
+- Used BrowserTools efficiently to handle multiple information retrieval tasks.
+- Avoided unnecessary APIs, keeping the workflow minimal and straightforward.
+
+$$WORKFLOW$$
+
+Group 1:
+
+Workflow for Panel 1:
+
+Panel Description: Identify the country with the most tourist attractions in 2024.
+
+Workflow Steps:
+
+Step 1
+- API: BrowserTools
+- Handles: Identifies the country with the most tourist attractions in 2024.
+- Input Variables:
+  - Name: query_tourist_country
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Query to find the country with the most tourist attractions in 2024.
+    - Value: "Which country had the most tourist attractions in 2024?"
+- Output Variables:
+  - Name: top_tourist_country
+    - Description: Country with the most tourist attractions in 2024.
+
+Workflow for Panel 2:
+
+Panel Description: Provide the weather forecast for the capital city on October 10, 2024.
+
+Workflow Steps:
+
+Step 1
+- API: BrowserTools
+- Handles: Finds the capital city of the identified country.
+- Input Variables:
+  - Name: top_tourist_country
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: Country name to find its capital city.
+    - Value: None
+- Output Variables:
+  - Name: capital_city
+    - Description: Capital city of the identified country.
+
+Step 2
+- API: BrowserTools
+- Handles: Finds the latitude, longitude of capital city of the identified country.
+- Input Variables:
+  - Name: capital_city
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: Capital city name of whom we have to get latitude, longitude.
+    - Value: None
+- Output Variables:
+  - Name: capital_city_coordinates
+    - Description: Coordinates (latitude, longitude) of the capital city of the identified country.
+
+Step 3
+- API: WeatherAPI.com_Forecast_Weather_API
+- Handles: Fetches the weather forecast for the capital city on October 10, 2024.
+- Input Variables:
+  - Name: capital_city_coordinates
+    - Parameter: q
+    - Type: string
+    - Source: API_Output (Panel 2, Step 2)
+    - Description: Capital city latitude, longitude for weather forecast.
+    - Value: None
+  - Name: forecast_date
+    - Parameter: dt
+    - Type: date
+    - Source: LLM_Generated
+    - Description: Date for the weather forecast.
+    - Value: "2024-10-10"
+- Output Variables:
+  - Name: weather_forecast
+    - Description: Weather forecast for the capital city on October 10, 2024.
+
+Workflow for Panel 3:
+
+Panel Description: Recommend the best tourist attractions to visit in the capital city based on the weather forecast.
+
+Workflow Steps:
+
+Step 1
+- API: BrowserTools
+- Handles: Recommends attractions based on the weather forecast.
+- Input Variables:
+  - Name: capital_city
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: Capital city of the identified country.
+    - Value: None
+  - Name: weather_forecast
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 2, Step 3)
+    - Description: Weather forecast to tailor recommendations.
+    - Value: None
+- Output Variables:
+  - Name: recommended_attractions
+    - Description: Recommended attractions based on the weather forecast.

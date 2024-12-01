@@ -1,0 +1,230 @@
+Please write one section of the report at a time, based on the provided panel step output.
+
+Each panel step output can be considered as a potential section for the report. However, to avoid repetition or irrelevance, you may choose to skip the panel if its content is already covered, repetitive, or not applicable. If the panel output is irrelevant or empty, you can output an empty `$$REPORT_SECTION$$`. Moreover we will be mainitaining references for each section of the report separately at the end of the report.
+
+In each iteration, you should:
+
+1. Review the user query, the section details, the report written so far, and the provided panel step.
+
+2. Add a Chain of Thought section where you think about whether to use the current panel step for the current section, and how to write the report. In this chain of thought, consider how to avoid repetition and ensure the report flows logically.
+
+    - Important Note: For introduction writing, always use the Section Details provided to get an idea of the structure of the report, as the structure mentioned in the first panel output might be incorrect. Please always remember this!
+
+    - Format for Chain of Thought:
+      $$CHAIN_OF_THOUGHT$$
+
+      - Selected Panel for Current Section: Panel {{panel_idx}}
+
+      - Reasoning:
+        - [Briefly explain why you selected or skipped this panel and how it fits into the report.]
+      
+    - Example:
+      $$CHAIN_OF_THOUGHT$$
+
+      - Selected Panel for Current Section: Panel 1
+
+      - Reasoning:
+        - I will use Panel 1 to create the Introduction section. It provides essential background information, and using the Section Details, I can structure the introduction appropriately. The structure in the panel output might be incorrect, so I will follow the Section Details for accuracy.
+      
+
+3. Write the new section based on the selected panel step, ensuring that you include all relevant content without shortening it. Be as verbose as necessary to explain things better, but avoid repeating content already included in the report. We will also maintain a references section at the end of the report for each section separately i.e., only provide references for the current section and not the previous sections, if no references are present then we will still maintain an empty references section with just the section name <h3>Section {{X}}:</h3> under $$REFERENCES$$. If any of the subsections is related to visual data then do not create that new subsection and rather club it with the previous section subtly. Always include the visual data and the images in the report and do not skip over them.
+
+    - Format for Report Section:
+      $$REPORT_SECTION$$
+
+      <!-- Include the <style> block only once at the beginning of the report -->
+
+      <h2>Section {{X}}: [Section Title]</h2>
+      <p>[Include detailed content from the selected panel step, presented in long, explanatory paragraphs that fully develop the ideas and provide in-depth insights.]</p>
+
+      <h3>Subsection {{X.Y}}: [Subsection Title]</h3>
+      <p>[Add additional detailed content, ensuring concepts are fully explained and analyzed in depth. Each subsection should expand on the main ideas with comprehensive discussions.]</p>
+
+      <h2>Section {{X+1}}: [Section Title]</h2>
+      <p>[Include detailed content from the selected panel step, presented in long, explanatory paragraphs that fully develop the ideas and provide in-depth insights.]</p>
+
+      <h3>Subsection {{X+1.Y}}: [Subsection Title]</h3>
+      <p>[Add additional detailed content, ensuring concepts are fully explained and analyzed in depth. Each subsection should expand on the main ideas with comprehensive discussions.]</p>
+
+      $$REFERENCES$$
+      <h3>Section {{X}}:</h3>
+      <p>[Add references for this section if present, if not present then keep it empty. Only provide references for the current section and not the previous sections]</p>
+
+    - Note:
+      - At a time, only a single section of the report should be written.
+      - Ensure the section fits logically within the existing report structure. If there is a $$REPORT_SECTION$$ section, then there should be a $$REFERENCES$$ section always. Only provide references for the current section and not the previous sections.
+      - Remember to include the `<style>` block only once at the beginning of the report.
+      - There should only be one references section which will have references for all the sections of the report. The references should in proper points, and if there are links then they should be blue in color and be hyperlinks.
+      - If any of the subsections is related to visual data then do not create that new subsection and rather club it with the previous section subtly. Always include the visual data and the images in the report and do not skip over them.
+
+4. Conclusion Section:
+    - In the end, when the panel output is just "Conclusion", you need to write the conclusion section. Use the report written so far to craft a comprehensive conclusion that summarizes the key points.
+    - Emphasize that the conclusion should be based on the content of the report written so far.
+    - Remember that in the panel output you will only recieve the word "Conclusion", which should trigger conclusion writing section for you.
+
+5. References Section:
+    - Maintain a $$REFERENCES$$ section at the end of the report for each section separately i.e., only provide references for the current section and not the previous sections, if no references are present then we will still maintain an empty references section with just the section name <h3>Section {{X}}:</h3> under $$REFERENCES$$.
+
+6. Termination Condition:
+    - When all the report sections have been written, and after writing the conclusion, in the final iteration, instead of `$$REPORT_SECTION$$`, output `$$TERMINATE$$`. However, still include the `$$CHAIN_OF_THOUGHT$$` with your reasoning.
+    - Do not terminate the report writing when the current panel output is "Conclusion", you should write the conclusion for the report then instead.
+    - Example:      
+      $$CHAIN_OF_THOUGHT$$
+
+      - Selected Panel for Current Section: [No panels left to process.]
+
+      - Reasoning:
+        - All panels have been processed, and the report is complete.
+
+      $$TERMINATE$$
+      
+
+7. Do Not Confuse Panel Outputs with Report:
+    - Do not confuse the panel step outputs to be the report and terminate without writing anything. Please carefully check what is the report written so far and based on that make the decision.
+
+Additional Guidelines:
+
+- Sequential Panel Processing:
+  - You will be provided with one panel at a time.
+  - Based on the report written so far, you have to write the corresponding section from the given panel.
+  - If the panel output is irrelevant or repetitive, you may skip it by outputting an empty `$$REPORT_SECTION$$`.
+  - Please maintain a references section at the end of the report for each section separately i.e., only provide references for the current section and not the previous sections, if no references are present then we will still maintain an empty references section with just the section name <h3>Section {{X}}:</h3> under $$REFERENCES$$.
+  - If any of the subsections is related to visual data then do not create that new subsection and rather club it with the previous section subtly. Always include the visual data and the images in the report and do not skip over them.
+
+- Introduction and Conclusion Sections:
+  - There should be a comprehensive Introduction section talking about the purpose of the report, the content, and the structure of the current report.
+    - Use the Section Details provided to get an idea of the structure of the report, rather than relying on the structure mentioned in the first panel output as that can be wrong.
+
+  - Similarly, an exhaustive Conclusion section should be there at the end of the report.
+    - When the panel output is "Conclusion", you should write a nice conclusion based on the report written so far.
+
+In each iteration, you will be provided with:
+- The user query for report generation:
+{{user_query}}
+
+- Section Details:
+{{section_details}}
+- Panel Step {{panel_idx+1}} Output:
+{{panel_steps}}
+
+- Here is the report written so far:
+{{report_so_far}}
+
+Your task is to produce:
+
+1. Chain of Thought:
+  - Think about whether to use the current panel step for the current section.
+  - Decide how to structure the section and integrate the content from the panel step.
+  - Consider how to avoid repetition with the report written so far.
+  - Use the specified format for the Chain of Thought.
+  - If it is the introduction section then think about purpose of the report, methodology and structure of the report. And if it is Conclusion section then focus on summarizing the key findings and understanding on the report topic.
+  - Check if refrences are given, if yes then please add them in the references section for the current section at the last. If no references are provided then we will still keep an empty references section. Only provide references for the current section and not the previous sections.
+  - If any of the subsections is related to visual data then do not create that new subsection and rather club it with the previous section subtly. Always include the visual data and the images in the report and do not skip over them.
+
+2. Formatted Report Text:
+  - Write the new section of the report, incorporating the content from the selected panel step.
+  - Ensure the section fits logically within the existing report.
+  - Use the specified format for the Report Section.
+  - Keep the references in the last of the report always.
+
+---
+
+### Example:
+
+Assuming we are at the beginning of the report.
+
+User Query:
+
+Analyze how the increased use of renewable energy sources like solar and wind power has affected carbon emission levels worldwide over the past decade.
+
+Section Details:
+
+	1.	Introduction to Renewable Energy and Carbon Emissions
+	2.	Historical Context of Energy Use
+	3.	Growth Trends in Renewable Energy (2014-2023)
+	4.	Solar Power Developments
+	5.	Wind Power Developments
+	6.	Impact on Carbon Emission Levels
+…
+[Other sections]
+
+Panel Step 1 Output:
+
+Panel 1: Introduction to Renewable Energy and Carbon Emissions
+	-	Background
+	-	Importance of Renewable Energy
+	-	Overview of Carbon Emissions
+
+Report Written So Far:
+
+<h2>References</h2> [when only references are there it means the report is empty, since we are starting.]
+
+Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+	-	Selected Panel for Current Section: Panel 1
+	-	Reasoning:
+	-	I will use Panel 1 to create the Introduction section. It provides essential background information on renewable energy and carbon emissions. According to the Section Details, this aligns with the first section of the report. I will ensure the introduction sets the context and outlines the structure based on the Section Details.
+  - There are eferences provided,so we will add the references section for section 1. As instructed, we will only be providing the references for the current section and not inlcude any of the references for the previous sections to avoid duplicacy.
+
+$$REPORT_SECTION$$
+
+<style>
+    h1 {{ font-size: 20pt; font-family: Arial, sans-serif; font-weight: bold; }}
+    h2 {{ font-size: 16pt; font-family: Arial, sans-serif; font-weight: bold; }}
+    h3 {{ font-size: 14pt; font-family: Arial, sans-serif; font-weight: bold; }}
+    p {{ font-size: 14pt; font-family: Times New Roman, serif; margin: 10px 0; }}
+    table {{ width: 100%; border-collapse: collapse; }}
+    th, td {{ border: 1px solid black; padding: 6px; text-align: left; font-size: 14pt; font-family: Times New Roman, serif; }}
+</style>
+
+
+<h1>Impact of Renewable Energy on Global Carbon Emissions Over the Past Decade</h1>
+
+
+<h2>Introduction</h2>
+<p>The increasing utilization of renewable energy sources, particularly solar and wind power, has become a pivotal factor in the global effort to reduce carbon emissions and combat climate change. Renewable energy refers to energy derived from natural processes that are replenished at a rate equal to or faster than they are consumed. The importance of renewable energy lies in its potential to provide sustainable power while minimizing environmental impacts associated with conventional fossil fuels.</p>
+
+
+<p>Carbon emissions, primarily in the form of carbon dioxide (CO<sub>2</sub>), are significant contributors to the greenhouse effect, leading to global warming and climate change. The energy sector is one of the largest sources of carbon emissions due to the burning of fossil fuels for electricity generation. This report aims to analyze how the increased use of renewable energy sources like solar and wind power has affected carbon emission levels worldwide over the past decade.</p>
+
+
+<p>The report is structured into several sections. It begins with a historical context of energy use, exploring the pre-2014 energy landscape and the evolution of renewable energy technologies. Subsequent sections delve into growth trends in renewable energy from 2014 to 2023, developments in solar and wind power, and their impact on carbon emission levels. The report also provides a regional analysis of renewable energy adoption, examines policy and regulatory frameworks, and discusses the economic and environmental impacts of renewable energy. Finally, it explores future projections and offers recommendations for renewable energy strategies.</p>
+
+$$REFERENCES$$
+
+<h3>Section 1:</h3>
+<p>The following references were used in Section 1:</p>
+<ul>
+    <li><a href="https://www.example.com/reference1" style="color: blue; text-decoration: underline;">Reference 1</a>: Overview of Renewable Energy Sources.</li>
+    <li><a href="https://www.example.com/reference2" style="color: blue; text-decoration: underline;">Reference 2</a>: Impact of Fossil Fuels on Carbon Emissions.</li>
+    <li><a href="https://www.example.com/reference3" style="color: blue; text-decoration: underline;">Reference 3</a>: Renewable Energy and Climate Change Mitigation.</li>
+</ul>
+
+
+
+
+Note:
+	-	In this example, we used the updated instructions to incorporate the Section Details for accurate structuring.
+	-	The $$CHAIN_OF_THOUGHT$$ reflects the reasoning, emphasizing the use of Section Details over the panel’s own suggested structure.
+	-	The $$REPORT_SECTION$$ includes the formatted introduction, ensuring it aligns with the overall report structure.
+  - The $$REFERENCES$$ includes the formatted references for the current section. We only provided references for the current section and not the previous sections to avoid duplicacy.
+	-	Remember to include the <style> block only once at the beginning of the report.
+	-	Each iteration processes one panel step at a time.
+  - Always add a refrences for each section. References section should be maintained at the end of the report.
+  - If any of the subsections is related to visual data then do not create that new subsection and rather club it with the previous section subtly. Always include the visual data and the images in the report and do not skip over them.
+
+##############################################
+User Query:
+{user_query}
+
+Section Details:
+{section_details}
+
+Panel Step {panel_idx} Output:
+{panel_steps}
+
+Report Written So Far:
+{report_so_far}
+
+Your Output:
