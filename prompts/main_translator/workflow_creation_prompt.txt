@@ -887,97 +887,6 @@ Step 2
 
 #### Example 3:
 
-Query: "What is the news in Netherlands?"
-
-Interpreter's Panel Requests:
-1. Panel 1: Hotel Options in New York City
-List of Relevant APIs:
-   - TripadvisorSearchLocation
-   - TripadvisorSearchHotels
-   - BrowserTools
-
-2. Panel 2: Weather Forecast for New York City
-List of Relevant APIs:
-   - WeatherAPI.com_Forecast_Weather_API
-   - BrowserTools
-
-Description of APIs:
-
-[Will be given to you]
-
-Your Output:
-
-$$CHAIN_OF_THOUGHT$$
-
-Panel 1: News in the Netherlands
-
-- API Selection:
-  - The user's query is "What is the news in Netherlands?"
-  - We can directly use the NewsAPISearchByKeyWord API to fetch news articles related to the Netherlands.
-  - BrowserTools is not necessary here since we can use the country name directly as the search query.
-  - We should avoid using the region parameter in the NewsAPI if we are unsure about the exact region code or if it might limit the results in unintended ways.
-
-- Input Parameters:
-  - NewsAPISearchByKeyWord:
-    - For NewsAPISearchByKeyWord there are no required input parameters. But for our purpose we will give the following parameters.
-      - query (string): The keyword or phrase to search for in news articles.
-      - language (string): The language of the news articles. This is optional but can be set to "en" for English.
-      - region (string): The region or country code. Since we are not sure about the correct region code for the Netherlands in the API, it's best to omit this parameter to ensure we don't miss relevant articles.
-
-- Source of Inputs:
-  - query: LLM_Generated, value "Netherlands", directly extracted from the user's query.
-  - language: LLM_Generated, value "en", assuming the user wants news articles in English.
-  - We will not use the region parameter to avoid potential issues with incorrect or restrictive region codes.
-
-- Workflow Flow:
-  - Step 1: Use NewsAPISearchByKeyWord to fetch recent news articles about the Netherlands using the keyword and language parameters.
-
-- Interdependencies:
-  - As this is a single-step workflow, there are no interdependencies with other steps or panels.
-
-- Variable Naming:
-  - Input Variables:
-    - news_query (for the query parameter)
-    - news_language (for the language parameter)
-  - Output Variables:
-    - news_articles
-
-- Grouping Panels and Interdependencies:
-  - Since there's only one panel, it will be placed in Group 1.
-  - There are no dependencies on other panels.
-
-- Dependency Limitation:
-  - The API call does not depend on any previous API outputs.
-
-- Workflow Efficiency:
-  - The workflow is minimal and straightforward, using only one API call.
-  - By avoiding unnecessary parameters like region, we reduce the risk of errors and ensure we retrieve the most comprehensive set of news articles.
-
-
-$$WORKFLOW$$
-
-- API: NewsAPISearchByKeyWord
-- Handles: Fetches news articles for Netherlands
-- Input Variables:
-  - Name: vacation_spots_list
-    - Parameter: query
-    - Type: string
-    - Source: LLM_Generated
-    - Description: query should be Netherlands
-    - Value: "Netherlands"
-  - Name: language
-    - Parameter: language
-    - Type: string
-    - Source: LLM_Generated
-    - Description: Language for news articles
-    - Value: en
-- Output Variables:
-  - Name: news_articles
-    - Description: News articles for Netherlands
-
-
-#### Example 4:
-
 Query: "Identify upcoming music festivals worldwide over the next three months (currently it is October 2024) and their exact dates, find affordable flights to these destinations from New York, and check recent Reddit threads for attendee experiences or tips."
 
 Interpreter's Panel Requests:
@@ -1325,223 +1234,7 @@ Step 2
   - Name: reddit_posts
     - Description: Top Reddit posts for each festival.
 
-#### Example 5:
-
-Query: "what are some 3 popular sci-fi books also provide their rating on Goodreads ratings, and find news articles about any that have been or will be adapted into movies or TV series."
-
-Interpreter's Panel Requests:
-1. Panel 1: Popular Sci-Fi Books with Goodreads Ratings
-Details: Display a list of popular science fiction books along with their ratings from Goodreads. Include details such as the book title, author, and average rating.
-List of Relevant APIs:
-   - Goodreads_Search_Book_By_Keyword
-   - BrowserTools
-
-2. Panel 2: News Articles on Sci-Fi Book Adaptations
-Details: Find and display news articles about science fiction books that have been or will be adapted into movies or TV series. Include article titles, publication dates, and a brief summary.
-List of Relevant APIs:
-   - NewsAPISearchByKeyWord
-   - BrowserTools
-
-Description of APIs:
-
-[Will be given to you]
-
-Your Output:
-
-$$CHAIN_OF_THOUGHT$$
-
-Panel 1: Popular Sci-Fi Books with Goodreads Ratings
-
-- Understanding Panel Details:
-  - The panel aims to display a list of 3 popular science fiction books along with their ratings from Goodreads.
-  - Details to include: book title, author, average rating.
-
-- API Selection:
-  - BrowserTools: To retrieve a list of 3 popular sci-fi books.
-    - Reasoning: The Goodreads_Search_Book_By_Keyword API requires specific keywords or book titles to search effectively.
-    - We cannot use general terms like "popular sci-fi books" as the keyword parameter in the Goodreads API; it won't yield meaningful results.
-    - Therefore, we first need to obtain specific book titles using BrowserTools.
-  - Goodreads_Search_Book_By_Keyword: To get the Goodreads ratings and details for the specific books obtained from BrowserTools.
-
-- Input Parameters:
-  - BrowserTools:
-    - Requires parameter query (string): A query to find 3 popular sci-fi books.
-  - Goodreads_Search_Book_By_Keyword:
-    - keyword (string): The specific book titles obtained from BrowserTools.
-
-- Source of Inputs:
-  - BrowserTools:
-    - query: LLM_Generated, value: "List 3 popular science fiction books."
-  - Goodreads_Search_Book_By_Keyword:
-    - For Goodreads_Search_Book_By_Keyword we have to consider these required input parameters: {'keyword': {'type': 'String', 'description': 'Search term or keyword to look up books.'}}
-    - keyword: API_Output (Panel 1, Step 1), output sci_fi_books_list from BrowserTools.
-
-- Workflow Flow:
-  - Step 1: Use BrowserTools to obtain a list of 3 popular sci-fi books.
-  - Step 2: Use Goodreads_Search_Book_By_Keyword to retrieve ratings and details for each book obtained in Step 1.
-
-- Interdependencies:
-  - Step 2 depends on Step 1 for the sci_fi_books_list.
-  - The input variable sci_fi_books_list in Step 2 must match the output variable name from Step 1.
-
-- Variable Naming:
-  - Input Variable for Step 1:
-    - Name: query_sci_fi_books (for parameter query)
-  - Output Variable for Step 1:
-    - Name: sci_fi_books_list
-  - Input Variable for Step 2:
-    - Name: sci_fi_books_list (matching the output from Step 1)
-  - Output Variable for Step 2:
-    - Name: goodreads_ratings
-
-- Validation:
-  - The Goodreads_Search_Book_By_Keyword API requires specific book titles or keywords.
-  - Using general terms like "popular sci-fi books" as the keyword may not return accurate results from goodreads api directly.
-  - Therefore, obtaining specific book titles from BrowserTools is necessary for effective use of the Goodreads API.
-
-Panel 2: News Articles on Sci-Fi Book Adaptations
-
-- Understanding Panel Details:
-  - The panel aims to find and display news articles about sci-fi books that have been or will be adapted into movies or TV series.
-  - Include article titles, publication dates, and brief summaries.
-
-- API Selection:
-  - BrowserTools: To identify which sci-fi books from the list have been or will be adapted into movies or TV series.
-  - NewsAPISearchByKeyWord: To find news articles about these adaptations.
-
-- Input Parameters:
-  - BrowserTools:
-    - Requires parameter query (string): A query to find adaptations of books from sci_fi_books_list.
-  - NewsAPISearchByKeyWord:
-    - For NewsAPISearchByKeyWord there are no required input parameters. But for our purpose we will give the following parameters.
-    - query (string): Keywords related to the identified adaptations.
-    - language (string): Set to "en" for English articles.
-
-- Source of Inputs:
-  - BrowserTools:
-    - query: API_Output (Panel 1, Step 1), using sci_fi_books_list to find adaptation information.
-  - NewsAPISearchByKeyWord:
-    - query: API_Output (Panel 2, Step 1), output adaptation_keywords from BrowserTools.
-    - language: LLM_Generated, value: "en"
-
-- Workflow Flow:
-  - Step 1: Use BrowserTools to identify which books have been adapted and generate keywords for searching news articles.
-  - Step 2: Use NewsAPISearchByKeyWord to find news articles about these adaptations.
-
-- Interdependencies:
-  - Step 1 depends on Panel 1, Step 1 for sci_fi_books_list.
-  - Step 2 depends on Step 1 for adaptation_keywords.
-
-- Variable Naming:
-  - Input Variable for Step 1:
-    - Name: sci_fi_books_list (from Panel 1, Step 1)
-  - Output Variable for Step 1:
-    - Name: adaptation_keywords
-  - Input Variables for Step 2:
-    - Name: adaptation_keywords (matching the output from Step 1)
-    - Name: news_language
-  - Output Variable for Step 2:
-    - Name: news_articles
-
-- Validation:
-  - Using specific adaptation keywords improves the relevance of news articles retrieved.
-  - Setting the language parameter to "en" ensures articles are in English.
-
-- Potential Issues in the Workflow:
-  - In Panel 2, Step 1, the Value field for sci_fi_books_list is set to None, which is appropriate since it depends on the output from Panel 1, Step 1.
-  - The variable names are consistent with the dependencies and follow the guidelines.
-
-Grouping Panels and Interdependencies
-
-- Both panels are interdependent:
-  - Panel 2 depends on Panel 1 for sci_fi_books_list.
-- Therefore, both panels should be placed in Group 1.
-
-Dependency Limitation
-
-- Ensured that each API depends on at most one previous API's output.
-- Input variables that depend on previous outputs have matching names to maintain consistency.
-
-Workflow Efficiency
-
-- Kept the workflow minimal by:
-  - Using only necessary APIs.
-  - Avoiding unnecessary API calls.
-  - Ensuring data flows efficiently between steps.
-
-$$WORKFLOW$$
-
-Group 1:
-
-Workflow for Panel 1:
-
-Panel Description: Display a list of 3 popular science fiction books along with their ratings from Goodreads.
-
-Workflow Steps:
-
-Step 1
-- API: BrowserTools
-- Handles: Look for 3 popular science fiction books
-- Input Variables:
-  - Name: query_sci_books
-    - Parameter: query
-    - Type: string
-    - Source: LLM_Generated
-    - Description: List of 3 popular sci-fi books
-    - Value: None
-- Output Variables:
-  - Name: sci_fi_books_list
-    - Description: Keywords related to sci-fi book adaptations.
-
-Step 2
-- API: Goodreads_Search_Book_By_Keyword
-- Handles: Retrieves popular sci-fi books ratings on goodreads.
-- Input Variables:
-  - Name: sci_fi_books_list
-    - Parameter: keyword
-    - Type: string
-    - Source: API_Output (Panel 1, Step 1)
-    - Description: popular sci-fi books to search on goodreads.
-    - Value: None
-- Output Variables:
-  - Name: goodreads_ratings
-    - Description: Ratings and more information about popular sci-fi books retrieved from BrowserTools in step 1.
-
-Workflow for Panel 2:
-
-Panel Description: Find news articles about sci-fi books adapted into movies or TV series.
-
-Workflow Steps:
-
-Step 1
-- API: BrowserTools
-- Handles: Identifies sci-fi books adapted into movies or TV series.
-- Input Variables:
-  - Name: sci_fi_books_list
-    - Parameter: query
-    - Type: string
-    - Source: API_Output (Panel 1, Step 1)
-    - Description: List of sci-fi books to find adaptations.
-    - Value: None
-- Output Variables:
-  - Name: adaptation_keywords
-    - Description: Keywords related to sci-fi book adaptations.
-
-Step 2
-- API: NewsAPISearchByKeyWord
-- Handles: Finds news articles about sci-fi book adaptations.
-- Input Variables:
-  - Name: adaptation_keywords
-    - Parameter: query
-    - Type: string
-    - Source: API_Output (Panel 2, Step 1)
-    - Description: Keywords for searching news articles on adaptations.
-    - Value: None
-- Output Variables:
-  - Name: news_articles
-    - Description: News articles about sci-fi book adaptations.
-
-#### Example 6:
+#### Example 4:
 
 Query: "Which country had the most amount tourist attractions in 2024 in the world? Provide the weather forecast for its capital on October 10, 2024, and recommend the best attractions to visit based on that weather."
 
@@ -1848,3 +1541,464 @@ Step 1
 - Output Variables:
   - Name: recommended_attractions
     - Description: Recommended attractions based on the weather forecast.
+
+#### Example 5:
+
+Query: "Within the G7 member countries, which two capital cities are located farthest from each other based on direct geographical distance? Provide the two country names in alphabetical order."
+
+Interpreter's Panel Requests:
+1. Panel 1: Fetch G7 Countries and Capitals
+Details: Use BrowserTools to list all G7 countries and identify each of their capital cities. This panel starts fresh and references no prior panels.
+List of Relevant APIs:
+   - BrowserTools
+
+2. Panel 2: Compute Capital-to-Capital Distances
+Details: Using the capital cities from Panel 1, retrieve or calculate the distances between each pair. This panel depends on the output from Panel 1.
+List of Relevant APIs:
+   - BrowserTools
+
+3. Panel 3: Determine Farthest Capitals in G7
+Details: Take the distances from Panel 2, use pure reasoning to find which pair is farthest apart, and output the corresponding countries in alphabetical order. This panel relies on Panel 2’s data.
+List of Relevant APIs:
+   - ReasoningAgent
+
+Description of APIs:
+
+[Will be given to you]
+
+Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+Panel 1: Fetch G7 Countries and Capitals
+
+• Understanding Panel Requirements:
+  - The query asks which two G7 capital cities are the farthest apart.
+  - First, we must identify the G7 countries and their respective capitals. 
+  - Only BrowserTools is available for fetching external data from the web.
+
+• API Selection:
+  - BrowserTools: We will craft a query to retrieve the official list of G7 nations and the names of their capitals.
+
+• Dependencies & Flow:
+  - This panel does not rely on any prior panel output since it is our first step. 
+  - The output from this panel (list of G7 capitals) will be required for the next panel.
+
+• Variable Naming:
+  - Input variable to BrowserTools: query_g7_capitals
+  - Output variable from Panel 1: g7_capitals_list
+
+Panel 2: Compute Capital-to-Capital Distances
+
+• Understanding Panel Requirements:
+  - Now that we have the G7 capitals, we need to get the distances between each pair of capital cities.
+  - We will again use BrowserTools to gather the latitude and longitude for each city or directly retrieve the distances between each pair if a reliable resource is available.
+
+• API Selection:
+  - BrowserTools: We will query a suitable source that can give us the direct distances or lat-long data for each city. If lat-long data is found, we can compute or find the distance results from a known service or formula. Either way, it's done externally, so BrowserTools is the choice.
+
+• Dependencies & Flow:
+  - This panel depends on the output from Panel 1 (g7_capitals_list).
+  - The output from this panel (g7_distance_data) will be required for the next panel.
+
+• Variable Naming:
+  - Input variable: g7_capitals_list (matching the output name from Panel 1).
+  - Output variable: g7_distance_data (representing pairwise distance information between each G7 capital).
+
+Panel 3: Determine Farthest Capitals in G7
+
+• Understanding Panel Requirements:
+  - We have the distance data for each pair of capitals from Panel 2.
+  - We must find which two cities are the farthest apart, then return the corresponding countries in alphabetical order.
+
+• API Selection:
+  - ReasoningAgent: This is a pure reasoning/logical step, where we do not need external data. We only need to analyze the distance data provided by Panel 2 and identify the largest distance.
+
+• Dependencies & Flow:
+  - This panel depends on the output from Panel 2 (g7_distance_data).
+  - No external resources are required, only internal reasoning.
+
+• Variable Naming:
+  - Input variable: g7_distance_data
+  - Output variable: farthest_capitals (the final result containing two countries in alphabetical order)
+
+$$WORKFLOW$$
+
+Group 1:
+
+Workflow for Panel 1:
+
+Panel Description: Identify all G7 countries and their capitals.
+
+Workflow Steps:
+
+Step 1
+- API: BrowserTools
+- Handles: Obtaining official list of G7 countries and their capital cities.
+- Input Variables:
+  - Name: query_g7_capitals
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: A query to fetch G7 nations and their capitals.
+    - Value: "List all G7 member countries and the official capital city of each."
+- Output Variables:
+  - Name: g7_capitals_list
+    - Description: A structured list of G7 countries with their capital cities.
+
+Workflow for Panel 2:
+
+Panel Description: Compute or retrieve the distance between each G7 capital city pair.
+
+Workflow Steps:
+
+Step 1
+- API: BrowserTools
+- Handles: Uses the capital cities from Panel 1 to calculate or retrieve distances.
+- Input Variables:
+  - Name: g7_capitals_list
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: The list of G7 capital cities needed to compute distances.
+    - Value: None
+- Output Variables:
+  - Name: g7_distance_data
+    - Description: Pairwise distance information for each G7 capital city combination.
+
+Workflow for Panel 3:
+
+Panel Description: Determine which two capitals are farthest apart, then list their countries alphabetically.
+
+Workflow Steps:
+
+Step 1
+- API: ReasoningAgent
+- Handles: Identifies the maximum distance and sorts the corresponding countries by alphabetical order.
+- Input Variables:
+  - Name: g7_distance_data
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: Distance data for each G7 capital city pair.
+    - Value: None
+- Output Variables:
+  - Name: farthest_capitals
+    - Description: Two countries in alphabetical order whose capitals are farthest apart.
+
+
+#### Example 6:
+
+Query: "The US Department of Agriculture published guidelines for organic labeling in 1978 that covered certain herbs, grains, and legumes. As of 2024, what percentage of those guidelines have been fully replaced or superseded? Round to the nearest whole percent."
+
+Interpreter's Panel Requests:
+1. Panel 1: Retrieve 1978 USDA Organic Labeling Guidelines
+Details: Use BrowserTools to locate and summarize the 1978 USDA guidelines for organic labeling, specifically focusing on herbs, grains, and legumes. This panel has no dependencies.
+List of Relevant APIs:
+   - BrowserTools
+
+2. Panel 2: Check Current Status of 1978 Guidelines
+Details: Use BrowserTools to see which of the guidelines from Panel 1 are still valid or have been replaced as of 2024. This panel depends on the guidelines identified in Panel 1.
+List of Relevant APIs:
+   - BrowserTools
+
+3. Panel 3: Calculate Percentage of Replaced Guidelines
+Details: Use the ReasoningAgent to compare which guidelines have been superseded (Panel 2) against the total from Panel 1. Compute the percentage and round to the nearest whole percent. This panel depends on outputs from Panels 1 and 2.
+List of Relevant APIs:
+   - ReasoningAgent
+
+Description of APIs:
+
+[Will be given to you]
+
+Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+Panel 1: Retrieve 1978 USDA Organic Labeling Guidelines
+
+• Understanding Panel Requirements:
+  - The query concerns USDA guidelines for organic labeling from 1978, specifically covering herbs, grains, and legumes.
+  - We must find which guidelines existed in 1978, focusing on these product categories.
+
+• API Selection:
+  - BrowserTools: We need to search for the official or summarized USDA documentation from 1978. This data is external, so BrowserTools is the logical choice.
+
+• Dependencies & Flow:
+  - Since this is our first step, there are no previous panels or outputs to rely on.
+  - The output (list or summary of 1978 guidelines) will be needed by subsequent panels to check their current status.
+
+• Variable Naming:
+  - Input variable: query_1978_guidelines
+  - Output variable: usda_1978_guidelines
+
+Panel 2: Check Current Status of 1978 Guidelines
+
+• Understanding Panel Requirements:
+  - Now that we have the 1978 guidelines, we need to determine which ones have been replaced or superseded as of 2024.
+
+• API Selection:
+  - BrowserTools: Again, we need external data from USDA or other reliable sources to see which of the original guidelines are still in force or replaced.
+
+• Dependencies & Flow:
+  - This panel depends on Panel 1’s output (usda_1978_guidelines).
+  - We will gather a status list or mapping of "still valid" vs. "replaced/superseded."
+
+• Variable Naming:
+  - Input variable: usda_1978_guidelines
+  - Output variable: usda_2024_status
+
+Panel 3: Calculate Percentage of Replaced Guidelines
+
+• Understanding Panel Requirements:
+  - We must determine what fraction of the 1978 guidelines have been superseded and convert that to a percentage.
+  - Lastly, we round to the nearest whole percent.
+
+• API Selection:
+  - ReasoningAgent: This step is purely analytical. We have the total guidelines from Panel 1 and the updated statuses from Panel 2. We need no external data at this point.
+
+• Dependencies & Flow:
+  - This panel depends on outputs from Panel 1 (list of all guidelines) and Panel 2 (their statuses).
+  - We’ll compute the fraction replaced vs. total guidelines.
+
+• Variable Naming:
+  - Input variables: usda_1978_guidelines, usda_2024_status
+  - Output variable: replaced_percentage
+
+$$WORKFLOW$$
+
+Group 1:
+
+Workflow for Panel 1:
+
+Panel Description: Find and summarize the 1978 USDA guidelines for organic labeling, focusing on herbs, grains, and legumes.
+
+Workflow Steps:
+
+Step 1
+- API: BrowserTools
+- Handles: Locating original 1978 USDA organic labeling guidelines
+- Input Variables:
+  - Name: query_1978_guidelines
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: A direct search query to retrieve relevant 1978 USDA documents or official summaries about organic labeling for herbs, grains, and legumes.
+    - Value: "Find the 1978 USDA published guidelines for organic labeling focusing on herbs, grains, and legumes."
+- Output Variables:
+  - Name: usda_1978_guidelines
+    - Description: A structured summary or listing of the 1978 organic labeling guidelines.
+
+Workflow for Panel 2:
+
+Panel Description: Determine which of the 1978 guidelines have been replaced or superseded as of 2024.
+
+Workflow Steps:
+
+Step 1
+- API: BrowserTools
+- Handles: Checking the current (2024) status of each 1978 guideline found in Panel 1
+- Input Variables:
+  - Name: usda_1978_guidelines
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: The previously retrieved list of 1978 USDA guidelines for herbs, grains, and legumes
+    - Value: None
+- Output Variables:
+  - Name: usda_2024_status
+    - Description: Indicates which guidelines remain valid, modified, or have been fully replaced.
+
+Workflow for Panel 3:
+
+Panel Description: Calculate the percentage of 1978 guidelines that have been superseded, rounding to the nearest whole percent.
+
+Workflow Steps:
+
+Step 1
+- API: ReasoningAgent
+- Handles: Compares the original guidelines (Panel 1) with their 2024 status (Panel 2) to calculate the fraction replaced.
+- Input Variables:
+  - Name: usda_1978_guidelines
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: The original count/list of 1978 guidelines
+    - Value: None
+  - Name: usda_2024_status
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: The updated status of guidelines as of 2024
+    - Value: None
+- Output Variables:
+  - Name: replaced_percentage
+    - Description: The integer percentage of replaced guidelines, rounded to the nearest whole percent
+
+#### Example 7:
+
+Query: I have a partial blueprint file named 'site_diagram.png' that shows some labeled columns and partial floor markings for a new shopping complex. It doesn’t explicitly mention the total number of shops or whether there is a basement or rooftop garden. Please determine how many shops are planned for this complex, whether a basement level exists, and if there is a rooftop garden. The file shows only partial labels like '1F', '2F', and an incomplete scribble near the top.
+
+Attachment: "file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/site_diagram.png"
+Attachment file content:
+- Partial text reading "Flo..." near some staircases
+- Faint outline of two floors labeled "1F" and "2F"
+- A partially scribbled rooftop outline with no clear label
+- No visible mention of basement or total shops
+- Some note referencing "Column A, Column B" but not enough detail to confirm total floors or shops
+
+Interpreter's Panel Requests:
+1. Panel 1: Analyze Blueprint Image
+Details: Use BrowserTools to analyze 'site_diagram.png'. Extract any text, labels for floors, references to basements, rooftop structures, and approximate shop counts if mentioned. Strongly note that this panel's approach must not be independent; it must rely solely on the partial file content provided. It is critical for guiding further steps.
+List of Relevant APIs:
+   - BrowserTools
+
+2. Panel 2: Gather External References
+Details: After reviewing the partial blueprint details from Panel 1, use BrowserTools to search for any external documentation or references that match the partial blueprint (e.g., developer website, local building code references, or news articles). Strongly mention that this panel depends on the outputs from Panel 1 to refine the search query, not forming an independent search approach.
+List of Relevant APIs:
+   - BrowserTools
+
+3. Panel 3: Consolidate Building Details
+Details: Use the ReasoningAgent to combine the partial blueprint analysis from Panel 1 and the external references from Panel 2. Determine the total number of shops, whether there is a basement level, and if a rooftop garden is included. This panel depends on Panels 1 and 2 for all data and performs pure reasoning on that data.
+List of Relevant APIs:
+   - ReasoningAgent
+
+Description of APIs:
+
+[Will be given to you]
+
+Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+Panel 1: Analyze Blueprint Image
+
+- Understanding Panel Details:
+  - The query wants us to analyze a partial blueprint file named "site_diagram.png" to extract any indication of the building's total shops, basement existence, and potential rooftop garden.
+  - Since the file content does not fully specify all these details, we must visually parse the blueprint for textual or graphical hints.
+  - BrowserTools is the only option for external data retrieval and image analysis.
+
+- API Selection:
+  - BrowserTools: Required to perform image analysis on the blueprint since the partial file content alone does not give complete information.
+
+- Input / Output Requirements:
+  - We will pass the image file path to BrowserTools, instructing it to detect any references to floors, basement levels, rooftop structures, or number of shops.
+
+- Interdependencies:
+  - This is the first panel; it has no dependencies on a previous panel.
+  - The resulting extracted blueprint data will feed into subsequent panels.
+
+- Variable Naming:
+  - Input variable name: blueprint_path
+  - Output variable name: blueprint_analysis
+
+Panel 2: Gather External References
+
+- Understanding Panel Details:
+  - After analyzing the partial blueprint, we may discover partial references or project codes that prompt a web search for more comprehensive details (such as total shops, building specs).
+  - We must use BrowserTools again to check official building references, developer sites, or local building codes.
+
+- API Selection:
+  - BrowserTools: We refine the search based on any data extracted from Panel 1’s blueprint analysis (e.g., project name, design codes, partial references).
+
+- Input / Output Requirements:
+  - The partial blueprint details from Panel 1 will guide our search queries.
+  - We gather more precise data about total shops, basement existence, or rooftop garden references from external sources.
+
+- Interdependencies:
+  - Panel 2 depends on Panel 1’s output (blueprint_analysis).
+  - The search approach must not be independent but driven by the blueprint information.
+
+- Variable Naming:
+  - Input variable name: blueprint_analysis
+  - Output variable name: external_references
+
+Panel 3: Consolidate Building Details
+
+- Understanding Panel Details:
+  - We now have blueprint data (Panel 1) and external references (Panel 2).
+  - A ReasoningAgent panel is needed to synthesize the final information about the total number of shops, basement presence, and rooftop garden features.
+
+- API Selection:
+  - ReasoningAgent: No additional external search is needed; this step is purely inferential, drawing on prior panels’ data.
+
+- Input / Output Requirements:
+  - Combine blueprint_analysis with external_references to determine the final building attributes.
+
+- Interdependencies:
+  - Depends on both Panel 1 (blueprint_analysis) and Panel 2 (external_references).
+  - This final step draws all data together but does not add new searches.
+
+- Variable Naming:
+  - Input variables: blueprint_analysis, external_references
+  - Output variable: consolidated_building_info
+
+$$WORKFLOW$$
+
+Group 1:
+
+Workflow for Panel 1:
+
+Panel Description: Analyze Blueprint Image
+
+Workflow Steps:
+
+Step 1
+- API: BrowserTools
+- Handles: Performs image analysis on the partial blueprint file to detect floor labels, references to shops, basement, or rooftop structures.
+- Input Variables:
+  - Name: blueprint_path
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: File path for the partial blueprint image
+    - Value: "Performs detailed image analysis on the partial blueprint file to detect floor labels, references to shops, basement, or rooftop structures. file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/site_diagram.png"
+- Output Variables:
+  - Name: blueprint_analysis
+    - Description: Extracted textual/graphical information from the blueprint, indicating floors, partial shop references, basement hints, or potential rooftop outline
+
+Workflow for Panel 2:
+
+Panel Description: Gather External References
+
+Workflow Steps:
+
+Step 1
+- API: BrowserTools
+- Handles: Searches web references to clarify any partial data from the blueprint
+- Input Variables:
+  - Name: blueprint_analysis
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: Data extracted from the blueprint, used to refine external web searches
+    - Value: None
+- Output Variables:
+  - Name: external_references
+    - Description: Relevant building code references, developer site details, or official data confirming total shops, basement presence, and rooftop garden
+
+Workflow for Panel 3:
+
+Panel Description: Consolidate Building Details
+
+Workflow Steps:
+
+Step 1
+- API: ReasoningAgent
+- Handles: Combines blueprint analysis with external references to determine the total number of shops, basement existence, and rooftop garden features
+- Input Variables:
+  - Name: blueprint_analysis
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 1, Step 1)
+    - Description: Summarized blueprint details from Panel 1
+    - Value: None
+  - Name: external_references
+    - Parameter: query
+    - Type: string
+    - Source: API_Output (Panel 2, Step 1)
+    - Description: External data clarifying building features
+    - Value: None
+- Output Variables:
+  - Name: consolidated_building_info
+    - Description: Final details including the total shops planned, whether a basement level is present, and if a rooftop garden exists

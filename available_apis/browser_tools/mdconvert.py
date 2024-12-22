@@ -24,6 +24,7 @@ import speech_recognition as sr
 import sys
 import traceback
 from openai import AzureOpenAI
+from openai import OpenAI
 
 import PIL
 import shutil
@@ -620,7 +621,8 @@ class MarkdownConverter:
         else:
             self._requests_session = requests_session
 
-        self._mlm_client = AzureOpenAI()
+        # self._mlm_client = AzureOpenAI()
+        self._mlm_client = OpenAI()
 
         self._page_converters: List[DocumentConverter] = []
 

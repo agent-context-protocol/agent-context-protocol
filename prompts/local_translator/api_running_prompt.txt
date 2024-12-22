@@ -572,6 +572,7 @@ Verification of Input Variables:
 - The query parameter is required and expects a string representing the user's question or search term.
 - The vacation_spots_list is a list of vacation spot names.
 - Since the query parameter accepts a single string, and the API recommends not to ask too much information in one search, we should execute separate API requests for each vacation spot.
+- If we want to perform image analysis using BrowserTools, then we always have to provide the image path else BrowserTools wont know what is being referred to.
 
 Determining Single vs. Multiple API Requests:
 
@@ -652,6 +653,8 @@ API Documentation:
 
 [You will be given the api documentation]
 
+# Your Output:
+
 $$CHAIN_OF_THOUGHT$$
 
 Input Variables:
@@ -668,6 +671,7 @@ Verification of Input Variables:
 - The parameter query is required and expects a string representing the user's question.
 - The historical_date variable matches the expected parameter query and is of the correct type (string).
 - The value is provided but is not a query.
+- If we want to perform image analysis using BrowserTools, then we always have to provide the image path else BrowserTools wont know what is being referred to.
 
 Forming the Query:
 
@@ -743,6 +747,8 @@ API Documentation:
 
 [You will be given the api documentation]
 
+# Your Output:
+
 $$CHAIN_OF_THOUGHT$$
 
 Input Variables:
@@ -759,6 +765,7 @@ Verification of Input Variables:
 - The parameter query is required and expects a string representing the search query.
 - The country_name variable matches the expected parameter query and is of the correct type (string).
 - The value is provided but is not a query.
+- If we want to perform image analysis using BrowserTools, then we always have to provide the image path else BrowserTools wont know what is being referred to.
 
 Forming the Query:
 
@@ -843,6 +850,8 @@ API Documentation:
 
 [You will be given the api documentation]
 
+# Your Output:
+
 $$CHAIN_OF_THOUGHT$$
 
 Input Variables:
@@ -859,6 +868,7 @@ Verification of Input Variables:
 	-	The parameter query is required and expects a string representing the user’s question.
 	-	The query_marketing_decisions variable matches the expected parameter query and is of the correct type (string).
 	-	The value is provided but lacks the necessary context, as the API does not have access to the attachment unless included in the query.
+  - If we want to perform image analysis using BrowserTools, then we always have to provide the image path else BrowserTools wont know what is being referred to.
 
 Forming the Query:
 
@@ -919,114 +929,88 @@ BODY
 
 #### Example 8:
 
+# Input:
+
 -	User Query:
-“Based on the attached patient medical history, what are the recommended next steps for treatment? Please provide the recommendations as outlined in the history.”
+I have a partial blueprint file named 'site_diagram.png' that shows some labeled columns and partial floor markings for a new shopping complex. It doesn’t explicitly mention the total number of shops or whether there is a basement or rooftop garden. Please determine how many shops are planned for this complex, whether a basement level exists, and if there is a rooftop garden. The file shows only partial labels like '1F', '2F', and an incomplete scribble near the top.
 
-Attachment File Content:
-
-[Patient Medical History]
-- Patient Name: John Doe
-- Age: 45
-- Diagnoses: Type 2 Diabetes, Hypertension
-- Previous Treatments: Metformin, Lisinopril
-- Recent Test Results: Elevated blood glucose levels, increased blood pressure
-[Further details]
+Attachment: "file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/site_diagram.png"
+Attachment file content:
+- Partial text reading "Flo..." near some staircases
+- Faint outline of two floors labeled "1F" and "2F"
+- A partially scribbled rooftop outline with no clear label
+- No visible mention of basement or total shops
+- Some note referencing "Column A, Column B" but not enough detail to confirm total floors or shops
 
 -	Panel Description:
-“Determine the recommended treatment steps from the patient’s medical history.”
+Analyze Blueprint Image
 
 Step Details:
 
--	API: BrowserTools
-  -	Handles: Provides treatment recommendations based on the patient’s medical history.
-  -	Input Variables:
-    -	Name: query_treatment_recommendations
-    -	Parameter: query
-    -	Type: string
-    -	Source: LLM_Generated
-    -	Description: Query to determine treatment recommendations from the medical history.
-    -	Value: “What are the recommended next steps for treatment based on the patient’s medical history?”
--	Output Variables:
-  -	Name: treatment_recommendations
-    -	Description: Recommended next steps for treatment.
+- API: BrowserTools
+- Handles: Performs image analysis on the partial blueprint file to detect floor labels, references to shops, basement, or rooftop structures.
+- Input Variables:
+  - Name: blueprint_path
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: File path for the partial blueprint image
+    - Value: "Performs detailed image analysis on the partial blueprint file to detect floor labels, references to shops, basement, or rooftop structures. file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/site_diagram.png"
+- Output Variables:
+  - Name: blueprint_analysis
+    - Description: Extracted textual/graphical information from the blueprint, indicating floors, partial shop references, basement hints, or potential rooftop outline
+
 
 API Documentation:
 
 [You will be given the api documentation]
 
+# Your Output:
+
 $$CHAIN_OF_THOUGHT$$
 
-Input Variables:
+1. We have one input variable:
+   - Name: blueprint_path
+   - Parameter: query
+   - Type: string
+   - Source: LLM_Generated
+   - Description: File path for the partial blueprint image
+   - Value: "Performs detailed image analysis on the partial blueprint file to detect floor labels, references to shops, basement, or rooftop structures. file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/site_diagram.png"
 
-	-	Name: query_treatment_recommendations
-	-	Parameter: query
-	-	Type: string
-	-	Source: LLM_Generated
-	-	Description: Query to determine treatment recommendations from the medical history.
-	-	Value: "What are the recommended next steps for treatment based on the patient's medical history?"
+2. Verification:
+   - The parameter query is valid for BrowserTools. It can accept a string containing both the intention (analyzing the image) and the file path.
+   - The input variable name blueprint_path is consistent with the expected usage in this step.
+   - If we want to perform image analysis using BrowserTools, then we always have to provide the image path else BrowserTools wont know what is being referred to. For this query we have ensured that file path is attached.
 
-Verification of Input Variables:
+3. Single vs. Multiple API Requests:
+   - Only one request is needed, as we are analyzing a single blueprint file.
 
-	-	The parameter query is required and expects a string representing the user’s question.
-	-	The query_treatment_recommendations variable matches the expected parameter query and is of the correct type (string).
-	-	The value lacks the specific medical history details needed for accurate recommendations.
+4. HTTP Method & Function Name:
+   - For BrowserTools, we often treat it as a Python function with method FUNCTION.
+   - The function name can be something like BrowserTools_api_response or a similar placeholder based on documentation.
 
-Forming the Query:
+5. Headers:
+   - No special headers are required for a Python function call.
 
-	-	To enable the API to provide precise recommendations, we need to include the patient’s medical history in the query. We should always provide the whole file attachment without shortening it on our own.
-  - We need to priortize the query for the purpose of the step we are executing and not try to answer the whole user query.
-	-	Constructed query:
+6. Request Body:
+   - We must provide the entire query string, including the file path, so BrowserTools can handle the partial blueprint analysis effectively.
 
-"What are the recommended next steps for treatment based on the following patient's medical history?
-[Patient Medical History]
-- Patient Name: John Doe
-- Age: 45
-- Diagnoses: Type 2 Diabetes, Hypertension
-- Previous Treatments: Metformin, Lisinopril
-- Recent Test Results: Elevated blood glucose levels, increased blood pressure
-[Further details]"
-
-
-Dependencies:
-
-	-	The input variable is generated by the LLM and does not depend on previous API outputs.
-
-HTTP Method & Function Name:
-
-	-	The method is FUNCTION since we are handling a Python function.
-	-	The function name is BrowserTools_api_response.
-
-Headers:
-
-	-	No headers are required; the Headers section should be empty.
-
-Request Body:
-
-	-	Include the constructed query:
-
-{
-  "query": "What are the recommended next steps for treatment based on the following patient's medical history?\n[Patient Medical History]\n- Patient Name: John Doe\n- Age: 45\n- Diagnoses: Type 2 Diabetes, Hypertension\n- Previous Treatments: Metformin, Lisinopril\n- Recent Test Results: Elevated blood glucose levels, increased blood pressure\n[Further details]"
-}
-
-Limiting Output:
-
-	-	Only one API request is needed.
-
-Final Decision:
-
-	-	Proceed with the API request using the constructed query.
+7. Final Decision:
+   - Make a single FUNCTION call with the "query" parameter containing the entire textual request plus the file path.
 
 $$API_REQUEST$$
 
 API_ENDPOINT
 
-Method: FUNCTION
-URL: BrowserTools_api_response
+Method: FUNCTION  
+URL: browser_tools_function
 
 HEADERS
+
+{}
 
 BODY
 
 {
-  "query": "What are the recommended next steps for treatment based on the following patient's medical history?\n[Patient Medical History]\n- Patient Name: John Doe\n- Age: 45\n- Diagnoses: Type 2 Diabetes, Hypertension\n- Previous Treatments: Metformin, Lisinopril\n- Recent Test Results: Elevated blood glucose levels, increased blood pressure\n[Further details]"
+  "query": "Performs detailed image analysis on the partial blueprint file to detect floor labels, references to shops, basement, or rooftop structures. file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/site_diagram.png"
 }

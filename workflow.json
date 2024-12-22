@@ -1,29 +1,29 @@
 {
-    "user_query": "Assuming scientists in the famous youtube video The Thinking Machine (Artificial Intelligence in the 1960s) were interviewed the same year, what is the name of the scientist predicting the sooner thinking machines or robots? Answer using the format First name Last name",
+    "user_query": "According to wikipedia, how many Asian countries still have a monarchy and access to the sea in 2021?",
     "1": {
         "1": {
-            "panel_description": "Identify the scientists featured in the YouTube video 'The Thinking Machine (Artificial Intelligence in the 1960s)'.",
+            "panel_description": "Identify Asian countries with monarchies.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Identifies the scientists featured in the video.",
+                    "handles": "Retrieves a list of Asian countries with monarchies.",
                     "input_vars": [
                         {
-                            "name": "query_scientists_in_video",
+                            "name": "query_asian_monarchies",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to find the list of scientists featured in the video.",
-                            "value": "List of scientists featured in the YouTube video 'The Thinking Machine (Artificial Intelligence in the 1960s)'.",
+                            "description": "Query to find Asian countries with monarchies.",
+                            "value": "List of Asian countries with monarchies.",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "scientists_list",
-                            "description": "List of scientists featured in the video.",
+                            "name": "asian_monarchies_list",
+                            "description": "List of Asian countries with monarchies.",
                             "used_by": [
                                 {
                                     "panel": 2,
@@ -36,20 +36,20 @@
             }
         },
         "2": {
-            "panel_description": "Determine if any of the scientists identified in the previous panel were interviewed in the same year as the video.",
+            "panel_description": "Determine which Asian monarchies have access to the sea.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Determines if any of the scientists were interviewed in the same year as the video.",
+                    "handles": "Determines sea access for each country in the list of Asian monarchies.",
                     "input_vars": [
                         {
-                            "name": "scientists_list",
+                            "name": "asian_monarchies_list",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "API_Output (Panel 1, Step 1)",
-                            "description": "List of scientists to check for interviews in the same year as the video.",
+                            "description": "List of Asian countries with monarchies to check for sea access.",
                             "value": "None",
                             "dependencies": [
                                 {
@@ -57,23 +57,12 @@
                                     "step": 1
                                 }
                             ]
-                        },
-                        {
-                            "name": "query_interviewed_scientists",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to find interviews conducted in the same year as the video featuring these scientists.",
-                            "value": "Interviews conducted in the same year as 'The Thinking Machine (Artificial Intelligence in the 1960s)' featuring scientists from [scientists_list].",
-                            "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "interviewed_scientists",
-                            "description": "List of scientists interviewed in the same year as the video.",
+                            "name": "monarchies_with_sea_access",
+                            "description": "List of Asian monarchies with access to the sea.",
                             "used_by": [
                                 {
                                     "panel": 3,
@@ -86,20 +75,20 @@
             }
         },
         "3": {
-            "panel_description": "Identify which of the scientists, who were interviewed in the same year as the video, predicted the sooner arrival of thinking machines or robots.",
+            "panel_description": "Verify the status of Asian monarchies with sea access as of 2021.",
             "steps": {
                 "1": {
-                    "api": "BrowserTools",
-                    "handles": "Identifies the scientist predicting the sooner arrival of thinking machines or robots.",
+                    "api": "ReasoningAgent",
+                    "handles": "Verifies the status of the countries with sea access as of 2021.",
                     "input_vars": [
                         {
-                            "name": "interviewed_scientists",
+                            "name": "monarchies_with_sea_access",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "API_Output (Panel 2, Step 1)",
-                            "description": "List of interviewed scientists to check for predictions.",
+                            "description": "List of Asian monarchies with sea access to verify their status as of 2021.",
                             "value": "None",
                             "dependencies": [
                                 {
@@ -107,23 +96,12 @@
                                     "step": 1
                                 }
                             ]
-                        },
-                        {
-                            "name": "query_predicting_scientist",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to find the scientist predicting the sooner arrival of thinking machines or robots.",
-                            "value": "Scientist from [interviewed_scientists] predicting the sooner arrival of thinking machines or robots in interviews conducted in the same year as 'The Thinking Machine (Artificial Intelligence in the 1960s)'.",
-                            "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "predicting_scientist",
-                            "description": "Name of the scientist predicting the sooner arrival of thinking machines or robots.",
+                            "name": "verified_monarchies_2021",
+                            "description": "Verified list of Asian monarchies with sea access as of 2021.",
                             "used_by": []
                         }
                     ]

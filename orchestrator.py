@@ -12,8 +12,8 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-# client = OpenAI()
-client = AzureOpenAI()
+client = OpenAI()
+# client = AzureOpenAI()
 
 # GLOBAL VARIABLE
 all_panel_outputs = {}
@@ -47,18 +47,34 @@ class Manager:
             self.groups[group_id] = group_translators
             self.modification_count[group_id] = 0  # Initialize modification count for each group
 
+    # async def run(self):
+    #     main_translator_task = asyncio.create_task(self.main_translator.process_queue())
+
+    #     group_tasks = []
+    #     for group_id in self.groups.keys():
+    #         task = asyncio.create_task(self.run_group(group_id))
+    #         group_tasks.append(task)
+
+    #     for completed_task in asyncio.as_completed(group_tasks):
+    #         group_id, group_results = await completed_task
+    #         yield group_id, group_results
+
+    #     main_translator_task.cancel()
+    #     try:
+    #         await main_translator_task
+    #     except asyncio.CancelledError:
+    #         pass
+
     async def run(self):
+        # Start processing the main translator queue
         main_translator_task = asyncio.create_task(self.main_translator.process_queue())
 
-        group_tasks = []
+        # Run each group task sequentially
         for group_id in self.groups.keys():
-            task = asyncio.create_task(self.run_group(group_id))
-            group_tasks.append(task)
-
-        for completed_task in asyncio.as_completed(group_tasks):
-            group_id, group_results = await completed_task
+            group_id, group_results = await self.run_group(group_id)
             yield group_id, group_results
 
+        # Cancel the main translator task
         main_translator_task.cancel()
         try:
             await main_translator_task

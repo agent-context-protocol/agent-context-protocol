@@ -13,6 +13,7 @@ from rich import print as pp
 from rich.console import Console
 from rich.table import Table
 from rich import box
+import base64
 
 from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
@@ -21,6 +22,8 @@ from langchain_openai import ChatOpenAI
 from langchain_openai import AzureChatOpenAI
 from langchain_community.cache import SQLiteCache
 from langchain_core.callbacks import BaseCallbackHandler
+
+from openai import OpenAI
 
 from autogen.code_utils import execute_code
 import autogen
@@ -31,9 +34,11 @@ from available_apis.browser_tools.browser_utils import SimpleTextBrowser
 MODEL='gpt-4o-2024-08-06'
 DATA_NAME = '2023_level1'
 SPLIT = 'validation'
-AZURE_OPENAI_API_KEY = os.getenv('AZURE_OPENAI_API_KEY_SWEDEN')
-AZURE_OPENAI_ENDPOINT = os.getenv('AZURE_OPENAI_ENDPOINT_SWEDEN')
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+OPENAI_API_BASE = os.getenv('OPENAI_API_BASE')
 BING_API_KEY = os.getenv('BING_API_KEY')
+
+client = OpenAI()
 
 class LLMCallbackHandler(BaseCallbackHandler):
 
@@ -73,8 +78,10 @@ with open('/Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-tra
 class Sibyl:
     def __init__(self):
         cache = SQLiteCache("llm_cache.sqlite")
-        self.llm = AzureChatOpenAI(azure_deployment=MODEL, api_version="2024-04-01-preview", temperature=0, streaming=False, max_retries=5, cache=cache)
-        self.llm_without_cache = AzureChatOpenAI(azure_deployment=MODEL, api_version="2024-04-01-preview", temperature=0.1, streaming=False, max_retries=5)
+        # self.llm = AzureChatOpenAI(azure_deployment=MODEL, api_version="2024-04-01-preview", temperature=0, streaming=False, max_retries=5, cache=cache)
+        # self.llm_without_cache = AzureChatOpenAI(azure_deployment=MODEL, api_version="2024-04-01-preview", temperature=0.1, streaming=False, max_retries=5)
+        self.llm = ChatOpenAI(model=MODEL, temperature=0, streaming=False, max_retries=5, api_key=OPENAI_API_KEY, base_url=OPENAI_API_BASE, cache=cache, timeout = 350)
+        self.llm_without_cache = ChatOpenAI(model=MODEL, temperature=0.1, streaming=False, max_retries=5, api_key=OPENAI_API_KEY, base_url=OPENAI_API_BASE, timeout = 350)
         self.format_answer_chain = FORMAT_ANSWER_PROMPT | self.llm | StrOutputParser()
 
         self.tool_choice_output_parser = JsonOutputParser(pydantic_object=ToolChoice)
@@ -111,15 +118,17 @@ class Sibyl:
         agent1 = autogen.ConversableAgent(
             name="Actor",
             system_message='''You are a helpful assistant.  When answering a question, you must explain your thought process step by step before answering the question. When others make suggestions about your answers, think carefully about whether or not to adopt the opinions of others.
-If you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided. Your EDUCATED GUESS should be a number OR as few words as possible OR a comma separated list of numbers and/or strings. DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.''',
-            llm_config={"config_list": [{"model": MODEL, "api_type": "azure", "api_version": "2024-04-01-preview", "temperature": 0.1, "api_key": AZURE_OPENAI_API_KEY, "base_url": AZURE_OPENAI_ENDPOINT}]},
+If you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided.  DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.''',
+            # llm_config={"config_list": [{"model": MODEL, "api_type": "azure", "api_version": "2024-04-01-preview", "temperature": 0.1, "api_key": AZURE_OPENAI_API_KEY, "base_url": AZURE_OPENAI_ENDPOINT}]},
+            llm_config={"config_list": [{"model": MODEL, "temperature": 0.1, "api_key": OPENAI_API_KEY, "base_url": OPENAI_API_BASE}]},
             is_termination_msg=lambda x: x.get("content", "").find("TERMINATE") >= 0,
         )
 
         agent2 = autogen.ConversableAgent(
             name="Critic",
             system_message='''You are a helpful assistant.You want to help others spot logical or intellectual errors. When and only when you can't find a logical flaw in the other person's reasoning, you should say "TERMINATE" to end the conversation.''',
-            llm_config={"config_list": [{"model": MODEL, "api_type": "azure", "api_version": "2024-04-01-preview", "temperature": 0, "api_key": AZURE_OPENAI_API_KEY, "base_url": AZURE_OPENAI_ENDPOINT}]},
+            # llm_config={"config_list": [{"model": MODEL, "api_type": "azure", "api_version": "2024-04-01-preview", "temperature": 0, "api_key": AZURE_OPENAI_API_KEY, "base_url": AZURE_OPENAI_ENDPOINT}]},
+            llm_config={"config_list": [{"model": MODEL, "temperature": 0, "api_key": OPENAI_API_KEY, "base_url": OPENAI_API_BASE}]},
         )
 
         groupchat = autogen.GroupChat(
@@ -133,13 +142,15 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
         manager = autogen.GroupChatManager(
             groupchat=groupchat,
             is_termination_msg=lambda x: x.get("content", "").find("TERMINATE") >= 0,
-            llm_config={"config_list": [{"model": MODEL, "api_type": "azure", "api_version": "2024-04-01-preview", "temperature": 0.0, "api_key": AZURE_OPENAI_API_KEY, "base_url": AZURE_OPENAI_ENDPOINT}]},
+            # llm_config={"config_list": [{"model": MODEL, "api_type": "azure", "api_version": "2024-04-01-preview", "temperature": 0.0, "api_key": AZURE_OPENAI_API_KEY, "base_url": AZURE_OPENAI_ENDPOINT}]},
+            llm_config={"config_list": [{"model": MODEL, "temperature": 0.0, "api_key": OPENAI_API_KEY, "base_url": OPENAI_API_BASE}]},
         )
 
         self.society_of_mind_agent = SocietyOfMindAgent(
             "society_of_mind",
             chat_manager=manager,
-            llm_config={"config_list": [{"model": MODEL, "api_type": "azure", "api_version": "2024-04-01-preview", "temperature": 0.0, "api_key": AZURE_OPENAI_API_KEY, "base_url": AZURE_OPENAI_ENDPOINT}]}
+            # llm_config={"config_list": [{"model": MODEL, "api_type": "azure", "api_version": "2024-04-01-preview", "temperature": 0.0, "api_key": AZURE_OPENAI_API_KEY, "base_url": AZURE_OPENAI_ENDPOINT}]}
+            llm_config={"timeout": 350, "config_list": [{"model": MODEL, "temperature": 0.0, "api_key": OPENAI_API_KEY, "base_url": OPENAI_API_BASE}]}
         )
 
         self.user_proxy = autogen.UserProxyAgent(
@@ -210,6 +221,37 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
             )
         else:
             return header.strip() + "\n=======================\n" + content
+        
+    def vision_qa(self, url, query):
+        if 'file://' in url:
+            url = url[7:]
+        if 'GAIA' in url:
+            with open(url, "rb") as image_file:
+                encoded_url = base64.b64encode(image_file.read()).decode('utf-8')
+            url = f"data:image/jpeg;base64,{encoded_url}"
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": f"Please provide an answer after analyzing the image for this specific query {query}"},
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": url,
+                                },
+                            },
+                        ],
+                    }
+                ],
+                max_tokens=300,
+            )
+
+            return response.choices[0].message.content
+        except Exception as e:
+            return "Due to invalid url, the image was not able to be analysed"
 
     def find_next(self) -> str:
         find_result = self.browser.find_next()
@@ -255,7 +297,7 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
                     if tool_choice['tool'] == 'computer_terminal' and tool_choice['tool_args'].get('code', '') == '':
                         has_error = True
                         continue
-                    elif tool_choice['tool'] not in ['informational_web_search', 'navigational_web_search', 'visit_page', 'page_up', 'page_down', 'download_file', 'find_on_page_ctrl_f', 'find_next', 'computer_terminal', 'None']:
+                    elif tool_choice['tool'] not in ['informational_web_search', 'navigational_web_search', 'visit_page', 'page_up', 'page_down', 'download_file', 'find_on_page_ctrl_f', 'find_next', 'computer_terminal', 'vision_qa', 'None']:
                         has_error = True
                         continue
                     else:
@@ -283,6 +325,8 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
                 tool_result = self.find_on_page_ctrl_f(**args)
             elif tool == "find_next":
                 tool_result = self.find_next()
+            elif tool == "vision_qa":
+                tool_result = self.vision_qa(**args)
             elif tool == 'computer_terminal':
                 improve_error = False
                 for _ in range(10):
@@ -316,7 +360,7 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
             answer = self.user_proxy.initiate_chat(
                 self.society_of_mind_agent, 
                 message=f"""{question}\nIf you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided.
-Your EDUCATED GUESS should be a number OR as few words as possible OR a comma separated list of numbers and/or strings. DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
+ DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
         else:
             steps_prompt = '\n'.join(steps)
             answer = self.user_proxy.initiate_chat(
@@ -326,11 +370,98 @@ Your EDUCATED GUESS should be a number OR as few words as possible OR a comma se
 
 Referring to the information I have obtained (which may not be accurate), what do you think is the answer to the question?
 If you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided.
-Your EDUCATED GUESS should be a number OR as few words as possible OR a comma separated list of numbers and/or strings. DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
+ DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
         # formatted_answer = self.format_answer_chain.invoke({'question': question, 'answer': answer})#.answer
 
         return answer
     
+
+# Reasoning Agent
+
+class ReasoningAgent:
+    def __init__(self):
+        cache = SQLiteCache("llm_cache.sqlite")
+        # self.llm = AzureChatOpenAI(azure_deployment=MODEL, api_version="2024-04-01-preview", temperature=0, streaming=False, max_retries=5, cache=cache)
+        # self.llm_without_cache = AzureChatOpenAI(azure_deployment=MODEL, api_version="2024-04-01-preview", temperature=0.1, streaming=False, max_retries=5)
+        self.llm = ChatOpenAI(model=MODEL, temperature=0, streaming=False, max_retries=5, api_key=OPENAI_API_KEY, base_url=OPENAI_API_BASE, cache=cache, timeout = 350)
+        self.llm_without_cache = ChatOpenAI(model=MODEL, temperature=0.1, streaming=False, max_retries=5, api_key=OPENAI_API_KEY, base_url=OPENAI_API_BASE, timeout = 350)
+        self.format_answer_chain = FORMAT_ANSWER_PROMPT | self.llm | StrOutputParser()
+
+
+        self.summarize_tool_chain = SUMMARIZE_STEP_PROMPT_TEMPLATE | self.llm | StrOutputParser()
+
+        self.llm_callback_handler = LLMCallbackHandler()
+
+        agent1 = autogen.ConversableAgent(
+            name="Actor",
+            system_message='''You are a helpful assistant.  When answering a question, you must explain your thought process step by step before answering the question. When others make suggestions about your answers, think carefully about whether or not to adopt the opinions of others.
+            For your context, you have to enact as a reasoning agent and find out an answer for the reasoning question through a deep thought process.
+            If you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided.  DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.''',
+            # llm_config={"config_list": [{"model": MODEL, "api_type": "azure", "api_version": "2024-04-01-preview", "temperature": 0.1, "api_key": AZURE_OPENAI_API_KEY, "base_url": AZURE_OPENAI_ENDPOINT}]},
+            llm_config={"config_list": [{"model": MODEL, "temperature": 0.1, "api_key": OPENAI_API_KEY, "base_url": OPENAI_API_BASE}]},
+            is_termination_msg=lambda x: x.get("content", "").find("TERMINATE") >= 0,
+        )
+
+        agent2 = autogen.ConversableAgent(
+            name="Critic",
+            system_message='''You are a helpful assistant.You want to help others spot logical or intellectual errors. When and only when you can't find a logical flaw in the other person's reasoning, you should say "TERMINATE" to end the conversation.
+            For your context, you have to enact as a reasoning agent and find out an answer for the reasoning question through a deep thought process.''',
+            # llm_config={"config_list": [{"model": MODEL, "api_type": "azure", "api_version": "2024-04-01-preview", "temperature": 0, "api_key": AZURE_OPENAI_API_KEY, "base_url": AZURE_OPENAI_ENDPOINT}]},
+            llm_config={"config_list": [{"model": MODEL, "temperature": 0, "api_key": OPENAI_API_KEY, "base_url": OPENAI_API_BASE}]},
+        )
+
+        groupchat = autogen.GroupChat(
+            agents=[agent1, agent2],
+            messages=[],
+            speaker_selection_method="round_robin",
+            allow_repeat_speaker=False,
+            max_round=8,
+        )
+
+        manager = autogen.GroupChatManager(
+            groupchat=groupchat,
+            is_termination_msg=lambda x: x.get("content", "").find("TERMINATE") >= 0,
+            # llm_config={"config_list": [{"model": MODEL, "api_type": "azure", "api_version": "2024-04-01-preview", "temperature": 0.0, "api_key": AZURE_OPENAI_API_KEY, "base_url": AZURE_OPENAI_ENDPOINT}]},
+            llm_config={"config_list": [{"model": MODEL, "temperature": 0.0, "api_key": OPENAI_API_KEY, "base_url": OPENAI_API_BASE}]},
+        )
+
+        self.society_of_mind_agent = SocietyOfMindAgent(
+            "society_of_mind",
+            chat_manager=manager,
+            # llm_config={"config_list": [{"model": MODEL, "api_type": "azure", "api_version": "2024-04-01-preview", "temperature": 0.0, "api_key": AZURE_OPENAI_API_KEY, "base_url": AZURE_OPENAI_ENDPOINT}]}
+            llm_config={"timeout": 350, "config_list": [{"model": MODEL, "temperature": 0.0, "api_key": OPENAI_API_KEY, "base_url": OPENAI_API_BASE}]}
+        )
+
+        self.user_proxy = autogen.UserProxyAgent(
+            "user_proxy",
+            human_input_mode="NEVER",
+            code_execution_config=False,
+            default_auto_reply="",
+            is_termination_msg=lambda x: True,
+        )
+
+    def ask(self, raw_question: str) -> str:
+        row = None 
+
+        if row is not None:
+            print(f"Cache hit for question: {raw_question}")
+            return row[0]
+        else:
+            print(f"Cache miss for question: {raw_question}")
+
+        steps = []
+
+        question = raw_question
+        pp(f"Question: {question}")
+
+
+        answer = self.user_proxy.initiate_chat(
+            self.society_of_mind_agent, 
+            message=f"""{question}\nYou have to make a well-informed answer or an educated guess based on the query that has been provided. For your context, you have to enact as a reasoning agent and find out an answer for the reasoning question through a deep thought process.
+             DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
+
+
+        return answer
 
 ############################
 def browser_tools_function(dict_body):
@@ -353,3 +484,35 @@ def browser_tools_function(dict_body):
     # print("original sybil answerrrr: ",answer)
 
     return response_dict
+
+# # report check
+# dict_body = {"query": "What is there in the background and forwground of this image in the url: https://images.pexels.com/photos/346885/pexels-photo-346885.jpeg?cs=srgb&dl=pexels-nurseryart-346885.jpg&fm=jpg"}
+# res_dict = browser_tools_function(dict_body)
+# print("res_dict : ",res_dict)
+
+#########################################
+def reasoning_agent_function(dict_body):
+    response_dict = {}
+
+    if "query" not in dict_body:
+        response_dict["status_code"] = 400
+        response_dict["text"] = "Missing required parameters query"
+        return response_dict
+    
+    query = dict_body["query"]
+    
+    reasoning_agent_obj = ReasoningAgent()
+
+    answer = reasoning_agent_obj.ask(query)
+
+    response_dict["status_code"] = 200
+    response_dict["text"] = answer
+
+    # print("original sybil answerrrr: ",answer)
+
+    return response_dict
+
+# report check
+# dict_body = {"query": "There are 12 identical balls, one of which is slightly heavier than the others. You have a balance scale and need to find the heavier ball in just 3 weighings. How can you do it?"}
+# res_dict = reasoning_agent_function(dict_body)
+# print("res_dict : ",res_dict)

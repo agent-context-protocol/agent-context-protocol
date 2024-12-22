@@ -5,6 +5,9 @@
   "BrowserTools": {
     "Use": "As a web search engine to retrieve and synthesize information from multiple sources into a single, concise response. It can also be utilized for reasoning tasks and coding assistance, including code writing and execution."
   },
+  "ReasoningAgent": {
+    "Use": "This function acts as a reasoming agent to deeply think about a reasoning problem which does not require web search and rather can be solved through pure reasoning."
+  },
   "TripadvisorSearchLocation": {
     "Use": "This API is used to search for location details (like a city or region) based on a query string, providing results limited to locations name, type, and geoID which is used by other TripAdvisor APIs."
   },

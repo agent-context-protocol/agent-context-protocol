@@ -33,6 +33,8 @@ When the page is very long, content truncation may occur due to the limited disp
     When the page is too long to be fully displayed in one viewport, you can use this function to scroll the viewport to the first occurrence of the search string. If the viewport has already displayed the entire page(Showing page 1 of 1.), there is no need to use this function. This is equivalent to Ctrl+F. This search string supports wildcards like '*'
 - find_next() -> str:
     Scroll the viewport to the next occurrence of the search string.
+- vision_qa(url: str, query: str) -> str:
+    When provided an url from the web of an image, and a query about some detail of the image. It tried to answer the query after analyzing the image in the given web url.
 
 ## Computer Terminal
 - computer_terminal(code: str) -> str
@@ -41,7 +43,7 @@ When the page is very long, content truncation may occur due to the limited disp
 In the query parameters, we should always give extensive details in the query for full context such that we can search better and specifically when required. Please keep this in consideration always.
 
 Based on the question and the step history, tell me which function you would use to solve the problem in next step. 
-If you don't need any function or the question is very easy to answer, function "None" is also an option. 
+If you don't need any function or the question is very easy to answer, function "None" is also an option. Do not get into a loop of choosing the same tool again and again, choos "None" if nothing else is left to be searched for.
 Do not change the format and precision of the results (including rounding), as a dedicated person will handle the final formatting of the results.
 Use JSON format to answer.
 {format_instructions}
