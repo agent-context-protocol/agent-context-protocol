@@ -76,7 +76,7 @@ with open('/Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-tra
 
 # @ray.remote
 class Sibyl:
-    def __init__(self):
+    def __init__(self, interpreter_bool=False):
         cache = SQLiteCache("llm_cache.sqlite")
         # self.llm = AzureChatOpenAI(azure_deployment=MODEL, api_version="2024-04-01-preview", temperature=0, streaming=False, max_retries=5, cache=cache)
         # self.llm_without_cache = AzureChatOpenAI(azure_deployment=MODEL, api_version="2024-04-01-preview", temperature=0.1, streaming=False, max_retries=5)
@@ -114,6 +114,8 @@ class Sibyl:
         }
         self.browser = SimpleTextBrowser(**browser_config)
         self.llm_callback_handler = LLMCallbackHandler()
+
+        self.interpreter_bool = interpreter_bool
 
         agent1 = autogen.ConversableAgent(
             name="Actor",
@@ -357,20 +359,45 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
             steps.append(f"Step:{len(steps)+1}\nTool: {tool}, Args: {args}\n{step_note}\n\n")
 
         if len(steps) == 0:
-            answer = self.user_proxy.initiate_chat(
-                self.society_of_mind_agent, 
-                message=f"""{question}\nIf you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided.
- DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
+            if self.interpreter_bool:
+                answer = self.user_proxy.initiate_chat(
+                    self.society_of_mind_agent, 
+                    message=f"""{question}\nIf you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided. 
+                    You have to only suggest sub-tasks/sub-queries for solving the main query and strictly not provide the solution yourself.
+                    For your context, you have to provide the sub-tasks/sub-queries required to be done for solving the query provided by the user. You have to analyse thq query well and suggest the most logical and appropriate sub-tasks/sub-queries which if solved could lead to solving the main query. 
+                    You have two tools at your service BrowserTools (As a web search engine to retrieve and synthesize information from multiple sources into a single, concise response. It can also be utilized for reasoning tasks , image based question answering and coding assistance, including code writing and execution.) and ReasoningAgent (This function acts as a reasoming agent to deeply think about a reasoning problem which does not require web search and rather can be solved through pure reasoning.).
+                    For every sub-task/sub-query please mention which tool would be better for it BrowserTools or ReasoningAgent. Remember that use ReasoningAgent for purely reasoning based things, if any prior knowledge of something is assumed, then its better to use BrowserTools instead.
+                    DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
+            else:
+                answer = self.user_proxy.initiate_chat(
+                    self.society_of_mind_agent, 
+                    message=f"""{question}\nIf you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided.
+                    DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
         else:
-            steps_prompt = '\n'.join(steps)
-            answer = self.user_proxy.initiate_chat(
-                self.society_of_mind_agent, 
-                message=f"""{question}\nTo answer the above question, I did the following:
-{steps_prompt}
+            if self.interpreter_bool:
+                steps_prompt = '\n'.join(steps)
+                answer = self.user_proxy.initiate_chat(
+                    self.society_of_mind_agent, 
+                    message=f"""{question}\nTo answer the above question, I did the following:
+                    {steps_prompt}
 
-Referring to the information I have obtained (which may not be accurate), what do you think is the answer to the question?
-If you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided.
- DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
+                    Referring to the information I have obtained (which may not be accurate), what do you think is the answer to the question?
+                    You have to only suggest sub-tasks/sub-queries for solving the main query and strictly not provide the solution yourself.
+                    For your context, you have to provide the sub-tasks/sub-queries required to be done for solving the query provided by the user. You have to analyse thq query well and suggest the most logical and appropriate sub-tasks/sub-queries which if solved could lead to solving the main query. 
+                    You have two tools at your service BrowserTools (As a web search engine to retrieve and synthesize information from multiple sources into a single, concise response. It can also be utilized for reasoning tasks , image based question answering and coding assistance, including code writing and execution.) and ReasoningAgent (This function acts as a reasoming agent to deeply think about a reasoning problem which does not require web search and rather can be solved through pure reasoning.).
+                    For every sub-task/sub-query please mention which tool would be better for it BrowserTools or ReasoningAgent. Remember that use ReasoningAgent for purely reasoning based things, if any prior knowledge of something is assumed, then its better to use BrowserTools instead.
+                    If you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided.
+                    DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
+            else:
+                steps_prompt = '\n'.join(steps)
+                answer = self.user_proxy.initiate_chat(
+                    self.society_of_mind_agent, 
+                    message=f"""{question}\nTo answer the above question, I did the following:
+                    {steps_prompt}
+
+                    Referring to the information I have obtained (which may not be accurate), what do you think is the answer to the question?
+                    If you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided.
+                    DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
         # formatted_answer = self.format_answer_chain.invoke({'question': question, 'answer': answer})#.answer
 
         return answer
@@ -464,7 +491,7 @@ class ReasoningAgent:
         return answer
 
 ############################
-def browser_tools_function(dict_body):
+def browser_tools_function(dict_body, interpreter_bool = False):
     response_dict = {}
 
     if "query" not in dict_body:
@@ -474,7 +501,7 @@ def browser_tools_function(dict_body):
     
     query = dict_body["query"]
     
-    sybil_obj = Sibyl()
+    sybil_obj = Sibyl(interpreter_bool = interpreter_bool)
 
     answer = sybil_obj.ask(query)
 

@@ -68,7 +68,7 @@ class LocalTranslatorNode(BaseNode):
     ###################################################################
     # input format prep functions
 
-    def prepare_input_for_api_running_step(self, step, api_documentation):
+    def prepare_input_for_api_running_step(self, step, api_documentation, modify_query_context = None):
         """
         Prepare the input for a single step in the workflow.
         
@@ -124,6 +124,12 @@ class LocalTranslatorNode(BaseNode):
         # Add the API documentation provided
         input_string += "\nAPI Documentation:\n"
         input_string += api_documentation
+
+        if modify_query_context:
+            assistance_request_str = "\nPreviously the below query lead to the below mentioned error. Please build a new query to avoid this error.\n"
+            assistance_request_str += f"Query: {modify_query_context['query']}\n"
+            assistance_request_str += f"Error Details:\n{str(modify_query_context)}"
+            input_string += assistance_request_str
 
         return input_string
     
@@ -976,7 +982,7 @@ class LocalTranslatorNode(BaseNode):
         """
         overall_success_bool = False
         overall_counter = 0
-        while not overall_success_bool and overall_counter < 5:
+        while not overall_success_bool and overall_counter < 1:
             # self.chat_history = []
             overall_counter += 1
             
@@ -990,8 +996,20 @@ class LocalTranslatorNode(BaseNode):
             # preperation of input data for detailed workflow creation
             assistance_request_bool = False
             assistance_error_dict = None
-            for s_i in range(num_steps):
+            modify_query_bool = False
+            modify_query_context = None
+            api_output_error_counter = 0
+            giving_up_bool = False
+            s_i = -1
+            while s_i < num_steps and api_output_error_counter < 3:
+            # for s_i in range(num_steps):
+                if not modify_query_bool:
+                    s_i += 1
+                    api_output_error_counter = 0
+                if s_i >= num_steps:
+                    break
                 step_no = s_i+1
+                # print("self.panel_workflow keys: ",self.panel_workflow.keys())
                 step = self.panel_workflow[str(step_no)]
                 api_outputs_list = []
                 print(f"Processing Step {step_no} for API: {step['api']}")
@@ -1011,8 +1029,12 @@ class LocalTranslatorNode(BaseNode):
                     api_documentation = FUNCTION_APIS_DOCUMENTATION_DICT[step['api']]
                 else:
                     raise ValueError("API Documentation Not Found.")
-                input_data = self.prepare_input_for_api_running_step(step, api_documentation)
+                input_data = self.prepare_input_for_api_running_step(step, api_documentation, modify_query_context)
                 # print(f"Prepared input for step {step['step']}: {input_data}")
+
+                # reset modify details
+                modify_query_context = None
+                modify_query_bool = False
 
                 print("input_data : ",input_data)
 
@@ -1122,10 +1144,20 @@ class LocalTranslatorNode(BaseNode):
                         print("\napi_output_llm_output : ",api_output_llm_output)
                         api_parsed_output = self.parse_and_store_api_response(api_output_llm_output, self.panel_no, step_no)
                         # if a 6xx error was raised then status_code key will be there in api_parsed_output
-                        if 'status_code' in api_parsed_output:
-                            # call for assistance request along with giving error description
-                            assistance_request_bool =  True
-                            assistance_error_dict = api_parsed_output
+                        if 'status_code' in api_parsed_output and api_parsed_output['status_code'] == 604:
+                            # # call for assistance request along with giving error description
+                            # assistance_request_bool =  True
+                            # assistance_error_dict = api_parsed_output
+                            # break
+                            giving_up_bool = True
+                        elif 'status_code' in api_parsed_output:
+                            modify_query_bool = True
+                            query_details = ""
+                            for api_req_i in range(len(parsed_api_request['api_requests'])):
+                                query_details += f"Query {api_req_i+1}: {str(parsed_api_request['api_requests'][api_req_i]['body'])}\n"
+                            api_parsed_output['query'] = query_details
+                            modify_query_context = api_parsed_output
+                            api_output_error_counter += 1
                             break
                         print("api_parsed_output : ",api_parsed_output)
                         run_success = True
@@ -1136,6 +1168,12 @@ class LocalTranslatorNode(BaseNode):
 
                 if assistance_request_bool:
                     break
+
+                if giving_up_bool:
+                    break
+
+                if modify_query_bool:
+                    continue
 
             
                 if not run_success:
@@ -1216,7 +1254,7 @@ class LocalTranslatorNode(BaseNode):
                 
                 await asyncio.sleep(0.2)
                 continue
-            else:
+            elif not giving_up_bool and api_output_error_counter < 3:
                 # overall this step was succesful
                 overall_success_bool = True
 

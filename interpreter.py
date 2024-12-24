@@ -1,6 +1,7 @@
 from utils import fetch_user_data, update_interpreter_with_similar_apis
 import json
 from base import BaseNode
+from available_apis.browser_tools.main import browser_tools_function
 
 class InterpreterNode(BaseNode):
     def __init__(self, node_name, user_query = None, system_prompt = None, personal_json = 'personal_info.json'):
@@ -32,7 +33,10 @@ class InterpreterNode(BaseNode):
         if self.user_query:
             # initial_message = fetch_user_data(self.personal_json, self.user_query)
             # print('User Context: ',initial_message)
-            self.chat_history.append({"role": "user", "content": f'''User Query: {self.user_query}'''})
+            suggested_sections = browser_tools_function({"query": f"Please provide how the query should be resolved into sub-queries/tasks for solving this query. Do not provide the solution, just provide sub-queries/tasks required to solve the task.\nUser Query: {self.user_query}"}, True)
+            print(f"\nUser Query: {self.user_query} \n\n Suggested Sections and Sub-Sections for the report:\n{suggested_sections['text']}")
+            self.chat_history.append({"role": "user", "content": f'''User Query: {self.user_query} \n\n Suggested sub-queries/tasks for the solving the user query:\n{suggested_sections['text']}'''})
+            # self.chat_history.append({"role": "user", "content": f'''User Query: {self.user_query}'''})
             available_api_string = self.create_available_api_string()
             print("available_api_string : ",available_api_string)
             self.chat_history.append({"role": "user", "content": available_api_string})

@@ -144,7 +144,7 @@ class Manager:
                         translator.drop = True
                         # return None
                 group_results[translator.panel_no] =translator.get_results()
-                all_panel_outputs[translator.panel_no] = translator.get_results()['output']
+                all_panel_outputs[translator.panel_no] = group_results[translator.panel_no]['output']
                 # except Exception as e:
                 #     print(f"Error in translator {translator.panel_no}: {str(e)}")
 
@@ -177,6 +177,7 @@ class MainOrchestrator:
         self.interpreter.user_query = user_query
         panels_list = self.interpreter.setup()
         workflow = self.main_translator.setup(user_query, panels_list)
+        all_panel_outputs = {}
         return workflow
 
     async def run(self, user_query, workflow):

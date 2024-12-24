@@ -1,0 +1,20 @@
+QuestionIndex,Query,Answer,GT_Answer
+1,Which gyms near Tompkins Square Park (<200m) have fitness classes before 7am?,TMPL Clubs,"CrossFit East River
+Avea Pilates"
+2,What are hikes in Yellowstone that have been recommended by at least three different people with kids and are highly rated on TripAdvisor (an average from 4.5/5 from at least 50 reviews)?,Lone Star Geyser Trail,"Trout lake trail
+Artist Point
+Fountain Paint Pot
+Lone Star Geyser
+Storm Point Trail"
+3,"Based on recent years (2020-2023), how likely am I to hit a rainy day (at least 0.5mm of precipitation) if I travel to Seattle during the first week of September? (provide the answer in percentage)",11,14.2
+4,What's the lowest price a Single Family house was sold in Queen Anne in January 2023?,FAILED,1010000
+5,Which restaurants (not takeaway only) within 1 blocks of Washington Square Park have vegan mains for under $15?,"Manousheh, chloe., Superiority Burger, Red Bamboo, Peacefood Cafe, Vegan Grill",Shanghai villa
+6,"Which paintball places in Cologne, Germany are within a 10 minute walk from a karting track?",FAILED,Adrenalinpark Köln
+7,What is the highest rated (according to IMDB) Daniel Craig movie that is less than 150 minutes and is available on Netflix (US)?,Road to Perdition,Glass Onion: A Knives Out Mystery
+8,"How much will I save by getting annual passes for my family (2 adults, 1 kid age 5, 1 kid age 2) for the Seattle Children Museum, compared to buying daily tickets, if we visit 4 times in a year?",FAILED,45
+9, "Empty", "Empty", "Empty"
+10,Which of the people in the monday.com C-suite did not have a C-suite position during the company's IPO?,"Daniel Lereya, Yoni Osherov, Adi Dar, Shiran Nawi","Shiran Nawi, Yoni Osherov, Daniel Lereya"
+11,What is the link to the GFF3 file for beluga whales that was the most recent one on 20/10/2020?,No,https://ftp.ensembl.org/pub/release-101/gff3/delphinapterus_leucas/Delphinapterus_leucas.ASM228892v3.101.gff3.gz
+12,"Which Vanguard ETF had the highest pct increase between 2013 and 2023: VGT, MGK, or VONG?",FAILED,VGT
+13,"Which Magic: The Gathering Standard card (non-foil paper version released in its original set) that was banned at the same time as Oko, Thief of Crowns (including Oko, Crown of Thorns) had the highest price decrease from its all-time high to its all-time low?",Veil of Summer,"Oko, Thief of Crowns"
+14,"What's the smallest house (based on square footage) that has at least 2 beds and 2 baths and was sold in Prince Edward Island between June 1, 2022 and May 15 2024 according to Zillow?",FAILED,1148 sqft

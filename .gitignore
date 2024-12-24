@@ -24,7 +24,7 @@ available_apis/browser_tools/__pycache__/
 coding/
 
 # Ignore GAIA directory
-GAIA/
+/GAIA/
 
 # Ignore specific file patterns
 llm_cache.sqlite

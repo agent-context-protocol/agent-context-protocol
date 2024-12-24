@@ -1,107 +1,122 @@
 {
-    "user_query": "According to wikipedia, how many Asian countries still have a monarchy and access to the sea in 2021?",
+    "user_query": "What's the smallest house (based on square footage) that has at least 2 beds and 2 baths and was sold in Prince Edward Island between June 1, 2022 and May 15 2024 according to Zillow?",
     "1": {
         "1": {
-            "panel_description": "Identify Asian countries with monarchies.",
+            "panel_description": "Confirm Zillow Data Availability",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Retrieves a list of Asian countries with monarchies.",
+                    "handles": "Confirms Zillow's data availability for recently sold homes in Prince Edward Island, including details such as the number of bedrooms, bathrooms, and square footage, and ensures the data covers the specified date range.",
                     "input_vars": [
                         {
-                            "name": "query_asian_monarchies",
+                            "name": "zillow_data_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to find Asian countries with monarchies.",
-                            "value": "List of Asian countries with monarchies.",
+                            "description": "Query to confirm Zillow's data availability for the specified criteria.",
+                            "value": "Does Zillow provide data on recently sold homes in Prince Edward Island, including details such as the number of bedrooms, bathrooms, and square footage, and does it cover the date range of June 1, 2022, to May 15, 2024?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "asian_monarchies_list",
-                            "description": "List of Asian countries with monarchies.",
-                            "used_by": [
-                                {
-                                    "panel": 2,
-                                    "step": 1
-                                }
-                            ]
+                            "name": "zillow_data_availability",
+                            "description": "Confirmation of Zillow's data availability for the specified criteria.",
+                            "used_by": []
                         }
                     ]
                 }
             }
-        },
+        }
+    },
+    "2": {
         "2": {
-            "panel_description": "Determine which Asian monarchies have access to the sea.",
+            "panel_description": "Access and Filter Zillow Listings",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Determines sea access for each country in the list of Asian monarchies.",
+                    "handles": "Accesses Zillow's sold listings for Prince Edward Island and applies filters to show only homes with at least 2 beds and 2 baths.",
                     "input_vars": [
                         {
-                            "name": "asian_monarchies_list",
+                            "name": "zillow_filter_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
-                            "source": "API_Output (Panel 1, Step 1)",
-                            "description": "List of Asian countries with monarchies to check for sea access.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 1,
-                                    "step": 1
-                                }
-                            ]
+                            "source": "LLM_Generated",
+                            "description": "Query to access and filter Zillow's listings based on the specified criteria.",
+                            "value": "Access Zillow's sold listings for Prince Edward Island and apply filters to show only homes with at least 2 beds and 2 baths.",
+                            "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "monarchies_with_sea_access",
-                            "description": "List of Asian monarchies with access to the sea.",
-                            "used_by": [
-                                {
-                                    "panel": 3,
-                                    "step": 1
-                                }
-                            ]
+                            "name": "filtered_listings",
+                            "description": "Filtered Zillow listings for the specified criteria.",
+                            "used_by": []
                         }
                     ]
                 }
             }
-        },
+        }
+    },
+    "3": {
         "3": {
-            "panel_description": "Verify the status of Asian monarchies with sea access as of 2021.",
+            "panel_description": "Sort and Verify Listings",
             "steps": {
                 "1": {
-                    "api": "ReasoningAgent",
-                    "handles": "Verifies the status of the countries with sea access as of 2021.",
+                    "api": "BrowserTools",
+                    "handles": "Sorts the filtered listings from Panel 2 by square footage in ascending order and verifies that the listings fall within the specified date range.",
                     "input_vars": [
                         {
-                            "name": "monarchies_with_sea_access",
+                            "name": "sort_verify_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
-                            "source": "API_Output (Panel 2, Step 1)",
-                            "description": "List of Asian monarchies with sea access to verify their status as of 2021.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 2,
-                                    "step": 1
-                                }
-                            ]
+                            "source": "LLM_Generated",
+                            "description": "Query to sort and verify the listings based on the specified criteria.",
+                            "value": "Sort the filtered listings by square footage in ascending order and verify that the listings fall within the date range of June 1, 2022, to May 15, 2024.",
+                            "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "verified_monarchies_2021",
-                            "description": "Verified list of Asian monarchies with sea access as of 2021.",
+                            "name": "sorted_verified_listings",
+                            "description": "Sorted and verified listings for the specified criteria.",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "4": {
+        "4": {
+            "panel_description": "Identify and Cross-Verify Smallest House",
+            "steps": {
+                "1": {
+                    "api": "BrowserTools",
+                    "handles": "Identifies the house with the smallest square footage that meets all criteria and cross-verifies the information with other sources.",
+                    "input_vars": [
+                        {
+                            "name": "identify_cross_verify_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to identify and cross-verify the smallest house based on the specified criteria.",
+                            "value": "Identify the house with the smallest square footage that has at least 2 beds and 2 baths and was sold in Prince Edward Island between June 1, 2022, and May 15, 2024, and cross-verify the information with other sources.",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "smallest_house_info",
+                            "description": "Information about the house with the smallest square footage that meets all criteria.",
                             "used_by": []
                         }
                     ]
