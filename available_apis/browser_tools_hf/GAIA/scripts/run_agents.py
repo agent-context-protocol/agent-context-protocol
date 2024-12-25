@@ -13,7 +13,7 @@ from langchain.agents import AgentExecutor
 from langchain.tools.base import ToolException
 from transformers.agents.default_tools import Tool
 from transformers.agents.agents import AgentError
-from .evaluation.hard_questions import HARD_QUESTIONS
+from available_apis.browser_tools_hf.GAIA.scripts.evaluation.hard_questions import HARD_QUESTIONS
 
 def acall_langchain_agent(agent: AgentExecutor, question: str) -> str:
     return agent.ainvoke({"input": question})

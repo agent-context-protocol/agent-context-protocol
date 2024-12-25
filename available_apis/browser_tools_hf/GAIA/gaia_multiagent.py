@@ -5,14 +5,18 @@ import asyncio
 import os
 from typing import Optional
 import pandas as pd
+from openai import OpenAI, AsyncOpenAI
 from dotenv import load_dotenv
 import datasets
 from huggingface_hub import login
-from transformers.agents import ReactCodeAgent, ReactJsonAgent, HfApiEngine
+from transformers.agents import ReactCodeAgent, ReactJsonAgent
 from transformers.agents.agents import DEFAULT_REACT_JSON_SYSTEM_PROMPT
 from transformers.agents.default_tools import Tool, PythonInterpreterTool
 from transformers.agents.llm_engine import MessageRole
-from scripts.tools.web_surfer import (
+from langchain_openai import ChatOpenAI
+from langchain_openai import AzureChatOpenAI
+from langchain_community.cache import SQLiteCache
+from available_apis.browser_tools_hf.GAIA.scripts.tools.web_surfer import (
     SearchInformationTool,
     NavigationalSearchTool,
     VisitTool,
@@ -22,11 +26,11 @@ from scripts.tools.web_surfer import (
     FindNextTool,
     ArchiveSearchTool,
 )
-from scripts.tools.mdconvert import MarkdownConverter
-from scripts.reformulator import prepare_response
-from scripts.run_agents import answer_questions
-from scripts.tools.visual_qa import VisualQATool, VisualQAGPT4Tool, visualizer
-from scripts.llm_engines import OpenAIEngine, AnthropicEngine, NIMEngine
+from available_apis.browser_tools_hf.GAIA.scripts.tools.mdconvert import MarkdownConverter
+from available_apis.browser_tools_hf.GAIA.scripts.reformulator import prepare_response
+from available_apis.browser_tools_hf.GAIA.scripts.run_agents import answer_questions
+from available_apis.browser_tools_hf.GAIA.scripts.tools.visual_qa import VisualQATool, VisualQAGPT4Tool, visualizer
+from available_apis.browser_tools_hf.GAIA.scripts.llm_engines import OpenAIEngine, AnthropicEngine, NIMEngine
 load_dotenv(override=True)
 login(os.getenv("HUGGINGFACEHUB_API_TOKEN"))
 
@@ -40,8 +44,16 @@ USE_JSON = False
 
 SET = "validation"
 
+MODEL='gpt-4o-2024-08-06'
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+OPENAI_API_BASE = os.getenv('OPENAI_API_BASE')
+
 # proprietary_llm_engine = AnthropicEngine(use_bedrock=True)
-proprietary_llm_engine = AnthropicEngine()
+# proprietary_llm_engine = AnthropicEngine()
+proprietary_llm_engine = OpenAI()
+
+cache = SQLiteCache("llm_cache.sqlite")
+proprietary_llm_engine = ChatOpenAI(model=MODEL, temperature=0, streaming=False, max_retries=5, api_key=OPENAI_API_KEY, base_url=OPENAI_API_BASE, cache=cache, timeout = 350)
 
 repo_id_llama3 = "meta-llama/Meta-Llama-3-70B-Instruct"
 repo_id_command_r = "CohereForAI/c4ai-command-r-plus"
@@ -72,12 +84,7 @@ print(pd.Series(eval_ds["task"]).value_counts())
 
 
 # Replace with OAI if needed
-if USE_OPEN_MODELS:
-    websurfer_llm_engine = HfApiEngine(
-        model=REPO_ID_OS_MODEL,
-    )  # chosen for its high context length
-else:
-    websurfer_llm_engine = proprietary_llm_engine
+websurfer_llm_engine = proprietary_llm_engine
 
 ### BUILD AGENTS & TOOLS
 
@@ -212,9 +219,7 @@ TASK_SOLVING_TOOLBOX = [
 if USE_JSON:
     TASK_SOLVING_TOOLBOX.append(PythonInterpreterTool())
 
-hf_llm_engine = HfApiEngine(model=REPO_ID_OS_MODEL)
-
-llm_engine = hf_llm_engine if USE_OPEN_MODELS else proprietary_llm_engine
+llm_engine = proprietary_llm_engine
 
 react_agent = ReactCodeAgent(
     llm_engine=llm_engine,

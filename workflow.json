@@ -1,122 +1,107 @@
 {
-    "user_query": "What's the smallest house (based on square footage) that has at least 2 beds and 2 baths and was sold in Prince Edward Island between June 1, 2022 and May 15 2024 according to Zillow?",
+    "user_query": "How many High Energy Physics - Lattice articles listed in January 2020 on Arxiv had ps versions available?",
     "1": {
         "1": {
-            "panel_description": "Confirm Zillow Data Availability",
+            "panel_description": "Identify URL for January 2020 High Energy Physics - Lattice Articles on arXiv.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Confirms Zillow's data availability for recently sold homes in Prince Edward Island, including details such as the number of bedrooms, bathrooms, and square footage, and ensures the data covers the specified date range.",
+                    "handles": "Searches for the URL on arXiv for High Energy Physics - Lattice articles for January 2020.",
                     "input_vars": [
                         {
-                            "name": "zillow_data_query",
+                            "name": "query_jan2020_url",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to confirm Zillow's data availability for the specified criteria.",
-                            "value": "Does Zillow provide data on recently sold homes in Prince Edward Island, including details such as the number of bedrooms, bathrooms, and square footage, and does it cover the date range of June 1, 2022, to May 15, 2024?",
+                            "description": "Search query to find the URL for High Energy Physics - Lattice articles on arXiv for January 2020.",
+                            "value": "arXiv High Energy Physics - Lattice articles January 2020 URL",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "zillow_data_availability",
-                            "description": "Confirmation of Zillow's data availability for the specified criteria.",
-                            "used_by": []
+                            "name": "jan2020_url",
+                            "description": "URL for High Energy Physics - Lattice articles on arXiv for January 2020.",
+                            "used_by": [
+                                {
+                                    "panel": 2,
+                                    "step": 1
+                                }
+                            ]
                         }
                     ]
                 }
             }
-        }
-    },
-    "2": {
+        },
         "2": {
-            "panel_description": "Access and Filter Zillow Listings",
+            "panel_description": "Access and extract January 2020 articles from the identified URL.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Accesses Zillow's sold listings for Prince Edward Island and applies filters to show only homes with at least 2 beds and 2 baths.",
+                    "handles": "Accesses the URL and extracts article details, including available formats.",
                     "input_vars": [
                         {
-                            "name": "zillow_filter_query",
+                            "name": "jan2020_url",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to access and filter Zillow's listings based on the specified criteria.",
-                            "value": "Access Zillow's sold listings for Prince Edward Island and apply filters to show only homes with at least 2 beds and 2 baths.",
-                            "dependencies": []
+                            "source": "API_Output (Panel 1, Step 1)",
+                            "description": "URL for accessing High Energy Physics - Lattice articles on arXiv for January 2020.",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "panel": 1,
+                                    "step": 1
+                                }
+                            ]
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "filtered_listings",
-                            "description": "Filtered Zillow listings for the specified criteria.",
-                            "used_by": []
+                            "name": "article_details",
+                            "description": "List of articles for January 2020 with available formats.",
+                            "used_by": [
+                                {
+                                    "panel": 3,
+                                    "step": 1
+                                }
+                            ]
                         }
                     ]
                 }
             }
-        }
-    },
-    "3": {
+        },
         "3": {
-            "panel_description": "Sort and Verify Listings",
+            "panel_description": "Count the number of articles with PS versions available.",
             "steps": {
                 "1": {
-                    "api": "BrowserTools",
-                    "handles": "Sorts the filtered listings from Panel 2 by square footage in ascending order and verifies that the listings fall within the specified date range.",
+                    "api": "ReasoningAgent",
+                    "handles": "Counts the number of articles with ps versions from the extracted list.",
                     "input_vars": [
                         {
-                            "name": "sort_verify_query",
+                            "name": "article_details",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to sort and verify the listings based on the specified criteria.",
-                            "value": "Sort the filtered listings by square footage in ascending order and verify that the listings fall within the date range of June 1, 2022, to May 15, 2024.",
-                            "dependencies": []
+                            "source": "API_Output (Panel 2, Step 1)",
+                            "description": "List of articles with their available formats.",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "panel": 2,
+                                    "step": 1
+                                }
+                            ]
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "sorted_verified_listings",
-                            "description": "Sorted and verified listings for the specified criteria.",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        }
-    },
-    "4": {
-        "4": {
-            "panel_description": "Identify and Cross-Verify Smallest House",
-            "steps": {
-                "1": {
-                    "api": "BrowserTools",
-                    "handles": "Identifies the house with the smallest square footage that meets all criteria and cross-verifies the information with other sources.",
-                    "input_vars": [
-                        {
-                            "name": "identify_cross_verify_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to identify and cross-verify the smallest house based on the specified criteria.",
-                            "value": "Identify the house with the smallest square footage that has at least 2 beds and 2 baths and was sold in Prince Edward Island between June 1, 2022, and May 15, 2024, and cross-verify the information with other sources.",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "smallest_house_info",
-                            "description": "Information about the house with the smallest square footage that meets all criteria.",
+                            "name": "ps_version_count",
+                            "description": "Number of articles with ps versions available.",
                             "used_by": []
                         }
                     ]

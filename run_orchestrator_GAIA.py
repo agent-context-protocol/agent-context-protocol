@@ -63,20 +63,24 @@ def reformat_query_with_attachment_content(user_query):
     # reformatted_query = f"question: {user_query.split('Attachment: file://')[0].strip()}\n"
     reformatted_query = f"question: {user_query}\n"
     reformatted_query += f"Attachment File Content:\n{text_content}"
+
+    file_path_str = f"'Attachment: file://{user_query.split('Attachment: file://')[0].strip()}\n\nAttachment File Content:\n{text_content}"
     
     # # Display extracted details for confirmation
     # print("Result title:", res.title)
     # print("Result text content:", res.text_content)
     
-    return reformatted_query
+    return reformatted_query, file_path_str
 
 async def run_orch_func(user_query):
     orchestrator = MainOrchestrator()
 
     # if user query has a file attachement
+    file_path_str = None
     if "Attachment: file://" in user_query:
-        user_query = reformat_query_with_attachment_content(user_query)
+        user_query, file_path_str = reformat_query_with_attachment_content(user_query)
         print("user_query : ",user_query)
+        print("file_path_str : ",file_path_str)
         # print(cause_Error)
         
 
@@ -84,7 +88,7 @@ async def run_orch_func(user_query):
     workflow = await orchestrator.initialise(user_query)
 
     outputs={}
-    async for group_id, group_results in orchestrator.run(user_query, workflow):
+    async for group_id, group_results in orchestrator.run(user_query, workflow, file_path_str):
         outputs[group_id] = group_results
 
     print("Workflow completed!")

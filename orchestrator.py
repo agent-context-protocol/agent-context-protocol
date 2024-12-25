@@ -19,7 +19,8 @@ client = OpenAI()
 all_panel_outputs = {}
 
 class Manager:
-    def __init__(self, workflow, main_translator, local_translator_system_prompt):
+    def __init__(self, workflow, file_path_str, main_translator, local_translator_system_prompt):
+        self.file_path_str = file_path_str
         self.main_translator = main_translator
         self.local_translator_system_prompt = local_translator_system_prompt
         self.groups = {}
@@ -37,7 +38,8 @@ class Manager:
                     workflow["user_query"],
                     translator_data["panel_description"],
                     system_prompt=local_translator_system_prompt,
-                    main_translator=self.main_translator
+                    main_translator=self.main_translator,
+                    file_path_str=file_path_str
                 )
                 translator.group_workflow = group_data
                 translator.group_id = group_id
@@ -107,7 +109,8 @@ class Manager:
                     modified_workflow["user_query"],
                     translator_data["panel_description"],
                     system_prompt=self.local_translator_system_prompt,
-                    main_translator=self.main_translator
+                    main_translator=self.main_translator,
+                    file_path_str=self.file_path_str,
                 )
                 translator.group_workflow = group_data
                 translator.group_id = group_id
@@ -180,7 +183,7 @@ class MainOrchestrator:
         all_panel_outputs = {}
         return workflow
 
-    async def run(self, user_query, workflow):
+    async def run(self, user_query, workflow, file_path_str):
         # Get initial setup from interpreter and send to main translator
         # self.interpreter.user_query = user_query
         # panels_list = self.interpreter.setup()
@@ -192,7 +195,7 @@ class MainOrchestrator:
 
         print("Workflow:", workflow)
 
-        communication_manager = Manager(workflow, self.main_translator, self.local_translator_system_prompt)
+        communication_manager = Manager(workflow, file_path_str, self.main_translator, self.local_translator_system_prompt)
         
         # Modify the Manager to yield results as groups complete
         async for group_id, group_results in communication_manager.run():

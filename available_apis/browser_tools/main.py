@@ -22,7 +22,7 @@ from langchain_openai import ChatOpenAI
 from langchain_openai import AzureChatOpenAI
 from langchain_community.cache import SQLiteCache
 from langchain_core.callbacks import BaseCallbackHandler
-
+import requests
 from openai import OpenAI
 
 from autogen.code_utils import execute_code
@@ -37,6 +37,7 @@ SPLIT = 'validation'
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 OPENAI_API_BASE = os.getenv('OPENAI_API_BASE')
 BING_API_KEY = os.getenv('BING_API_KEY')
+SERPAPI_KEY = os.environ["SERPAPI_API_KEY"]
 
 client = OpenAI()
 
@@ -106,6 +107,7 @@ class Sibyl:
 
         browser_config={
             "bing_api_key": BING_API_KEY,
+            # "serpapi_key": SERPAPI_KEY,
             "viewport_size": 1024 * 16,
             "downloads_folder": "coding",
             "request_kwargs": {
@@ -176,11 +178,13 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
     
     def informational_web_search(self, query: str) -> str:
         self.browser.visit_page(f"bing: {query}")
+        # self.browser.visit_page(f"google: {query}")
         header, content = self.browser_state()
         return header.strip() + "\n=======================\n" + content
     
     def navigational_web_search(self, query: str) -> str:
         self.browser.visit_page(f"bing: {query}")
+        # self.browser.visit_page(f"google: {query}")
         # Extract the first linl
         m = re.search(r"\[.*?\]\((http.*?)\)", self.browser.page_content)
         if m:
@@ -264,6 +268,20 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
         else:
             return header.strip() + "\n=======================\n" + content
         
+
+    def find_archived_url(self, url, date) -> str:
+        archive_url = f"https://archive.org/wayback/available?url={url}&timestamp={date}"
+        response = requests.get(archive_url).json()
+        try:
+            closest = response["archived_snapshots"]["closest"]
+        except:
+            raise Exception(f"Your url was not archived on Wayback Machine, try a different url.")
+        target_url = closest["url"]
+        self.browser.visit_page(target_url)
+        header, content = self.browser_state()
+        return f"Web archive for url {url}, snapshot taken at date {closest['timestamp'][:8]}:\n" + header.strip() + "\n=======================\n" + content
+
+        
     def computer_terminal(self, code: str) -> str:
         status_code, stdout, _ = execute_code(code, work_dir='coding', use_docker=False, timeout=20)
         return {
@@ -299,7 +317,7 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
                     if tool_choice['tool'] == 'computer_terminal' and tool_choice['tool_args'].get('code', '') == '':
                         has_error = True
                         continue
-                    elif tool_choice['tool'] not in ['informational_web_search', 'navigational_web_search', 'visit_page', 'page_up', 'page_down', 'download_file', 'find_on_page_ctrl_f', 'find_next', 'computer_terminal', 'vision_qa', 'None']:
+                    elif tool_choice['tool'] not in ['informational_web_search', 'navigational_web_search', 'visit_page', 'page_up', 'page_down', 'download_file', 'find_on_page_ctrl_f', 'find_next', 'computer_terminal', 'vision_qa', 'find_archived_url', 'None']:
                         has_error = True
                         continue
                     else:
@@ -329,6 +347,8 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
                 tool_result = self.find_next()
             elif tool == "vision_qa":
                 tool_result = self.vision_qa(**args)
+            elif tool == 'find_archived_url':
+                tool_result = self.find_archived_url(**args)
             elif tool == 'computer_terminal':
                 improve_error = False
                 for _ in range(10):
@@ -363,10 +383,15 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
                 answer = self.user_proxy.initiate_chat(
                     self.society_of_mind_agent, 
                     message=f"""{question}\nIf you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided. 
-                    You have to only suggest sub-tasks/sub-queries for solving the main query and strictly not provide the solution yourself.
-                    For your context, you have to provide the sub-tasks/sub-queries required to be done for solving the query provided by the user. You have to analyse thq query well and suggest the most logical and appropriate sub-tasks/sub-queries which if solved could lead to solving the main query. 
-                    You have two tools at your service BrowserTools (As a web search engine to retrieve and synthesize information from multiple sources into a single, concise response. It can also be utilized for reasoning tasks , image based question answering and coding assistance, including code writing and execution.) and ReasoningAgent (This function acts as a reasoming agent to deeply think about a reasoning problem which does not require web search and rather can be solved through pure reasoning.).
-                    For every sub-task/sub-query please mention which tool would be better for it BrowserTools or ReasoningAgent. Remember that use ReasoningAgent for purely reasoning based things, if any prior knowledge of something is assumed, then its better to use BrowserTools instead.
+                    You have to only suggest sub-tasks/sub-queries for solving the main query and strictly not provide the solution yourself. For your context, propose the sub-tasks/sub-queries required to address the user’s query thoroughly. Carefully analyze the query and suggest the most logical and appropriate sub-tasks/sub-queries which, if solved, would lead to answering the main query. Based on your initial web searches, you can recommend well-informed sub-tasks/sub-queries that make the solution path more focused rather than vague, utilizing insights into which searches met expectations and which did not, while providing workarounds where needed.
+
+                    Disentangle the query into different sub-tasks/sub-queries so that each is an independent part of the main query—avoid combining unrelated issues into a single sub-task, as it increases confusion. Also, do not create too many sub-tasks/sub-queries unnecessarily. For example, do not break down a single web-search task into multiple smaller sub-tasks that repeat the same step. Similarly, when handling files, retrieving and analyzing the file information should be combined into one sub-task or sub-query, without splitting it into separate ones for verification or redundant analysis. There is absolutely no need for verification based steps, please dont add them.
+
+                    You have two tools at your disposal:
+                    1. **BrowserTools**: A web search engine that can retrieve and synthesize information from multiple sources into a concise response. It can also handle image-based question answering, coding assistance, and code execution.
+                    2. **ReasoningAgent**: An agent for deep thinking on problems that can be solved with pure reasoning, without requiring web searches.
+
+                    For each sub-task/sub-query, specify which tool (BrowserTools or ReasoningAgent) is best suited. Use ReasoningAgent for purely reasoning-based tasks; if some prior knowledge or outside information is assumed, use BrowserTools instead.
                     DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
             else:
                 answer = self.user_proxy.initiate_chat(
@@ -382,10 +407,15 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
                     {steps_prompt}
 
                     Referring to the information I have obtained (which may not be accurate), what do you think is the answer to the question?
-                    You have to only suggest sub-tasks/sub-queries for solving the main query and strictly not provide the solution yourself.
-                    For your context, you have to provide the sub-tasks/sub-queries required to be done for solving the query provided by the user. You have to analyse thq query well and suggest the most logical and appropriate sub-tasks/sub-queries which if solved could lead to solving the main query. 
-                    You have two tools at your service BrowserTools (As a web search engine to retrieve and synthesize information from multiple sources into a single, concise response. It can also be utilized for reasoning tasks , image based question answering and coding assistance, including code writing and execution.) and ReasoningAgent (This function acts as a reasoming agent to deeply think about a reasoning problem which does not require web search and rather can be solved through pure reasoning.).
-                    For every sub-task/sub-query please mention which tool would be better for it BrowserTools or ReasoningAgent. Remember that use ReasoningAgent for purely reasoning based things, if any prior knowledge of something is assumed, then its better to use BrowserTools instead.
+                    You have to only suggest sub-tasks/sub-queries for solving the main query and strictly not provide the solution yourself. For your context, propose the sub-tasks/sub-queries required to address the user’s query thoroughly. Carefully analyze the query and suggest the most logical and appropriate sub-tasks/sub-queries which, if solved, would lead to answering the main query. Based on your initial web searches, you can recommend well-informed sub-tasks/sub-queries that make the solution path more focused rather than vague, utilizing insights into which searches met expectations and which did not, while providing workarounds where needed.
+
+                    Disentangle the query into different sub-tasks/sub-queries so that each is an independent part of the main query—avoid combining unrelated issues into a single sub-task, as it increases confusion. Also, do not create too many sub-tasks/sub-queries unnecessarily. For example, do not break down a single web-search task into multiple smaller sub-tasks that repeat the same step. Similarly, when handling files, retrieving and analyzing the file information should be combined into one sub-task or sub-query, without splitting it into separate ones for verification or redundant analysis. There is absolutely no need for verification based steps, please dont add them.
+
+                    You have two tools at your disposal:
+                    1. **BrowserTools**: A web search engine that can retrieve and synthesize information from multiple sources into a concise response. It can also handle image-based question answering, coding assistance, and code execution.
+                    2. **ReasoningAgent**: An agent for deep thinking on problems that can be solved with pure reasoning, without requiring web searches.
+
+                    For each sub-task/sub-query, specify which tool (BrowserTools or ReasoningAgent) is best suited. Use ReasoningAgent for purely reasoning-based tasks; if some prior knowledge or outside information is assumed, use BrowserTools instead.
                     If you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided.
                     DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
             else:
@@ -396,7 +426,7 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
                     {steps_prompt}
 
                     Referring to the information I have obtained (which may not be accurate), what do you think is the answer to the question?
-                    If you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided.
+                    It is ok to be not sure about the answer and provide a partial answer through a vague educated guess based on the information provided, but remember that providing some answer is much better than saying that no answer exists.
                     DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
         # formatted_answer = self.format_answer_chain.invoke({'question': question, 'answer': answer})#.answer
 
@@ -512,8 +542,9 @@ def browser_tools_function(dict_body, interpreter_bool = False):
 
     return response_dict
 
-# # report check
+# report check
 # dict_body = {"query": "What is there in the background and forwground of this image in the url: https://images.pexels.com/photos/346885/pexels-photo-346885.jpeg?cs=srgb&dl=pexels-nurseryart-346885.jpg&fm=jpg"}
+# dict_body = {"query": "The photograph in the Whitney Museum of American Art's collection with accession number 2022.128 shows a person holding a book. Which military unit did the author of this book join in 1813? Answer without using articles."}
 # res_dict = browser_tools_function(dict_body)
 # print("res_dict : ",res_dict)
 

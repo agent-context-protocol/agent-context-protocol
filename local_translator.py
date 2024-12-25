@@ -22,7 +22,7 @@ merge_browser_functions()
 
 #######################################ßßß
 class LocalTranslatorNode(BaseNode):
-    def __init__(self, panel_no, user_query, panel_description, system_prompt=None, main_translator=None):
+    def __init__(self, panel_no, user_query, panel_description, system_prompt=None, main_translator=None, file_path_str=None):
         super().__init__(panel_no, system_prompt)
         self.panel_no = panel_no
         self.panel_description = panel_description
@@ -31,6 +31,7 @@ class LocalTranslatorNode(BaseNode):
         self.main_translator = main_translator
         self.group_id = None
         self.user_query = user_query
+        self.file_path_str=file_path_str
 
         self.prev_status_update = None
 
@@ -937,6 +938,9 @@ class LocalTranslatorNode(BaseNode):
     # for running functions
     def function_call(self, api_name, body = None):
         
+        if api_name in ["BrowserTools", "ReasoningAgent"]:
+            if "query" in body:
+                body["query"] = body["query"] + f"\nFile-->{self.file_path_str}"
         response = FUNCTION_APIS_FUNCTION_DICT[api_name](body)
 
         # Check if the request was successful

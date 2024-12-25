@@ -10,7 +10,7 @@ import requests
 from pypdf import PdfReader
 from markdownify import markdownify as md
 import mimetypes
-from .browser import SimpleTextBrowser
+from available_apis.browser_tools_hf.GAIA.scripts.tools.browser import SimpleTextBrowser
 
 load_dotenv(override=True)
 

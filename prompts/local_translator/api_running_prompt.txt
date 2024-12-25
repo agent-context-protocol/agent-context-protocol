@@ -123,6 +123,7 @@ API Documentation:
   - Only raise errors for critical issues; minor problems should be handled internally.
   - Provide a clear explanation in the ERROR_EXPLANATION section.
 
+- Do not unnecessarily add complexity to the queries based on whole user query trying to answer the whole user query. You have to focus on the purpose of the step you are executing. User query was provided for getting the global context.
 ---
     
 ### Your Goal:
@@ -135,6 +136,7 @@ API Documentation:
   - Pay attention to deliberately exclude any unnecessary pieces of data in the API call.
   - If the API has parameters to limit the output, such as page and pageSize, use them to limit the pageSize to less than 15 with page being 1 or as appropriate for the specific API.
 - If the query is referring to the file attachment then please provide the file attachment as well as it is to the BroswerTools APIs else they wont understand the context.
+- Do not unnecessarily add complexity to the queries based on the whole user query trying to answer the whole user query. You have to focus on the purpose of the step you are executing. User query was provided for getting the global context.
 
 ### Output Format (Strictly follow this)
 
@@ -168,6 +170,7 @@ $$CHAIN_OF_THOUGHT$$
     - See if the API has parameters to limit the output, like page and pageSize.
     - If yes, set pageSize to less than 15 and page to 1 or as appropriate.
     - Keep the number of API requests under 5. If more are there, then prioritize and call up to 5 API requests. Only allow BrowserTools API to have more than 5 API calls.
+  - Do not unnecessarily add complexity to the queries based on whole user query trying to answer the whole user query. You have to focus on the purpose of the step you are executing. User query was provided for getting the global context.
 
 $$API_REQUEST$$
 
@@ -217,7 +220,7 @@ ERROR_EXPLANATION
 - If you encounter any issues that prevent you from finalizing the API request (e.g., missing required inputs, conflicts in parameters), you should raise an error detailing the issue.
 - Always prefer making multiple API requests over overloading a single parameter with multiple values, unless the API specifically supports multiple values and it's necessary.
 - If the query is referring to the file attachment then please provide the file attachment as well as it is to the BroswerTools APIs else they wont understand the context.
-- Do not unnecessarily add complexity to the BroswerTools queries based on user query trying to answer the whole user query. You have to focus on the purpose of the step you are executing.
+- Do not unnecessarily add complexity to the queries based on user query trying to answer the whole user query. You have to focus on the purpose of the step you are executing. User query was provided for getting the global context.
 
 ### Some More Example:
 
@@ -597,6 +600,8 @@ Final Decision:
 - Create ten separate API requests, one for each vacation spot.
 - Each request will have its own query parameter formatted as "What are the latitude and longitude of [vacation spot]?"
 
+-  We are not unnecessarily adding complexity to the queries based on whole user query trying to answer the whole user query. You have to focus on the purpose of the step you are executing.
+
 $$API_REQUEST$$
 
 API_ENDPOINT
@@ -706,6 +711,8 @@ Final Decision:
 
 - Proceed with the API request using the constructed query.
 
+- We are not unnecessarily adding complexity to the queries based on whole user query trying to answer the whole user query. You have to focus on the purpose of the step you are executing.
+
 $$API_REQUEST$$
 
 API_ENDPOINT
@@ -800,6 +807,8 @@ Final Decision:
 
 - Proceed with the API request using the constructed query.
 
+-  We are not unnecessarily adding complexity to the queries based on whole user query trying to answer the whole user query. You have to focus on the purpose of the step you are executing.
+
 $$API_REQUEST$$
 
 API_ENDPOINT
@@ -814,120 +823,8 @@ BODY
   "query": "What are the official languages of Switzerland?",
 }
 
+
 #### Example 7:
-
-# Input:
-
--	User Query:
-“Using the attached transcript of the latest board meeting, what were the key decisions made regarding the new marketing strategy? Provide the details as stated in the transcript.”
-
-Attachment File Content:
-
-[Transcript of the board meeting]
-Chairperson: "We need to allocate more budget to digital marketing channels..."
-Marketing Director: "Agreed, focusing on social media influencers could boost our brand..."
-[Further dialogue]
-
--	Panel Description:
-“Extract the key decisions about the new marketing strategy from the board meeting transcript.”
-
-Step Details:
-
--	API: BrowserTools
--	Handles: Summarizes key decisions from the transcript regarding the new marketing strategy.
--	Input Variables:
-  -	Name: query_marketing_decisions
-    -	Parameter: query
-    -	Type: string
-    -	Source: LLM_Generated
-    -	Description: Query to extract key marketing decisions from the transcript.
-    -	Value: “Extract the key decisions about the new marketing strategy from the board meeting transcript.”
--	Output Variables:
-  -	Name: marketing_strategy_decisions
-    -	Description: Key decisions regarding the new marketing strategy.
-
-API Documentation:
-
-[You will be given the api documentation]
-
-# Your Output:
-
-$$CHAIN_OF_THOUGHT$$
-
-Input Variables:
-
-	-	Name: query_marketing_decisions
-	-	Parameter: query
-	-	Type: string
-	-	Source: LLM_Generated
-	-	Description: Query to extract key marketing decisions from the transcript.
-	-	Value: "Extract the key decisions about the new marketing strategy from the board meeting transcript."
-
-Verification of Input Variables:
-
-	-	The parameter query is required and expects a string representing the user’s question.
-	-	The query_marketing_decisions variable matches the expected parameter query and is of the correct type (string).
-	-	The value is provided but lacks the necessary context, as the API does not have access to the attachment unless included in the query.
-  - If we want to perform image analysis using BrowserTools, then we always have to provide the image path else BrowserTools wont know what is being referred to.
-
-Forming the Query:
-
-	-	To ensure the API can process the request accurately, we need to include the transcript content within the query as it is. We should always provide the whole file attachment without shortening it on our own.
-	- We need to priortize the query for the purpose of the step we are executing and not try to answer the whole user query.
-  -	Constructed query:
-
-"Extract the key decisions about the new marketing strategy from the following board meeting transcript:
-[Transcript of the board meeting]
-Chairperson: 'We need to allocate more budget to digital marketing channels...'
-Marketing Director: 'Agreed, focusing on social media influencers could boost our brand...'
-[Further dialogue]"
-
-Dependencies:
-
-	-	The input variable is generated by the LLM and does not depend on previous API outputs.
-
-HTTP Method & Function Name:
-
-	-	The method is FUNCTION since we are handling a Python function.
-	-	The function name is browser_tools_function.
-
-Headers:
-
-	-	No headers are required; the Headers section should be empty.
-
-Request Body:
-
-	-	Include the constructed query:
-
-{
-  "query": "Extract the key decisions about the new marketing strategy from the following board meeting transcript:\n[Transcript of the board meeting]\nChairperson: 'We need to allocate more budget to digital marketing channels...'\nMarketing Director: 'Agreed, focusing on social media influencers could boost our brand...'\n[Further dialogue]"
-}
-
-
-Limiting Output:
-
-	-	Only one API request is needed.
-
-Final Decision:
-
-	-	Proceed with the API request using the constructed query.
-
-$$API_REQUEST$$
-
-API_ENDPOINT
-
-Method: FUNCTION
-URL: browser_tools_function
-
-HEADERS
-
-BODY
-
-{
-  "query": "Extract the key decisions about the new marketing strategy from the following board meeting transcript:\n[Transcript of the board meeting]\nChairperson: 'We need to allocate more budget to digital marketing channels...'\nMarketing Director: 'Agreed, focusing on social media influencers could boost our brand...'\n[Further dialogue]"
-}
-
-#### Example 8:
 
 # Input:
 
@@ -998,6 +895,8 @@ $$CHAIN_OF_THOUGHT$$
 7. Final Decision:
    - Make a single FUNCTION call with the "query" parameter containing the entire textual request plus the file path.
 
+-  We are not unnecessarily adding complexity to the queries based on whole user query trying to answer the whole user query. You have to focus on the purpose of the step you are executing. 
+
 $$API_REQUEST$$
 
 API_ENDPOINT
@@ -1013,4 +912,116 @@ BODY
 
 {
   "query": "Performs detailed image analysis on the partial blueprint file to detect floor labels, references to shops, basement, or rooftop structures. file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/site_diagram.png"
+}
+
+#### Example 8
+
+# Input:
+
+- User Query:
+  "I have a multi-part task. First, there's a PDF file named flight_schedules.pdf that contains flight departure times, arrival times, ticket prices, and seats left. Later, I'll compare these flights with another source. Right now, I just need to extract all flight details from the PDF.
+  file:///Users/ExampleUser/Documents/flight_schedules.pdf"
+
+- Step Details:
+  - API: BrowserTools
+  - Handles: Extracts text and tabular data from a PDF file containing flight schedules
+  - Input Variables:
+    - Name: flight_schedule_info
+      - Parameter: query
+      - Type: string
+      - Source: LLM_Generated
+      - Description: Request to analyze the PDF flight schedules
+      - Value: "Extract flight details from the PDF flight_schedules.pdf"
+  - Output Variables:
+    - Name: extracted_flights
+      - Description: Complete list of flights (departure times, arrival times, ticket prices, seats left)
+
+Input Details:
+
+API_KEY: YOUR_API_KEY
+
+API Documentation:
+
+[BrowserTools API documentation goes here, clarifying that the API needs a file path in the query to perform PDF analysis]
+
+# Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+1. The user query talks about analyzing a PDF (flight_schedules.pdf).  
+2. The step only focuses on extracting flight details from that PDF.  
+3. However, the Value in the input variable does not explicitly include the file path. Without the file path, BrowserTools cannot analyze the PDF.  
+4. We must therefore append the file path to the final query so BrowserTools knows which file to analyze.  
+
+$$API_REQUEST$$
+
+API_ENDPOINT
+
+Method: FUNCTION  
+URL: browser_tools_function
+
+HEADERS
+
+{}
+
+BODY
+
+{
+  "query": "Extract flight details from the PDF. file:///Users/ExampleUser/Documents/flight_schedules.pdf"
+}
+
+#### Example 9
+
+# Input:
+
+- User Query:
+  "I have a high-resolution map of a state forest named forest_map.png. The map shows hiking trails, campsites, and scenic overlooks. Eventually, I'll need to compare these to a list of wildlife sightings, but for now, I only want to locate each hiking trail on the map.
+  file:///Users/ExampleUser/Maps/forest_map.png"
+
+- Step Details:
+  - API: BrowserTools
+  - Handles: Performs image analysis to identify marked trails on a state forest map
+  - Input Variables:
+    - Name: forest_map_analysis
+      - Parameter: query
+      - Type: string
+      - Source: LLM_Generated
+      - Description: Task to analyze the map for labeled hiking trails
+      - Value: "Identify all the hiking trails from forest_map.png"
+  - Output Variables:
+    - Name: trail_list
+      - Description: List of hiking trails found on the map
+
+Input Details:
+
+API_KEY: YOUR_API_KEY
+
+API Documentation:
+
+[BrowserTools API documentation stating that image files must be referenced by file path]
+
+# Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+1. The user eventually wants a broader comparison involving wildlife sightings, but the current step only requires extracting the hiking trails from the image.  
+2. The input variable mentions the map name but does not include the actual file path.  
+3. BrowserTools needs the complete path to forest_map.png to analyze it.  
+4. We will add the file path to the query so that the API can process the image properly.
+
+$$API_REQUEST$$
+
+API_ENDPOINT
+
+Method: FUNCTION  
+URL: browser_tools_function
+
+HEADERS
+
+{}
+
+BODY
+
+{
+  "query": "Identify all the hiking trails from the image. file:///Users/ExampleUser/Maps/forest_map.png"
 }

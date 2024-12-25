@@ -13,9 +13,9 @@ import pathvalidate
 from urllib.parse import urljoin, urlparse, unquote, parse_qs
 from urllib.request import url2pathname
 from typing import Any, Dict, List, Optional, Union, Tuple
-from .mdconvert import MarkdownConverter, UnsupportedFormatException, FileConversionException
+from available_apis.browser_tools_hf.GAIA.scripts.tools.mdconvert import MarkdownConverter, UnsupportedFormatException, FileConversionException
 from serpapi import GoogleSearch
-from .cookies import COOKIES
+from available_apis.browser_tools_hf.GAIA.scripts.tools.cookies import COOKIES
 
 
 class SimpleTextBrowser:
