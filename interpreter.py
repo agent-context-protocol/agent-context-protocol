@@ -1,7 +1,8 @@
 from utils import fetch_user_data, update_interpreter_with_similar_apis
 import json
 from base import BaseNode
-from available_apis.browser_tools.main import browser_tools_function
+# from available_apis.browser_tools.main import browser_tools_function
+from available_apis.browser_tools_hf.GAIA.main import browser_tools_function
 
 class InterpreterNode(BaseNode):
     def __init__(self, node_name, user_query = None, system_prompt = None, personal_json = 'personal_info.json'):

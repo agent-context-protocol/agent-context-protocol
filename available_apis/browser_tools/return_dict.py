@@ -1,4 +1,5 @@
-from available_apis.browser_tools.main import browser_tools_function, reasoning_agent_function
+from available_apis.browser_tools.main import reasoning_agent_function #, browser_tools_function
+from available_apis.browser_tools_hf.GAIA.main import browser_tools_function
 
 # BROWSER_TOOLS_FUNCTION_DOCS = """Function: browser_tools_function
 

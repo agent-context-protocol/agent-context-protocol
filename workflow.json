@@ -1,107 +1,122 @@
 {
-    "user_query": "How many High Energy Physics - Lattice articles listed in January 2020 on Arxiv had ps versions available?",
+    "user_query": "In the YouTube 360 VR video from March 2018 narrated by the voice actor of Lord of the Rings' Gollum, what number was mentioned by the narrator directly after dinosaurs were first shown in the video?",
     "1": {
         "1": {
-            "panel_description": "Identify URL for January 2020 High Energy Physics - Lattice Articles on arXiv.",
+            "panel_description": "Identify the voice actor who played Gollum in the Lord of the Rings series.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Searches for the URL on arXiv for High Energy Physics - Lattice articles for January 2020.",
+                    "handles": "Identifying the voice actor of Gollum in the Lord of the Rings series.",
                     "input_vars": [
                         {
-                            "name": "query_jan2020_url",
+                            "name": "query_voice_actor",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Search query to find the URL for High Energy Physics - Lattice articles on arXiv for January 2020.",
-                            "value": "arXiv High Energy Physics - Lattice articles January 2020 URL",
+                            "description": "Query to find the voice actor of Gollum in the Lord of the Rings series.",
+                            "value": "Who is the voice actor of Gollum in the Lord of the Rings series?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "jan2020_url",
-                            "description": "URL for High Energy Physics - Lattice articles on arXiv for January 2020.",
-                            "used_by": [
-                                {
-                                    "panel": 2,
-                                    "step": 1
-                                }
-                            ]
+                            "name": "voice_actor_name",
+                            "description": "Name of the voice actor who played Gollum.",
+                            "used_by": []
                         }
                     ]
                 }
             }
-        },
+        }
+    },
+    "2": {
         "2": {
-            "panel_description": "Access and extract January 2020 articles from the identified URL.",
+            "panel_description": "Locate the YouTube 360 VR video from March 2018 narrated by the identified voice actor.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Accesses the URL and extracts article details, including available formats.",
+                    "handles": "Locating the YouTube 360 VR video from March 2018 narrated by the identified voice actor.",
                     "input_vars": [
                         {
-                            "name": "jan2020_url",
+                            "name": "query_video",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
-                            "source": "API_Output (Panel 1, Step 1)",
-                            "description": "URL for accessing High Energy Physics - Lattice articles on arXiv for January 2020.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 1,
-                                    "step": 1
-                                }
-                            ]
+                            "source": "LLM_Generated",
+                            "description": "Query to find the YouTube 360 VR video from March 2018 narrated by the identified voice actor.",
+                            "value": "YouTube 360 VR video from March 2018 narrated by [voice_actor_name]",
+                            "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "article_details",
-                            "description": "List of articles for January 2020 with available formats.",
-                            "used_by": [
-                                {
-                                    "panel": 3,
-                                    "step": 1
-                                }
-                            ]
+                            "name": "video_url",
+                            "description": "URL of the located YouTube 360 VR video.",
+                            "used_by": []
                         }
                     ]
                 }
             }
-        },
+        }
+    },
+    "3": {
         "3": {
-            "panel_description": "Count the number of articles with PS versions available.",
+            "panel_description": "Verify the video and find the point where dinosaurs first appear.",
             "steps": {
                 "1": {
-                    "api": "ReasoningAgent",
-                    "handles": "Counts the number of articles with ps versions from the extracted list.",
+                    "api": "BrowserTools",
+                    "handles": "Verifying the video and finding the point where dinosaurs first appear.",
                     "input_vars": [
                         {
-                            "name": "article_details",
+                            "name": "query_dinosaurs",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
-                            "source": "API_Output (Panel 2, Step 1)",
-                            "description": "List of articles with their available formats.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 2,
-                                    "step": 1
-                                }
-                            ]
+                            "source": "LLM_Generated",
+                            "description": "Query to verify the video and find the point where dinosaurs first appear.",
+                            "value": "Verify the video at [video_url] and find the point where dinosaurs first appear",
+                            "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "ps_version_count",
-                            "description": "Number of articles with ps versions available.",
+                            "name": "dinosaurs_appearance_time",
+                            "description": "Time in the video where dinosaurs first appear.",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "4": {
+        "4": {
+            "panel_description": "Determine the number mentioned by the narrator immediately after the dinosaurs appear.",
+            "steps": {
+                "1": {
+                    "api": "BrowserTools",
+                    "handles": "Determining the number mentioned by the narrator immediately after the dinosaurs appear.",
+                    "input_vars": [
+                        {
+                            "name": "query_number",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to determine the number mentioned by the narrator immediately after the dinosaurs appear.",
+                            "value": "In the video at [video_url], what number is mentioned by the narrator immediately after the dinosaurs appear at [dinosaurs_appearance_time]?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "mentioned_number",
+                            "description": "Number mentioned by the narrator immediately after the dinosaurs appear.",
                             "used_by": []
                         }
                     ]

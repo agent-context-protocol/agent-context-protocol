@@ -50,10 +50,10 @@ OPENAI_API_BASE = os.getenv('OPENAI_API_BASE')
 
 # proprietary_llm_engine = AnthropicEngine(use_bedrock=True)
 # proprietary_llm_engine = AnthropicEngine()
-proprietary_llm_engine = OpenAI()
+proprietary_llm_engine = OpenAIEngine()
 
-cache = SQLiteCache("llm_cache.sqlite")
-proprietary_llm_engine = ChatOpenAI(model=MODEL, temperature=0, streaming=False, max_retries=5, api_key=OPENAI_API_KEY, base_url=OPENAI_API_BASE, cache=cache, timeout = 350)
+# cache = SQLiteCache("llm_cache.sqlite")
+# proprietary_llm_engine = ChatOpenAI(model=MODEL, temperature=0, streaming=False, max_retries=5, api_key=OPENAI_API_KEY, base_url=OPENAI_API_BASE, cache=cache, timeout = 350)
 
 repo_id_llama3 = "meta-llama/Meta-Llama-3-70B-Instruct"
 repo_id_command_r = "CohereForAI/c4ai-command-r-plus"

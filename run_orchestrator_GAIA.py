@@ -64,7 +64,7 @@ def reformat_query_with_attachment_content(user_query):
     reformatted_query = f"question: {user_query}\n"
     reformatted_query += f"Attachment File Content:\n{text_content}"
 
-    file_path_str = f"'Attachment: file://{user_query.split('Attachment: file://')[0].strip()}\n\nAttachment File Content:\n{text_content}"
+    file_path_str = f"'Attachment: file://{user_query.split('Attachment: file://')[1].strip()}\n\nAttachment File Content:\n{text_content}"
     
     # # Display extracted details for confirmation
     # print("Result title:", res.title)

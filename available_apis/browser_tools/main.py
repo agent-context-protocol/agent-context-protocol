@@ -383,14 +383,22 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
                 answer = self.user_proxy.initiate_chat(
                     self.society_of_mind_agent, 
                     message=f"""{question}\nIf you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided. 
-                    You have to only suggest sub-tasks/sub-queries for solving the main query and strictly not provide the solution yourself. For your context, propose the sub-tasks/sub-queries required to address the user’s query thoroughly. Carefully analyze the query and suggest the most logical and appropriate sub-tasks/sub-queries which, if solved, would lead to answering the main query. Based on your initial web searches, you can recommend well-informed sub-tasks/sub-queries that make the solution path more focused rather than vague, utilizing insights into which searches met expectations and which did not, while providing workarounds where needed.
+                    1. **Main Instruction**  
+                    You have to only suggest sub-tasks/sub-queries for solving the main query and strictly not provide the solution yourself. For your context, propose the sub-tasks/sub-queries required to address the user’s query thoroughly. Carefully analyze the query and suggest the most logical and appropriate sub-tasks/sub-queries which, if solved, would lead to answering the main query. 
 
-                    Disentangle the query into different sub-tasks/sub-queries so that each is an independent part of the main query—avoid combining unrelated issues into a single sub-task, as it increases confusion. Also, do not create too many sub-tasks/sub-queries unnecessarily. For example, do not break down a single web-search task into multiple smaller sub-tasks that repeat the same step. Similarly, when handling files, retrieving and analyzing the file information should be combined into one sub-task or sub-query, without splitting it into separate ones for verification or redundant analysis. There is absolutely no need for verification based steps, please dont add them.
+                    2. **Disentangle the Query**  
+                    Disentangle the query into different sub-tasks/sub-queries so that each is an independent part of the main query—avoid combining unrelated issues into a single sub-task, as it increases confusion. Also, do not create too many sub-tasks/sub-queries unnecessarily. For example, do not break down a single web-search task into multiple smaller sub-tasks that repeat the same step.  
+                    Similarly, when handling files, retrieving and analyzing the file information should be combined into one sub-task or sub-query, without splitting it into separate ones for verification or redundant analysis. All necessary actions for a single file (e.g., reviewing, matching, or referencing) must be contained within that one sub-task/sub-query. There is absolutely no need for verification-based steps, so please do not add them.
 
+                    3. **Avoid Data-Loading Sub-Tasks**  
+                    Do not include a separate sub-task just for loading or importing data. Assume that the details for the file paths and attachments are already available wherever needed.
+
+                    4. **Tools Available**  
                     You have two tools at your disposal:
-                    1. **BrowserTools**: A web search engine that can retrieve and synthesize information from multiple sources into a concise response. It can also handle image-based question answering, coding assistance, and code execution.
-                    2. **ReasoningAgent**: An agent for deep thinking on problems that can be solved with pure reasoning, without requiring web searches.
+                    - BrowserTools: A web search engine that can retrieve and synthesize information from multiple sources into a concise response. It can also handle image-based question answering, coding assistance, and code execution.  
+                    - ReasoningAgent: An agent for deep thinking on problems that can be solved with pure reasoning, without requiring web searches.
 
+                    5. **Tool Selection**  
                     For each sub-task/sub-query, specify which tool (BrowserTools or ReasoningAgent) is best suited. Use ReasoningAgent for purely reasoning-based tasks; if some prior knowledge or outside information is assumed, use BrowserTools instead.
                     DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
             else:
@@ -407,15 +415,27 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
                     {steps_prompt}
 
                     Referring to the information I have obtained (which may not be accurate), what do you think is the answer to the question?
+                    1. **Main Instruction**  
                     You have to only suggest sub-tasks/sub-queries for solving the main query and strictly not provide the solution yourself. For your context, propose the sub-tasks/sub-queries required to address the user’s query thoroughly. Carefully analyze the query and suggest the most logical and appropriate sub-tasks/sub-queries which, if solved, would lead to answering the main query. Based on your initial web searches, you can recommend well-informed sub-tasks/sub-queries that make the solution path more focused rather than vague, utilizing insights into which searches met expectations and which did not, while providing workarounds where needed.
+                    
+                    2. **Web-Search Refinements**  
+                    If any web search path does not yield relevant information, adapt and find alternative approaches or approximations. Do not be overly strict about a particular path. The ultimate goal is to reach a valid answer, so be flexible with sub-queries as needed.
 
-                    Disentangle the query into different sub-tasks/sub-queries so that each is an independent part of the main query—avoid combining unrelated issues into a single sub-task, as it increases confusion. Also, do not create too many sub-tasks/sub-queries unnecessarily. For example, do not break down a single web-search task into multiple smaller sub-tasks that repeat the same step. Similarly, when handling files, retrieving and analyzing the file information should be combined into one sub-task or sub-query, without splitting it into separate ones for verification or redundant analysis. There is absolutely no need for verification based steps, please dont add them.
+                    3. **Disentangle the Query**  
+                    Disentangle the query into different sub-tasks/sub-queries so that each is an independent part of the main query—avoid combining unrelated issues into a single sub-task, as it increases confusion. Also, do not create too many sub-tasks/sub-queries unnecessarily. For example, do not break down a single web-search task into multiple smaller sub-tasks that repeat the same step.  
+                    Similarly, when handling files, retrieving and analyzing the file information should be combined into one sub-task or sub-query, without splitting it into separate ones for verification or redundant analysis. All necessary actions for a single file (e.g., reviewing, matching, or referencing) must be contained within that one sub-task/sub-query. There is absolutely no need for verification-based steps, so please do not add them.
 
+                    4. **Avoid Data-Loading Sub-Tasks**  
+                    Do not include a separate sub-task just for loading or importing data. Assume that the details for the file paths and attachments are already available wherever needed.
+
+                    5. **Tools Available**  
                     You have two tools at your disposal:
-                    1. **BrowserTools**: A web search engine that can retrieve and synthesize information from multiple sources into a concise response. It can also handle image-based question answering, coding assistance, and code execution.
-                    2. **ReasoningAgent**: An agent for deep thinking on problems that can be solved with pure reasoning, without requiring web searches.
+                    - BrowserTools: A web search engine that can retrieve and synthesize information from multiple sources into a concise response. It can also handle image-based question answering, coding assistance, and code execution.  
+                    - ReasoningAgent: An agent for deep thinking on problems that can be solved with pure reasoning, without requiring web searches.
 
+                    6. **Tool Selection**  
                     For each sub-task/sub-query, specify which tool (BrowserTools or ReasoningAgent) is best suited. Use ReasoningAgent for purely reasoning-based tasks; if some prior knowledge or outside information is assumed, use BrowserTools instead.
+
                     If you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided.
                     DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
             else:

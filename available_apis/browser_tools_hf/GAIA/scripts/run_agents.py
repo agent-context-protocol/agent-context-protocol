@@ -302,6 +302,102 @@ Here is the task:
     return results
 
 
+async def answer_questions_only(
+    example,
+    agent: AgentExecutor,
+    agent_name: str,
+    agent_call_function: Callable = call_langchain_agent,
+    visual_inspection_tool: Tool = None,
+    text_inspector_tool: Tool = None,
+) -> List[Dict[str, Any]]:
+    """
+    Evaluates the agent on a given dataset.
+
+    """
+
+    # run agent
+    result = await arun_agent(
+        example=example,
+        agent_executor=agent,
+        agent_name=agent_name,
+        agent_call_function=agent_call_function,
+    )
+
+    return result
+
+def read_file_paths(
+    example,
+    visual_inspection_tool: Tool = None,
+    text_inspector_tool: Tool = None,
+) -> List[Dict[str, Any]]:
+    """
+    Evaluates the agent on a given dataset.
+
+    """
+
+    prompt_use_files = ""
+    if example['file_name']:
+        # if '.MOV' in example['file_name']:
+        #     continue
+        prompt_use_files += f"\n\nTo answer the question above, you will have to use these attached files:"
+        if example['file_name'].split('.')[-1] in ['pdf', 'xlsx']:
+            image_path = example['file_name'].split('.')[0] + '.png'
+            if os.path.exists(image_path):
+                prompt_use_files += f"\nAttached image: {image_path}"
+            else:
+                prompt_use_files += f"\nAttached file: {example['file_name']}"
+        elif example['file_name'].split('.')[-1] == "zip":
+            import shutil
+
+            folder_name = example['file_name'].replace(".zip", "")
+            os.makedirs(folder_name, exist_ok=True)
+            shutil.unpack_archive(example['file_name'], folder_name)
+
+            # Convert the extracted files
+            prompt_use_files = "\n\nYou have been given a zip archive of supporting files. We extracted it into a directory: find the extracted files at the following paths:\n"
+            for root, dirs, files in os.walk(folder_name):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    prompt_use_files += f"- {file_path}\n"
+                    if file.split('.')[-1] in ['png', 'jpg', 'jpeg'] and visual_inspection_tool is not None:
+                        prompt = f"""Write a caption of 5 sentences maximum for this image. Pay special attention to any details that might be useful for someone answering the following question:
+{example['question']}. But do not try to answer the question directly!
+Do not add any information that is not present in the image.
+""".strip()
+                        prompt_use_files += "> Description of this image: " + visual_inspection_tool(image_path=file_path, question=prompt) + '\n\n'
+                    else:
+                        prompt = f"""Write a short caption (5 sentences maximum) for this file. Pay special attention to any details that might be useful for someone answering the following question:
+{example['question']}. But do not try to answer the question directly!
+Do not add any information that is not present in the file.
+""".strip()
+                        prompt_use_files += "> Description of this file: " + text_inspector_tool.forward_initial_exam_mode(file_path=file_path, question=prompt) + '\n\n'
+        elif example['file_name'].split('.')[-1] in ['png', 'jpg', 'jpeg']:
+            prompt_use_files += f"\nAttached image: {example['file_name']}"
+        elif example['file_name'].split('.')[-1] in ['mp3', 'm4a', 'wav']:
+            prompt_use_files += f"\nAttached audio: {example['file_name']}"
+        else:
+            prompt_use_files += f"\nAttached file: {example['file_name']}"
+
+        if example['file_name'].split('.')[-1] in ['png', 'jpg', 'jpeg'] and visual_inspection_tool is not None:
+            prompt = f"""Write a caption of 5 sentences maximum for this image. Pay special attention to any details that might be useful for someone answering the following question:
+{example['question']}. But do not try to answer the question directly!
+Do not add any information that is not present in the image.
+""".strip()
+            prompt_use_files += "\n> Description of this image: " + visual_inspection_tool(image_path=example['file_name'], question=prompt)
+        elif '.zip' not in example['file_name'] and text_inspector_tool is not None:
+            prompt = f"""Write a short caption (5 sentences maximum) for this file. Pay special attention to any details that might be useful for someone answering the following question:
+{example['question']}. But do not try to answer the question directly!
+Do not add any information that is not present in the file.
+""".strip()
+            prompt_use_files += "\n> Description of this file: " + text_inspector_tool.forward_initial_exam_mode(file_path=example['file_name'], question=prompt)
+    else:
+        prompt_use_files += "\n\nYou have been given no local files to access."
+    example['augmented_question'] = f"""It is paramount that you complete this task and provide a correct answer.
+Give it all you can: I know for a fact that you have access to all the relevant tools to solve it. Failure or 'I cannot answer' will not be tolerated, success will be rewarded.
+Here is the task:
+""" + example['question'] + prompt_use_files
+
+
 async def run_full_tests(
     dataset: Dataset,
     agents: Dict[str, AgentExecutor],

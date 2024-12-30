@@ -23,7 +23,7 @@ async def process_query(query, timeout=900):
 
 async def main():
     # Name of the CSV file
-    csv_filename = "answers_level2.csv"
+    csv_filename = "answers_level3_hf.csv"
 
     # ----------------------------------------------------
     # 1. Check if answers.csv exists; if not, create & write header.
@@ -34,7 +34,7 @@ async def main():
         with open(csv_filename, "w", newline="") as f:
             writer = csv.writer(f)
             writer.writerow(["QuestionIndex", "Query", "Answer", "GT_Answer"])
-        processed_count = 0
+        processed_count = []
     else:
         # Count how many data rows are already in the CSV (excluding header)
         with open(csv_filename, "r", newline="") as f:
@@ -48,10 +48,10 @@ async def main():
     # ----------------------------------------------------
     # 2. Load dataset
     # ----------------------------------------------------
-    dataset = load_dataset("gaia-benchmark/GAIA", '2023_level2',
+    dataset = load_dataset("gaia-benchmark/GAIA", '2023_level3',
                            token="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")
     SPLIT = 'validation'
-    num_samples_eval = 86
+    num_samples_eval = 26
 
     raw_questions = [dataset[SPLIT][i]['Question'] for i in range(num_samples_eval)]
     file_names = [dataset[SPLIT][i]['file_name'] for i in range(num_samples_eval)]
@@ -80,7 +80,7 @@ async def main():
         if str(i+1) in processed_count:
             print(f"Skipping Question {i+1} (already in {csv_filename}).")
             continue
-        if i == 7:
+        if i == 1 or i == 6:
             continue
 
         print("###########################")

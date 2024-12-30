@@ -936,10 +936,15 @@ class LocalTranslatorNode(BaseNode):
     
     
     # for running functions
-    def function_call(self, api_name, body = None):
+    def function_call(self, step, api_name, body = None):
         
         if api_name in ["BrowserTools", "ReasoningAgent"]:
             if "query" in body:
+                for in_var in step["input_vars"]:
+                    if "API_Output" in in_var["source"]:
+                        in_var_desc = in_var["description"]
+                        in_var_val = in_var["value"]
+                        body["query"] = body["query"] + f"\n{in_var_desc}\n {in_var_val}\n"
                 body["query"] = body["query"] + f"\nFile-->{self.file_path_str}"
         response = FUNCTION_APIS_FUNCTION_DICT[api_name](body)
 
@@ -1078,7 +1083,7 @@ class LocalTranslatorNode(BaseNode):
                     try:
                         for api_req_i in range(len(parsed_api_request['api_requests'])):
                             if parsed_api_request['api_requests'][api_req_i]['method'] == "FUNCTION":
-                                api_success_bool, api_output = self.function_call(step['api'], parsed_api_request['api_requests'][api_req_i]['body'])
+                                api_success_bool, api_output = self.function_call(step, step['api'], parsed_api_request['api_requests'][api_req_i]['body'])
                             else:
                                 api_success_bool, api_output = self.requests_func(parsed_api_request['api_requests'][api_req_i]['method'], parsed_api_request['api_requests'][api_req_i]['url'], parsed_api_request['api_requests'][api_req_i]['headers'], parsed_api_request['api_requests'][api_req_i]['body'])
 
