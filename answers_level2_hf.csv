@@ -1,0 +1,134 @@
+QuestionIndex,Query,Answer,GT_Answer
+1,"A paper about AI regulation that was originally submitted to arXiv.org in June 2022 shows a figure with three axes, where each axis has a label word at both ends. Which of these words is used to describe a type of society in a Physics and Society article submitted to arXiv.org on August 11, 2016?","Egalitarian",egalitarian
+2,"I’m researching species that became invasive after people who kept them as pets released them. There’s a certain species of fish that was popularized as a pet by being the main character of the movie Finding Nemo. According to the USGS, where was this fish found as a nonnative species, before the year 2020? I need the answer formatted as the five-digit zip codes of the places the species was found, separated by commas if there is more than one place.",34689,34689
+3,"If we assume all articles published by Nature in 2020 (articles, only, not book reviews/columns, etc) relied on statistical significance to justify their findings and they on average came to a p-value of 0.04, how many papers would be incorrect as to their claims of statistical significance? Round the value up to the next integer.",179,41
+4,"In Unlambda, what exact charcter or text needs to be added to correct the following code to output ""For penguins""? If what is needed is a character, answer with the name of the character. If there are different names for the character, use the shortest. The text location is not needed. Code:
+
+`r```````````.F.o.r. .p.e.n.g.u.i.n.si",ns,backtick
+5,"The attached spreadsheet shows the inventory for a movie and video game rental store in Seattle, Washington. What is the title of the oldest Blu-Ray recorded in this spreadsheet? Return it as appearing in the spreadsheet.
+Attachment: file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/32102e3e-d12a-4209-9163-7b3a104efe5d.xlsx",Time-Parking 2: Parallel Universe,Time-Parking 2: Parallel Universe
+6,"The object in the British Museum's collection with a museum number of 2012,5015.17 is the shell of a particular mollusk species. According to the abstract of a research article published in Science Advances in 2021, beads made from the shells of this species were found that are at least how many thousands of years old?",142,142
+7,"According to github, when was Regression added to the oldest closed numpy.polynomial issue that has the Regression label in MM/DD/YY?",11/25/22,04/15/18
+9,What are the EC numbers of the two most commonly used chemicals for the virus testing method in the paper about SPFMV and SPCSV in the Pearl Of Africa from 2016? Return the semicolon-separated numbers in the order of the alphabetized chemicals.,3.1.3.1;1.11.1.7,3.1.3.1; 1.11.1.7
+10,"In April of 1977, who was the Prime Minister of the first place mentioned by name in the Book of Esther (in the New International Version)?",Morarji Desai,Morarji Desai
+11,What's the last line of the rhyme under the flavor name on the headstone visible in the background of the photo of the oldest flavor's headstone in the Ben & Jerry's online flavor graveyard as of the end of 2022?,"Some say that raisin, Caused its demise.",So we had to let it die.
+12,"Use density measures from the chemistry materials licensed by Marisa Alviar-Agnew & Henry Agnew under the CK-12 license in LibreText's Introductory Chemistry materials as compiled 08/21/2023.
+
+I have a gallon of honey and a gallon of mayonnaise at 25C. I remove one cup of honey at a time from the gallon of honey. How many times will I need to remove a cup to have the honey weigh less than the mayonaise? Assume the containers themselves weigh the same.",6,6
+13,"When you take the average of the standard population deviation of the red numbers and the standard sample deviation of the green numbers in this image using the statistics module in Python 3.11, what is the result rounded to the nearest three decimal points?
+Attachment: file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/df6561b2-7ee5-4540-baab-5095f742716a.png",17.479,17.056
+14,"In terms of geographical distance between capital cities, which 2 countries are the furthest from each other within the ASEAN bloc according to wikipedia? Answer using a comma separated list, ordering the countries by alphabetical order.","Indonesia, Myanmar","Indonesia, Myanmar"
+15,"I need to fact-check a citation. This is the citation from the bibliography:
+
+Greetham, David. ""Uncoupled: OR, How I Lost My Author(s)."" Textual Cultures: Texts, Contexts, Interpretation, vol. 3 no. 1, 2008, p. 45-46. Project MUSE, doi:10.2979/tex.2008.3.1.44.
+
+And this is the in-line citation:
+
+Our relationship with the authors of the works we read can often be “obscured not by a ""cloak of print"" but by the veil of scribal confusion and mis-transmission” (Greetham 45-46).
+
+Does the quoted text match what is actually in the article? If Yes, answer Yes, otherwise, give me the word in my citation that does not match with the correct one (without any article).",cloak,cloak
+16,Which contributor to the version of OpenCV where support was added for the Mask-RCNN model has the same name as a former Chinese head of government when the names are transliterated to the Latin alphabet?,No,Li Peng
+17,What is the maximum length in meters of #9 in the first National Geographic short on YouTube that was ever released according to the Monterey Bay Aquarium website? Just give the number.,0,1.8
+18,What two-word type of model did Manash Pratim Kashyap's and PS Fader's studies in customer retention studies published during 2018-2019 have in common (no punctuation)?,Beta Geometric,beta geometric
+19,How many High Energy Physics - Lattice articles listed in January 2020 on Arxiv had ps versions available?,5,31
+20,The photograph in the Whitney Museum of American Art's collection with accession number 2022.128 shows a person holding a book. Which military unit did the author of this book join in 1813? Answer without using articles.,Prussian army,Russian-German Legion
+21,"What is the minimum number of page links a person must click on to go from the english Wikipedia page on The Lord of the Rings (the book) to the english Wikipedia page on A Song of Ice and Fire (the book series)? In your count, include each link you would click on to get to the page. Use the pages as they appeared at the end of the day on July 3, 2023.",2,2
+22,"I went to Virtue restaurant & bar in Chicago for my birthday on March 22, 2021 and the main course I had was delicious!  Unfortunately, when I went back about a month later on April 21, it was no longer on the dinner menu.  Using the Wayback Machine, can you help me figure out which main course was on the dinner menu for Virtue on March 22, 2021 but not April 21, 2021? Answer using the singular form, without articles.",Beef Short Rib,shrimp
+23,"It is 1999. Before you party like it is 1999, please assist me in settling a bet.
+
+Fiona Apple and Paula Cole released albums prior to 1999. Of these albums, which didn't receive a letter grade from Robert Christgau? Provide your answer as a comma delimited list of album titles, sorted alphabetically.","Harbinger, This Fire","Harbinger, Tidal"
+24,"In the 2018 VSCode blog post on replit.com, what was the command they clicked on in the last video to remove extra lines?",No video content,Format Document
+25,Compute the check digit the Tropicos ID for the Order Helotiales would have if it were an ISBN-10 number.,8,3
+26,"What time was the Tri-Rail train that carried the most passengers on May 27, 2019 scheduled to arrive in Pompano Beach? Express your answer in the 12-hour digital clock format without leading zero if any, and include whether it is AM or PM.",2:30 PM,6:41 PM
+29,"In Valentina Re’s contribution to the 2017 book “World Building: Transmedia, Fans, Industries”, what horror movie does the author cite as having popularized metalepsis between a dream world and reality? Use the complete name with article if any.",A Nightmare on Elm Street,A Nightmare on Elm Street
+30,"The Metropolitan Museum of Art has a portrait in its collection with an accession number of 29.100.5. Of the consecrators and co-consecrators of this portrait's subject as a bishop, what is the name of the one who never became pope?",Alfonso Visconti,Alfonso Visconti
+31,"The attached file contains a list of vendors in the Liminal Springs mall, along with each vendor’s monthly revenue and the rent they pay the mall. I want you to find the vendor that makes the least money, relative to the rent it pays. Then, tell me what is listed in the “type” column for that vendor.
+Attachment: file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/076c8171-9b3b-49b9-a477-244d2a532826.xlsx",Finance,Finance
+32,"According to Google Finance, when was the first year the Apple stock went above $50 (without adjusting for stock split)?",2005,2018
+33,"According to Box Office Mojo's 2020 Worldwide Box Office list, how many of the top 10 highest-grossing worldwide movies are also on the top 10 highest-grossing domestic movies? Your answer should be a numerical integer value.",6,6
+34,How many pages if the 2023 IPCC report (85 pages version) mentions nuclear energy?,2,0
+35,How many images are there in the latest 2022 Lego english wikipedia article?,5,13
+36,"The attached file shows a list of books in the collection of Scribe County Public Library. How many of the library’s books that are authored by Rick Riordan are not currently on the library’s shelves?
+Attachment: file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/e9a2c537-8232-4c3f-85b0-b52de6bcba99.pdf",5,7
+37,"On a leap day before the year 2008, a joke was removed from the Wikipedia page for “Dragon”. What was the phrase that was removed? Give the phrase as it appeared on the page, but without punctuation.",FAILED,Here be dragons
+38,"Find the value of x to the nearest tenth: Lx = (d/dx * (A * x-squared)) + 4-thousand'n'ninety-7 minus C
+Where L is the last two digits of the year of the Venezuelan Declaration of Independence,
+A is the number of colors in the TikTok logo as of July 2023, excluding black and white,
+and C is the height of the average woman in the Philippines according to a July 2023 Business Insider article, rounded to the nearest whole centimeter",789.4,563.9
+39,"In the endnote found in the second-to-last paragraph of page 11 of the book with the doi 10.2307/j.ctv9b2xdv, what date in November was the Wikipedia article accessed? Just give the day of the month.",15,4
+40,"Using bass clef notes, what is the age of someone who has experienced the word spelled out in the sheet music by the note letters the total number of lines and notes minus the number of notes on lines in the image?
+Attachment: file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/8f80e01c-1296-4371-9486-bb3d68651a60.png",8,90
+41,"On July 15, 2008, Phys.org published an article about a catastrophe. Find the explosive force of this catastrophe according to Encyclopedia Britannica, then find the name of the US nuclear test that had the same yield. Your answer should only be the last word of the name of the test.",Bravo,Bravo
+42,"The attached file lists accommodations in the resort town of Seahorse Island. Based on the information in this file, which seems like the better available place to stay for a family that enjoys swimming and wants a full house?
+Attachment: file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/366e2f2b-8632-4ef2-81eb-bc3877489217.pdf",Pinedrift Avenue,Shelley's place
+43,How many edits were made to the Wikipedia page on Antidisestablishmentarianism from its inception until June of 2023?,36,2732
+44,How many nonindigenous crocodiles were found in Florida from the year 2000 through 2020? You can get the data from the USGS Nonindigenous Aquatic Species database.,0,6
+45,"The work referenced in footnote 397 of Federico Lauria's 2014 dissertation is also the source for the titles of two paintings in the Smithsonian American Art Museum's collection, as of August 2023. What is the absolute difference between the chapter numbers of the chapters that the titles of these two paintings quote?",6,8
+46,"As of the 2020 census, what was the population difference between the largest county seat and smallest county seat, by land area of the county seat, in Washington state? For population figures, please use the official data from data.census.gov. Please report the integer difference.",735662,736455
+47,"Given $x_0 = -5$ and $f(x) = x^3 + 4x^2 - 3x + 8$, what is the smallest $n$ where using Newton's Method $n = n+1$ after rounding to four decimal places?",FAILED,2
+48,"The attached file shows the locomotives in the collection of a North American railroad museum. How many wheels do the listed steam locomotives have in total?
+Attachment: file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/54612da3-fd56-4941-80f4-5eb82330de25.xlsx",56,60
+49,"This is a secret message my friend gave me. It says where we should meet for our picnic on Friday. The only problem is, it’s encrypted in the Caesar cipher, so I can’t read it. Can you tell me what it says? This is the message:
+
+Zsmxsm sc sx Zyvilsec Zvkjk.",Polybius Polybius Park,Picnic is in Ploybius Plaza.
+50,"What is the area of the green polygon in the attached file? The numbers in purple represent the lengths of the side they are next to.
+Attachment: file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/6359a0b1-8f7b-499b-9336-840f9ab90688.png",95,39
+51,"The attached spreadsheet contains the sales of menu items for a regional fast-food chain. Which city had the greater total sales: Wharvton or Algrimand?
+Attachment: file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/7cc4acfa-63fd-4acc-a1a1-e8e529e0a97f.xlsx",Wharvton,Wharvton
+52,Who composed the song that was performed by a rooster and a hamster in separate animated videos at separate tempos with different lyrics? Answer using the format First name Last name.,Roger Miller,Roger Miller
+53,"According to the World Bank, which countries had gross savings of over 35% of GDP for every year in the period 2001-2010? Give your answer as a comma-separated list of countries in alphabetical order. Use the countries most common names in english when answering.","China, Kuwait, Qatar, Singapore, United Arab Emirates","Brunei, China, Morocco, Singapore"
+54,"I’m thinking about selling my home, so I want to learn more about how homes in my area sold recently. I live in Pearl City, Hawaii, which is on the island of Oahu. I know two homes near me that sold in 2022 were 2072 Akaikai Loop, and 2017 Komo Mai Drive. Find which of those homes sold for more in 2022, and tell me how much it sold for. Don’t put commas or decimal places in the answer.","2017 Komo Mai Drive, 900000,900000
+55,"On ScienceDirect, what is the difference to 3 decimal places in the sample standard deviations of the number of Reference Works in each Life Science domain compared to Health Sciences as of 2022?",FAILED,0.269
+
+57,"Look at the attached image. The quiz is scored as follows:
+
+Problems that ask the student to add or subtract fractions: 5 points
+Problems that ask the student to multiply or divide fractions: 10 points
+Problems that ask the student to form an improper fraction: 15 points
+Problems that ask the student to form a mixed number: 20 points
+
+Due to a technical issue that delayed having students take the quiz, the teacher is giving everyone 5 bonus points.
+
+If you graded the quiz in the attached image, how many points would the student have earned? There is no partial credit.
+Attachment: file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/cca70ce6-1952-45d2-acd4-80c903b0bc49.png",90,85
+58,"The attached image contains a Python script. Run the Python code against an array of strings, listed below. The output of the Python script will be a URL containing C++ source code. Compile and run this C++ code against the array [35, 12, 8, 99, 21, 5] and return the sum of the third and fifth integers in the sorted list.
+
+arr = ['_alg', 'ghi', 'C++', 'jkl', 'tps', '/Q', 'pqr', 'stu', ':', '//', 'rose', 'vwx', 'yz1', '234', 'tta', '567', '890', 'cod', 'e.', 'or', 'g/', 'wiki', '/', 'ing', 'sort', 'abc' , 'or', 'it', 'hms', 'mno' , 'uic', 'ksort', '#', 'ht' ]
+Attachment: file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/b7f857e4-d8aa-4387-af2a-0e844df5b9d8.png",FAILED,47
+59,"I have the Standard plan in the image below, and I just uploaded 60 equally sized files and got a message that I'm 100GB over the limit. I have 980 more files of the same size to upload. What is the average additional cost per file in dollar that goes over my current plan limit rounded to the nearest cent if I have to upgrade to the minimum possible plan to store them all? Answer with the following format: x.xx
+Attachment: file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/d8152ad6-e4d5-4c12-8bb7-8d57dc10c6de.png",0.01,0.03
+60,"The attached PDF lists accommodations in the resort community of Seahorse Island. Which type of accommodation has a higher average rating in Seahorse Island?
+Attachment: file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/67e8878b-5cef-4375-804e-e6291fdbe78a.pdf",Hotels,Hotels
+61,"It's May 2023, and I'm about to drive across the U.S. from California to Maine. I always recycle my water bottles at the end of a trip, and I drink 5 12-ounce water bottles for every 100 miles I travel, rounded to the nearest 100. Assuming I follow I-40 from Los Angeles to Cincinnati, then take I-90 from Cincinnati to Augusta, how many dollars will I get back according to Wikipedia?",8,8
+62,What is the latest chronological year date written in the image on the webpage found when following the first citation reference link on the latest version of Carl Nebel's Wikipedia page as of August 2023?,No,1927
+63,"The YouTube channel Game Grumps began a Let’s Play of the game Sonic the Hedgehog (2006) in the year 2012. Thirty seconds into the first episode, a phrase is shown on the screen in white letters on a red background. How many times does the letter ""E"" appear in this phrase?",1,4
+64,"This spreadsheet contains a list of clients for a retractable awning company. Each client has ordered a new awning for the back of their house within the last 90 days. The company makes different designs depending on whether the awning is made to block sunrises or sunsets. In this region, houses with odd-numbered street addresses face east, and houses with even-numbered street addresses face west. How many of these clients will be receiving the sunset awning design?
+Attachment: file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/4d51c4bf-4b0e-4f3d-897b-3f6687a7d9f2.xlsx",4,8
+65,"The book with the doi 10.1353/book.24372 concerns a certain neurologist. According to chapter 2 of the book, what author influenced this neurologist’s belief in “endopsychic myths”? Give the last name only.",Rank,Kleinpaul
+
+67,"On the DeepFruits fruit detection graph on Connected Papers from 2016, what feature caused the largest bubble to be the size it is?",800,Citations
+68,"During the first week of August 2015, one of the NASA Astronomy Pictures of the Day shows the lights of a city on the horizon. The namesake of this city also has a landmark building in Chicago named after him. What is the name of the architectural firm that designed this landmark building? Give the first name appearing in the name of the firm as of June 2023.",Holabird,Holabird
+69,"All of the individuals who formally held the position of United States secretary of homeland security prior to April 2019, excluding those who held the position in an acting capacity, have a bachelor's degree. Of the universities that these bachelor's degrees were from, which is the westernmost university and which is the easternmost university? Give them to me as a comma-separated list, I only want the name of the cities where the universities are located, with the westernmost city listed first.","Santa Clara, Boston","Santa Clara, Boston"
+70,"Consider the following symbols: 𒐜  𒐐𒐚
+
+This is a number written using the Mesopotamian/Babylonian number system and represented with Sumerian cuneiform. Convert this number into Arabic numerals as a decimal number.",536,536
+
+72,"As of August 2023, who is the only winner of the US version of Survivor to be born in the month of May?",Michele Fitzgerald,Michele Fitzgerald
+73,"The cover of the August 2021 issue of Vogue shows a famous landmark in the background behind some trees. How tall is this monument in yards, rounded to the nearest yard? Give the number only.",185,185
+74,I'm curious about how much information is available for popular video games before their release. Find the Wikipedia page for the 2019 game that won the British Academy Games Awards. How many revisions did that page have before the month listed as the game's release date on that Wikipedia page (as of the most recent entry from 2022)?,547,60
+75,"The attached spreadsheet lists the locomotives owned by a local railroad museum. What is the typical American name for the type of locomotive this museum uses for the Murder Mystery Express?
+Attachment: file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/edd4d4f2-1a58-45c4-b038-67337af4e029.xlsx",Berkshire,Berkshire
+76,"What is the absolute difference in tens of thousands between the population of chinstrap penguins on the Wikipedia page for penguin species populations as of the end of 2018 and the population recorded in the Nature.com ""global population assessment of the Chinstrap penguin"" article from 2020, assuming two penguins per breeding pair?",12,116
+77,"The attached file lists the locomotives owned by a local railroad museum. It gives each locomotive’s identifying number, operating status, and the name of the daily excursion it heads, if operational. What are the odds that today’s Sunset Picnic Trip will use a steam locomotive? Assume that each day’s excursion picks one of its assigned locomotives at random, and express the answer in the form “1 in 4”, “1 in 5”, etc.
+Attachment: file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/4d0aa727-86b1-406b-9b33-f870dd14a4a5.xlsx",1 in 3,1 in 3
+78,When was a picture of St. Thomas Aquinas first added to the Wikipedia page on the Principle of double effect? Answer using the format DD/MM/YYYY.,No,19/02/2009
+79,"According to Openreview.net, at the NeurIPS 2022 Conference, how many papers by an author named Yuri were accepted with a ""certain"" recommendation?",0,3
+80,"If this whole pint is made up of ice cream, how many percent above or below the US federal standards for butterfat content is it when using the standards as reported by Wikipedia in 2020? Answer as + or - a number rounded to one decimal place.
+Attachment: file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/b2c257e0-3ad7-4f05-b8e3-d9da973be36e.jpg",+4.4,+4.6
+81,"Take the gender split from the 2011 Bulgarian census about those who have completed tertiary education. Subtract the smaller number from the larger number, then return the difference in thousands of women. So if there were 30.1 thousand more men, you'd give ""30.1""",234.9,234.9
+82,"I'd like to learn more about some popular reality television competition shows. As of the end of the 44th season of the American version of Survivor, how many more unique winners have there been compared to the number of winners of American Idol?",21,21
+83,"In the film Goldfinger, what color was the object that James Bond concealed himself and his companion Pussy Galore at the end of the film? If there are multiple colors, put them in a comma-separated list in alphabetical order.","orange, white","orange, white"
+84,"As of May 2023, how many stops are between South Station and Windsor Gardens on MBTA’s Franklin-Foxboro line (not included)?",7,10
+85,"In the 2015 Metropolitan Museum of Art exhibition titled after the Chinese zodiac animal of 2015, how many of the ""twelve animals of the Chinese zodiac"" have a hand visible?",1,11
+86,"At the two-minute mark in the YouTube video uploaded by the channel “GameGrumps” on May 14, 2017 as part of their playthrough of the game Mario Kart 8 Deluxe, the shows’ hosts are competing on one of the game’s racetracks. What was the world record time for that track in the game’s 150cc mode as of June 7, 2023? Express your answer in minutes and seconds, rounding the seconds to the nearest hundredth, e.g. 1:01.001.",1:38.41,1:41.614
+56,What is the last word before the second chorus of the King of Pop's fifth single from his sixth studio album?,FAILED,stare

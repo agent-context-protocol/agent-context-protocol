@@ -333,9 +333,11 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
                     You have two tools at your disposal:
                     - BrowserTools: A web search engine that can retrieve and synthesize information from multiple sources into a concise response. It can also handle image-based question answering, coding assistance, and code execution.  
                     - ReasoningAgent: An agent for deep thinking on problems that can be solved with pure reasoning, without requiring web searches.
+                    - CalculatorAgent: Use this function as a calculator agent to get precise answers for the calculation to be performed as described by the user. This agent uses python coding for perfoming the calculations.
 
-                    5. **Tool Selection**  
-                    For each sub-task/sub-query, specify which tool (BrowserTools or ReasoningAgent) is best suited. Use ReasoningAgent for purely reasoning-based tasks; if some prior knowledge or outside information is assumed, use BrowserTools instead.
+                    6. **Tool Selection**  
+                    For each sub-task/sub-query, specify which tool (BrowserTools or ReasoningAgent) is best suited. Use ReasoningAgent for purely reasoning-based tasks; if some prior knowledge or outside information is assumed, use BrowserTools instead. And use CalculatorAgent for all important calculations.
+
                     DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
             else:
                 answer = self.user_proxy.initiate_chat(
@@ -366,11 +368,12 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
 
                     5. **Tools Available**  
                     You have two tools at your disposal:
-                    - BrowserTools: A web search engine that can retrieve and synthesize information from multiple sources into a concise response. It can also handle image-based question answering, coding assistance, and code execution.  
+                    - BrowserTools: A web search engine that can retrieve and synthesize information from multiple sources into a concise response. It can also handle image-based question answering, coding assistance, and code execution. For large counting based things from files or data always use BrowserTools.
                     - ReasoningAgent: An agent for deep thinking on problems that can be solved with pure reasoning, without requiring web searches.
+                    - CalculatorAgent: Use this function as a calculator agent to get precise answers for the calculation to be performed as described by the user. This agent uses python coding for perfoming the calculations.
 
                     6. **Tool Selection**  
-                    For each sub-task/sub-query, specify which tool (BrowserTools or ReasoningAgent) is best suited. Use ReasoningAgent for purely reasoning-based tasks; if some prior knowledge or outside information is assumed, use BrowserTools instead.
+                    For each sub-task/sub-query, specify which tool (BrowserTools or ReasoningAgent) is best suited. Use ReasoningAgent for purely reasoning-based tasks; if some prior knowledge or outside information is assumed or for large counting based things from files or data always use BrowserTools instead. And use CalculatorAgent for all important calculations.
 
                     If you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided.
                     DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
@@ -382,9 +385,9 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
                     message=f"""{question}\nTo answer the above question, I did the following:
                     {steps_prompt}
 
-                    Referring to the information I have obtained (which may not be accurate), what do you think is the answer to the question?
-                    It is ok to be not sure about the answer and provide a partial answer through a vague educated guess based on the information provided, but remember that providing some answer is much better than saying that no answer exists.
-                    DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
+                    Referring to the information I have obtained (which may not be entirely accurate), please provide an answer to the question. It is acceptable to be unsure and give a partial or approximate response, but always offer whatever context or details you do have for answering the query (even partially is alright) by summarizing the main findings from the steps. 
+                    Avoid saying “no information was found” or “it does not exist,” and do not output “I don’t know” or “Unable to determine.” Instead, provide your best approximation or partial answer based on the information available, even if it isn’t perfectly correct.
+                    """).summary
         # formatted_answer = self.format_answer_chain.invoke({'question': question, 'answer': answer})#.answer
 
         return answer
@@ -411,7 +414,7 @@ def browser_tools_function(dict_body, interpreter_bool = False):
 
     return response_dict
 
-# # report check
+# report check
 # # dict_body = {"query": "What is there in the background and forwground of this image in the url: https://images.pexels.com/photos/346885/pexels-photo-346885.jpeg?cs=srgb&dl=pexels-nurseryart-346885.jpg&fm=jpg"}
 # dict_body = {"query": "Who won the 2024 us elections and against whom?"}
 # res_dict = browser_tools_function(dict_body)

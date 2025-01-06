@@ -1,122 +1,146 @@
 {
-    "user_query": "In the YouTube 360 VR video from March 2018 narrated by the voice actor of Lord of the Rings' Gollum, what number was mentioned by the narrator directly after dinosaurs were first shown in the video?",
+    "user_query": "The longest-lived vertebrate is named after an island.  According to Wikipedia as of January 1, 2021, what is the 2020 estimated population of that island, to the nearest thousand?",
     "1": {
         "1": {
-            "panel_description": "Identify the voice actor who played Gollum in the Lord of the Rings series.",
+            "panel_description": "Identify the longest-lived vertebrate named after an island.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Identifying the voice actor of Gollum in the Lord of the Rings series.",
+                    "handles": "Identifies the longest-lived vertebrate named after an island.",
                     "input_vars": [
                         {
-                            "name": "query_voice_actor",
+                            "name": "vertebrate_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to find the voice actor of Gollum in the Lord of the Rings series.",
-                            "value": "Who is the voice actor of Gollum in the Lord of the Rings series?",
+                            "description": "Query to find the longest-lived vertebrate named after an island.",
+                            "value": "What is the longest-lived vertebrate named after an island?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "voice_actor_name",
-                            "description": "Name of the voice actor who played Gollum.",
-                            "used_by": []
+                            "name": "vertebrate_name",
+                            "description": "Name of the longest-lived vertebrate named after an island.",
+                            "used_by": [
+                                {
+                                    "panel": 2,
+                                    "step": 1
+                                }
+                            ]
                         }
                     ]
                 }
             }
-        }
-    },
-    "2": {
+        },
         "2": {
-            "panel_description": "Locate the YouTube 360 VR video from March 2018 narrated by the identified voice actor.",
+            "panel_description": "Verify the island name associated with the vertebrate.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Locating the YouTube 360 VR video from March 2018 narrated by the identified voice actor.",
+                    "handles": "Verifies the island name associated with the vertebrate.",
                     "input_vars": [
                         {
-                            "name": "query_video",
+                            "name": "vertebrate_name",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to find the YouTube 360 VR video from March 2018 narrated by the identified voice actor.",
-                            "value": "YouTube 360 VR video from March 2018 narrated by [voice_actor_name]",
-                            "dependencies": []
+                            "source": "API_Output (Panel 1, Step 1)",
+                            "description": "Name of the vertebrate to verify the associated island.",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "panel": 1,
+                                    "step": 1
+                                }
+                            ]
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "video_url",
-                            "description": "URL of the located YouTube 360 VR video.",
-                            "used_by": []
+                            "name": "island_name",
+                            "description": "Name of the island associated with the vertebrate.",
+                            "used_by": [
+                                {
+                                    "panel": 3,
+                                    "step": 1
+                                }
+                            ]
                         }
                     ]
                 }
             }
-        }
-    },
-    "3": {
+        },
         "3": {
-            "panel_description": "Verify the video and find the point where dinosaurs first appear.",
+            "panel_description": "Find the 2020 estimated population of the identified island.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Verifying the video and finding the point where dinosaurs first appear.",
+                    "handles": "Finds the 2020 estimated population of the island from Wikipedia.",
                     "input_vars": [
                         {
-                            "name": "query_dinosaurs",
+                            "name": "island_name",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to verify the video and find the point where dinosaurs first appear.",
-                            "value": "Verify the video at [video_url] and find the point where dinosaurs first appear",
-                            "dependencies": []
+                            "source": "API_Output (Panel 2, Step 1)",
+                            "description": "Name of the island to find its 2020 estimated population.",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "panel": 2,
+                                    "step": 1
+                                }
+                            ]
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "dinosaurs_appearance_time",
-                            "description": "Time in the video where dinosaurs first appear.",
-                            "used_by": []
+                            "name": "island_population",
+                            "description": "2020 estimated population of the island.",
+                            "used_by": [
+                                {
+                                    "panel": 4,
+                                    "step": 1
+                                }
+                            ]
                         }
                     ]
                 }
             }
-        }
-    },
-    "4": {
+        },
         "4": {
-            "panel_description": "Determine the number mentioned by the narrator immediately after the dinosaurs appear.",
+            "panel_description": "Round the population figure to the nearest thousand.",
             "steps": {
                 "1": {
-                    "api": "BrowserTools",
-                    "handles": "Determining the number mentioned by the narrator immediately after the dinosaurs appear.",
+                    "api": "CalculatorAgent",
+                    "handles": "Rounds the population figure to the nearest thousand.",
                     "input_vars": [
                         {
-                            "name": "query_number",
+                            "name": "island_population",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to determine the number mentioned by the narrator immediately after the dinosaurs appear.",
-                            "value": "In the video at [video_url], what number is mentioned by the narrator immediately after the dinosaurs appear at [dinosaurs_appearance_time]?",
-                            "dependencies": []
+                            "source": "API_Output (Panel 3, Step 1)",
+                            "description": "Population figure to be rounded to the nearest thousand.",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "panel": 3,
+                                    "step": 1
+                                }
+                            ]
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "mentioned_number",
-                            "description": "Number mentioned by the narrator immediately after the dinosaurs appear.",
+                            "name": "rounded_population",
+                            "description": "Population figure rounded to the nearest thousand.",
                             "used_by": []
                         }
                     ]

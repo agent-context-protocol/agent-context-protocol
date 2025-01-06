@@ -23,7 +23,7 @@ async def process_query(query, timeout=900):
 
 async def main():
     # Name of the CSV file
-    csv_filename = "answers_level3_hf.csv"
+    csv_filename = "answers_level2_hf.csv"
 
     # ----------------------------------------------------
     # 1. Check if answers.csv exists; if not, create & write header.
@@ -48,10 +48,10 @@ async def main():
     # ----------------------------------------------------
     # 2. Load dataset
     # ----------------------------------------------------
-    dataset = load_dataset("gaia-benchmark/GAIA", '2023_level3',
+    dataset = load_dataset("gaia-benchmark/GAIA", '2023_level2',
                            token="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")
     SPLIT = 'validation'
-    num_samples_eval = 26
+    num_samples_eval = 86
 
     raw_questions = [dataset[SPLIT][i]['Question'] for i in range(num_samples_eval)]
     file_names = [dataset[SPLIT][i]['file_name'] for i in range(num_samples_eval)]
@@ -77,10 +77,12 @@ async def main():
         # Remember: processed_count tracks how many rows are in CSV
         #           i is zero-based, but CSV logs i+1 as QuestionIndex.
         # So if i < processed_count, it means i+1 <= processed_count has been done.
-        if str(i+1) in processed_count:
+        if str(i+1) in processed_count or i+1 == 55:
             print(f"Skipping Question {i+1} (already in {csv_filename}).")
             continue
-        if i == 1 or i == 6:
+        # if i == 1 or i == 6 or i == 3:
+        #     continue
+        if query.split(".")[-1] in ["pdb", "zip", "mp3", "mpga"]:
             continue
 
         print("###########################")

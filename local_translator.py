@@ -50,6 +50,9 @@ class LocalTranslatorNode(BaseNode):
         with open('prompts/local_translator/api_output_prompt.txt', 'r') as file:
             self.api_output_prompt = file.read()
 
+        with open('prompts/local_translator/api_output_prompt_no_error.txt', 'r') as file:
+            self.api_output_prompt_no_error = file.read()
+
         # status/assistance prompt
         with open('prompts/local_translator/status_assistance_prompt.txt', 'r') as file:
             self.status_assistance_prompt = file.read()
@@ -989,9 +992,16 @@ class LocalTranslatorNode(BaseNode):
         Args:
             api_descriptions (dict): Dictionary where the key is the API name and the value is the API description.
         """
+        # Setting the max tries:
+        overall_max_tries = 1
+        api_input_error_max_tries = 3
+        api_running_error_max_tries = 3
+        api_output_parsing_max_tries = 3
+        api_output_error_max_tries = 2
+        ###########
         overall_success_bool = False
         overall_counter = 0
-        while not overall_success_bool and overall_counter < 1:
+        while not overall_success_bool and overall_counter < overall_max_tries:
             # self.chat_history = []
             overall_counter += 1
             
@@ -1010,7 +1020,7 @@ class LocalTranslatorNode(BaseNode):
             api_output_error_counter = 0
             giving_up_bool = False
             s_i = -1
-            while s_i < num_steps and api_output_error_counter < 3:
+            while s_i < num_steps and api_output_error_counter < api_output_error_max_tries:
             # for s_i in range(num_steps):
                 if not modify_query_bool:
                     s_i += 1
@@ -1057,7 +1067,7 @@ class LocalTranslatorNode(BaseNode):
                 api_running_error_counter = 0
                 parse_error_bool = False
                 api_success_bool = False
-                while not run_success and api_input_error_counter < 5 and api_running_error_counter < 3:
+                while not run_success and api_input_error_counter < api_input_error_max_tries and api_running_error_counter < api_running_error_max_tries:
                     # preparing the input to the api
                     api_input_error_counter += 1
                     try:
@@ -1140,14 +1150,17 @@ class LocalTranslatorNode(BaseNode):
                 api_output_llm_input = self.prepare_input_for_api_output(api_outputs_list, self.panel_no, step_no)
                 print("\napi_output_llm_input : ",api_output_llm_input)
                 # generating the api response format from the LLM
-                self.chat_history.append({"role": "user", "content": self.api_output_prompt}) # system prompt for workflow_creation
+                if api_output_error_counter == api_output_error_max_tries-1:
+                    self.chat_history.append({"role": "user", "content": self.api_output_prompt_no_error}) 
+                else:
+                    self.chat_history.append({"role": "user", "content": self.api_output_prompt}) # system prompt for workflow_creation
                 self.chat_history.append({"role": "user", "content": api_output_llm_input })
 
 
                 run_success = False
-                counter = 0
-                while not run_success and counter < 5:
-                    counter += 1
+                api_output_parsing_error_counter = 0
+                while not run_success and api_output_parsing_error_counter < api_output_parsing_max_tries:
+                    api_output_parsing_error_counter += 1
                     try:
                         api_output_llm_output = self.generate()
                         print("\napi_output_llm_output : ",api_output_llm_output)

@@ -177,10 +177,11 @@ class MainOrchestrator:
             self.local_translator_system_prompt = file.read()
 
     async def initialise(self, user_query):
+        global all_panel_outputs  # Declare that we are modifying the global variable
+        all_panel_outputs = {}   # Reset the global variable
         self.interpreter.user_query = user_query
         panels_list = self.interpreter.setup()
         workflow = self.main_translator.setup(user_query, panels_list)
-        all_panel_outputs = {}
         return workflow
 
     async def run(self, user_query, workflow, file_path_str):
@@ -228,15 +229,15 @@ class MainOrchestrator:
         
 
 
-async def main():
-    orchestrator = MainOrchestrator()
-    await orchestrator.run("what is the weather in seattle, usa")
-    # await orchestrator.run("what is the weather in seattle, usa. Also what are the best spots to visit in seattle?")
-    # await orchestrator.run("tell me top 30 vacation spots in europe and current weather there no illustrations")
-    # await orchestrator.run("What are the top 5 most rainy areas in the world?.")
-    # await orchestrator.run("what are top news headlines for today? What is the weather at some of the top news headline locations")
-    # await orchestrator.run("where in the world should i go for travelling? What is the weather and current news at those places? Also i want to understand what generally causes null pointer errors in java")
+# async def main():
+#     orchestrator = MainOrchestrator()
+#     await orchestrator.run("what is the weather in seattle, usa")
+#     # await orchestrator.run("what is the weather in seattle, usa. Also what are the best spots to visit in seattle?")
+#     # await orchestrator.run("tell me top 30 vacation spots in europe and current weather there no illustrations")
+#     # await orchestrator.run("What are the top 5 most rainy areas in the world?.")
+#     # await orchestrator.run("what are top news headlines for today? What is the weather at some of the top news headline locations")
+#     # await orchestrator.run("where in the world should i go for travelling? What is the weather and current news at those places? Also i want to understand what generally causes null pointer errors in java")
 
 
-if __name__ == "__main__":
-    asyncio.run(main())
+# if __name__ == "__main__":
+#     asyncio.run(main())

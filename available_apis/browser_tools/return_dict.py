@@ -1,4 +1,4 @@
-from available_apis.browser_tools.main import reasoning_agent_function #, browser_tools_function
+from available_apis.browser_tools.main import reasoning_agent_function, calculator_agent #, browser_tools_function
 from available_apis.browser_tools_hf.GAIA.main import browser_tools_function
 
 # BROWSER_TOOLS_FUNCTION_DOCS = """Function: browser_tools_function
@@ -62,21 +62,44 @@ Example Usage:
 3. response = reasoning_agent_function("If a train travels at a speed of 60 km/h and covers a distance of 180 km, how long does the journey take?")
 """
 
+CALCULATOR_AGENT_FUNCTION_DOCS = """Function: calculator_agent
+
+Description:
+This function acts as calculator agent and tries to generate a precise answer to a user's query describing the calaculation to be performed.
+
+Use Case:
+Use this function as a calculator agent to get precise answers for the calculation to be performed as described by the user. This agent uses python coding for perfoming the calculations.
+
+Parameters:
+- **query** (string, required): The user's query describing the calculation to be performed.
+
+Expected Output:
+- **response_content** (string): A compiled answer.
+
+Example Usage:
+1. response = calculator_agent("what is 107 divided by 12.345")
+2. response = calculator_agent("what 1/10th ratio of a 1540")
+"""
+
 BROWSER_FUNCTION_DOCUMENTATION_DICT = {
     "BrowserTools": BROWSER_TOOLS_FUNCTION_DOCS,
     "ReasoningAgent": REASONING_AGENT_FUNCTION_DOCS,
+    "CalculatorAgent": CALCULATOR_AGENT_FUNCTION_DOCS,
     }
 BROSWER_FUNCTION_DICT = {
     "BrowserTools": browser_tools_function,
     "ReasoningAgent": reasoning_agent_function,
+    "CalculatorAgent": calculator_agent,
     }
 
 BROSWER_FUNCTION_REQD_PARAMS_DICT = {
     "BrowserTools": {"query": {"type": "string"}},
     "ReasoningAgent": {"query": {"type": "string"}},
+    "CalculatorAgent": {"query": {"type": "string"}},
 }
 
 BROSWER_FUNCTION_PARAMS_DICT = {
     "BrowserTools": {"query": {"type": "string"}},
     "ReasoningAgent": {"query": {"type": "string"}},
+    "CalculatorAgent": {"query": {"type": "string"}},
 }

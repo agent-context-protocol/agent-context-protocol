@@ -31,6 +31,10 @@ from autogen.agentchat.contrib.society_of_mind_agent import SocietyOfMindAgent
 
 from available_apis.browser_tools.browser_utils import SimpleTextBrowser
 
+from autogen import ConversableAgent
+from autogen.coding import LocalCommandLineCodeExecutor
+import tempfile
+
 MODEL='gpt-4o-2024-08-06'
 DATA_NAME = '2023_level1'
 SPLIT = 'validation'
@@ -397,9 +401,11 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
                     You have two tools at your disposal:
                     - BrowserTools: A web search engine that can retrieve and synthesize information from multiple sources into a concise response. It can also handle image-based question answering, coding assistance, and code execution.  
                     - ReasoningAgent: An agent for deep thinking on problems that can be solved with pure reasoning, without requiring web searches.
+                    - CalculatorAgent: Use this function as a calculator agent to get precise answers for the calculation to be performed as described by the user. This agent uses python coding for perfoming the calculations.
 
-                    5. **Tool Selection**  
-                    For each sub-task/sub-query, specify which tool (BrowserTools or ReasoningAgent) is best suited. Use ReasoningAgent for purely reasoning-based tasks; if some prior knowledge or outside information is assumed, use BrowserTools instead.
+                    6. **Tool Selection**  
+                    For each sub-task/sub-query, specify which tool (BrowserTools or ReasoningAgent) is best suited. Use ReasoningAgent for purely reasoning-based tasks; if some prior knowledge or outside information is assumed, use BrowserTools instead. And use CalculatorAgent for all important calculations.
+
                     DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
             else:
                 answer = self.user_proxy.initiate_chat(
@@ -430,11 +436,12 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
 
                     5. **Tools Available**  
                     You have two tools at your disposal:
-                    - BrowserTools: A web search engine that can retrieve and synthesize information from multiple sources into a concise response. It can also handle image-based question answering, coding assistance, and code execution.  
+                    - BrowserTools: A web search engine that can retrieve and synthesize information from multiple sources into a concise response. It can also handle image-based question answering, coding assistance, and code execution. For large counting based things from files or data always use BrowserTools.
                     - ReasoningAgent: An agent for deep thinking on problems that can be solved with pure reasoning, without requiring web searches.
+                    - CalculatorAgent: Use this function as a calculator agent to get precise answers for the calculation to be performed as described by the user. This agent uses python coding for perfoming the calculations.
 
                     6. **Tool Selection**  
-                    For each sub-task/sub-query, specify which tool (BrowserTools or ReasoningAgent) is best suited. Use ReasoningAgent for purely reasoning-based tasks; if some prior knowledge or outside information is assumed, use BrowserTools instead.
+                    For each sub-task/sub-query, specify which tool (BrowserTools or ReasoningAgent) is best suited. Use ReasoningAgent for purely reasoning-based tasks; if some prior knowledge or outside information is assumed or for large counting based things from files or data always use BrowserTools instead. And use CalculatorAgent for all important calculations.
 
                     If you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided.
                     DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
@@ -593,4 +600,106 @@ def reasoning_agent_function(dict_body):
 # report check
 # dict_body = {"query": "There are 12 identical balls, one of which is slightly heavier than the others. You have a balance scale and need to find the heavier ball in just 3 weighings. How can you do it?"}
 # res_dict = reasoning_agent_function(dict_body)
+# print("res_dict : ",res_dict)
+
+#############################################
+def calculator_agent(dict_body):
+
+    response_dict = {}
+
+    if "query" not in dict_body:
+        response_dict["status_code"] = 400
+        response_dict["text"] = "Missing required parameters query"
+        return response_dict
+    
+    query = dict_body["query"]
+
+    llm_client = OpenAI()
+
+    system_prompt = """You are calculator, who needs to write code for calculating whatever is required, you need to write clean and straightforwad code while
+                       restricting yourself to simply python and numpy. Your output should strictly be the python code only with any text or special characters 
+                       before or after. In the python code the final answer should be printed via the print function always, else there will be no point of you."""
+    
+    print("###########")
+    run_success = False
+    trial_num = 0
+    error_message = ""
+    code_string = ""
+    while not run_success:
+        print("trial_num : ",trial_num)
+
+        
+        # Prepare the user query
+        if code_string == "" and error_message == "" and trial_num == 0:
+            user_query = f'''So the user query is : {query},please write python code for calculating this.'''
+        elif code_string != "" and error_message != "" and trial_num < 5:
+            user_query = f'''So the user query is : {query},please write python code for calculating this.\n The code we have is {code_string} \n And error that it causes is {error_message}'''
+        else:
+            print(ValueError)
+        
+        # print("\nuser_query : ",user_query)
+
+        # do the LLM call
+        completion = llm_client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+            {
+            "role": "system",
+            "content": system_prompt},
+
+            {"role": "user", 
+            "content": user_query}
+            ]
+        )
+
+        code_respone = completion.choices[0].message.content
+
+        # print("\nplot_respone : ",plot_respone)
+
+        # reset the strings
+        code_string = ""
+        error_message = ""
+
+        # print("plot_respone.split: ",plot_respone.split(' '))
+
+        # retrieve the appropriate things from the plot_respone
+        
+        code_string = code_respone.replace("```python","").replace("```","")
+        
+
+        # Create a local command line code executor.
+        # temp_dir = tempfile.TemporaryDirectory()
+        executor = LocalCommandLineCodeExecutor(
+            timeout=20,  # Timeout for each code execution in seconds.
+            work_dir="./coding_work_dir",  # Use the temporary directory to store the code files.
+        )
+
+        # Create an agent with code executor configuration.
+        code_executor_agent = ConversableAgent(
+            "code_executor_agent",
+            llm_config=False,  # Turn off LLM for this agent.
+            code_execution_config={"executor": executor},  # Use the local command line code executor.
+            human_input_mode="NEVER",  # Always take human input for this agent for safety.
+        )
+
+        try:
+            # print("code_string : ",code_string)
+            reply = code_executor_agent.generate_reply(messages=[{"role": "user", "content": "```python\n"+code_string+"\n```"}])
+            run_success = True
+            break
+        except Exception as e:
+            error_message = str(e)
+            print("error_message : ", error_message)
+            trial_num += 1
+            continue      
+       
+
+    response_dict["status_code"] = 200
+    response_dict["text"] = reply
+
+    return response_dict
+
+# # report check
+# dict_body = {"query": "what is 107 divided by 12.345"}
+# res_dict = coding_agent(dict_body)
 # print("res_dict : ",res_dict)

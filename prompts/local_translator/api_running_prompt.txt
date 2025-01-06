@@ -54,9 +54,7 @@ API Documentation:
 
 4. Handle Errors Appropriately:
    - 601 MISSING_REQUIRED_PARAMETERS: One or more required parameters are missing in the workflow step details.
-   - 602 WRONG_STEP_DETAILS: Raise this error if the API step details are incomplete or incorrect, such as when invalid parameters are provided, or if the input variable values are in an incorrect format or data type, preventing the API request from being properly constructed.
-   - 603 INVALID_PARAMETER_USAGE: Raised when a parameter is used incorrectly, such as including multiple values in a parameter that accepts only single values, or incorrect data formatting that doesn't align with the API's expectations.
-   - Errors should only be raised in critical cases that cannot be resolved automatically. Minor issues, such as correctable formatting problems or missing optional data, should be handled internally without raising an error.
+   - Errors should only be raised in critical cases that cannot be resolved automatically. Issues, such as correctable formatting problems or missing data without which as well the queries can be apporximated, should be handled internally without raising an error.
 
 ### Important Guidelines:
 
@@ -118,9 +116,7 @@ API Documentation:
 
 - Error Handling:
   - 601 MISSING_REQUIRED_PARAMETERS: One or more required parameters are missing in the workflow step details.
-  - 602 WRONG_STEP_DETAILS: Raise this error if the API step details are incorrect or incomplete, such as invalid parameters or wrong input formats.
-  - 603 INVALID_PARAMETER_USAGE: Raised when a parameter is used incorrectly, such as including multiple values in a parameter that accepts only single values, or incorrect data formatting that doesn't align with the API's expectations.
-  - Only raise errors for critical issues; minor problems should be handled internally.
+  - Only raise errors for critical issues; Issues, such as correctable formatting problems or missing data without which as well the queries can be apporximated, should be handled internally without raising an error.
   - Provide a clear explanation in the ERROR_EXPLANATION section.
 
 - Do not unnecessarily add complexity to the queries based on whole user query trying to answer the whole user query. You have to focus on the purpose of the step you are executing. User query was provided for getting the global context.
@@ -217,7 +213,7 @@ ERROR_EXPLANATION
 ### Remember:
 
 - Any deviations from the API documentation or the output format can result in errors during execution.
-- If you encounter any issues that prevent you from finalizing the API request (e.g., missing required inputs, conflicts in parameters), you should raise an error detailing the issue.
+- If you encounter any issues that prevent you from finalizing the API request (e.g., missing required inputs, conflicts in parameters), you should raise an error detailing the issue. Issues, such as correctable formatting problems or missing data without which as well the queries can be apporximated, should be handled internally without raising an error.
 - Always prefer making multiple API requests over overloading a single parameter with multiple values, unless the API specifically supports multiple values and it's necessary.
 - If the query is referring to the file attachment then please provide the file attachment as well as it is to the BroswerTools APIs else they wont understand the context.
 - Do not unnecessarily add complexity to the queries based on user query trying to answer the whole user query. You have to focus on the purpose of the step you are executing. User query was provided for getting the global context.
@@ -466,74 +462,6 @@ BODY
 
 Step Details:
 
-- API: WeatherAPI.com_Realtime_Weather_Api
-- Handles: Fetches real-time weather data
-- Input Variables:
-  - Name: longitude_data
-    - Parameter: q
-    - Type: string
-    - Source: API_Output (Panel 2, Step 1)
-    - Description: Longitutdes of the top cities
-    - Value: None
-- Output Variables:
-  - Name: realtime_weather
-    - Description: Real-time weather data for each city
-
-API Documentation:
-
-[You will be given the api documentation]
-
-# Your Output:
-
-$$CHAIN_OF_THOUGHT$$
-
-Input Variables:
-
-- Name: longitude_data
-  - Parameter: q
-  - Type: string
-  - Source: API_Output (Panel 2, Step 1)
-  - Description: Longitudes of the top cities
-  - Value: None
-
-Verification of Input Variables:
-
-- The WeatherAPI.com_Realtime_Weather_Api requires the parameter q, which is a string representing the location.
-- The parameter q can accept:
-  - City name (e.g., "Paris")
-  - ZIP code (e.g., "10001")
-  - Latitude and longitude in the format "lat,lon" (e.g., "48.8567,2.3508")
-- Currently, we only have longitude_data without latitude_data.
-- The longitude_data depends on API_Output (Panel 2, Step 1), but its value is None, indicating missing data.
-- Without both latitude and longitude, we cannot construct the required q parameter in the format "lat,lon".
-
-Dependencies:
-
-- The input variable longitude_data lacks the corresponding latitude_data.
-- Since latitude_data is not provided, and longitude_data has no value, we cannot proceed.
-
-Conclusion:
-
-- The required parameter q is incomplete due to missing latitude_data.
-- We cannot fetch real-time weather data without both latitude and longitude.
-- Therefore, we must raise an 601 MISSING_REQUIRED_PARAMETERS error for missing required parameters.
-
-$$API_REQUEST$$
-
-STATUS_CODE
-
-601 MISSING_REQUIRED_PARAMETERS
-
-ERROR_EXPLANATION
-
-The latitude of the location we want weather of is missing. We cannot get the weather from WeatherAPI.com_Realtime_Weather_Api without both longitude and latitude of the location
-
-#### Example 4:
-
-# Input:
-
-Step Details:
-
 - API: BrowserTools
 - Handles: Fetches latitude and longitude for each vacation spot
 - Input Variables:
@@ -631,7 +559,7 @@ BODY
 }
 
 
-#### Example 5:
+#### Example 4:
 
 # Input:
 
@@ -727,7 +655,7 @@ BODY
   "query": "What significant historical events happened on July 20, 1969?",
 }
 
-#### Example 6:
+#### Example 5:
 
 # Input:
 
@@ -824,7 +752,7 @@ BODY
 }
 
 
-#### Example 7:
+#### Example 6:
 
 # Input:
 
@@ -914,7 +842,7 @@ BODY
   "query": "Performs detailed image analysis on the partial blueprint file to detect floor labels, references to shops, basement, or rooftop structures. file:///Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/GAIA/2023/validation/site_diagram.png"
 }
 
-#### Example 8
+#### Example 7
 
 # Input:
 
@@ -970,7 +898,7 @@ BODY
   "query": "Extract flight details from the PDF. file:///Users/ExampleUser/Documents/flight_schedules.pdf"
 }
 
-#### Example 9
+#### Example 8
 
 # Input:
 
@@ -1024,4 +952,196 @@ BODY
 
 {
   "query": "Identify all the hiking trails from the image. file:///Users/ExampleUser/Maps/forest_map.png"
+}
+
+#### Example 9
+
+# Input:
+
+- User Query:
+  "Various researchers have published findings on the distribution of microalgae in brackish waters. Specifically, I'm interested in Dr. Henderson's, Dr. Baumer's, and Dr. Fukumoto's reported species from 2019 to 2021 in the southwestern estuaries of Alaska."
+
+- Step Details:
+  - API: BrowserTools
+  - Handles: Performs a web search or document lookup to retrieve info about microalgae species found in southwestern estuaries of Alaska
+  - Input Variables:
+    - Name: henderson_data
+      - Parameter: query_henderson
+      - Type: string
+      - Source: API_Output (Panel 2, Step 4)
+      - Description: Microalgae species list from Dr. Henderson's studies
+      - Value: None
+    - Name: baumer_data
+      - Parameter: query_baumer
+      - Type: string
+      - Source: API_Output (Panel 3, Step 1)
+      - Description: Microalgae species list from Dr. Baumer's studies
+      - Value: "Nitzschia, Skeletonema"
+    - Name: fukumoto_data
+      - Parameter: query_fukumoto
+      - Type: string
+      - Source: API_Output (Panel 1, Step 3)
+      - Description: Microalgae species from Dr. Fukumoto's research
+      - Value: "Thalassiosira, Chaetoceros"
+  - Output Variables:
+    - Name: approximate_distribution
+      - Description: Combined approximate distribution of microalgae in southwestern estuaries of Alaska
+
+Input Details:
+
+API_KEY: YOUR_API_KEY
+
+API Documentation:
+
+[BrowserTools API documentation, which needs the query to specify relevant context for the search or analysis]
+
+# Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+1. We have three input variables (henderson_data, baumer_data, fukumoto_data). henderson_data is None, so we lack that entire dataset.  
+2. We still have Baumer’s and Fukumoto’s partial listings. We’ll merge them in the query to get an approximate distribution.  
+3. Because the API is BrowserTools, we must form a single query string with enough context. We do not have Henderson’s data, so we rely on the other two researchers’ lists.  
+
+$$API_REQUEST$$
+
+API_ENDPOINT
+
+Method: FUNCTION  
+URL: browser_tools_function
+
+HEADERS
+
+{}
+
+BODY
+
+{
+  "query": "Retrieve any web or document info on microalgae species 'Nitzschia, Skeletonema, Thalassiosira, Chaetoceros' in the southwestern estuaries of Alaska (approx. 2019-2021)."
+}
+
+
+---
+
+#### Example 10
+
+# Input:
+
+- User Query:
+  "Check references from the PaleoArt symposium. We’re specifically missing the mentions made by Dr. Mendez on plesiosaurs, while we do have partial notes on Dr. Li’s and Dr. Rosales’s observations."
+
+- Step Details:
+  - API: BrowserTools
+  - Handles: Finds references and context from an online symposium about PaleoArt
+  - Input Variables:
+    - Name: mendez_plesiosaur_mentions
+      - Parameter: query_mendez
+      - Type: string
+      - Source: API_Output (Panel 1, Step 2)
+      - Description: Mentions of plesiosaurs from Dr. Mendez
+      - Value: None
+    - Name: li_observations
+      - Parameter: query_li
+      - Type: string
+      - Source: API_Output (Panel 2, Step 5)
+      - Description: Observations from Dr. Li
+      - Value: "Theropod skeletal composition"
+    - Name: rosales_observations
+      - Parameter: query_rosales
+      - Type: string
+      - Source: LLM_Generated
+      - Description: Comments from Dr. Rosales
+      - Value: "Fossil coloration in pterosaurs"
+  - Output Variables:
+    - Name: approximate_paleo_data
+      - Description: Merged references or notes from the PaleoArt symposium talks, approximating Mendez’s missing details
+
+Input Details:
+
+API_KEY: YOUR_API_KEY
+
+API Documentation:
+
+[BrowserTools API documentation, specifying that queries should include as much context as possible for relevant search results]
+
+# Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+1. The user wants to gather references from the PaleoArt symposium, but Dr. Mendez’s data on plesiosaurs is missing.  
+2. We do have partial notes from Dr. Li (Theropods) and Dr. Rosales (Pterosaurs).  
+3. We’ll form a single query that approximates Mendez’s missing data by combining what we do have, ensuring that the search or doc lookups revolve around PaleoArt references of these paleontological findings.  
+
+$$API_REQUEST$$
+
+API_ENDPOINT
+
+Method: FUNCTION  
+URL: browser_tools_function
+
+HEADERS
+
+{}
+
+BODY
+
+{
+  "query": "Check references from the PaleoArt symposium for 'Theropod skeletal composition' and 'Fossil coloration in pterosaurs'. Mendez’s plesiosaur mentions are missing, so approximate any relevant plesiosaur references for the symposium talks."
+}
+
+
+---
+
+#### Example 11
+
+# Input:
+
+- User Query (global context):
+  "We plan to compile a comprehensive report on medieval manuscripts. In the final steps, we have compare them to modern translations and formulate ans answer."
+
+- Step Details:
+  - API: BrowserTools
+  - Handles: Performs a targeted web search for digital scans of specific medieval manuscripts
+  - Input Variables:
+    - Name: manuscripts_search
+      - Parameter: query
+      - Type: string
+      - Source: LLM_Generated
+      - Description: Query to locate digital scans of medieval manuscripts
+      - Value: "Find online digital scans of the 12th-century Lucerne Chronicles"
+  - Output Variables:
+    - Name: manuscript_scans
+      - Description: Links or references to digital scans if found
+
+Input Details:
+
+API_KEY: YOUR_API_KEY
+
+API Documentation:
+
+[BrowserTools API documentation explaining how to search the web or library databases]
+
+# Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+1. The user query is about a big research project involving medieval manuscripts and eventually modern translations.  
+2. However, this step focuses solely on locating digital scans of the 12th-century Lucerne Chronicles.  
+3. We should not incorporate the entire final comparison or broader purpose into this sub-query; we must stay on track and only query for the scans themselves.  
+
+$$API_REQUEST$$
+
+API_ENDPOINT
+
+Method: FUNCTION  
+URL: browser_tools_function
+
+HEADERS
+
+{}
+
+BODY
+
+{
+  "query": "Locate any available digital scans of the 12th-century Lucerne Chronicles in online libraries or archives."
 }

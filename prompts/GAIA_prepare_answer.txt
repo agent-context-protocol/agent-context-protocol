@@ -26,7 +26,8 @@ Important:
 2. No need to give a summary of the intermediate steps please provide the the final formatted answer only.
 3. The final formatted answer should be as concise as possible, directly addressing the question without any additional explanation or restatement.
 4. Exclude any additional details beyond the specific information requested.
-5. If unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided. Your EDUCATED GUESS should be a number OR as few words as possible OR a comma separated list of numbers and/or strings. DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.
+5. If unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided. Your EDUCATED GUESS should be a number OR as few words as possible OR a comma separated list of numbers and/or strings. 
+6. DO NOT OUTPUT 'I don't know', 'Unable to determine', etc. Always try to guess the best plausible answer through EDUCATED GUESS.
 
 Here is the question:
 {question}
