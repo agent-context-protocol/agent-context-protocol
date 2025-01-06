@@ -2,7 +2,7 @@ from utils import fetch_user_data, update_interpreter_with_similar_apis
 import json
 from base import BaseNode
 from available_apis.browser_tools.main import browser_tools_function
-# from available_apis.browser_tools_hf.GAIA.main import browser_tools_function
+import available_apis.browser_tools_hf.GAIA.main as browser_tools_function_hf #import browser_tools_function
 
 class InterpreterNode(BaseNode):
     def __init__(self, node_name, user_query = None, system_prompt = None, personal_json = 'personal_info.json'):
@@ -32,8 +32,9 @@ class InterpreterNode(BaseNode):
 
     def setup(self):
         if self.user_query:
-            # initial_message = fetch_user_data(self.personal_json, self.user_query)
-            # print('User Context: ',initial_message)
+            # if ".mp3" in self.user_query or ".m4a" in self.user_query or ".wav" in self.user_query:
+            # suggested_sections = browser_tools_function_hf.browser_tools_function({"query": f"Please provide how the query should be resolved into sub-queries/tasks for solving this query. Based on your try to solve the question naively try to find workaround on sub-parts for which finding information was difficult. Strictly do not provide an answer.\nUser Query: {self.user_query}"}, True)
+            # else:
             suggested_sections = browser_tools_function({"query": f"Please provide how the query should be resolved into sub-queries/tasks for solving this query. Based on your try to solve the question naively try to find workaround on sub-parts for which finding information was difficult. Strictly do not provide an answer.\nUser Query: {self.user_query}"}, True)
             # suggested_sections = browser_tools_function({"query": f"User Query: {self.user_query}"}, True)
             print(f"\nUser Query: {self.user_query} \n\n Suggested sub-queries:\n{suggested_sections['text']}")

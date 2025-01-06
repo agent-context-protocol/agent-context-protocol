@@ -1,32 +1,32 @@
 {
-    "user_query": "The longest-lived vertebrate is named after an island.  According to Wikipedia as of January 1, 2021, what is the 2020 estimated population of that island, to the nearest thousand?",
+    "user_query": "A paper about AI regulation that was originally submitted to arXiv.org in June 2022 shows a figure with three axes, where each axis has a label word at both ends. Which of these words is used to describe a type of society in a Physics and Society article submitted to arXiv.org on August 11, 2016?",
     "1": {
         "1": {
-            "panel_description": "Identify the longest-lived vertebrate named after an island.",
+            "panel_description": "Identify June 2022 AI Regulation Paper and Extract Axis Labels",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Identifies the longest-lived vertebrate named after an island.",
+                    "handles": "Searches for the AI regulation paper submitted to arXiv.org in June 2022 and extracts axis labels from the figure.",
                     "input_vars": [
                         {
-                            "name": "vertebrate_query",
+                            "name": "ai_regulation_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to find the longest-lived vertebrate named after an island.",
-                            "value": "What is the longest-lived vertebrate named after an island?",
+                            "description": "Query to find the AI regulation paper and extract axis labels.",
+                            "value": "Find AI regulation paper submitted to arXiv.org in June 2022 and extract axis labels from the figure.",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "vertebrate_name",
-                            "description": "Name of the longest-lived vertebrate named after an island.",
+                            "name": "axis_labels",
+                            "description": "Labels from the three axes in the figure of the AI regulation paper.",
                             "used_by": [
                                 {
-                                    "panel": 2,
+                                    "panel": 3,
                                     "step": 1
                                 }
                             ]
@@ -36,33 +36,28 @@
             }
         },
         "2": {
-            "panel_description": "Verify the island name associated with the vertebrate.",
+            "panel_description": "Identify August 2016 Physics and Society Article and Extract Society Descriptions",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Verifies the island name associated with the vertebrate.",
+                    "handles": "Searches for the Physics and Society article submitted to arXiv.org on August 11, 2016, and extracts society descriptions.",
                     "input_vars": [
                         {
-                            "name": "vertebrate_name",
+                            "name": "physics_society_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
-                            "source": "API_Output (Panel 1, Step 1)",
-                            "description": "Name of the vertebrate to verify the associated island.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 1,
-                                    "step": 1
-                                }
-                            ]
+                            "source": "LLM_Generated",
+                            "description": "Query to find the Physics and Society article and extract society descriptions.",
+                            "value": "Find Physics and Society article submitted to arXiv.org on August 11, 2016, and extract words describing a type of society.",
+                            "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "island_name",
-                            "description": "Name of the island associated with the vertebrate.",
+                            "name": "society_descriptions",
+                            "description": "Words used to describe a type of society in the Physics and Society article.",
                             "used_by": [
                                 {
                                     "panel": 3,
@@ -75,20 +70,36 @@
             }
         },
         "3": {
-            "panel_description": "Find the 2020 estimated population of the identified island.",
+            "panel_description": "Cross-reference Axis Labels with Society Descriptions",
             "steps": {
                 "1": {
-                    "api": "BrowserTools",
-                    "handles": "Finds the 2020 estimated population of the island from Wikipedia.",
+                    "api": "ReasoningAgent",
+                    "handles": "Compares the words from the axis labels of the June 2022 paper with the words describing a type of society in the August 2016 article to find a match.",
                     "input_vars": [
                         {
-                            "name": "island_name",
+                            "name": "axis_labels",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "API_Output (Panel 1, Step 1)",
+                            "description": "Axis labels from the AI regulation paper.",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "panel": 1,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "society_descriptions",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "API_Output (Panel 2, Step 1)",
-                            "description": "Name of the island to find its 2020 estimated population.",
+                            "description": "Society descriptions from the Physics and Society article.",
                             "value": "None",
                             "dependencies": [
                                 {
@@ -100,47 +111,8 @@
                     ],
                     "output_vars": [
                         {
-                            "name": "island_population",
-                            "description": "2020 estimated population of the island.",
-                            "used_by": [
-                                {
-                                    "panel": 4,
-                                    "step": 1
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        },
-        "4": {
-            "panel_description": "Round the population figure to the nearest thousand.",
-            "steps": {
-                "1": {
-                    "api": "CalculatorAgent",
-                    "handles": "Rounds the population figure to the nearest thousand.",
-                    "input_vars": [
-                        {
-                            "name": "island_population",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "API_Output (Panel 3, Step 1)",
-                            "description": "Population figure to be rounded to the nearest thousand.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 3,
-                                    "step": 1
-                                }
-                            ]
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "rounded_population",
-                            "description": "Population figure rounded to the nearest thousand.",
+                            "name": "matching_word",
+                            "description": "Word used to describe a type of society that matches an axis label.",
                             "used_by": []
                         }
                     ]

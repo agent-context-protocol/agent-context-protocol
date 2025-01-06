@@ -4,10 +4,10 @@ import asyncio
 import os
 import csv
 
-dataset = load_dataset("gaia-benchmark/GAIA", '2023_level2', token="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")
+dataset = load_dataset("gaia-benchmark/GAIA", '2023_level3', token="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")
 
 SPLIT = 'validation'
-num_samples_eval = 86
+num_samples_eval = 26
 
 raw_questions = [dataset[SPLIT][i]['Question'] for i in range(num_samples_eval)]
 file_names = [dataset[SPLIT][i]['file_name'] for i in range(num_samples_eval)]
@@ -31,7 +31,7 @@ questions_with_attachments = [
 # Level 2
 # Instead of hardcoding answers, read them from CSV using QuestionIndex (starting at 1).
 answers_dict = {}
-with open('answers_level2_hf.csv', 'r', encoding='utf-8-sig') as f:
+with open('answers_level3_hf.csv', 'r', encoding='utf-8-sig') as f:
     reader = csv.DictReader(f)
     for row in reader:
         # Convert QuestionIndex to int

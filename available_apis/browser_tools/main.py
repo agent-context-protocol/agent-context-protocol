@@ -310,77 +310,78 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
             question = raw_question
         pp(f"Question: {question}")
 
-        for _ in range(20):
-            has_error = False
-            for _ in range(30):
-                try:
-                    if has_error:
-                        tool_choice = self.choose_tool_chain_without_cache.invoke({'question': question, 'steps': '\n\n'.join(steps)})
-                    else:
-                        tool_choice = self.choose_tool_chain.invoke({'question': question, 'steps': '\n\n'.join(steps)})
-                    if tool_choice['tool'] == 'computer_terminal' and tool_choice['tool_args'].get('code', '') == '':
-                        has_error = True
-                        continue
-                    elif tool_choice['tool'] not in ['informational_web_search', 'navigational_web_search', 'visit_page', 'page_up', 'page_down', 'download_file', 'find_on_page_ctrl_f', 'find_next', 'computer_terminal', 'vision_qa', 'find_archived_url', 'None']:
-                        has_error = True
-                        continue
-                    else:
-                            break
-                except Exception as e:
-                    print(f"Error: {e}")
-                    has_error = True
-                    continue
-            tool = tool_choice['tool']
-            args = tool_choice['tool_args']
-            pp(f"Tool: {tool}, Args: {args}")
-            if tool == "informational_web_search":
-                tool_result = self.informational_web_search(**args)
-            elif tool == "navigational_web_search":
-                tool_result = self.navigational_web_search(**args)
-            elif tool == "visit_page":
-                tool_result = self.visit_page(**args)
-            elif tool == "page_up":
-                tool_result = self.page_up()
-            elif tool == "page_down":
-                tool_result = self.page_down()
-            elif tool == "download_file":
-                tool_result = self.download_file(**args)
-            elif tool == "find_on_page_ctrl_f":
-                tool_result = self.find_on_page_ctrl_f(**args)
-            elif tool == "find_next":
-                tool_result = self.find_next()
-            elif tool == "vision_qa":
-                tool_result = self.vision_qa(**args)
-            elif tool == 'find_archived_url':
-                tool_result = self.find_archived_url(**args)
-            elif tool == 'computer_terminal':
-                improve_error = False
-                for _ in range(10):
+        if not self.interpreter_bool:
+            for _ in range(20):
+                has_error = False
+                for _ in range(30):
                     try:
-                        origin_code = args['code']
-                        if improve_error:
-                            improved_code = self.improve_code_chain_without_cache.invoke({'question': question, 'steps': '\n\n'.join(steps), 'code': origin_code})['improved_code']
+                        if has_error:
+                            tool_choice = self.choose_tool_chain_without_cache.invoke({'question': question, 'steps': '\n\n'.join(steps)})
                         else:
-                            improved_code = self.improve_code_chain.invoke({'question': question, 'steps': '\n\n'.join(steps), 'code': origin_code})['improved_code']
-                        tool_result = self.computer_terminal(improved_code)
-                        break
+                            tool_choice = self.choose_tool_chain.invoke({'question': question, 'steps': '\n\n'.join(steps)})
+                        if tool_choice['tool'] == 'computer_terminal' and tool_choice['tool_args'].get('code', '') == '':
+                            has_error = True
+                            continue
+                        elif tool_choice['tool'] not in ['informational_web_search', 'navigational_web_search', 'visit_page', 'page_up', 'page_down', 'download_file', 'find_on_page_ctrl_f', 'find_next', 'computer_terminal', 'vision_qa', 'find_archived_url', 'None']:
+                            has_error = True
+                            continue
+                        else:
+                                break
                     except Exception as e:
                         print(f"Error: {e}")
-                        improve_error = True
+                        has_error = True
                         continue
-            elif tool == 'None':
-                tool_result = None
-            else:
-                print(f"Unknown tool: {tool}")
-                tool_result = None
-            
-            if tool == 'None':
-                print(f"No tool chosen, break")
-                break
+                tool = tool_choice['tool']
+                args = tool_choice['tool_args']
+                pp(f"Tool: {tool}, Args: {args}")
+                if tool == "informational_web_search":
+                    tool_result = self.informational_web_search(**args)
+                elif tool == "navigational_web_search":
+                    tool_result = self.navigational_web_search(**args)
+                elif tool == "visit_page":
+                    tool_result = self.visit_page(**args)
+                elif tool == "page_up":
+                    tool_result = self.page_up()
+                elif tool == "page_down":
+                    tool_result = self.page_down()
+                elif tool == "download_file":
+                    tool_result = self.download_file(**args)
+                elif tool == "find_on_page_ctrl_f":
+                    tool_result = self.find_on_page_ctrl_f(**args)
+                elif tool == "find_next":
+                    tool_result = self.find_next()
+                elif tool == "vision_qa":
+                    tool_result = self.vision_qa(**args)
+                elif tool == 'find_archived_url':
+                    tool_result = self.find_archived_url(**args)
+                elif tool == 'computer_terminal':
+                    improve_error = False
+                    for _ in range(10):
+                        try:
+                            origin_code = args['code']
+                            if improve_error:
+                                improved_code = self.improve_code_chain_without_cache.invoke({'question': question, 'steps': '\n\n'.join(steps), 'code': origin_code})['improved_code']
+                            else:
+                                improved_code = self.improve_code_chain.invoke({'question': question, 'steps': '\n\n'.join(steps), 'code': origin_code})['improved_code']
+                            tool_result = self.computer_terminal(improved_code)
+                            break
+                        except Exception as e:
+                            print(f"Error: {e}")
+                            improve_error = True
+                            continue
+                elif tool == 'None':
+                    tool_result = None
+                else:
+                    print(f"Unknown tool: {tool}")
+                    tool_result = None
+                
+                if tool == 'None':
+                    print(f"No tool chosen, break")
+                    break
 
-            step_note = self.summarize_tool_chain.invoke({'question': question, 'steps': '\n\n'.join(steps), 'tool_result': tool_result, 'tool': tool, 'args': args})
-            print(f"Step note: \n{step_note}")
-            steps.append(f"Step:{len(steps)+1}\nTool: {tool}, Args: {args}\n{step_note}\n\n")
+                step_note = self.summarize_tool_chain.invoke({'question': question, 'steps': '\n\n'.join(steps), 'tool_result': tool_result, 'tool': tool, 'args': args})
+                print(f"Step note: \n{step_note}")
+                steps.append(f"Step:{len(steps)+1}\nTool: {tool}, Args: {args}\n{step_note}\n\n")
 
         if len(steps) == 0:
             if self.interpreter_bool:
@@ -388,8 +389,8 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
                     self.society_of_mind_agent, 
                     message=f"""{question}\nIf you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided. 
                     1. **Main Instruction**  
-                    You have to only suggest sub-tasks/sub-queries for solving the main query and strictly not provide the solution yourself. For your context, propose the sub-tasks/sub-queries required to address the user’s query thoroughly. Carefully analyze the query and suggest the most logical and appropriate sub-tasks/sub-queries which, if solved, would lead to answering the main query. 
-
+                    You have to only suggest sub-tasks/sub-queries for solving the main query and strictly not provide the solution yourself. For your context, propose the sub-tasks/sub-queries required to address the user’s query thoroughly. Carefully analyze the query and suggest the most logical and appropriate sub-tasks/sub-queries which, if solved, would lead to answering the main query. Based on your initial web searches, you can recommend well-informed sub-tasks/sub-queries that make the solution path more focused rather than vague, utilizing insights into which searches met expectations and which did not, while providing workarounds where needed.
+                    
                     2. **Disentangle the Query**  
                     Disentangle the query into different sub-tasks/sub-queries so that each is an independent part of the main query—avoid combining unrelated issues into a single sub-task, as it increases confusion. Also, do not create too many sub-tasks/sub-queries unnecessarily. For example, do not break down a single web-search task into multiple smaller sub-tasks that repeat the same step.  
                     Similarly, when handling files, retrieving and analyzing the file information should be combined into one sub-task or sub-query, without splitting it into separate ones for verification or redundant analysis. All necessary actions for a single file (e.g., reviewing, matching, or referencing) must be contained within that one sub-task/sub-query. There is absolutely no need for verification-based steps, so please do not add them.
@@ -399,12 +400,12 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
 
                     4. **Tools Available**  
                     You have two tools at your disposal:
-                    - BrowserTools: A web search engine that can retrieve and synthesize information from multiple sources into a concise response. It can also handle image-based question answering, coding assistance, and code execution.  
+                    - BrowserTools: A web search engine that can retrieve and synthesize information from multiple sources into a concise response. It can also handle image-based question answering, coding assistance, and code execution. For large counting based things from files or data always use BrowserTools.
                     - ReasoningAgent: An agent for deep thinking on problems that can be solved with pure reasoning, without requiring web searches.
                     - CalculatorAgent: Use this function as a calculator agent to get precise answers for the calculation to be performed as described by the user. This agent uses python coding for perfoming the calculations.
 
                     6. **Tool Selection**  
-                    For each sub-task/sub-query, specify which tool (BrowserTools or ReasoningAgent) is best suited. Use ReasoningAgent for purely reasoning-based tasks; if some prior knowledge or outside information is assumed, use BrowserTools instead. And use CalculatorAgent for all important calculations.
+                    For each sub-task/sub-query, specify which tool (BrowserTools or ReasoningAgent) is best suited. Use ReasoningAgent for purely reasoning-based tasks; if some prior knowledge or outside information is assumed or for large counting based things from files or data always use BrowserTools instead. And use CalculatorAgent for all important calculations.
 
                     DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
             else:

@@ -23,7 +23,7 @@ async def process_query(query, timeout=900):
 
 async def main():
     # Name of the CSV file
-    csv_filename = "answers_level2_hf.csv"
+    csv_filename = "answers_level2_hf_res.csv"
 
     # ----------------------------------------------------
     # 1. Check if answers.csv exists; if not, create & write header.
@@ -82,7 +82,8 @@ async def main():
             continue
         # if i == 1 or i == 6 or i == 3:
         #     continue
-        if query.split(".")[-1] in ["pdb", "zip", "mp3", "mpga"]:
+        # if query.split(".")[-1] in ["pdb", "zip", "mp3", "mpga"]:
+        if query.split(".")[-1] in ["mpga", ".MOV"]:
             continue
 
         print("###########################")
