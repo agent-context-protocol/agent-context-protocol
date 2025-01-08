@@ -7,6 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from openai import OpenAI
 from openai import AzureOpenAI
 import os
+import queue
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -17,21 +18,21 @@ client = OpenAI()
 
 # GLOBAL VARIABLE
 all_panel_outputs = {}
-
 class Manager:
-    def __init__(self, workflow, file_path_str, main_translator, local_translator_system_prompt):
+    def __init__(self, workflow, file_path_str, main_translator, local_translator_system_prompt, logger = None):
         self.file_path_str = file_path_str
         self.main_translator = main_translator
+        # self.logger = logger
         self.local_translator_system_prompt = local_translator_system_prompt
         self.groups = {}
         self.local_translators = {}
         self.thread_pool = ThreadPoolExecutor()
-        self.modification_count = {}  # Track modification attempts for each group
+        # print(type(workflow))
         
         for group_id, group_data in workflow.items():
             if group_id == "user_query":
                 continue
-            group_translators = []
+            group_translators = queue.Queue()
             for translator_id, translator_data in group_data.items():
                 translator = LocalTranslatorNode(
                     int(translator_id),
@@ -45,10 +46,8 @@ class Manager:
                 translator.group_id = group_id
                 translator.panel_workflow = translator_data["steps"]
                 self.local_translators[translator_id] = translator
-                group_translators.append(translator)
+                group_translators.put(translator)
             self.groups[group_id] = group_translators
-            self.modification_count[group_id] = 0  # Initialize modification count for each group
-
     # async def run(self):
     #     main_translator_task = asyncio.create_task(self.main_translator.process_queue())
 
@@ -68,22 +67,24 @@ class Manager:
     #         pass
 
     async def run(self):
-        # Start processing the main translator queue
         main_translator_task = asyncio.create_task(self.main_translator.process_queue())
 
-        # Run each group task sequentially
+        group_tasks = []
         for group_id in self.groups.keys():
-            group_id, group_results = await self.run_group(group_id)
+            task = asyncio.create_task(self.run_group(group_id))
+            group_tasks.append(task)
+
+        for completed_task in asyncio.as_completed(group_tasks):
+            group_id, group_results = await completed_task
             yield group_id, group_results
 
-        # Cancel the main translator task
         main_translator_task.cancel()
         try:
             await main_translator_task
         except asyncio.CancelledError:
             pass
 
-    async def modify_group(self, modified_workflow, group_id):
+    async def modify_group(self, current_translator, modified_workflow, group_id):
         # group_translators = []
         # print(modified_workflow)
         # for translator_id, translator_data in modified_workflow.items():
@@ -98,28 +99,55 @@ class Manager:
         #     self.local_translators[translator_id] = translator
         #     group_translators.append(translator)
         # self.groups[group_id] = group_translators
-        self.modification_count[group_id] += 1  # Increment modification count
-        for group_id, group_data in modified_workflow.items():
-            if group_id == "user_query":
-                continue
-            group_translators = []
-            for translator_id, translator_data in group_data.items():
-                translator = LocalTranslatorNode(
+        group_translators = queue.Queue()
+        group_data = modified_workflow[str(group_id)]
+        translator = current_translator
+        translator_id = translator.panel_no
+        print(modified_workflow)
+        print(group_id)
+        print(translator_id)
+        translator_data = modified_workflow[str(group_id)][str(translator_id)]
+        translator = LocalTranslatorNode(
                     int(translator_id),
                     modified_workflow["user_query"],
                     translator_data["panel_description"],
                     system_prompt=self.local_translator_system_prompt,
                     main_translator=self.main_translator,
-                    file_path_str=self.file_path_str,
+                    file_path_str=self.file_path_str
+            )
+        translator.group_workflow = group_data
+        translator.group_id = group_id
+        translator.panel_workflow = translator_data["steps"]
+        self.local_translators[translator_id] = translator
+        group_translators.put(translator)
+        while not self.groups[group_id].empty():
+            group_data = modified_workflow[str(group_id)]
+            translator = self.groups[group_id].get()
+            translator_id = translator.panel_no
+            print(modified_workflow)
+            print(group_id)
+            print(translator_id)
+            translator_data = modified_workflow[str(group_id)][str(translator_id)]
+            translator = LocalTranslatorNode(
+                    # translator_id,
+                    # translator_data["panel_description"],
+                    # system_prompt=self.local_translator_system_prompt,
+                    # main_translator=self.main_translator,
+                    # logger = self.logger
+                    int(translator_id),
+                    modified_workflow["user_query"],
+                    translator_data["panel_description"],
+                    system_prompt=self.local_translator_system_prompt,
+                    main_translator=self.main_translator,
+                    file_path_str=self.file_path_str
                 )
-                translator.group_workflow = group_data
-                translator.group_id = group_id
-                translator.panel_workflow = translator_data["steps"]
-                self.local_translators[translator_id] = translator
-                group_translators.append(translator)
-            self.groups[group_id] = group_translators
+            translator.group_workflow = group_data
+            translator.group_id = group_id
+            translator.panel_workflow = translator_data["steps"]
+            self.local_translators[translator_id] = translator
+            group_translators.put(translator)
 
-        print('Successfully Modified This Groups Workflow.')
+        self.groups[group_id] = group_translators
 
         await asyncio.sleep(0.1)
 
@@ -127,33 +155,50 @@ class Manager:
         group_results = {}
         group_done = False
         counter = 0
-        while True and counter < 5:
-            group_done = True
-            for translator in self.groups[group_id]:
+        while not self.groups[group_id].empty() and counter < 5:
+            # while not self.groups[group_id].empty():
                 # try:
+            translator = self.groups[group_id].get()
+            try:
                 await translator.build_verify()
+            except Exception as e:
+                # Handle error and set translator.drop to True
+                translator.drop = True
+                print(f"Error occurred: {e}. Setting drop=True for translator {translator.panel_no}")
+            finally:
                 if translator.drop:
                     print('Dropping This Workflow...')
-                    
-                if translator.modify:
-                    print('Modifying This Workflow...')
-                    print("\ntranslator.group_workflow : ",translator.group_workflow)
-                    if self.modification_count[group_id] < 2:
-                        group_done = False
-                        await self.modify_group(translator.group_workflow, group_id)
-                        break
-                    else:
-                        print(f"Dropping Translator {translator.panel_no} in group {group_id} due to excessive modifications.")
+                    while not self.groups[group_id].empty():
+                        translator = self.groups[group_id].get()
                         translator.drop = True
-                        # return None
-                group_results[translator.panel_no] =translator.get_results()
-                all_panel_outputs[translator.panel_no] = group_results[translator.panel_no]['output']
+                        group_results[translator.panel_no] = translator.get_results()
+                    continue
+
+            if translator.drop:
+                print('Dropping This Workflow...')
+                while not self.groups[group_id].empty():
+                    translator = self.groups[group_id].get()
+                    translator.drop = True
+                    group_results[translator.panel_no] = translator.get_results()
+                    continue
+            
+            if translator.modify:
+                print('Modifying This Workflow...')
+                print("\ntranslator.group_workflow : ",translator.group_workflow)
+                group_done = False
+                await self.modify_group(translator, translator.group_workflow, group_id)
+                counter += 1
+                continue
+
+            group_results[translator.panel_no] = translator.get_results()
                 # except Exception as e:
                 #     print(f"Error in translator {translator.panel_no}: {str(e)}")
-
-            counter += 1
-            if group_done:
-                break 
+        
+        if counter == 5:
+            while not self.groups[group_id].empty():
+                translator = self.groups[group_id].get()
+                translator.drop = True
+                group_results[translator.panel_no] = translator.get_results()
 
         return group_id, group_results
 
@@ -177,11 +222,11 @@ class MainOrchestrator:
             self.local_translator_system_prompt = file.read()
 
     async def initialise(self, user_query):
-        global all_panel_outputs  # Declare that we are modifying the global variable
-        all_panel_outputs = {}   # Reset the global variable
         self.interpreter.user_query = user_query
         panels_list = self.interpreter.setup()
         workflow = self.main_translator.setup(user_query, panels_list)
+        global all_panel_outputs  # Declare that we are modifying the global variable
+        all_panel_outputs = {}
         return workflow
 
     async def run(self, user_query, workflow, file_path_str):
@@ -229,15 +274,15 @@ class MainOrchestrator:
         
 
 
-# async def main():
-#     orchestrator = MainOrchestrator()
-#     await orchestrator.run("what is the weather in seattle, usa")
-#     # await orchestrator.run("what is the weather in seattle, usa. Also what are the best spots to visit in seattle?")
-#     # await orchestrator.run("tell me top 30 vacation spots in europe and current weather there no illustrations")
-#     # await orchestrator.run("What are the top 5 most rainy areas in the world?.")
-#     # await orchestrator.run("what are top news headlines for today? What is the weather at some of the top news headline locations")
-#     # await orchestrator.run("where in the world should i go for travelling? What is the weather and current news at those places? Also i want to understand what generally causes null pointer errors in java")
+async def main():
+    orchestrator = MainOrchestrator()
+    await orchestrator.run("what is the weather in seattle, usa")
+    # await orchestrator.run("what is the weather in seattle, usa. Also what are the best spots to visit in seattle?")
+    # await orchestrator.run("tell me top 30 vacation spots in europe and current weather there no illustrations")
+    # await orchestrator.run("What are the top 5 most rainy areas in the world?.")
+    # await orchestrator.run("what are top news headlines for today? What is the weather at some of the top news headline locations")
+    # await orchestrator.run("where in the world should i go for travelling? What is the weather and current news at those places? Also i want to understand what generally causes null pointer errors in java")
 
 
-# if __name__ == "__main__":
-#     asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
