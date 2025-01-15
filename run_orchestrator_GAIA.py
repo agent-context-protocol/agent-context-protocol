@@ -79,7 +79,7 @@ def reformat_query_with_attachment_content(user_query):
                                 """.strip()
 
                     text_content += "> Description of this file: " + text_inspector_tool.forward_initial_exam_mode(file_path=file_path_loc, question=prompt) + '\n\n'
-    elif ".pdb" in file_path or ".jsonld" in file_path or ".mp3" in file_path or ".m4a" in file_path or ".wav" in file_path:
+    elif ".pdb" in file_path or ".jsonld" in file_path or ".mp3" in file_path or ".m4a" in file_path or ".wav" in file_path or ".xml" in file_path:
         prompt = f"""Write a short caption (5 sentences maximum) for this file. Pay special attention to any details that might be useful for someone answering the following question:
                     {user_query}. But do not try to answer the question directly!
                     Do not add any information that is not present in the file.
