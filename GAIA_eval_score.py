@@ -31,7 +31,7 @@ questions_with_attachments = [
 # Level 2
 # Instead of hardcoding answers, read them from CSV using QuestionIndex (starting at 1).
 answers_dict = {}
-with open('answers_level3_hf.csv', 'r', encoding='utf-8-sig') as f:
+with open('answers_level3_hf_mod.csv', 'r', encoding='utf-8-sig') as f:
     reader = csv.DictReader(f)
     for row in reader:
         # Convert QuestionIndex to int

@@ -113,7 +113,8 @@ class Manager:
                     translator_data["panel_description"],
                     system_prompt=self.local_translator_system_prompt,
                     main_translator=self.main_translator,
-                    file_path_str=self.file_path_str
+                    file_path_str=self.file_path_str,
+                    workflow_modification_bool=False,
             )
         translator.group_workflow = group_data
         translator.group_id = group_id
@@ -139,7 +140,8 @@ class Manager:
                     translator_data["panel_description"],
                     system_prompt=self.local_translator_system_prompt,
                     main_translator=self.main_translator,
-                    file_path_str=self.file_path_str
+                    file_path_str=self.file_path_str,
+                    workflow_modification_bool=False,
                 )
             translator.group_workflow = group_data
             translator.group_id = group_id
@@ -155,7 +157,7 @@ class Manager:
         group_results = {}
         group_done = False
         counter = 0
-        while not self.groups[group_id].empty() and counter < 5:
+        while not self.groups[group_id].empty() and counter < 2:
             # while not self.groups[group_id].empty():
                 # try:
             translator = self.groups[group_id].get()
@@ -191,6 +193,7 @@ class Manager:
                 continue
 
             group_results[translator.panel_no] = translator.get_results()
+            all_panel_outputs[translator.panel_no] = group_results[translator.panel_no]['output']
                 # except Exception as e:
                 #     print(f"Error in translator {translator.panel_no}: {str(e)}")
         

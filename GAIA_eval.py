@@ -23,7 +23,9 @@ async def process_query(query, timeout=900):
 
 async def main():
     # Name of the CSV file
-    csv_filename = "answers_level2_hf_res.csv"
+    SPLIT = 'test'
+    level = "2023_level3"
+    csv_filename = f"answers_{level}_mod_{SPLIT}.csv"
 
     # ----------------------------------------------------
     # 1. Check if answers.csv exists; if not, create & write header.
@@ -48,10 +50,10 @@ async def main():
     # ----------------------------------------------------
     # 2. Load dataset
     # ----------------------------------------------------
-    dataset = load_dataset("gaia-benchmark/GAIA", '2023_level2',
+    dataset = load_dataset("gaia-benchmark/GAIA", level,
                            token="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")
-    SPLIT = 'validation'
-    num_samples_eval = 86
+    num_samples_eval = len(dataset[SPLIT])
+    print("num_samples_eval : ",num_samples_eval)
 
     raw_questions = [dataset[SPLIT][i]['Question'] for i in range(num_samples_eval)]
     file_names = [dataset[SPLIT][i]['file_name'] for i in range(num_samples_eval)]
@@ -62,7 +64,6 @@ async def main():
         if file_name else raw_question
         for raw_question, file_name in zip(raw_questions, file_names)
     ]
-
     # print("\nquestions_with_attachments:", questions_with_attachments, "\n")
 
     # ----------------------------------------------------

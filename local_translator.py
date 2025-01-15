@@ -22,7 +22,7 @@ merge_browser_functions()
 
 #######################################ßßß
 class LocalTranslatorNode(BaseNode):
-    def __init__(self, panel_no, user_query, panel_description, system_prompt=None, main_translator=None, file_path_str=None):
+    def __init__(self, panel_no, user_query, panel_description, system_prompt=None, main_translator=None, file_path_str=None, workflow_modification_bool = True):
         super().__init__(panel_no, system_prompt)
         self.panel_no = panel_no
         self.panel_description = panel_description
@@ -32,6 +32,8 @@ class LocalTranslatorNode(BaseNode):
         self.group_id = None
         self.user_query = user_query
         self.file_path_str=file_path_str
+
+        self.workflow_modification_bool = workflow_modification_bool
 
         self.prev_status_update = None
 
@@ -1149,8 +1151,9 @@ class LocalTranslatorNode(BaseNode):
                 # api_output_llm_input = self.prepare_input_for_api_output(api_outputs_list[0], self.panel_no, step_no)
                 api_output_llm_input = self.prepare_input_for_api_output(api_outputs_list, self.panel_no, step_no)
                 print("\napi_output_llm_input : ",api_output_llm_input)
+
                 # generating the api response format from the LLM
-                if api_output_error_counter == api_output_error_max_tries-1:
+                if not self.workflow_modification_bool and api_output_error_counter == api_output_error_max_tries-1:
                     self.chat_history.append({"role": "user", "content": self.api_output_prompt_no_error}) 
                 else:
                     self.chat_history.append({"role": "user", "content": self.api_output_prompt}) # system prompt for workflow_creation
@@ -1167,19 +1170,27 @@ class LocalTranslatorNode(BaseNode):
                         api_parsed_output = self.parse_and_store_api_response(api_output_llm_output, self.panel_no, step_no)
                         # if a 6xx error was raised then status_code key will be there in api_parsed_output
                         if 'status_code' in api_parsed_output and api_parsed_output['status_code'] == 604:
-                            # # call for assistance request along with giving error description
-                            # assistance_request_bool =  True
-                            # assistance_error_dict = api_parsed_output
-                            # break
-                            giving_up_bool = True
+                            if self.workflow_modification_bool:
+                                # call for assistance request along with giving error description
+                                assistance_request_bool =  True
+                                assistance_error_dict = api_parsed_output
+                                break
+                            else:
+                                giving_up_bool = True
                         elif 'status_code' in api_parsed_output:
-                            modify_query_bool = True
-                            query_details = ""
-                            for api_req_i in range(len(parsed_api_request['api_requests'])):
-                                query_details += f"Query {api_req_i+1}: {str(parsed_api_request['api_requests'][api_req_i]['body'])}\n"
-                            api_parsed_output['query'] = query_details
-                            modify_query_context = api_parsed_output
                             api_output_error_counter += 1
+                            if api_output_error_counter == api_output_error_max_tries:
+                                # call for assistance request along with giving error description
+                                assistance_request_bool =  True
+                                assistance_error_dict = api_parsed_output
+                                break
+                            else:
+                                modify_query_bool = True
+                                query_details = ""
+                                for api_req_i in range(len(parsed_api_request['api_requests'])):
+                                    query_details += f"Query {api_req_i+1}: {str(parsed_api_request['api_requests'][api_req_i]['body'])}\n"
+                                api_parsed_output['query'] = query_details
+                                modify_query_context = api_parsed_output
                             break
                         print("api_parsed_output : ",api_parsed_output)
                         run_success = True
