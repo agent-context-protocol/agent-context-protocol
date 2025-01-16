@@ -197,11 +197,12 @@ class Manager:
                 # except Exception as e:
                 #     print(f"Error in translator {translator.panel_no}: {str(e)}")
         
-        if counter == 5:
+        if counter == 2:
             while not self.groups[group_id].empty():
                 translator = self.groups[group_id].get()
                 translator.drop = True
                 group_results[translator.panel_no] = translator.get_results()
+                all_panel_outputs[translator.panel_no] = group_results[translator.panel_no]['output']
 
         return group_id, group_results
 
