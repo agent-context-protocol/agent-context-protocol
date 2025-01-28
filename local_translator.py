@@ -431,7 +431,7 @@ class LocalTranslatorNode(BaseNode):
             for output_var in step_data['output_vars']:
                 result.append(f"  - Name: {output_var['name']}")
                 result.append(f"    - Description: {output_var['description']}")
-                result.append(f"    - Value: {output_var['value']}")
+                result.append(f"    - Value: {output_var.get('value', '')}")
 
         # Join and return the final string
         return "\n".join(result)

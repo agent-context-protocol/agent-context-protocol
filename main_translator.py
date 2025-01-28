@@ -15,8 +15,6 @@ def merge_browser_functions():
 
 # Run the merge function
 merge_browser_functions()
-
-#######################################ßßß
 class MainTranslatorNode(BaseNode):
     def __init__(self, node_name, system_prompt = None):
         super().__init__(node_name, system_prompt)
@@ -537,8 +535,8 @@ class MainTranslatorNode(BaseNode):
 
     ########################
     def setup(self, query, panels_list):
-        self.query = query
         self.panels_list = panels_list
+        self.query = query
         # Logic to create workflow and initialize local translator instances
         # We can use self.chat_history to provide context
         formatted_string = self.create_first_input_data(query, panels_list)
@@ -701,11 +699,14 @@ class MainTranslatorNode(BaseNode):
             if parsed_updated_workflow['chosen_action'] == "DROP_PANEL":
                 # Acquire the lock only when modifying shared resources
                 async with self.lock:
+
                     local_translator_object.drop = True
                 print('Sent Request to Drop Panel')
 
             elif parsed_updated_workflow['chosen_action'] == "MODIFY":
                 # Perform file I/O in a separate thread to avoid blocking the event loop
+                print("updated_workflow_dict before loading:", local_translator_object.group_workflow)
+                print("parsed_updated_workflow before loading:", parsed_updated_workflow)
                 updated_workflow_dict = await asyncio.to_thread(
                     self.save_and_load_workflow, 
                     local_translator_object.group_id, 
@@ -731,7 +732,7 @@ class MainTranslatorNode(BaseNode):
         # Save the workflow to a file
         filename = f"updated_workflow_group_{group_id}.json"
         with open(filename, "w") as json_file:
-            json.dump(workflow, json_file, indent=4)
+            json.dump(workflow[int(group_id)], json_file, indent=4)
         # Load the workflow back from the file
         with open(filename, "r") as json_file:
             updated_workflow_dict = json.load(json_file)

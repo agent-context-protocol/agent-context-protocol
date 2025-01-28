@@ -100,16 +100,16 @@ class Manager:
         #     group_translators.append(translator)
         # self.groups[group_id] = group_translators
         group_translators = queue.Queue()
-        group_data = modified_workflow[str(group_id)]
+        group_data = modified_workflow
         translator = current_translator
         translator_id = translator.panel_no
         print(modified_workflow)
         print(group_id)
         print(translator_id)
-        translator_data = modified_workflow[str(group_id)][str(translator_id)]
+        translator_data = modified_workflow[str(translator_id)]
         translator = LocalTranslatorNode(
                     int(translator_id),
-                    modified_workflow["user_query"],
+                    self.main_translator.query,
                     translator_data["panel_description"],
                     system_prompt=self.local_translator_system_prompt,
                     main_translator=self.main_translator,
@@ -122,13 +122,15 @@ class Manager:
         self.local_translators[translator_id] = translator
         group_translators.put(translator)
         while not self.groups[group_id].empty():
-            group_data = modified_workflow[str(group_id)]
+            group_data = modified_workflow
             translator = self.groups[group_id].get()
             translator_id = translator.panel_no
             print(modified_workflow)
             print(group_id)
             print(translator_id)
-            translator_data = modified_workflow[str(group_id)][str(translator_id)]
+            if translator_id not in modified_workflow.keys():
+                continue
+            translator_data = modified_workflow[str(translator_id)]
             translator = LocalTranslatorNode(
                     # translator_id,
                     # translator_data["panel_description"],
@@ -136,7 +138,7 @@ class Manager:
                     # main_translator=self.main_translator,
                     # logger = self.logger
                     int(translator_id),
-                    modified_workflow["user_query"],
+                    self.main_translator.query,
                     translator_data["panel_description"],
                     system_prompt=self.local_translator_system_prompt,
                     main_translator=self.main_translator,
