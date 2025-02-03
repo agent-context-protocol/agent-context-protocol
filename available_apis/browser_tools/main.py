@@ -67,16 +67,16 @@ class ImproveCode(BaseModel):
     reason: str = Field(description="Step by step reasoning on how to improve the code")
     improved_code: str = Field(description="The improved code")
 
-with open("/Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/available_apis/browser_tools/prompts/format_answer.txt") as f:
+with open("/Users/db/Desktop/workspace/princeton/benchmarks/interpreter-translator/available_apis/browser_tools/prompts/format_answer.txt") as f:
     FORMAT_ANSWER_PROMPT = ChatPromptTemplate.from_template(f.read())
 
-with open('/Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/available_apis/browser_tools/prompts/choose_tool.txt') as f:
+with open('/Users/db/Desktop/workspace/princeton/benchmarks/interpreter-translator/available_apis/browser_tools/prompts/choose_tool.txt') as f:
     CHOOSE_TOOL_PROMPT_TEMPLATE = f.read()
 
-with open('/Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/available_apis/browser_tools/prompts/summarize_step.txt') as f:
+with open('/Users/db/Desktop/workspace/princeton/benchmarks/interpreter-translator/available_apis/browser_tools/prompts/summarize_step.txt') as f:
     SUMMARIZE_STEP_PROMPT_TEMPLATE = ChatPromptTemplate.from_template(f.read())
 
-with open('/Users/aarjun1/Documents/Arjun/Princeton_Work/newCode/interpreter-translator-rapid_apis_GAIA_Simple/available_apis/browser_tools/prompts/improve_code.txt') as f:
+with open('/Users/db/Desktop/workspace/princeton/benchmarks/interpreter-translator/available_apis/browser_tools/prompts/improve_code.txt') as f:
     IMPROVE_CODE_PROMPT_TEMPLATE = f.read()
 
 # @ray.remote

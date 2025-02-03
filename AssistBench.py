@@ -3,7 +3,7 @@ import csv
 import os
 from run_orchestrator_GAIA import run_orch_func
 from datasets import load_dataset
-from GAIA.score import question_scorer
+# from GAIA.score import question_scorer
 
 async def process_query(query, timeout=900):
     """Async helper that runs `run_orch_func` with a given timeout."""

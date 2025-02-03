@@ -3,6 +3,8 @@ import json
 from base import BaseNode
 from available_apis.browser_tools.main import browser_tools_function
 import available_apis.browser_tools_hf.GAIA.main as browser_tools_function_hf #import browser_tools_function
+# from available_apis.function_format.magentic_one import browser_tools_function
+import asyncio
 
 class InterpreterNode(BaseNode):
     def __init__(self, node_name, user_query = None, system_prompt = None, personal_json = 'personal_info.json'):
@@ -30,7 +32,7 @@ class InterpreterNode(BaseNode):
         return result_string
 
 
-    def setup(self):
+    async def setup(self):
         if self.user_query:
             # if ".mp3" in self.user_query or ".m4a" in self.user_query or ".wav" in self.user_query:
             # suggested_sections = browser_tools_function_hf.browser_tools_function({"query": f"Please provide how the query should be resolved into sub-queries/tasks for solving this query. Based on your try to solve the question naively try to find workaround on sub-parts for which finding information was difficult. Strictly do not provide an answer.\nUser Query: {self.user_query}"}, True)
@@ -43,7 +45,7 @@ class InterpreterNode(BaseNode):
             available_api_string = self.create_available_api_string()
             print("available_api_string : ",available_api_string)
             self.chat_history.append({"role": "user", "content": available_api_string})
-            output = self.generate()
+            output = await self.async_generate()
             print(output)
             output = self.modify_message(output)
             return output
@@ -58,7 +60,3 @@ class InterpreterNode(BaseNode):
             panels_list.append(update_interpreter_with_similar_apis(panel))
 
         return panels_list 
-    
-'''
-Still Need to implement how the communication between interpreter and the translator will be handled after the initial setup.
-'''

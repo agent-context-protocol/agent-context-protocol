@@ -128,7 +128,7 @@ class Manager:
             print(modified_workflow)
             print(group_id)
             print(translator_id)
-            if str(translator_id) not in modified_workflow.keys():
+            if str(translator_id) not ion modified_workflow.keys():
                 print('Skipping This Workflow...')
                 print(translator_id)
                 print(modified_workflow)
