@@ -107,15 +107,15 @@ class Manager:
         print(group_id)
         print(translator_id)
         translator_data = modified_workflow[str(translator_id)]
-        # translator = LocalTranslatorNode(
-        #             int(translator_id),
-        #             self.main_translator.query,
-        #             translator_data["panel_description"],
-        #             system_prompt=self.local_translator_system_prompt,
-        #             main_translator=self.main_translator,
-        #             file_path_str=self.file_path_str,
-        #             workflow_modification_bool=False,
-        #     )
+        translator = LocalTranslatorNode(
+                    int(translator_id),
+                    self.main_translator.query,
+                    translator_data["panel_description"],
+                    system_prompt=self.local_translator_system_prompt,
+                    main_translator=self.main_translator,
+                    file_path_str=self.file_path_str,
+                    workflow_modification_bool=False,
+            )
         translator.group_workflow = group_data
         translator.group_id = group_id
         translator.panel_workflow = translator_data["steps"]
@@ -128,10 +128,8 @@ class Manager:
             print(modified_workflow)
             print(group_id)
             print(translator_id)
-            if str(translator_id) not ion modified_workflow.keys():
+            if str(translator_id) not in modified_workflow.keys():
                 print('Skipping This Workflow...')
-                print(translator_id)
-                print(modified_workflow)
                 continue
             translator_data = modified_workflow[str(translator_id)]
             translator = LocalTranslatorNode(
@@ -232,7 +230,7 @@ class MainOrchestrator:
 
     async def initialise(self, user_query):
         self.interpreter.user_query = user_query
-        panels_list = self.interpreter.setup()
+        panels_list = await self.interpreter.setup()
         workflow = self.main_translator.setup(user_query, panels_list)
         global all_panel_outputs  # Declare that we are modifying the global variable
         all_panel_outputs = {}

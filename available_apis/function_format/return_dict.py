@@ -1,5 +1,4 @@
 from available_apis.function_format.perplexity_function import PERPLEXITY_CHAT_COMPLETION_FUNCTION_DOCS, perplexity_api_response
-from available_apis.function_format.magentic_one import MAGENTIC_ONE_API_FUNCTION_DOCS, magentic_one_api_response
 import inspect
 
 def get_required_arguments(func):
@@ -13,11 +12,9 @@ def get_required_arguments(func):
 
 FUNCTION_APIS_DOCUMENTATION_DICT = {
     "Perplexity": PERPLEXITY_CHAT_COMPLETION_FUNCTION_DOCS,
-    "MagenticOne": MAGENTIC_ONE_API_FUNCTION_DOCS
     }
 FUNCTION_APIS_FUNCTION_DICT = {
     "Perplexity": perplexity_api_response,
-    "MagenticOne": magentic_one_api_response
     }
 
 # FUNCTION_APIS_REQD_PARAMS_DICT = {
@@ -26,10 +23,8 @@ FUNCTION_APIS_FUNCTION_DICT = {
 
 FUNCTION_APIS_REQD_PARAMS_DICT = {
     "Perplexity": {"query": {"type": "string"}},
-    "MagenticOne": {"query": {"type": "string"}},
 }
 
 FUNCTION_APIS_PARAMS_DICT = {
     "Perplexity": {"query": {"type": "string"}, "preplexity_ai_key": {"type": "string"}},
-    "MagenticOne": {"query": {"type": "string"}},
 }

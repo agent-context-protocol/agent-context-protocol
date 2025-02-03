@@ -577,7 +577,7 @@ def browser_tools_function(dict_body, interpreter_bool = False):
 # print("res_dict : ",res_dict)
 
 #########################################
-def reasoning_agent_function(dict_body):
+async def reasoning_agent_function(dict_body):
     response_dict = {}
 
     if "query" not in dict_body:
@@ -604,7 +604,7 @@ def reasoning_agent_function(dict_body):
 # print("res_dict : ",res_dict)
 
 #############################################
-def calculator_agent(dict_body):
+async def calculator_agent(dict_body):
 
     response_dict = {}
 
