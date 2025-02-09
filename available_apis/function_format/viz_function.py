@@ -78,6 +78,8 @@ def visualization_agent(dict_body):
     plots_explanation_string = ""
     code_string = ""
     error_message = ""
+    no_plot_bool = False
+    
     print("###########")
     while not run_success:
         print("trial_num : ",trial_num)
@@ -163,21 +165,22 @@ def visualization_agent(dict_body):
                 continue      
 
         elif '$$PROMPT$$':
-            dalle_prompt = plot_respone.split("$$PROMPT$$")[1]
-            # print("\ndalle_prompt: ",dalle_prompt)
+            # dalle_prompt = plot_respone.split("$$PROMPT$$")[1]
+            # # print("\ndalle_prompt: ",dalle_prompt)
 
-            dalle_response, dalle_image_url = visualization_dalle_LLM_Agent(llm_client, plot_respone)
-            img_response = requests.get(dalle_image_url)
-            img_gen = Image.open(BytesIO(img_response.content))
+            # dalle_response, dalle_image_url = visualization_dalle_LLM_Agent(llm_client, plot_respone)
+            # img_response = requests.get(dalle_image_url)
+            # img_gen = Image.open(BytesIO(img_response.content))
 
-            # Display the image
-            plt.imshow(img_gen)
-            plt.axis('off')  # Hide axes
-            plt.savefig(f'./save_viz/illust/illust_{index}')
-            plt.clf()          # Clear the current figure
-            plt.close()        # Close the figure window
-            plt.rcdefaults()   # Reset matplotlib settings to defaults (optional)
-            run_success = True
+            # # Display the image
+            # plt.imshow(img_gen)
+            # plt.axis('off')  # Hide axes
+            # plt.savefig(f'./save_viz/illust/illust_{index}')
+            # plt.clf()          # Clear the current figure
+            # plt.close()        # Close the figure window
+            # plt.rcdefaults()   # Reset matplotlib settings to defaults (optional)
+            # run_success = True
+            no_plot_bool = True
             break
         else:
             print("\nErroneous plot_respone : ",plot_respone)
@@ -186,19 +189,29 @@ def visualization_agent(dict_body):
         trial_num += 1
 
     response_dict["status_code"] = 200
-    if dalle_prompt == "":
+
+    # if dalle_prompt == "":
+    #     # Get the list of matching files with relative paths
+    #     files = glob.glob(f'./save_viz/plot/plot_{index}_*')
+    #     # Join the list into a single string, separated by newlines
+    #     files_string = '\n'.join(files)
+    #     response_dict["text"] = plots_explanation_string + f"\nPlots saved at the following paths: {files_string}.\nMore Context and References: {response}." 
+    # else:
+    #     # Get the list of matching files with relative paths
+    #     files = glob.glob(f'./save_viz/illust/illust_{index}*')
+    #     # Join the list into a single string, separated by newlines
+    #     files_string = '\n'.join(files)
+    #     # response_dict["text"] = dalle_prompt + f"\nImages saved at the following paths: {files_string}"
+    #     response_dict["text"] = f"\nImages saved at the following paths: {files_string}" 
+
+    if not no_plot_bool:
         # Get the list of matching files with relative paths
         files = glob.glob(f'./save_viz/plot/plot_{index}_*')
         # Join the list into a single string, separated by newlines
         files_string = '\n'.join(files)
         response_dict["text"] = plots_explanation_string + f"\nPlots saved at the following paths: {files_string}.\nMore Context and References: {response}." 
     else:
-        # Get the list of matching files with relative paths
-        files = glob.glob(f'./save_viz/illust/illust_{index}*')
-        # Join the list into a single string, separated by newlines
-        files_string = '\n'.join(files)
-        # response_dict["text"] = dalle_prompt + f"\nImages saved at the following paths: {files_string}"
-        response_dict["text"] = f"\nImages saved at the following paths: {files_string}" 
+        response_dict["text"] = f"\nNo Images were saved." 
 
     return response_dict
 
@@ -219,10 +232,10 @@ def visualization_dalle_LLM_Agent(llm_client, prompt):
 VISUALIZATION_AGENT_FUNCTION_DOCS = """Function: visualization_agent
 
 Description:
-This function generates visualizations (plots or images) based on a user's query and the system's response. It can create plots by executing generated code or produce images using text prompts for image generation models like DALL·E.
+This function generates visualizations (plots or images) based on a user's query and the system's response. It can create plots by executing generated code.
 
 Use Case:
-Use this function to create visual representations that complement textual information, enhancing understanding or providing illustrative support for data and concepts. It's ideal for generating charts, graphs, or illustrative images corresponding to the provided query and response. Strictly every panel should have only one visualization agent step.
+Use this function to create visual representations that complement textual information, enhancing understanding or providing illustrative support for data and concepts. It's ideal for generating charts, graphs. Strictly every panel should have only one visualization agent step.
 
 Parameters:
 - query (string, required): The user's initial question or request that requires visualization.
@@ -230,7 +243,7 @@ Parameters:
 - index (string, required): An identifier used to save and reference the generated visualization files uniquely. We have to pass the current panel number.
 
 Expected Output:
-- response_content (string): An explanation of the generated plots or the image prompt used for image generation.
+- response_content (string): An explanation of the generated plots or in the case when no plot was genrated it will output: No Images were saved.
 
 Example Usage:
 ```python
@@ -242,6 +255,33 @@ dict_body = {
 
 response = visualization_agent(dict_body)
 print(response["text"])"""
+
+# VISUALIZATION_AGENT_FUNCTION_DOCS = """Function: visualization_agent
+
+# Description:
+# This function generates visualizations (plots or images) based on a user's query and the system's response. It can create plots by executing generated code or produce images using text prompts for image generation models like DALL·E.
+
+# Use Case:
+# Use this function to create visual representations that complement textual information, enhancing understanding or providing illustrative support for data and concepts. It's ideal for generating charts, graphs, or illustrative images corresponding to the provided query and response. Strictly every panel should have only one visualization agent step.
+
+# Parameters:
+# - query (string, required): The user's initial question or request that requires visualization.
+# - response (string, required): The system's textual response to the query, providing context for generating the visualization.
+# - index (string, required): An identifier used to save and reference the generated visualization files uniquely. We have to pass the current panel number.
+
+# Expected Output:
+# - response_content (string): An explanation of the generated plots or the image prompt used for image generation.
+
+# Example Usage:
+# ```python
+# dict_body = {
+#     "query": "Please plot the GDP growth of the top 5 economies over the last decade.",
+#     "response": "The GDP growth of the top 5 economies varies over the last decade, with some fluctuations.",
+#     "index": 1
+# }
+
+# response = visualization_agent(dict_body)
+# print(response["text"])"""
 
 # dict_body_ex = {
 #     "query": "Please plot the GDP of the 5 largest economies in the world.",

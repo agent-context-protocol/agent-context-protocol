@@ -128,21 +128,53 @@ class Sibyl:
         self.browser = SimpleTextBrowser(**browser_config)
         self.llm_callback_handler = LLMCallbackHandler()
 
-        agent1 = autogen.ConversableAgent(
-            name="Actor",
-            system_message='''You are a helpful assistant.  When answering a question, you must explain your thought process step by step before answering the question. When others make suggestions about your answers, think carefully about whether or not to adopt the opinions of others.
-If you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided. Your EDUCATED GUESS should be a number OR as few words as possible OR a comma separated list of numbers and/or strings. DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.''',
-            # llm_config={"config_list": [{"model": MODEL, "api_type": "azure", "api_version": "2024-04-01-preview", "temperature": 0.1, "api_key": OPENAI_API_KEY, "base_url": OPENAI_API_BASE}]},
-            llm_config={"config_list": [{"model": MODEL, "temperature": 0.1, "api_key": OPENAI_API_KEY, "base_url": OPENAI_API_BASE}]},
-            is_termination_msg=lambda x: x.get("content", "").find("TERMINATE") >= 0,
-        )
+        if interpreter_report_bool:
+            agent1 = autogen.ConversableAgent(
+                name="Actor",
+                system_message='''You are a helpful assistant.  When answering a question, you must explain your thought process step by step before answering the question. When others make suggestions about your answers, think carefully about whether or not to adopt the opinions of others.
+                For your context we are writing a very comprehensive and detailed report on the above-mentioned query. To achieve this, we must systematically define the report’s sections and their subsections so that we can produce a well-structured, high-quality document.
+                Your task is to identify the relevant sections and subsections to be explored for writing a thorough, cohesive report. Also, please specify where plots can be integrated within the relevant subsections by noting them in brackets (e.g., "(visualization could be integrated here)") rather than creating separate subsections solely for visuals. Strictly do not create separate sections or subsections dedicated entirely to visualization. Only python plot based visual elements can be included and must be mentioned parenthetically in the narrative of an existing subsection rather than forming a distinct subsection or section on their own. Additionally, for any mathematical aspects or concepts, ensure they are integrated directly into the relevant sections and subsections rather than creating separate sections or subsections solely for mathematical aspects.
+                Do not leave all the plots for the final section. Instead, distribute them throughout the report in different, relevant sections. Limit the use of visual data to 3–5 sections in total.
+                Aim to provide 15 to 20 sections in the report. Each section should have between 1 and 5 subsections. If the topic is technical, include more technical details rather than being generic. Whenever applicable, try to include mathematical concepts and equations—particularly in areas like engineering, finance, computer science, or machine learning—to elucidate technical ideas. Remember, however, that the final report is intended for a broad audience, so present the technical content in an accessible manner.
+                In the Introduction, skip the objectives of the report, as well as any scope or methodology details. Also, omit the Conclusion, Appendices, and References section strictly always, as they will be handled separately layer. Ensure that your sections and subsections are not repetitive and that you take care to avoid overlapping content. Make the descriptions of each section and subsection extensive and detailed to prevent redundancy or identical information appearing in multiple parts of the report. Additionally, refrain from creating sections or subsections that simply compile information from previous sections; another agent will handle that task later.
+                If you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided.  DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.''',
+                # llm_config={"config_list": [{"model": MODEL, "api_type": "azure", "api_version": "2024-04-01-preview", "temperature": 0.1, "api_key": OPENAI_API_KEY, "base_url": OPENAI_API_BASE}]},
+                llm_config={"config_list": [{"model": MODEL, "temperature": 0.1, "api_key": OPENAI_API_KEY, "base_url": OPENAI_API_BASE}]},
+                is_termination_msg=lambda x: x.get("content", "").find("TERMINATE") >= 0,
+            )
+        else:
+            agent1 = autogen.ConversableAgent(
+                name="Actor",
+                system_message='''You are a helpful assistant.  When answering a question, you must explain your thought process step by step before answering the question. When others make suggestions about your answers, think carefully about whether or not to adopt the opinions of others.
+                For your context we are writing section or sub-section of a report so please provide a detailed response that accumulates enough information for a portion of the report. Keep it verbose but non repetetive please.
+                If the topic is technical then try to add more technical and mathematical details like equations rather than being generic.
+                If you are unable to solve the question, make a well-informed EDUCATED GUESS based on the information we have provided.  DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.''',
+                # llm_config={"config_list": [{"model": MODEL, "api_type": "azure", "api_version": "2024-04-01-preview", "temperature": 0.1, "api_key": OPENAI_API_KEY, "base_url": OPENAI_API_BASE}]},
+                llm_config={"config_list": [{"model": MODEL, "temperature": 0.1, "api_key": OPENAI_API_KEY, "base_url": OPENAI_API_BASE}]},
+                is_termination_msg=lambda x: x.get("content", "").find("TERMINATE") >= 0,
+            )
 
-        agent2 = autogen.ConversableAgent(
-            name="Critic",
-            system_message='''You are a helpful assistant.You want to help others spot logical or intellectual errors. When and only when you can't find a logical flaw in the other person's reasoning, you should say "TERMINATE" to end the conversation.''',
-            # llm_config={"config_list": [{"model": MODEL, "api_type": "azure", "api_version": "2024-04-01-preview", "temperature": 0, "api_key": AZURE_OPENAI_API_KEY, "base_url": AZURE_OPENAI_ENDPOINT}]},
-            llm_config={"config_list": [{"model": MODEL, "temperature": 0, "api_key": OPENAI_API_KEY, "base_url": OPENAI_API_BASE}]},
-        )
+        if interpreter_report_bool:
+            agent2 = autogen.ConversableAgent(
+                name="Critic",
+                system_message='''You are a helpful assistant.You want to help others spot logical or intellectual errors. When and only when you can't find a logical flaw in the other person's reasoning, you should say "TERMINATE" to end the conversation.
+                For your context we are writing a very comprehensive and detailed report on the above-mentioned query. To achieve this, we must systematically define the report’s sections and their subsections so that we can produce a well-structured, high-quality document.
+                Your task is to identify the relevant sections and subsections to be explored for writing a thorough, cohesive report. Also, please specify where plots can be integrated within the relevant subsections by noting them in brackets (e.g., "(visualization could be integrated here)") rather than creating separate subsections solely for visuals. Strictly do not create separate sections or subsections dedicated entirely to visualization. Only python plot based visual elements can be included and must be mentioned parenthetically in the narrative of an existing subsection rather than forming a distinct subsection or section on their own. Additionally, for any mathematical aspects or concepts, ensure they are integrated directly into the relevant sections and subsections rather than creating separate sections or subsections solely for mathematical aspects.
+                Do not leave all the plots for the final section. Instead, distribute them throughout the report in different, relevant sections. Limit the use of visual data to 3–5 sections in total.
+                Aim to provide 15 to 20 sections in the report. Each section should have between 1 and 5 subsections. If the topic is technical, include more technical details rather than being generic. Whenever applicable, try to include mathematical concepts and equations—particularly in areas like engineering, finance, computer science, or machine learning—to elucidate technical ideas. Remember, however, that the final report is intended for a broad audience, so present the technical content in an accessible manner.
+                In the Introduction, skip the objectives of the report, as well as any scope or methodology details. Also, omit the Conclusion, Appendices, and References section strictly always, as they will be handled separately layer. Ensure that your sections and subsections are not repetitive and that you take care to avoid overlapping content. Make the descriptions of each section and subsection extensive and detailed to prevent redundancy or identical information appearing in multiple parts of the report. Additionally, refrain from creating sections or subsections that simply compile information from previous sections; another agent will handle that task later.''',
+                # llm_config={"config_list": [{"model": MODEL, "api_type": "azure", "api_version": "2024-04-01-preview", "temperature": 0, "api_key": AZURE_OPENAI_API_KEY, "base_url": AZURE_OPENAI_ENDPOINT}]},
+                llm_config={"config_list": [{"model": MODEL, "temperature": 0, "api_key": OPENAI_API_KEY, "base_url": OPENAI_API_BASE}]},
+            )
+        else:
+            agent2 = autogen.ConversableAgent(
+                name="Critic",
+                system_message='''You are a helpful assistant.You want to help others spot logical or intellectual errors. When and only when you can't find a logical flaw in the other person's reasoning, you should say "TERMINATE" to end the conversation.
+                For your context we are writing section or sub-section of a report so please provide a detailed response that accumulates enough information for a portion of the report. Keep it verbose but non repetetive please.
+                If the topic is technical then try to add more technical and mathematical details like equations rather than being generic.''',
+                # llm_config={"config_list": [{"model": MODEL, "api_type": "azure", "api_version": "2024-04-01-preview", "temperature": 0, "api_key": AZURE_OPENAI_API_KEY, "base_url": AZURE_OPENAI_ENDPOINT}]},
+                llm_config={"config_list": [{"model": MODEL, "temperature": 0, "api_key": OPENAI_API_KEY, "base_url": OPENAI_API_BASE}]},
+            )
 
         groupchat = autogen.GroupChat(
             agents=[agent1, agent2],
@@ -345,16 +377,20 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
             if self.interpreter_report_bool:
                 answer = self.user_proxy.initiate_chat(
                     self.society_of_mind_agent, 
-                    message=f"""{question}\nWe are writing a very comprehensive and detailed report on the above mention query. So for that we have to systematically define the Sections and Sub-Sections in them to explore for such that
-                              one can write a good report. Your job is just find the relevant sections and subsections in them which should be looked into for writing a nice comprehemsive report, try to identify sections in which plots can be integerated well and mention it as a part of the subsection as well (dont create a separate subsection). Do not leave all the plots for the last section (for eg last section being Visual Data and Analytics section), they should be interspersed between different relevant sections strcitly, but keep the visual data restricted to 3-5 sections. Aim to provide 15 to 20 sections
-                              for the report. You should mention the subsections in each and every sections, and the number of subsections can vary from 1 to 5. Skip Objectives of the Report and Scope and Methodolgy in the Introduction sections and also skip Conclusion, Appendices and References and ensure that you are not giving repetetive
-                              sections or subsections. Moreover avoid sections/subsections where we are compiling information from the previous sections, as that will be done by another agent later.
-                              DO NOT OUTPUT 'I don't know', 'Unable to determine', etc..""").summary
+                    message = f"""{question}
+                    We are writing a very comprehensive and detailed report on the above-mentioned query. To achieve this, we must systematically define the report’s sections and their subsections so that we can produce a well-structured, high-quality document.
+                    Your task is to identify the relevant sections and subsections to be explored for writing a thorough, cohesive report. Also, please specify where plots can be integrated within the relevant subsections by noting them in brackets (e.g., "(visualization could be integrated here)") rather than creating separate subsections solely for visuals. Strictly do not create separate sections or subsections dedicated entirely to visualization. Only python plot based visual elements can be included and must be mentioned parenthetically in the narrative of an existing subsection rather than forming a distinct subsection or section on their own. Additionally, for any mathematical aspects or concepts, ensure they are integrated directly into the relevant sections and subsections rather than creating separate sections or subsections solely for mathematical aspects.
+                    Do not leave all the plots for the final section. Instead, distribute them throughout the report in different, relevant sections. Limit the use of visual data to 3–5 sections in total.
+                    Aim to provide 15 to 20 sections in the report. Each section should have between 1 and 5 subsections. If the topic is technical, include more technical details rather than being generic. Whenever applicable, try to include mathematical concepts and equations—particularly in areas like engineering, finance, computer science, or machine learning—to elucidate technical ideas. Remember, however, that the final report is intended for a broad audience, so present the technical content in an accessible manner.
+                    In the Introduction, skip the objectives of the report, as well as any scope or methodology details. Also, omit the Conclusion, Appendices, and References section strictly always, as they will be handled separately layer. Ensure that your sections and subsections are not repetitive and that you take care to avoid overlapping content. Make the descriptions of each section and subsection extensive and detailed to prevent redundancy or identical information appearing in multiple parts of the report. Additionally, refrain from creating sections or subsections that simply compile information from previous sections; another agent will handle that task later.
+                    DO NOT OUTPUT “I don’t know” or “Unable to determine,” etc.""").summary
                 
             else:
                 answer = self.user_proxy.initiate_chat(
                     self.society_of_mind_agent, 
-                    message=f"""{question}\nIf you are unable to solve the question or if this is a reasoning or straightforward question which does not need browser tools, then please think about the query and make a well-informed EDUCATED GUESS based on the information provided in the question, including your reasoning. Keep it verbose please.
+    #                 message=f"""{question}\nIf you are unable to solve the question or if this is a reasoning or straightforward question which does not need browser tools, then please think about the query and make a well-informed EDUCATED GUESS based on the information provided in the question, including your reasoning. If the topic is technical then try to add more technical details rather than being generic, and if applicable it is strongly recommended to explain engineering, finance, computer science or machine learning related things using mathematical aspects and equations to explain the technical concepts please (but remember that the report is intended towards a wider audience and not technical or mathematical experts, so keep things easy to understand as well). Keep it verbose please.
+    # DO NOT OUTPUT 'I don't know', 'Unable to determine', etc. If the query is related to collecting information for making plots, then is the exception where you can say 'I don't know', 'Unable to determine' to avoid making wrong plots.""").summary
+                       message=f"""{question}\nIf you are unable to solve the question or if this is a reasoning or straightforward question which does not need browser tools, then please think about the query and make a well-informed EDUCATED GUESS based on the information provided in the question, including your reasoning. If the topic is technical then try to add more technical and mathematical details like equations rather than being generic. Keep it verbose but non repetetive please.
     DO NOT OUTPUT 'I don't know', 'Unable to determine', etc. If the query is related to collecting information for making plots, then is the exception where you can say 'I don't know', 'Unable to determine' to avoid making wrong plots.""").summary
         else:
             steps_prompt = '\n'.join(steps)
@@ -364,11 +400,13 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
                     message=f"""{question}\nTo find the appropriate sections and sub-sections of a report on the given query, I did the following:
     {steps_prompt}
 
-    Referring to the information I have obtained (which may not be accurate), what do you think should be the most appropriate sections and subsections for the report? We are writing a very comprehensive and detailed report on the above mention query. So for that we have to systematically define the Sections and Sub-Sections in them to explore for such that
-                              one can write a good report. Your job is just find the relevant sections and subsections in them which should be looked into for writing a nice comprehemsive report, try to identify sections in which plots can be integerated well and mention it as a part of the subsection as well (dont create a separate subsection). Do not leave all the plots for the last section (for eg last section being Visual Data and Analytics section), they should be interspersed between different relevant sections strcitly, but keep the visual data restricted to 3-4 sections. Aim to provide 15 to 20 sections
-                              for the report. You should mention the subsections in each and evry sections, and the number of subsections can vary from 1 to 5. Skip Objectives of the Report and Scope and Methodolgy in the Introduction sections and also skip Conclusion, Appendices and References and ensure that you are not giving repetetive
-                              sections or subsections. Moreover avoid sections/subsections where we are compiling information from the previous sections, as that will be done by another agent later.
-        DO NOT OUTPUT 'I don't know', 'Unable to determine', etc.""").summary
+                    Referring to the information I have obtained (which may not be accurate), what do you think should be the most appropriate sections and subsections for the report?
+                    We are writing a very comprehensive and detailed report on the above-mentioned query. To achieve this, we must systematically define the report’s sections and their subsections so that we can produce a well-structured, high-quality document.
+                    Your task is to identify the relevant sections and subsections to be explored for writing a thorough, cohesive report. Also, please specify where plots can be integrated within the relevant subsections by noting them in brackets (e.g., "(visualization could be integrated here)") rather than creating separate subsections solely for visuals. Strictly do not create separate sections or subsections dedicated entirely to visualization. Only python plot based visual elements can be included and must be mentioned parenthetically in the narrative of an existing subsection rather than forming a distinct subsection or section on their own. Additionally, for any mathematical aspects or concepts, ensure they are integrated directly into the relevant sections and subsections rather than creating separate sections or subsections solely for mathematical aspects.
+                    Do not leave all the plots for the final section. Instead, distribute them throughout the report in different, relevant sections. Limit the use of visual data to 3–5 sections in total.
+                    Aim to provide 15 to 20 sections in the report. Each section should have between 1 and 5 subsections. If the topic is technical, include more technical details rather than being generic. Whenever applicable, try to include mathematical concepts and equations—particularly in areas like engineering, finance, computer science, or machine learning—to elucidate technical ideas. Remember, however, that the final report is intended for a broad audience, so present the technical content in an accessible manner.
+                    In the Introduction, skip the objectives of the report, as well as any scope or methodology details. Also, omit the Conclusion, Appendices, and References section strictly always, as they will be handled separately layer. Ensure that your sections and subsections are not repetitive and that you take care to avoid overlapping content. Make the descriptions of each section and subsection extensive and detailed to prevent redundancy or identical information appearing in multiple parts of the report. Additionally, refrain from creating sections or subsections that simply compile information from previous sections; another agent will handle that task later.
+                    DO NOT OUTPUT “I don’t know” or “Unable to determine,” etc.""").summary
                 
             else:
                 answer = self.user_proxy.initiate_chat(
@@ -376,8 +414,8 @@ If you are unable to solve the question, make a well-informed EDUCATED GUESS bas
                     message=f"""{question}\nTo answer the above question, I did the following:
     {steps_prompt}
 
-    Referring to the information I have obtained (which may not be accurate), what do you think is the answer to the question? Please provide a detailed response that accumulates enough information for a portion of the report. Keep it verbose please.
-    If you are unable to solve the question, please think about the query and make a well-informed EDUCATED GUESS based on the information we have provided, including your reasoning.
+    Referring to the information I have obtained (which may not be accurate), what do you think is the answer to the question? Please provide a detailed response that accumulates enough information for a portion of the report. Keep it verbose but non repetetive please.
+    If you are unable to solve the question, please think about the query and make a well-informed EDUCATED GUESS based on the information we have provided, including your reasoning. If the topic is technical then try to add more technical and mathematical details like equations rather than being generic.
     DO NOT OUTPUT 'I don't know', 'Unable to determine', etc. If the query is related to collecting information for making plots, then is the exception where you can say 'I don't know', 'Unable to determine' to avoid making wrong plots. Lastly please compile the references (websites, papers, etc) and their specific links if available, used in the answer generated at the end, and simply list them out as References:""").summary
 
         return answer

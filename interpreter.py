@@ -28,12 +28,11 @@ class InterpreterNode(BaseNode):
 
         return result_string
 
-
     def setup(self):
         if self.user_query:
             # initial_message = fetch_user_data(self.personal_json, self.user_query)
             # print('User Context: ',initial_message)
-            suggested_sections = browser_tools_function({"query": f"Please provide what sections/subsections should be kept for a detailed and comprehensive report being written on the topic: {self.user_query}"}, True)
+            suggested_sections = browser_tools_function({"query": f"Please provide what sections/subsections should be kept for a detailed and comprehensive report being written on the topic (if the topic is technical then please include some in-depth technical sections, and if applicable try to add mathematical aspects to explain the technical concepts please.): {self.user_query}"}, True)
             print(f"\nUser Query: {self.user_query} \n\n Suggested Sections and Sub-Sections for the report:\n{suggested_sections['text']}")
             self.chat_history.append({"role": "user", "content": f'''User Query: {self.user_query} \n\n Suggested Sections and Sub-Sections for the report:\n{suggested_sections['text']}'''})
             available_api_string = self.create_available_api_string()

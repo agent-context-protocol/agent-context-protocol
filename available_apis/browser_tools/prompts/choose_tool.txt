@@ -44,6 +44,8 @@ When deciding which function to use, consider whether you need to search for add
 
 Only use None function after searching the web about the user query and when there is nothing more to search about. You can NEVER choose None as a function on the first step.
 
+If the topic is technical then try to add more technical details rather than being generic. And if applicable try to add mathematical aspects and equations to explain the technical concepts please.
+
 Based on the question and the step history, tell me which function you would use to solve the problem in the next step.
 
 Do not change the format and precision of the results (including rounding), as a dedicated person will handle the final formatting of the results.

@@ -1,29 +1,77 @@
 {
-    "user_query": "Explore the Impact of Large Language Model-Based Multi-Agent Systems on the Evolution of Artificial Intelligence",
+    "user_query": " Assess how changes in inflation rates and central bank interest rate policies impact investment strategies, currency values, and economic growth worldwide.",
     "1": {
         "1": {
-            "panel_description": "Introduction to LLM-Based Multi-Agent Systems.",
+            "panel_description": "Introduction to Inflation and Interest Rates",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Provides an introduction to the topic.",
+                    "handles": "Overview of Inflation and Interest Rates",
                     "input_vars": [
                         {
-                            "name": "introduction_query",
+                            "name": "overview_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to introduce the topic.",
-                            "value": "Provide an introduction to LLM-Based Multi-Agent Systems, including background, motivation, and importance.",
+                            "description": "Query to get an overview of inflation and interest rates.",
+                            "value": "Provide an overview of inflation and interest rates, including their definitions and significance.",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "introduction_content",
-                            "description": "Introduction to LLM-Based Multi-Agent Systems.",
+                            "name": "inflation_interest_overview",
+                            "description": "Overview of inflation and interest rates.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "BrowserTools",
+                    "handles": "Importance of Central Bank Policies",
+                    "input_vars": [
+                        {
+                            "name": "central_bank_policies_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand the importance of central bank policies.",
+                            "value": "Explain the importance of central bank policies in managing inflation and interest rates.",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "central_bank_policies_importance",
+                            "description": "Importance of central bank policies.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Global Economic Context",
+                    "input_vars": [
+                        {
+                            "name": "global_economic_context_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand the global economic context.",
+                            "value": "Describe the global economic context in relation to inflation and interest rates.",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "global_economic_context",
+                            "description": "Global economic context related to inflation and interest rates.",
                             "used_by": []
                         }
                     ]
@@ -31,178 +79,363 @@
             }
         },
         "2": {
-            "panel_description": "Foundations of Large Language Models.",
+            "panel_description": "Understanding Inflation",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Explores the foundations of LLMs.",
+                    "handles": "Definition and Measurement of Inflation",
                     "input_vars": [
                         {
-                            "name": "llm_foundations_query",
+                            "name": "inflation_definition_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to explore LLM foundations.",
-                            "value": "Explore the foundations of Large Language Models, including architecture, training, and capabilities.",
+                            "description": "Query to define and measure inflation.",
+                            "value": "What is inflation, and how is it measured?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "llm_foundations_content",
-                            "description": "Foundations of Large Language Models.",
-                            "used_by": [
-                                {
-                                    "panel": 4,
-                                    "step": 1
-                                }
-                            ]
+                            "name": "inflation_definition",
+                            "description": "Definition and measurement of inflation.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "BrowserTools",
+                    "handles": "Causes of Inflation",
+                    "input_vars": [
+                        {
+                            "name": "inflation_causes_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand the causes of inflation.",
+                            "value": "What are the main causes of inflation?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "inflation_causes",
+                            "description": "Causes of inflation.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Types of Inflation",
+                    "input_vars": [
+                        {
+                            "name": "inflation_types_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand the types of inflation.",
+                            "value": "What are the different types of inflation, such as demand-pull and cost-push?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "inflation_types",
+                            "description": "Types of inflation.",
+                            "used_by": []
                         }
                     ]
                 }
             }
         },
         "3": {
-            "panel_description": "Overview of Multi-Agent Systems.",
+            "panel_description": "Central Bank Interest Rate Policies",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Provides an overview of Multi-Agent Systems.",
+                    "handles": "Role of Central Banks",
                     "input_vars": [
                         {
-                            "name": "mas_overview_query",
+                            "name": "central_banks_role_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to provide an overview of Multi-Agent Systems.",
-                            "value": "Provide an overview of Multi-Agent Systems, including definition, development, and applications.",
+                            "description": "Query to understand the role of central banks.",
+                            "value": "What is the role of central banks in managing interest rates?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "mas_overview_content",
-                            "description": "Overview of Multi-Agent Systems.",
-                            "used_by": [
-                                {
-                                    "panel": 4,
-                                    "step": 1
-                                }
-                            ]
+                            "name": "central_banks_role",
+                            "description": "Role of central banks in managing interest rates.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "BrowserTools",
+                    "handles": "Tools for Managing Interest Rates",
+                    "input_vars": [
+                        {
+                            "name": "interest_rate_tools_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand the tools for managing interest rates.",
+                            "value": "What tools do central banks use to manage interest rates, such as open market operations and discount rates?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "interest_rate_tools",
+                            "description": "Tools for managing interest rates.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Historical Perspective on Interest Rate Policies",
+                    "input_vars": [
+                        {
+                            "name": "interest_rate_history_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand the historical perspective on interest rate policies.",
+                            "value": "What is the historical perspective on interest rate policies?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "interest_rate_history",
+                            "description": "Historical perspective on interest rate policies.",
+                            "used_by": []
                         }
                     ]
                 }
             }
         },
         "4": {
-            "panel_description": "Integration of LLMs into Multi-Agent Systems.",
+            "panel_description": "Monetary Policy Frameworks",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Explores the integration of LLMs into Multi-Agent Systems.",
+                    "handles": "Inflation Targeting",
                     "input_vars": [
                         {
-                            "name": "llm_foundations_content",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "API_Output (Panel 2, Step 1)",
-                            "description": "Key insights from Panel 2.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 2,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "mas_overview_content",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "API_Output (Panel 3, Step 1)",
-                            "description": "Key insights from Panel 3.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 3,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "integration_query",
+                            "name": "inflation_targeting_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query for integration analysis.",
-                            "value": "Explore the integration of LLMs into Multi-Agent Systems, including mechanisms, benefits, and case studies.",
+                            "description": "Query to understand inflation targeting.",
+                            "value": "What is inflation targeting in monetary policy frameworks?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "integration_content",
-                            "description": "Integration of LLMs into Multi-Agent Systems.",
-                            "used_by": [
-                                {
-                                    "panel": 5,
-                                    "step": 1
-                                }
-                            ]
+                            "name": "inflation_targeting",
+                            "description": "Inflation targeting in monetary policy frameworks.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "BrowserTools",
+                    "handles": "Monetary Policy Transmission Mechanisms",
+                    "input_vars": [
+                        {
+                            "name": "transmission_mechanisms_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand monetary policy transmission mechanisms.",
+                            "value": "What are the monetary policy transmission mechanisms?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "transmission_mechanisms",
+                            "description": "Monetary policy transmission mechanisms.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Unconventional Monetary Policies",
+                    "input_vars": [
+                        {
+                            "name": "unconventional_policies_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand unconventional monetary policies.",
+                            "value": "What are unconventional monetary policies, such as quantitative easing?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "unconventional_policies",
+                            "description": "Unconventional monetary policies.",
+                            "used_by": []
                         }
                     ]
                 }
             }
         },
         "5": {
-            "panel_description": "Collaborative Intelligence in Multi-Agent Systems.",
+            "panel_description": "Impact on Investment Strategies",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Delves into collaborative intelligence.",
+                    "handles": "Influence of Interest Rates on Investment Decisions",
                     "input_vars": [
                         {
-                            "name": "integration_content",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "API_Output (Panel 4, Step 1)",
-                            "description": "Key insights from Panel 4.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 4,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "collaboration_query",
+                            "name": "interest_investment_influence_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query for collaborative intelligence.",
-                            "value": "Delve into collaborative intelligence in Multi-Agent Systems, including collective intelligence, MacNet, and scaling laws.",
+                            "description": "Query to understand the influence of interest rates on investment decisions.",
+                            "value": "How do interest rates influence investment decisions?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "collaboration_content",
-                            "description": "Collaborative intelligence in Multi-Agent Systems.",
+                            "name": "interest_investment_influence",
+                            "description": "Influence of interest rates on investment decisions.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "BrowserTools",
+                    "handles": "Risk Assessment and Asset Allocation",
+                    "input_vars": [
+                        {
+                            "name": "risk_asset_allocation_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand risk assessment and asset allocation.",
+                            "value": "How do investors assess risk and allocate assets in response to interest rate changes?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "risk_asset_allocation",
+                            "description": "Risk assessment and asset allocation in response to interest rate changes.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Case Studies of Investment Strategies",
+                    "input_vars": [
+                        {
+                            "name": "investment_case_studies_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to find case studies of investment strategies during different inflationary periods.",
+                            "value": "Provide case studies of investment strategies during different inflationary periods.",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "investment_case_studies",
+                            "description": "Case studies of investment strategies during different inflationary periods.",
+                            "used_by": [
+                                {
+                                    "panel": 5,
+                                    "step": 4
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "4": {
+                    "api": "VizAgent",
+                    "handles": "Visualizes trends and strategies",
+                    "input_vars": [
+                        {
+                            "name": "investment_case_studies",
+                            "parameter": [
+                                "response"
+                            ],
+                            "type": "string",
+                            "source": "API_Output (Panel 5, Step 3)",
+                            "description": "Raw output of investment_case_studies from previous step. Please provide raw output.",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "panel": 5,
+                                    "step": 3
+                                }
+                            ]
+                        },
+                        {
+                            "name": "panel_num_5",
+                            "parameter": [
+                                "index"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Panel number goes to the index parameter.",
+                            "value": "5",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "visualization_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query specifying the type of visualization. We will combine all context from the previous panel steps as it is without shortening.",
+                            "value": "Create visualizations illustrating trends and strategies in investment during different inflationary periods.",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "investment_visualization",
+                            "description": "Visualization of investment trends and strategies.",
                             "used_by": []
                         }
                     ]
@@ -210,28 +443,76 @@
             }
         },
         "6": {
-            "panel_description": "Domains and Environments for LLM-Based Multi-Agents.",
+            "panel_description": "Effects on Currency Values",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Explores domains and environments.",
+                    "handles": "Exchange Rate Dynamics",
                     "input_vars": [
                         {
-                            "name": "domains_environments_query",
+                            "name": "exchange_rate_dynamics_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to explore domains and environments.",
-                            "value": "Explore the various domains and environments for LLM-based multi-agents, including cyber, social, and simulation environments.",
+                            "description": "Query to understand exchange rate dynamics.",
+                            "value": "What are the dynamics of exchange rates in response to inflation and interest rate changes?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "domains_environments_content",
-                            "description": "Domains and environments for LLM-based multi-agents.",
+                            "name": "exchange_rate_dynamics",
+                            "description": "Dynamics of exchange rates in response to inflation and interest rate changes.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "BrowserTools",
+                    "handles": "Interest Rate Parity and Currency Valuation",
+                    "input_vars": [
+                        {
+                            "name": "interest_rate_parity_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand interest rate parity and currency valuation.",
+                            "value": "How does interest rate parity affect currency valuation?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "interest_rate_parity",
+                            "description": "Interest rate parity and its effect on currency valuation.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Impact of Inflation on Currency Strength",
+                    "input_vars": [
+                        {
+                            "name": "inflation_currency_strength_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand the impact of inflation on currency strength.",
+                            "value": "How does inflation impact currency strength?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "inflation_currency_strength",
+                            "description": "Impact of inflation on currency strength.",
                             "used_by": []
                         }
                     ]
@@ -239,78 +520,209 @@
             }
         },
         "7": {
-            "panel_description": "Communication and Interaction in Multi-Agent Systems.",
+            "panel_description": "Economic Growth Implications",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Covers communication and interaction.",
+                    "handles": "Relationship between Inflation, Interest Rates, and Economic Growth",
                     "input_vars": [
                         {
-                            "name": "communication_interaction_query",
+                            "name": "growth_relationship_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to cover communication and interaction.",
-                            "value": "Cover communication and interaction in Multi-Agent Systems, including profiling, reasoning, and coordination.",
+                            "description": "Query to understand the relationship between inflation, interest rates, and economic growth.",
+                            "value": "What is the relationship between inflation, interest rates, and economic growth?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "communication_interaction_content",
-                            "description": "Communication and interaction in Multi-Agent Systems.",
+                            "name": "growth_relationship",
+                            "description": "Relationship between inflation, interest rates, and economic growth.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "BrowserTools",
+                    "handles": "Short-term vs. Long-term Growth Effects",
+                    "input_vars": [
+                        {
+                            "name": "growth_effects_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand short-term vs. long-term growth effects.",
+                            "value": "What are the short-term vs. long-term growth effects of inflation and interest rate changes?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "growth_effects",
+                            "description": "Short-term vs. long-term growth effects of inflation and interest rate changes.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Empirical Evidence and Economic Models",
+                    "input_vars": [
+                        {
+                            "name": "empirical_evidence_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to find empirical evidence and economic models.",
+                            "value": "Provide empirical evidence and economic models related to inflation, interest rates, and economic growth.",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "empirical_evidence",
+                            "description": "Empirical evidence and economic models related to inflation, interest rates, and economic growth.",
                             "used_by": [
                                 {
-                                    "panel": 8,
-                                    "step": 1
+                                    "panel": 7,
+                                    "step": 4
                                 }
                             ]
+                        }
+                    ]
+                },
+                "4": {
+                    "api": "VizAgent",
+                    "handles": "Visualizes growth trends and models",
+                    "input_vars": [
+                        {
+                            "name": "empirical_evidence",
+                            "parameter": [
+                                "response"
+                            ],
+                            "type": "string",
+                            "source": "API_Output (Panel 7, Step 3)",
+                            "description": "Raw output of empirical_evidence from previous step. Please provide raw output.",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "panel": 7,
+                                    "step": 3
+                                }
+                            ]
+                        },
+                        {
+                            "name": "panel_num_7",
+                            "parameter": [
+                                "index"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Panel number goes to the index parameter.",
+                            "value": "7",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "visualization_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query specifying the type of visualization. We will combine all context from the previous panel steps as it is without shortening.",
+                            "value": "Create visualizations illustrating growth trends and models related to inflation, interest rates, and economic growth.",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "growth_visualization",
+                            "description": "Visualization of growth trends and models.",
+                            "used_by": []
                         }
                     ]
                 }
             }
         },
         "8": {
-            "panel_description": "Problem-Solving and Decision-Making.",
+            "panel_description": "Global Interconnectedness",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Explores problem-solving and decision-making.",
+                    "handles": "International Spillovers of Monetary Policies",
                     "input_vars": [
                         {
-                            "name": "communication_interaction_content",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "API_Output (Panel 7, Step 1)",
-                            "description": "Key insights from Panel 7.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 7,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "problem_solving_query",
+                            "name": "international_spillovers_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query for problem-solving and decision-making.",
-                            "value": "Explore problem-solving and decision-making in LLM-based multi-agent systems, including planning, reasoning, and complex scenarios.",
+                            "description": "Query to understand international spillovers of monetary policies.",
+                            "value": "What are the international spillovers of monetary policies?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "problem_solving_content",
-                            "description": "Problem-solving and decision-making in LLM-based multi-agent systems.",
+                            "name": "international_spillovers",
+                            "description": "International spillovers of monetary policies.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "BrowserTools",
+                    "handles": "Role of Global Financial Markets",
+                    "input_vars": [
+                        {
+                            "name": "global_financial_markets_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand the role of global financial markets.",
+                            "value": "What is the role of global financial markets in the context of inflation and interest rate changes?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "global_financial_markets",
+                            "description": "Role of global financial markets in the context of inflation and interest rate changes.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Case Studies of Cross-border Economic Impacts",
+                    "input_vars": [
+                        {
+                            "name": "cross_border_impacts_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to find case studies of cross-border economic impacts.",
+                            "value": "Provide case studies of cross-border economic impacts related to inflation and interest rate changes.",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "cross_border_impacts",
+                            "description": "Case studies of cross-border economic impacts.",
                             "used_by": []
                         }
                     ]
@@ -318,84 +730,76 @@
             }
         },
         "9": {
-            "panel_description": "Evaluation and Benchmarking.",
+            "panel_description": "Central Bank Independence",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Covers evaluation and benchmarking.",
+                    "handles": "Importance of Independence in Policy Making",
                     "input_vars": [
                         {
-                            "name": "evaluation_query",
+                            "name": "independence_importance_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query for evaluation and benchmarking.",
-                            "value": "Cover evaluation and benchmarking of LLM-based multi-agent systems, including datasets, metrics, and comparative analysis.",
+                            "description": "Query to understand the importance of independence in policy making.",
+                            "value": "Why is independence important in central bank policy making?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "evaluation_content",
-                            "description": "Evaluation and benchmarking of LLM-based multi-agent systems.",
-                            "used_by": [
-                                {
-                                    "panel": 9,
-                                    "step": 2
-                                }
-                            ]
+                            "name": "independence_importance",
+                            "description": "Importance of independence in central bank policy making.",
+                            "used_by": []
                         }
                     ]
                 },
                 "2": {
-                    "api": "VizAgent",
-                    "handles": "Generates visual data for comparative analysis.",
+                    "api": "BrowserTools",
+                    "handles": "Examples of Central Bank Independence and Economic Outcomes",
                     "input_vars": [
                         {
-                            "name": "evaluation_content",
-                            "parameter": [
-                                "response"
-                            ],
-                            "type": "string",
-                            "source": "API_Output (Panel 9, Step 1)",
-                            "description": "Raw output of evaluation_content from previous step. Please provide raw output.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 9,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "panel_num_9",
-                            "parameter": [
-                                "index"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Panel number goes to the index parameter.",
-                            "value": "9",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "visualization_query",
+                            "name": "independence_examples_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query for visualization of comparative analysis.",
-                            "value": "Generate visual data for comparative analysis of benchmarks in LLM-based multi-agent systems.",
+                            "description": "Query to find examples of central bank independence and economic outcomes.",
+                            "value": "Provide examples of central bank independence and their economic outcomes.",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "evaluation_visualization",
-                            "description": "Visual data for comparative analysis of benchmarks.",
+                            "name": "independence_examples",
+                            "description": "Examples of central bank independence and economic outcomes.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Challenges to Central Bank Independence",
+                    "input_vars": [
+                        {
+                            "name": "independence_challenges_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand the challenges to central bank independence.",
+                            "value": "What are the challenges to central bank independence?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "independence_challenges",
+                            "description": "Challenges to central bank independence.",
                             "used_by": []
                         }
                     ]
@@ -403,28 +807,132 @@
             }
         },
         "10": {
-            "panel_description": "Challenges and Limitations.",
+            "panel_description": "Inflation and Interest Rate Dynamics",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Explores challenges and limitations.",
+                    "handles": "Mathematical Models of Inflation and Interest Rates",
                     "input_vars": [
                         {
-                            "name": "challenges_limitations_query",
+                            "name": "mathematical_models_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to explore challenges and limitations.",
-                            "value": "Explore the challenges and limitations of LLM-based multi-agent systems, including environment perception, human alignment, and action generation.",
+                            "description": "Query to understand mathematical models of inflation and interest rates.",
+                            "value": "What are the mathematical models of inflation and interest rates?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "challenges_limitations_content",
-                            "description": "Challenges and limitations of LLM-based multi-agent systems.",
+                            "name": "mathematical_models",
+                            "description": "Mathematical models of inflation and interest rates.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "BrowserTools",
+                    "handles": "Predictive Models and Forecasting Techniques",
+                    "input_vars": [
+                        {
+                            "name": "predictive_models_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand predictive models and forecasting techniques.",
+                            "value": "What are the predictive models and forecasting techniques for inflation and interest rates?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "predictive_models",
+                            "description": "Predictive models and forecasting techniques for inflation and interest rates.",
+                            "used_by": [
+                                {
+                                    "panel": 10,
+                                    "step": 4
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Limitations of Current Models",
+                    "input_vars": [
+                        {
+                            "name": "model_limitations_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand the limitations of current models.",
+                            "value": "What are the limitations of current models for inflation and interest rates?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "model_limitations",
+                            "description": "Limitations of current models for inflation and interest rates.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "4": {
+                    "api": "VizAgent",
+                    "handles": "Visualizes models and forecasts",
+                    "input_vars": [
+                        {
+                            "name": "predictive_models",
+                            "parameter": [
+                                "response"
+                            ],
+                            "type": "string",
+                            "source": "API_Output (Panel 10, Step 2)",
+                            "description": "Raw output of predictive_models from previous step. Please provide raw output.",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "panel": 10,
+                                    "step": 2
+                                }
+                            ]
+                        },
+                        {
+                            "name": "panel_num_10",
+                            "parameter": [
+                                "index"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Panel number goes to the index parameter.",
+                            "value": "10",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "visualization_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query specifying the type of visualization. We will combine all context from the previous panel steps as it is without shortening.",
+                            "value": "Create visualizations illustrating models and forecasts for inflation and interest rates.",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "models_visualization",
+                            "description": "Visualization of models and forecasts for inflation and interest rates.",
                             "used_by": []
                         }
                     ]
@@ -432,84 +940,76 @@
             }
         },
         "11": {
-            "panel_description": "Advancements in LLM-Based Multi-Agent Systems.",
+            "panel_description": "Policy Implications and Recommendations",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Covers recent progress and innovations.",
+                    "handles": "Strategies for Managing Inflation and Interest Rates",
                     "input_vars": [
                         {
-                            "name": "advancements_query",
+                            "name": "managing_strategies_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query for recent progress and innovations.",
-                            "value": "Cover recent progress and innovations in LLM-based multi-agent systems, including open problems and future directions.",
+                            "description": "Query to understand strategies for managing inflation and interest rates.",
+                            "value": "What are the strategies for managing inflation and interest rates?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "advancements_content",
-                            "description": "Recent progress and innovations in LLM-based multi-agent systems.",
-                            "used_by": [
-                                {
-                                    "panel": 11,
-                                    "step": 2
-                                }
-                            ]
+                            "name": "managing_strategies",
+                            "description": "Strategies for managing inflation and interest rates.",
+                            "used_by": []
                         }
                     ]
                 },
                 "2": {
-                    "api": "VizAgent",
-                    "handles": "Generates visual data for trends and innovations.",
+                    "api": "BrowserTools",
+                    "handles": "Policy Recommendations for Central Banks",
                     "input_vars": [
                         {
-                            "name": "advancements_content",
-                            "parameter": [
-                                "response"
-                            ],
-                            "type": "string",
-                            "source": "API_Output (Panel 11, Step 1)",
-                            "description": "Raw output of advancements_content from previous step. Please provide raw output.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 11,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "panel_num_11",
-                            "parameter": [
-                                "index"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Panel number goes to the index parameter.",
-                            "value": "11",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "visualization_query",
+                            "name": "policy_recommendations_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query for visualization of trends and innovations.",
-                            "value": "Generate visual data for trends and innovations in LLM-based multi-agent systems.",
+                            "description": "Query to find policy recommendations for central banks.",
+                            "value": "What are the policy recommendations for central banks in managing inflation and interest rates?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "advancements_visualization",
-                            "description": "Visual data for trends and innovations in LLM-based multi-agent systems.",
+                            "name": "policy_recommendations",
+                            "description": "Policy recommendations for central banks.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Future Trends in Monetary Policy",
+                    "input_vars": [
+                        {
+                            "name": "future_trends_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand future trends in monetary policy.",
+                            "value": "What are the future trends in monetary policy related to inflation and interest rates?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "future_trends",
+                            "description": "Future trends in monetary policy related to inflation and interest rates.",
                             "used_by": []
                         }
                     ]
@@ -517,84 +1017,76 @@
             }
         },
         "12": {
-            "panel_description": "Impact on the Evolution of Artificial Intelligence.",
+            "panel_description": "Case Studies",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Explores the impact on AI evolution.",
+                    "handles": "Analysis of Specific Countries' Monetary Policies",
                     "input_vars": [
                         {
-                            "name": "impact_query",
+                            "name": "country_policies_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query for impact on AI evolution.",
-                            "value": "Explore the impact of LLM-based multi-agent systems on the evolution of AI, including contribution to general AI and surpassing human intelligence.",
+                            "description": "Query to analyze specific countries' monetary policies.",
+                            "value": "Analyze the monetary policies of specific countries.",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "impact_content",
-                            "description": "Impact of LLM-based multi-agent systems on AI evolution.",
-                            "used_by": [
-                                {
-                                    "panel": 12,
-                                    "step": 2
-                                }
-                            ]
+                            "name": "country_policies",
+                            "description": "Analysis of specific countries' monetary policies.",
+                            "used_by": []
                         }
                     ]
                 },
                 "2": {
-                    "api": "VizAgent",
-                    "handles": "Generates visual data for evolutionary impact analysis.",
+                    "api": "BrowserTools",
+                    "handles": "Successes and Failures in Managing Inflation and Interest Rates",
                     "input_vars": [
                         {
-                            "name": "impact_content",
-                            "parameter": [
-                                "response"
-                            ],
-                            "type": "string",
-                            "source": "API_Output (Panel 12, Step 1)",
-                            "description": "Raw output of impact_content from previous step. Please provide raw output.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 12,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "panel_num_12",
-                            "parameter": [
-                                "index"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Panel number goes to the index parameter.",
-                            "value": "12",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "visualization_query",
+                            "name": "successes_failures_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query for visualization of evolutionary impact analysis.",
-                            "value": "Generate visual data for evolutionary impact analysis of LLM-based multi-agent systems on AI.",
+                            "description": "Query to find successes and failures in managing inflation and interest rates.",
+                            "value": "What are the successes and failures in managing inflation and interest rates?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "impact_visualization",
-                            "description": "Visual data for evolutionary impact analysis.",
+                            "name": "successes_failures",
+                            "description": "Successes and failures in managing inflation and interest rates.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Lessons Learned from Historical Examples",
+                    "input_vars": [
+                        {
+                            "name": "historical_lessons_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to find lessons learned from historical examples.",
+                            "value": "What lessons have been learned from historical examples of managing inflation and interest rates?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "historical_lessons",
+                            "description": "Lessons learned from historical examples of managing inflation and interest rates.",
                             "used_by": []
                         }
                     ]
@@ -602,28 +1094,76 @@
             }
         },
         "13": {
-            "panel_description": "Ethical and Societal Implications.",
+            "panel_description": "Impact on Financial Markets",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Explores ethical and societal implications.",
+                    "handles": "Bond Market Reactions to Interest Rate Changes",
                     "input_vars": [
                         {
-                            "name": "ethical_societal_query",
+                            "name": "bond_market_reactions_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to explore ethical and societal implications.",
-                            "value": "Explore the ethical and societal implications of LLM-based multi-agent systems, including considerations, impact, and regulation.",
+                            "description": "Query to understand bond market reactions to interest rate changes.",
+                            "value": "How do bond markets react to interest rate changes?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "ethical_societal_content",
-                            "description": "Ethical and societal implications of LLM-based multi-agent systems.",
+                            "name": "bond_market_reactions",
+                            "description": "Bond market reactions to interest rate changes.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "BrowserTools",
+                    "handles": "Stock Market Volatility and Inflation",
+                    "input_vars": [
+                        {
+                            "name": "stock_market_volatility_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand stock market volatility and inflation.",
+                            "value": "How does inflation affect stock market volatility?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "stock_market_volatility",
+                            "description": "Stock market volatility and its relation to inflation.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Real Estate Market Dynamics",
+                    "input_vars": [
+                        {
+                            "name": "real_estate_dynamics_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand real estate market dynamics.",
+                            "value": "What are the dynamics of the real estate market in response to inflation and interest rate changes?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "real_estate_dynamics",
+                            "description": "Real estate market dynamics in response to inflation and interest rate changes.",
                             "used_by": []
                         }
                     ]
@@ -631,84 +1171,76 @@
             }
         },
         "14": {
-            "panel_description": "Future Prospects and Research Directions.",
+            "panel_description": "Consumer Behavior and Spending",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Explores future prospects and research directions.",
+                    "handles": "Effects of Inflation on Consumer Purchasing Power",
                     "input_vars": [
                         {
-                            "name": "future_prospects_query",
+                            "name": "consumer_purchasing_power_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query for future prospects and research directions.",
-                            "value": "Explore future prospects and research directions for LLM-based multi-agent systems, including technologies, applications, and trends.",
+                            "description": "Query to understand the effects of inflation on consumer purchasing power.",
+                            "value": "How does inflation affect consumer purchasing power?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "future_prospects_content",
-                            "description": "Future prospects and research directions for LLM-based multi-agent systems.",
-                            "used_by": [
-                                {
-                                    "panel": 14,
-                                    "step": 2
-                                }
-                            ]
+                            "name": "consumer_purchasing_power",
+                            "description": "Effects of inflation on consumer purchasing power.",
+                            "used_by": []
                         }
                     ]
                 },
                 "2": {
-                    "api": "VizAgent",
-                    "handles": "Generates visual data for future trends and predictions.",
+                    "api": "BrowserTools",
+                    "handles": "Interest Rates and Consumer Credit",
                     "input_vars": [
                         {
-                            "name": "future_prospects_content",
-                            "parameter": [
-                                "response"
-                            ],
-                            "type": "string",
-                            "source": "API_Output (Panel 14, Step 1)",
-                            "description": "Raw output of future_prospects_content from previous step. Please provide raw output.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 14,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "panel_num_14",
-                            "parameter": [
-                                "index"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Panel number goes to the index parameter.",
-                            "value": "14",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "visualization_query",
+                            "name": "consumer_credit_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query for visualization of future trends and predictions.",
-                            "value": "Generate visual data for future trends and predictions in LLM-based multi-agent systems.",
+                            "description": "Query to understand the relationship between interest rates and consumer credit.",
+                            "value": "How do interest rates affect consumer credit?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "future_prospects_visualization",
-                            "description": "Visual data for future trends and predictions.",
+                            "name": "consumer_credit",
+                            "description": "Relationship between interest rates and consumer credit.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Behavioral Economics Insights",
+                    "input_vars": [
+                        {
+                            "name": "behavioral_economics_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to find insights from behavioral economics.",
+                            "value": "What insights does behavioral economics provide about consumer behavior in response to inflation and interest rate changes?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "behavioral_economics",
+                            "description": "Insights from behavioral economics about consumer behavior in response to inflation and interest rate changes.",
                             "used_by": []
                         }
                     ]
@@ -716,28 +1248,153 @@
             }
         },
         "15": {
-            "panel_description": "Conclusion.",
+            "panel_description": "Technological and Structural Changes",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Provides a conclusion to the report.",
+                    "handles": "Impact of Technology on Inflation and Interest Rates",
                     "input_vars": [
                         {
-                            "name": "conclusion_query",
+                            "name": "technology_impact_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query for conclusion.",
-                            "value": "Provide a conclusion to the report on LLM-Based Multi-Agent Systems, summarizing key findings and discussing implications for AI development.",
+                            "description": "Query to understand the impact of technology on inflation and interest rates.",
+                            "value": "How does technology impact inflation and interest rates?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "conclusion_content",
-                            "description": "Conclusion of the report on LLM-Based Multi-Agent Systems.",
+                            "name": "technology_impact",
+                            "description": "Impact of technology on inflation and interest rates.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "BrowserTools",
+                    "handles": "Structural Economic Changes and Policy Adaptation",
+                    "input_vars": [
+                        {
+                            "name": "structural_changes_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand structural economic changes and policy adaptation.",
+                            "value": "What are the structural economic changes and how do policies adapt to them?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "structural_changes",
+                            "description": "Structural economic changes and policy adaptation.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Future Outlook for Inflation and Interest Rates",
+                    "input_vars": [
+                        {
+                            "name": "future_outlook_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand the future outlook for inflation and interest rates.",
+                            "value": "What is the future outlook for inflation and interest rates?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "future_outlook",
+                            "description": "Future outlook for inflation and interest rates.",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        },
+        "16": {
+            "panel_description": "Challenges and Risks",
+            "steps": {
+                "1": {
+                    "api": "BrowserTools",
+                    "handles": "Potential Risks of High Inflation or Deflation",
+                    "input_vars": [
+                        {
+                            "name": "inflation_deflation_risks_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand the potential risks of high inflation or deflation.",
+                            "value": "What are the potential risks of high inflation or deflation?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "inflation_deflation_risks",
+                            "description": "Potential risks of high inflation or deflation.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "BrowserTools",
+                    "handles": "Economic Risks of Interest Rate Changes",
+                    "input_vars": [
+                        {
+                            "name": "interest_rate_risks_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to understand the economic risks of interest rate changes.",
+                            "value": "What are the economic risks of interest rate changes?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "interest_rate_risks",
+                            "description": "Economic risks of interest rate changes.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Mitigation Strategies for Policymakers",
+                    "input_vars": [
+                        {
+                            "name": "mitigation_strategies_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to find mitigation strategies for policymakers.",
+                            "value": "What are the mitigation strategies for policymakers to address inflation and interest rate risks?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "mitigation_strategies",
+                            "description": "Mitigation strategies for policymakers to address inflation and interest rate risks.",
                             "used_by": []
                         }
                     ]

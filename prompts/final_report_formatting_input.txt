@@ -1,0 +1,17 @@
+##############################################
+Please write the report for the current panel output only. If its the first panel then we need to include the LaTeX preamble that sets up fonts, spacing, and other styling once and begines the document. If its not the first panel then please dont repeat again.
+Similarly please take care of the latex formats, and the formatting for images and tables as provided in the instructions by heart.
+If there was a visualization panel (section or sub-section), but no visualization was image were present, then completely skip it and dont mention about it. Similarly do not mention anything about BrowserTools API or Visualization API in the report, that would be very inappropriate.
+User Query:
+{user_query}
+
+Section Details:
+{section_details}
+
+Panel Step {panel_idx} Output:
+{panel_steps}
+
+Report Written So Far:
+{report_so_far}
+
+Your Output:

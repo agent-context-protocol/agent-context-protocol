@@ -23,6 +23,7 @@ Your Current Role is: WORKFLOW_CREATION_REQUEST
 
    - Interdependencies:
      - What might be interdependencies between steps of the same panel and different panels? Interdependencies mean that a panel's input variable depends on a previous step, which might be from the same panel or a different one.
+     - It is encouraged to have some interdependecies between panels.
      - Important: If a panel description in the input mentions that it depends on some panel, then you should strictly follow that. If the same panel depends on multiple panels, then that panel should be multi-step and handle the dependencies individually accordingly.
      - Important: If the input variable for the current step depends on the output from a previous step, the input variable name must be exactly the same as the output variable name (from which we will fill the input variable value) to ensure consistency.
      - Example for Issue 1:
@@ -64,6 +65,8 @@ Your Current Role is: WORKFLOW_CREATION_REQUEST
    - If a common API output is required by two or more panels, then it would be best if they are in the same group. Do not call the same API for the same purpose multiple times in different groups.
    - Always choose the most straightforward, simple, and minimal workflow for each panel.
    - If there are more than 6 panels then we will put everything in the same group for simplicity. There should strictly be only 1 group in such situations.
+
+8. For Reports: If the topic is technical in nature then we should try to keep an appropriate amount of technical and mathematical aspects as well. And if applicable it is strongly recommended to explain engineering, finance, computer science or machine learning related things using mathematical aspects and equations to explain the technical concepts please
 
 ### Important Note:
 
@@ -143,6 +146,8 @@ Your Current Role is: WORKFLOW_CREATION_REQUEST
   - Since we have to run all the panels quickly in a time-sensitive manner, you should try to make the workflow minimal
 
 - If there are more than 6 panels then we will put everything in the same group for simplicity. There should strictly be only 1 group in such situations.
+
+- For Reports: If the topic is technical in nature then we should try to keep an appropriate amount of technical and mathematical aspects as well. And if applicable it is strongly recommended to explain engineering, finance, computer science or machine learning related things using mathematical aspects and equations to explain the technical concepts please
 
 - Do not use ** or ` or # in your output strictly.
 
@@ -962,6 +967,7 @@ Panel 1: Overview of Renewable Energy Sources
 - Validation:
   - Variable names are unique.
   - No dependencies to manage.
+  - If the topic is technical then we will add technical and mathematical aspects to its searches.
 
 Panel 2: Growth of Solar and Wind Power Over the Past Decade
 
@@ -994,6 +1000,7 @@ Panel 2: Growth of Solar and Wind Power Over the Past Decade
 - Validation:
   - Variable names are unique.
   - Dependencies are within the allowed limit.
+  - If the topic is technical then we will add technical and mathematical aspects to its searches.
 
 Panel 3: Global Carbon Emission Levels Over the Past Decade
 
@@ -1026,6 +1033,7 @@ Panel 3: Global Carbon Emission Levels Over the Past Decade
 - Validation:
   - Variable names are unique.
   - Dependencies are within the allowed limit.
+  - If the topic is technical then we will add technical and mathematical aspects to its searches.
 
 Panel 4: Correlation Analysis Between Renewable Energy Use and Carbon Emissions
 
@@ -1063,6 +1071,7 @@ Panel 4: Correlation Analysis Between Renewable Energy Use and Carbon Emissions
 - Validation:
   - Variable names are unique.
   - Dependencies are within the allowed limit.
+  - If the topic is technical then we will add technical and mathematical aspects to its searches.
 
 Panel 5: Case Studies of Renewable Energy Impact on Carbon Emissions
 
@@ -1086,6 +1095,7 @@ Panel 5: Case Studies of Renewable Energy Impact on Carbon Emissions
 - Validation:
   - Variable names are unique.
   - Dependencies are within the allowed limit.
+  - If the topic is technical then we will add technical and mathematical aspects to its searches.
 
 Panel 6: Challenges in Measuring Renewable Energy Impact
 
@@ -1109,6 +1119,7 @@ Panel 6: Challenges in Measuring Renewable Energy Impact
 - Validation:
   - Variable names are unique.
   - Dependencies are within the allowed limit.
+  - If the topic is technical then we will add technical and mathematical aspects to its searches.
 
 Panel 7: Future Projections of Renewable Energy Impact on Carbon Emissions
 
@@ -1134,6 +1145,7 @@ Panel 7: Future Projections of Renewable Energy Impact on Carbon Emissions
 - Validation:
   - Variable names are unique.
   - Dependencies are within the allowed limit.
+  - If the topic is technical then we will add technical and mathematical aspects to its searches.
 
 Grouping Panels and Interdependencies
 
@@ -1843,6 +1855,7 @@ Panel 1: Impact of Inflation Rates on Investment Strategies
 - Validation:
   - Variable names are unique.
   - No dependencies to manage. We ensured that this panel does not have more than 2-3 dependencies.
+  - If the topic is technical then we will add technical and mathematical aspects to its searches.
 
 
 Panel 2: Impact of Inflation Rates on Currency Values
@@ -1864,8 +1877,7 @@ Panel 2: Impact of Inflation Rates on Currency Values
 - Validation:
   - Variable names are unique.
   - No dependencies to manage. We ensured that this panel does not have more than 2-3 dependencies.
-
-
+  - If the topic is technical then we will add technical and mathematical aspects to its searches.
 
 Panel 3: Impact of Inflation Rates on Economic Growth
 
@@ -1886,7 +1898,7 @@ Panel 3: Impact of Inflation Rates on Economic Growth
 - Validation:
   - Variable names are unique.
   - No dependencies to manage. We ensured that this panel does not have more than 2-3 dependencies.
-
+  - If the topic is technical then we will add technical and mathematical aspects to its searches.
 
 
 Panel 4: Impact of Interest Rate Policies on Investment Strategies
@@ -1908,7 +1920,7 @@ Panel 4: Impact of Interest Rate Policies on Investment Strategies
 - Validation:
   - Variable names are unique.
   - No dependencies to manage. We ensured that this panel does not have more than 2-3 dependencies.
-
+  - If the topic is technical then we will add technical and mathematical aspects to its searches.
 
 
 Panel 5: Impact of Interest Rate Policies on Currency Values
@@ -1930,7 +1942,7 @@ Panel 5: Impact of Interest Rate Policies on Currency Values
 - Validation:
   - Variable names are unique.
   - No dependencies to manage. We ensured that this panel does not have more than 2-3 dependencies.
-
+  - If the topic is technical then we will add technical and mathematical aspects to its searches.
 
 
 Panel 6: Impact of Interest Rate Policies on Economic Growth
@@ -1952,8 +1964,7 @@ Panel 6: Impact of Interest Rate Policies on Economic Growth
 - Validation:
   - Variable names are unique.
   - No dependencies to manage. We ensured that this panel does not have more than 2-3 dependencies.
-
-
+  - If the topic is technical then we will add technical and mathematical aspects to its searches.
 
 Panel 7: Combined Effects on Investment Strategies
 
@@ -1985,8 +1996,7 @@ Panel 7: Combined Effects on Investment Strategies
 - Validation:
   - Variable names are unique.
   - We ensured that this panel does not have more than 2-3 dependencies.
-
-
+  - If the topic is technical then we will add technical and mathematical aspects to its searches.
 
 Panel 8: Combined Effects on Currency Values
 
@@ -2013,7 +2023,7 @@ Panel 8: Combined Effects on Currency Values
 - Validation:
   - Input variables match the output variable names they depend on.
   - We ensured that this panel does not have more than 2-3 dependencies.
-
+  - If the topic is technical then we will add technical and mathematical aspects to its searches.
 
 
 Panel 9: Combined Effects on Economic Growth
@@ -2041,7 +2051,7 @@ Panel 9: Combined Effects on Economic Growth
 - Validation:
   - Input variables match the output variable names they depend on.
   - We ensured that this panel does not have more than 2-3 dependencies.
-
+  - If the topic is technical then we will add technical and mathematical aspects to its searches.
 
 
 Panel 10: Case Studies of Countries with Recent Inflation and Interest Rate Changes
@@ -2060,7 +2070,8 @@ Panel 10: Case Studies of Countries with Recent Inflation and Interest Rate Chan
 - Validation:
   - Input variables match the output variable names they depend on. And the variable names are unique.
   - We ensured that this panel does not have more than 2-3 dependencies.
-
+  - If the topic is technical then we will add technical and mathematical aspects to its searches.
+  
 Grouping Panels and Interdependencies
 
 - Since there are more than 6 panels then we will put everything in the same group for simplicity. There should strictly be only 1 group in such situations.

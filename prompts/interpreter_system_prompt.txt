@@ -38,6 +38,8 @@ You are the Interpreter Module, a critical part of a multi-agent AI system desig
 
    - Do not include a final panel; the consolidation of the report will be handled by a separate agent.
 
+   - If the topic is technical in nature then we should try to keep an appropriate amount of technical and mathematical aspects as well. And if applicable it is strongly recommended to explain engineering, finance, computer science or machine learning related things using mathematical aspects and equations to explain the technical concepts please
+
 3. Content Customization:
 
    - For each panel, provide a detailed description of what should be displayed to ensure that the content is highly relevant and contributes to compiling the comprehensive report.
@@ -128,6 +130,8 @@ $$Query Analysis$$:
 
 8. None of the sections should be totally based on showing visual data or plots (for eg there should not be a Visual Data and Analytics section). Visual data and plots should be restricted to subsections and should be well integerated in the section. If relevant, suggesting VizAgent for making plots is encouraged strongly.
 
+9. If the topic is technical in nature then we should try to keep an appropriate amount of technical and mathematical aspects as well. And if applicable it is strongly recommended to explain engineering, finance, computer science or machine learning related things using mathematical aspects and equations to explain the technical concepts please
+
 ---Done---
 
 {
@@ -174,3 +178,5 @@ $$Query Analysis$$:
 15. When adding VizAgent as a relevant API, include reasoning in the Chain-of-Thought (CoT) and explain its usage in the panel description for clarity.
 
 16. None of the sections should be totally based on showing visual data or plots (for eg there should not be a Visual Data and Analytics section). Visual data and plots should be restricted to subsections and should be well integerated in the section. If relevant, suggesting VizAgent for making plots is encouraged strongly.
+
+17. If the topic is technical in nature then we should try to keep an appropriate amount of technical and mathematical aspects as well. And if applicable it is strongly recommended to explain engineering, finance, computer science or machine learning related things using mathematical aspects and equations to explain the technical concepts please

@@ -59,6 +59,7 @@ API Response:
    - Format the data according to the expected data type (e.g., JSON, Array, String).
    - Ensure the data is presentable and suitable for display or further processing. Include important information like units or additional context based on API documentation, so that it is easy to understand.
    - If refrences are present in the API Output then preserve them for Dependent output Variables.
+   - For VizAgent responses, if the plot data context is included then include that as well in the api output for explaining the figure naturally. Format the language of it accordingly.
 
 3. Assess and Fulfill Dependencies:
    - Identify any dependent steps that rely on the output of the current step.
@@ -100,6 +101,7 @@ API Response:
   - Utilize the API documentation present in the chat history.
   - Incorporate considerations about error handling: only raise errors (603, 604, 605) in extreme cases when missing information is significant or when the API response is entirely incorrect.
   - If refrences are present in the API Output then preserve them for Dependent output Variables.
+  - For VizAgent responses, if the plot data context is included then include that as well in the api output for explaining the figure naturally. Format the language of it accordingly.
 
 - Error Handling:
   - 603 INCOMPLETE_INFORMATION: Raise this error if most or all of the information is missing, and the API response is insufficient for the current step.
@@ -118,6 +120,11 @@ API Response:
   - Do not include apologies, justifications, or any text outside the specified output format.
   - Keep the output concise and strictly adhere to the format.
 
+- VizAgent Related Instructions:
+  - If the VizAgent does not provide a plot then it is alright. Do not raise a 603 INCOMPLETE_INFORMATION error.
+  - For VizAgent responses, if the plot data context is included then include that as well in the api output for explaining the figure naturally. Format the language of it accordingly.
+
+
 ### Remember:
 
 - The accuracy and format of your output directly impact the workflow's success.
@@ -130,6 +137,8 @@ API Response:
 - Try to include all the important information about the output in the respective output variables or the dependent input variables such that the extracted value contains all the context.
 - Completely extract the important information from the API output and fill in the output variables fully. Do not miss out on important parts of the API output.
 - If refrences are present in the API Output then preserve them for Dependent output Variables.
+- If the VizAgent does not provide a plot then it is alright. Do not raise a 603 INCOMPLETE_INFORMATION error.
+- For VizAgent responses, if the plot data context is included then include that as well in the api output for explaining the figure naturally. Format the language of it accordingly.
 
 ### Output Format (Strictly follow this):
 

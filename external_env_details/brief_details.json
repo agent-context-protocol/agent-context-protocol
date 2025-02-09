@@ -6,7 +6,7 @@
     "Use": "As a web search engine to retrieve and synthesize information from multiple sources into a single, concise response. It can also be utilized for reasoning tasks and coding assistance, including code writing and execution."
   },
   "VizAgent": {
-    "Use": "This generates visualizations (plots or images) based on a user's query and and a response containing information we can use to plot. It can create plots by executing generated code or produce images using text prompts for image generation models like DALL·E."
+    "Use": "This generates visualizations (plots) based on a user's query and and a response containing information we can use to plot. It can create plots by executing generated code."
   },
   "TripadvisorSearchLocation": {
     "Use": "This API is used to search for location details (like a city or region) based on a query string, providing results limited to locations name, type, and geoID which is used by other TripAdvisor APIs."

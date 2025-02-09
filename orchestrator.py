@@ -8,7 +8,7 @@ from openai import OpenAI
 from openai import AzureOpenAI
 import os
 from dotenv import load_dotenv
-from utils import create_pdf_from_html
+from utils import create_pdf_from_html, create_pdf_from_latex
 
 # Load environment variables from .env file
 load_dotenv()
@@ -27,6 +27,7 @@ class Manager:
         self.local_translators = {}
         self.thread_pool = ThreadPoolExecutor()
         self.modification_count = {}  # Track modification attempts for each group
+        self.user_query = workflow["user_query"]
         
         for group_id, group_data in workflow.items():
             if group_id == "user_query":
@@ -125,10 +126,13 @@ class Manager:
         group_results = {}
         group_done = False
         counter = 0
+        prev_summary = f"This is additional context and not your main query. You are writing a detailed report on the topic: {self.user_query}.\nSummary from the previous sub-sections and sections of the report we are building, try to look at these summaries carefully and not search for similar things since we do not want repetitive information in the final report"
         while True and counter < 5:
             group_done = True
             for translator in self.groups[group_id]:
                 # try:
+                # if prev_summary != "":
+                translator.prev_summary = prev_summary + f"\n Summary for section {translator.panel_no}:\n"
                 await translator.build_verify()
                 if translator.drop:
                     print('Dropping This Workflow...')
@@ -144,6 +148,7 @@ class Manager:
                         print(f"Dropping Translator {translator.panel_no} in group {group_id} due to excessive modifications.")
                         translator.drop = True
                         # return None
+                prev_summary = translator.prev_summary
                 group_results[translator.panel_no] =translator.get_results()
                 all_panel_outputs[translator.panel_no] = translator.get_results()['output']
                 # except Exception as e:
@@ -202,20 +207,32 @@ class MainOrchestrator:
         # In the end we accumulate details from all the panels and prepare a final answer for GAIA
         formatted_output = ""
         sorted_all_panel_outputs = dict(sorted(all_panel_outputs.items()))
+        # Get the maximum key to calculate n+1
+        last_key = max(sorted_all_panel_outputs.keys())
+        # Add the new entry
+        sorted_all_panel_outputs[last_key + 1] = "Conclusion:"
+        
         for step, output in sorted_all_panel_outputs.items():
             formatted_output += f"Step {step}:\n{output}\n"
         print("\nformatted_output : ",formatted_output)
         # Load the template file
         with open('prompts/final_report_formatting.txt', 'r') as file:
             final_report_formatting_system_prompt = file.read()
+        with open('prompts/final_report_formatting_input.txt', 'r') as file:
+            final_report_formatting_input_system_prompt = file.read()
 
         report_so_far_main = ""
-        report_so_far_ref = "\n<h2>References</h2>"
+        report_so_far_ref = "\n" + r"\section{References}"
         section_details = self.main_translator.panel_details
         # for pidx, panel_out in enumerate(formatted_output):
+        cntr_idx = 0
         for pidx, panel_out in sorted_all_panel_outputs.items():
             # report_iter += 1
-            frm_prmpt = final_report_formatting_system_prompt.format(user_query=user_query, panel_steps=panel_out, panel_idx=pidx, report_so_far=report_so_far_main + report_so_far_ref, section_details=section_details)
+            cntr_idx += 1
+            if cntr_idx == 1:
+                frm_prmpt = final_report_formatting_system_prompt + '\nThis is the first panel. Include the latex preambles and begin document like in the examples provided.\n' +final_report_formatting_input_system_prompt.format(user_query=user_query, panel_steps=panel_out, panel_idx=pidx, report_so_far=report_so_far_main + report_so_far_ref, section_details=section_details)
+            else:
+                frm_prmpt = final_report_formatting_system_prompt + '\nThis is not the first panel. So do not repeat the things like latex preambles and begin document like in the examples provided.\n' +final_report_formatting_input_system_prompt.format(user_query=user_query, panel_steps=panel_out, panel_idx=pidx, report_so_far=report_so_far_main + report_so_far_ref, section_details=section_details)
             print("frm_prmpt : ",frm_prmpt)
             completion = client.chat.completions.create(
                     model="gpt-4o-2024-08-06",
@@ -227,7 +244,8 @@ class MainOrchestrator:
                 )
 
             output = completion.choices[0].message.content
-            output = output.replace("```html", "").replace("```", "")
+            output = output.replace("```latex", "").replace("```", "")
+            # output = output.replace("```", "")
             print("\noutput : ",output)
             if "$$TERMINATE$$" in output:
                 break
@@ -240,8 +258,10 @@ class MainOrchestrator:
                 # print("\nreport_so_far : ",report_so_far_main + report_so_far_ref)
 
         # Save the string to a pdf file
-        create_pdf_from_html(report_so_far_main + report_so_far_ref, "generated_report.pdf")
-        print("output : ",report_so_far_main + report_so_far_ref) 
+        # create_pdf_from_html(report_so_far_main + report_so_far_ref, "generated_report.pdf")
+        final_output = report_so_far_main + report_so_far_ref + "\n" + r"\end{document}"
+        create_pdf_from_latex(final_output, "save_reports/generated_report.pdf")
+        print("output : ",final_output) 
         
 
 

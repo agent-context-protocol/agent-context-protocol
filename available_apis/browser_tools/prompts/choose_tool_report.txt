@@ -40,6 +40,8 @@ When deciding which function to use, consider whether you need to search for add
 
 Based on the query and the step history, tell me which function you would use to solve the explore more to figure out the relevant sections and subsections one would need to write a comprehensive report.
 
+If the topic is technical then try to add more technical details rather than being generic. And if applicable try to add mathematical aspects and equations to explain the technical concepts please.
+
 Do not change the format and precision of the results (including rounding), as a dedicated person will handle the final formatting of the results.
 
 Use JSON format to answer.

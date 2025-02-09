@@ -32,6 +32,8 @@ class LocalTranslatorNode(BaseNode):
         self.group_id = None
         self.user_query = user_query
 
+        self.prev_summary = ""
+
         self.prev_status_update = None
 
         self.get_system_prompts()
@@ -60,6 +62,10 @@ class LocalTranslatorNode(BaseNode):
         # api summarize prompt
         with open('prompts/local_translator/api_output_summarizer_prompt.txt', 'r') as file:
             self.api_output_summarizer_prompt = file.read()
+
+        # step summarizer prompt
+        with open('prompts/local_translator/step_output_summarizer_prompt.txt', 'r') as file:
+            self.step_summarizer_prompt = file.read()
 
     def get_api_keys(self):
         with open("./external_env_details/api_keys.json", "r") as json_file:
@@ -929,7 +935,11 @@ class LocalTranslatorNode(BaseNode):
     
     
     # for running functions
-    def function_call(self, api_name, body = None):
+    def function_call(self, step, api_name, body = None):
+
+        if api_name in ["BrowserTools"]:
+            if "query" in body:
+                body["query"] = "Main Query: " + body["query"] + f"The main query is for a sub-section of section {self.panel_no}.\n{self.prev_summary}\n"
         
         response = FUNCTION_APIS_FUNCTION_DICT[api_name](body)
 
@@ -1052,7 +1062,7 @@ class LocalTranslatorNode(BaseNode):
                     try:
                         for api_req_i in range(len(parsed_api_request['api_requests'])):
                             if parsed_api_request['api_requests'][api_req_i]['method'] == "FUNCTION":
-                                api_success_bool, api_output = self.function_call(step['api'], parsed_api_request['api_requests'][api_req_i]['body'])
+                                api_success_bool, api_output = self.function_call(step, step['api'], parsed_api_request['api_requests'][api_req_i]['body'])
                             else:
                                 api_success_bool, api_output = self.requests_func(parsed_api_request['api_requests'][api_req_i]['method'], parsed_api_request['api_requests'][api_req_i]['url'], parsed_api_request['api_requests'][api_req_i]['headers'], parsed_api_request['api_requests'][api_req_i]['body'])
 
@@ -1150,8 +1160,8 @@ class LocalTranslatorNode(BaseNode):
                 status_assist_input = self.prepare_status_assistance_input(self.group_workflow, step_no)
                 print("\nstatus_assist_input : ",status_assist_input)
                 
-                self.chat_history.append({"role": "user", "content": self.status_assistance_prompt}) # system prompt for workflow_creation
-                self.chat_history.append({"role": "user", "content": status_assist_input}) # system prompt for workflow_creation
+                self.chat_history.append({"role": "user", "content": self.status_assistance_prompt}) 
+                self.chat_history.append({"role": "user", "content": status_assist_input}) 
 
                 run_success = False
                 counter = 0
@@ -1173,6 +1183,12 @@ class LocalTranslatorNode(BaseNode):
                 
                 # updating the prev_status_update
                 self.prev_status_update = parsed_status_update['status_update']
+
+                # Summarizer
+                self.chat_history.append({"role": "user", "content": self.step_summarizer_prompt})
+                step_summary = self.generate()
+                # print("\nstep_summary : ",step_summary)
+                self.prev_summary = self.prev_summary + f"\nSub-Section {step_no} summary:\n{step_summary}"
 
             
             if assistance_request_bool:
