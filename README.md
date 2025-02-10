@@ -21,10 +21,9 @@
 
 
 3.	Run the App
+   Open the link provided by Streamlit in your browser or it will automatically open, enter your query, and click Run Workflow.
    ```bash
    streamlit run app.py
-
-    Open the link provided by Streamlit in your browser or it will automatically open, enter your query, and click Run Workflow.
 
 
 
