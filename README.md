@@ -11,7 +11,7 @@
     You can install your dependencies this yml file: https://drive.google.com/file/d/1LjAuhmhmudMFDmMmM8EwnybqYmt2I-2o/view?usp=sharing.
    
 2.	Set Up Your API Keys
-    Export these environment variables (replace with your own keys):
+   Export these environment variables:
     ```bash
     export OPENAI_API_KEY=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
     export OPEN_AI_BASE=https://api.openai.com/v1/chat/completions
@@ -20,7 +20,7 @@
     export HUGGINGFACEHUB_API_TOKEN=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
 
 
-3.	Run the App
+3.	Run the App:
    Open the link provided by Streamlit in your browser or it will automatically open, enter your query, and click Run Workflow.
    ```bash
    streamlit run app.py
