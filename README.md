@@ -10,7 +10,7 @@
 
     You can install your dependencies this yml file: https://drive.google.com/file/d/1LjAuhmhmudMFDmMmM8EwnybqYmt2I-2o/view?usp=sharing.
    
-2.	Set Up Your API Keys
+2.	Set Up Your API Keys.
    Export these environment variables:
     ```bash
     export OPENAI_API_KEY=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
