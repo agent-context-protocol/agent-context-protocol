@@ -1,77 +1,29 @@
 {
-    "user_query": " Assess how changes in inflation rates and central bank interest rate policies impact investment strategies, currency values, and economic growth worldwide.",
+    "user_query": "Examine how the shift to remote work environments has influenced productivity, team dynamics, and company culture in various industries.\n",
     "1": {
         "1": {
-            "panel_description": "Introduction to Inflation and Interest Rates",
+            "panel_description": "Provide an introduction to remote work, including trends, historical context, and the importance of studying its impact.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Overview of Inflation and Interest Rates",
+                    "handles": "Provides an introduction to remote work.",
                     "input_vars": [
                         {
-                            "name": "overview_query",
+                            "name": "remote_work_intro_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to get an overview of inflation and interest rates.",
-                            "value": "Provide an overview of inflation and interest rates, including their definitions and significance.",
+                            "description": "Query to gather information on remote work trends, historical context, and importance.",
+                            "value": "Provide an overview of remote work trends, historical context, and the importance of studying the impact of remote work.",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "inflation_interest_overview",
-                            "description": "Overview of inflation and interest rates.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "2": {
-                    "api": "BrowserTools",
-                    "handles": "Importance of Central Bank Policies",
-                    "input_vars": [
-                        {
-                            "name": "central_bank_policies_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand the importance of central bank policies.",
-                            "value": "Explain the importance of central bank policies in managing inflation and interest rates.",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "central_bank_policies_importance",
-                            "description": "Importance of central bank policies.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "3": {
-                    "api": "BrowserTools",
-                    "handles": "Global Economic Context",
-                    "input_vars": [
-                        {
-                            "name": "global_economic_context_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand the global economic context.",
-                            "value": "Describe the global economic context in relation to inflation and interest rates.",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "global_economic_context",
-                            "description": "Global economic context related to inflation and interest rates.",
+                            "name": "remote_work_intro",
+                            "description": "Introduction to remote work, including trends, historical context, and importance.",
                             "used_by": []
                         }
                     ]
@@ -79,76 +31,84 @@
             }
         },
         "2": {
-            "panel_description": "Understanding Inflation",
+            "panel_description": "Explore how remote work has influenced productivity, with a focus on measuring productivity, comparative analysis, and factors affecting productivity.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Definition and Measurement of Inflation",
+                    "handles": "Gathers data on productivity in remote settings.",
                     "input_vars": [
                         {
-                            "name": "inflation_definition_query",
+                            "name": "productivity_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to define and measure inflation.",
-                            "value": "What is inflation, and how is it measured?",
+                            "description": "Query to gather data on productivity in remote settings.",
+                            "value": "Explore how remote work has influenced productivity, including measuring productivity, comparative analysis, and factors affecting productivity.",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "inflation_definition",
-                            "description": "Definition and measurement of inflation.",
-                            "used_by": []
+                            "name": "productivity_data",
+                            "description": "Data on productivity in remote settings.",
+                            "used_by": [
+                                {
+                                    "panel": 2,
+                                    "step": 2
+                                }
+                            ]
                         }
                     ]
                 },
                 "2": {
-                    "api": "BrowserTools",
-                    "handles": "Causes of Inflation",
+                    "api": "VizAgent",
+                    "handles": "Visualizes productivity data.",
                     "input_vars": [
                         {
-                            "name": "inflation_causes_query",
+                            "name": "productivity_data",
+                            "parameter": [
+                                "response"
+                            ],
+                            "type": "string",
+                            "source": "API_Output (Panel 2, Step 1)",
+                            "description": "Raw output of productivity_data from previous step. Please provide raw output.",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "panel": 2,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "panel_num_2",
+                            "parameter": [
+                                "index"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Panel number goes to the index parameter.",
+                            "value": "2",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "visualization_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to understand the causes of inflation.",
-                            "value": "What are the main causes of inflation?",
+                            "description": "Query specifying the type of visualization. We will combine all context from the previous panel steps as it is without shortening.",
+                            "value": "Create a bar chart comparing productivity levels in remote and on-site work settings.",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "inflation_causes",
-                            "description": "Causes of inflation.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "3": {
-                    "api": "BrowserTools",
-                    "handles": "Types of Inflation",
-                    "input_vars": [
-                        {
-                            "name": "inflation_types_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand the types of inflation.",
-                            "value": "What are the different types of inflation, such as demand-pull and cost-push?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "inflation_types",
-                            "description": "Types of inflation.",
+                            "name": "productivity_visualization",
+                            "description": "Visualization of productivity data in remote settings.",
                             "used_by": []
                         }
                     ]
@@ -156,76 +116,28 @@
             }
         },
         "3": {
-            "panel_description": "Central Bank Interest Rate Policies",
+            "panel_description": "Examine the impact of remote work on team dynamics, focusing on communication, collaboration, and trust.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Role of Central Banks",
+                    "handles": "Gathers information on team dynamics in remote settings.",
                     "input_vars": [
                         {
-                            "name": "central_banks_role_query",
+                            "name": "team_dynamics_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to understand the role of central banks.",
-                            "value": "What is the role of central banks in managing interest rates?",
+                            "description": "Query to gather information on team dynamics in remote settings.",
+                            "value": "Examine the impact of remote work on team dynamics, including communication, collaboration, and trust.",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "central_banks_role",
-                            "description": "Role of central banks in managing interest rates.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "2": {
-                    "api": "BrowserTools",
-                    "handles": "Tools for Managing Interest Rates",
-                    "input_vars": [
-                        {
-                            "name": "interest_rate_tools_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand the tools for managing interest rates.",
-                            "value": "What tools do central banks use to manage interest rates, such as open market operations and discount rates?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "interest_rate_tools",
-                            "description": "Tools for managing interest rates.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "3": {
-                    "api": "BrowserTools",
-                    "handles": "Historical Perspective on Interest Rate Policies",
-                    "input_vars": [
-                        {
-                            "name": "interest_rate_history_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand the historical perspective on interest rate policies.",
-                            "value": "What is the historical perspective on interest rate policies?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "interest_rate_history",
-                            "description": "Historical perspective on interest rate policies.",
+                            "name": "team_dynamics_impact",
+                            "description": "Impact of remote work on team dynamics.",
                             "used_by": []
                         }
                     ]
@@ -233,76 +145,84 @@
             }
         },
         "4": {
-            "panel_description": "Monetary Policy Frameworks",
+            "panel_description": "Analyze how remote work influences company culture, focusing on defining culture, maintaining it, and employee engagement.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Inflation Targeting",
+                    "handles": "Gathers information on company culture in remote settings.",
                     "input_vars": [
                         {
-                            "name": "inflation_targeting_query",
+                            "name": "culture_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to understand inflation targeting.",
-                            "value": "What is inflation targeting in monetary policy frameworks?",
+                            "description": "Query to gather information on company culture in remote settings.",
+                            "value": "Analyze how remote work influences company culture, including defining culture, maintaining it, and employee engagement.",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "inflation_targeting",
-                            "description": "Inflation targeting in monetary policy frameworks.",
-                            "used_by": []
+                            "name": "culture_data",
+                            "description": "Information on company culture in remote settings.",
+                            "used_by": [
+                                {
+                                    "panel": 4,
+                                    "step": 2
+                                }
+                            ]
                         }
                     ]
                 },
                 "2": {
-                    "api": "BrowserTools",
-                    "handles": "Monetary Policy Transmission Mechanisms",
+                    "api": "VizAgent",
+                    "handles": "Visualizes survey data on employee engagement.",
                     "input_vars": [
                         {
-                            "name": "transmission_mechanisms_query",
+                            "name": "culture_data",
+                            "parameter": [
+                                "response"
+                            ],
+                            "type": "string",
+                            "source": "API_Output (Panel 4, Step 1)",
+                            "description": "Raw output of culture_data from previous step. Please provide raw output.",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "panel": 4,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "panel_num_4",
+                            "parameter": [
+                                "index"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Panel number goes to the index parameter.",
+                            "value": "4",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "visualization_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to understand monetary policy transmission mechanisms.",
-                            "value": "What are the monetary policy transmission mechanisms?",
+                            "description": "Query specifying the type of visualization. We will combine all context from the previous panel steps as it is without shortening.",
+                            "value": "Create a pie chart showing employee engagement levels in remote work settings.",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "transmission_mechanisms",
-                            "description": "Monetary policy transmission mechanisms.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "3": {
-                    "api": "BrowserTools",
-                    "handles": "Unconventional Monetary Policies",
-                    "input_vars": [
-                        {
-                            "name": "unconventional_policies_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand unconventional monetary policies.",
-                            "value": "What are unconventional monetary policies, such as quantitative easing?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "unconventional_policies",
-                            "description": "Unconventional monetary policies.",
+                            "name": "culture_visualization",
+                            "description": "Visualization of survey data on employee engagement.",
                             "used_by": []
                         }
                     ]
@@ -310,132 +230,28 @@
             }
         },
         "5": {
-            "panel_description": "Impact on Investment Strategies",
+            "panel_description": "Cover the technological infrastructure necessary for remote work, focusing on essential technologies and cybersecurity challenges.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Influence of Interest Rates on Investment Decisions",
+                    "handles": "Gathers information on technological infrastructure for remote work.",
                     "input_vars": [
                         {
-                            "name": "interest_investment_influence_query",
+                            "name": "tech_infrastructure_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to understand the influence of interest rates on investment decisions.",
-                            "value": "How do interest rates influence investment decisions?",
+                            "description": "Query to gather information on technological infrastructure for remote work.",
+                            "value": "Cover the technological infrastructure necessary for remote work, including essential technologies and cybersecurity challenges.",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "interest_investment_influence",
-                            "description": "Influence of interest rates on investment decisions.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "2": {
-                    "api": "BrowserTools",
-                    "handles": "Risk Assessment and Asset Allocation",
-                    "input_vars": [
-                        {
-                            "name": "risk_asset_allocation_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand risk assessment and asset allocation.",
-                            "value": "How do investors assess risk and allocate assets in response to interest rate changes?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "risk_asset_allocation",
-                            "description": "Risk assessment and asset allocation in response to interest rate changes.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "3": {
-                    "api": "BrowserTools",
-                    "handles": "Case Studies of Investment Strategies",
-                    "input_vars": [
-                        {
-                            "name": "investment_case_studies_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to find case studies of investment strategies during different inflationary periods.",
-                            "value": "Provide case studies of investment strategies during different inflationary periods.",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "investment_case_studies",
-                            "description": "Case studies of investment strategies during different inflationary periods.",
-                            "used_by": [
-                                {
-                                    "panel": 5,
-                                    "step": 4
-                                }
-                            ]
-                        }
-                    ]
-                },
-                "4": {
-                    "api": "VizAgent",
-                    "handles": "Visualizes trends and strategies",
-                    "input_vars": [
-                        {
-                            "name": "investment_case_studies",
-                            "parameter": [
-                                "response"
-                            ],
-                            "type": "string",
-                            "source": "API_Output (Panel 5, Step 3)",
-                            "description": "Raw output of investment_case_studies from previous step. Please provide raw output.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 5,
-                                    "step": 3
-                                }
-                            ]
-                        },
-                        {
-                            "name": "panel_num_5",
-                            "parameter": [
-                                "index"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Panel number goes to the index parameter.",
-                            "value": "5",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "visualization_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query specifying the type of visualization. We will combine all context from the previous panel steps as it is without shortening.",
-                            "value": "Create visualizations illustrating trends and strategies in investment during different inflationary periods.",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "investment_visualization",
-                            "description": "Visualization of investment trends and strategies.",
+                            "name": "tech_infrastructure",
+                            "description": "Information on technological infrastructure for remote work.",
                             "used_by": []
                         }
                     ]
@@ -443,76 +259,28 @@
             }
         },
         "6": {
-            "panel_description": "Effects on Currency Values",
+            "panel_description": "Explore the impact of remote work on specific industries, providing case studies and examples.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Exchange Rate Dynamics",
+                    "handles": "Gathers information on industry-specific impacts of remote work.",
                     "input_vars": [
                         {
-                            "name": "exchange_rate_dynamics_query",
+                            "name": "industry_impacts_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to understand exchange rate dynamics.",
-                            "value": "What are the dynamics of exchange rates in response to inflation and interest rate changes?",
+                            "description": "Query to gather information on industry-specific impacts of remote work.",
+                            "value": "Explore the impact of remote work on specific industries, including case studies and examples.",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "exchange_rate_dynamics",
-                            "description": "Dynamics of exchange rates in response to inflation and interest rate changes.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "2": {
-                    "api": "BrowserTools",
-                    "handles": "Interest Rate Parity and Currency Valuation",
-                    "input_vars": [
-                        {
-                            "name": "interest_rate_parity_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand interest rate parity and currency valuation.",
-                            "value": "How does interest rate parity affect currency valuation?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "interest_rate_parity",
-                            "description": "Interest rate parity and its effect on currency valuation.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "3": {
-                    "api": "BrowserTools",
-                    "handles": "Impact of Inflation on Currency Strength",
-                    "input_vars": [
-                        {
-                            "name": "inflation_currency_strength_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand the impact of inflation on currency strength.",
-                            "value": "How does inflation impact currency strength?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "inflation_currency_strength",
-                            "description": "Impact of inflation on currency strength.",
+                            "name": "industry_impacts",
+                            "description": "Information on industry-specific impacts of remote work.",
                             "used_by": []
                         }
                     ]
@@ -520,132 +288,28 @@
             }
         },
         "7": {
-            "panel_description": "Economic Growth Implications",
+            "panel_description": "Analyze the economic implications of remote work, focusing on cost-benefit analysis and impact on economies.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Relationship between Inflation, Interest Rates, and Economic Growth",
+                    "handles": "Gathers information on economic implications of remote work.",
                     "input_vars": [
                         {
-                            "name": "growth_relationship_query",
+                            "name": "economic_implications_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to understand the relationship between inflation, interest rates, and economic growth.",
-                            "value": "What is the relationship between inflation, interest rates, and economic growth?",
+                            "description": "Query to gather information on economic implications of remote work.",
+                            "value": "Analyze the economic implications of remote work, including cost-benefit analysis and impact on economies.",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "growth_relationship",
-                            "description": "Relationship between inflation, interest rates, and economic growth.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "2": {
-                    "api": "BrowserTools",
-                    "handles": "Short-term vs. Long-term Growth Effects",
-                    "input_vars": [
-                        {
-                            "name": "growth_effects_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand short-term vs. long-term growth effects.",
-                            "value": "What are the short-term vs. long-term growth effects of inflation and interest rate changes?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "growth_effects",
-                            "description": "Short-term vs. long-term growth effects of inflation and interest rate changes.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "3": {
-                    "api": "BrowserTools",
-                    "handles": "Empirical Evidence and Economic Models",
-                    "input_vars": [
-                        {
-                            "name": "empirical_evidence_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to find empirical evidence and economic models.",
-                            "value": "Provide empirical evidence and economic models related to inflation, interest rates, and economic growth.",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "empirical_evidence",
-                            "description": "Empirical evidence and economic models related to inflation, interest rates, and economic growth.",
-                            "used_by": [
-                                {
-                                    "panel": 7,
-                                    "step": 4
-                                }
-                            ]
-                        }
-                    ]
-                },
-                "4": {
-                    "api": "VizAgent",
-                    "handles": "Visualizes growth trends and models",
-                    "input_vars": [
-                        {
-                            "name": "empirical_evidence",
-                            "parameter": [
-                                "response"
-                            ],
-                            "type": "string",
-                            "source": "API_Output (Panel 7, Step 3)",
-                            "description": "Raw output of empirical_evidence from previous step. Please provide raw output.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 7,
-                                    "step": 3
-                                }
-                            ]
-                        },
-                        {
-                            "name": "panel_num_7",
-                            "parameter": [
-                                "index"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Panel number goes to the index parameter.",
-                            "value": "7",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "visualization_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query specifying the type of visualization. We will combine all context from the previous panel steps as it is without shortening.",
-                            "value": "Create visualizations illustrating growth trends and models related to inflation, interest rates, and economic growth.",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "growth_visualization",
-                            "description": "Visualization of growth trends and models.",
+                            "name": "economic_implications",
+                            "description": "Information on economic implications of remote work.",
                             "used_by": []
                         }
                     ]
@@ -653,76 +317,28 @@
             }
         },
         "8": {
-            "panel_description": "Global Interconnectedness",
+            "panel_description": "Examine the psychological and social aspects of remote work, focusing on mental health and social isolation.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "International Spillovers of Monetary Policies",
+                    "handles": "Gathers information on psychological and social aspects of remote work.",
                     "input_vars": [
                         {
-                            "name": "international_spillovers_query",
+                            "name": "psychological_social_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to understand international spillovers of monetary policies.",
-                            "value": "What are the international spillovers of monetary policies?",
+                            "description": "Query to gather information on psychological and social aspects of remote work.",
+                            "value": "Examine the psychological and social aspects of remote work, including mental health and social isolation.",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "international_spillovers",
-                            "description": "International spillovers of monetary policies.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "2": {
-                    "api": "BrowserTools",
-                    "handles": "Role of Global Financial Markets",
-                    "input_vars": [
-                        {
-                            "name": "global_financial_markets_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand the role of global financial markets.",
-                            "value": "What is the role of global financial markets in the context of inflation and interest rate changes?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "global_financial_markets",
-                            "description": "Role of global financial markets in the context of inflation and interest rate changes.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "3": {
-                    "api": "BrowserTools",
-                    "handles": "Case Studies of Cross-border Economic Impacts",
-                    "input_vars": [
-                        {
-                            "name": "cross_border_impacts_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to find case studies of cross-border economic impacts.",
-                            "value": "Provide case studies of cross-border economic impacts related to inflation and interest rate changes.",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "cross_border_impacts",
-                            "description": "Case studies of cross-border economic impacts.",
+                            "name": "psychological_social_impact",
+                            "description": "Information on psychological and social aspects of remote work.",
                             "used_by": []
                         }
                     ]
@@ -730,671 +346,28 @@
             }
         },
         "9": {
-            "panel_description": "Central Bank Independence",
+            "panel_description": "Explore future trends and predictions for remote work, focusing on trends, predictions, and policy considerations.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Importance of Independence in Policy Making",
+                    "handles": "Gathers information on future trends and predictions for remote work.",
                     "input_vars": [
                         {
-                            "name": "independence_importance_query",
+                            "name": "future_remote_work_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to understand the importance of independence in policy making.",
-                            "value": "Why is independence important in central bank policy making?",
+                            "description": "Query to gather information on future trends and predictions for remote work.",
+                            "value": "Explore future trends and predictions for remote work, including trends, predictions, and policy considerations.",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "independence_importance",
-                            "description": "Importance of independence in central bank policy making.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "2": {
-                    "api": "BrowserTools",
-                    "handles": "Examples of Central Bank Independence and Economic Outcomes",
-                    "input_vars": [
-                        {
-                            "name": "independence_examples_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to find examples of central bank independence and economic outcomes.",
-                            "value": "Provide examples of central bank independence and their economic outcomes.",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "independence_examples",
-                            "description": "Examples of central bank independence and economic outcomes.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "3": {
-                    "api": "BrowserTools",
-                    "handles": "Challenges to Central Bank Independence",
-                    "input_vars": [
-                        {
-                            "name": "independence_challenges_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand the challenges to central bank independence.",
-                            "value": "What are the challenges to central bank independence?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "independence_challenges",
-                            "description": "Challenges to central bank independence.",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        },
-        "10": {
-            "panel_description": "Inflation and Interest Rate Dynamics",
-            "steps": {
-                "1": {
-                    "api": "BrowserTools",
-                    "handles": "Mathematical Models of Inflation and Interest Rates",
-                    "input_vars": [
-                        {
-                            "name": "mathematical_models_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand mathematical models of inflation and interest rates.",
-                            "value": "What are the mathematical models of inflation and interest rates?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "mathematical_models",
-                            "description": "Mathematical models of inflation and interest rates.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "2": {
-                    "api": "BrowserTools",
-                    "handles": "Predictive Models and Forecasting Techniques",
-                    "input_vars": [
-                        {
-                            "name": "predictive_models_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand predictive models and forecasting techniques.",
-                            "value": "What are the predictive models and forecasting techniques for inflation and interest rates?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "predictive_models",
-                            "description": "Predictive models and forecasting techniques for inflation and interest rates.",
-                            "used_by": [
-                                {
-                                    "panel": 10,
-                                    "step": 4
-                                }
-                            ]
-                        }
-                    ]
-                },
-                "3": {
-                    "api": "BrowserTools",
-                    "handles": "Limitations of Current Models",
-                    "input_vars": [
-                        {
-                            "name": "model_limitations_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand the limitations of current models.",
-                            "value": "What are the limitations of current models for inflation and interest rates?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "model_limitations",
-                            "description": "Limitations of current models for inflation and interest rates.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "4": {
-                    "api": "VizAgent",
-                    "handles": "Visualizes models and forecasts",
-                    "input_vars": [
-                        {
-                            "name": "predictive_models",
-                            "parameter": [
-                                "response"
-                            ],
-                            "type": "string",
-                            "source": "API_Output (Panel 10, Step 2)",
-                            "description": "Raw output of predictive_models from previous step. Please provide raw output.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 10,
-                                    "step": 2
-                                }
-                            ]
-                        },
-                        {
-                            "name": "panel_num_10",
-                            "parameter": [
-                                "index"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Panel number goes to the index parameter.",
-                            "value": "10",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "visualization_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query specifying the type of visualization. We will combine all context from the previous panel steps as it is without shortening.",
-                            "value": "Create visualizations illustrating models and forecasts for inflation and interest rates.",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "models_visualization",
-                            "description": "Visualization of models and forecasts for inflation and interest rates.",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        },
-        "11": {
-            "panel_description": "Policy Implications and Recommendations",
-            "steps": {
-                "1": {
-                    "api": "BrowserTools",
-                    "handles": "Strategies for Managing Inflation and Interest Rates",
-                    "input_vars": [
-                        {
-                            "name": "managing_strategies_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand strategies for managing inflation and interest rates.",
-                            "value": "What are the strategies for managing inflation and interest rates?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "managing_strategies",
-                            "description": "Strategies for managing inflation and interest rates.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "2": {
-                    "api": "BrowserTools",
-                    "handles": "Policy Recommendations for Central Banks",
-                    "input_vars": [
-                        {
-                            "name": "policy_recommendations_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to find policy recommendations for central banks.",
-                            "value": "What are the policy recommendations for central banks in managing inflation and interest rates?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "policy_recommendations",
-                            "description": "Policy recommendations for central banks.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "3": {
-                    "api": "BrowserTools",
-                    "handles": "Future Trends in Monetary Policy",
-                    "input_vars": [
-                        {
-                            "name": "future_trends_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand future trends in monetary policy.",
-                            "value": "What are the future trends in monetary policy related to inflation and interest rates?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "future_trends",
-                            "description": "Future trends in monetary policy related to inflation and interest rates.",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        },
-        "12": {
-            "panel_description": "Case Studies",
-            "steps": {
-                "1": {
-                    "api": "BrowserTools",
-                    "handles": "Analysis of Specific Countries' Monetary Policies",
-                    "input_vars": [
-                        {
-                            "name": "country_policies_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to analyze specific countries' monetary policies.",
-                            "value": "Analyze the monetary policies of specific countries.",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "country_policies",
-                            "description": "Analysis of specific countries' monetary policies.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "2": {
-                    "api": "BrowserTools",
-                    "handles": "Successes and Failures in Managing Inflation and Interest Rates",
-                    "input_vars": [
-                        {
-                            "name": "successes_failures_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to find successes and failures in managing inflation and interest rates.",
-                            "value": "What are the successes and failures in managing inflation and interest rates?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "successes_failures",
-                            "description": "Successes and failures in managing inflation and interest rates.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "3": {
-                    "api": "BrowserTools",
-                    "handles": "Lessons Learned from Historical Examples",
-                    "input_vars": [
-                        {
-                            "name": "historical_lessons_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to find lessons learned from historical examples.",
-                            "value": "What lessons have been learned from historical examples of managing inflation and interest rates?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "historical_lessons",
-                            "description": "Lessons learned from historical examples of managing inflation and interest rates.",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        },
-        "13": {
-            "panel_description": "Impact on Financial Markets",
-            "steps": {
-                "1": {
-                    "api": "BrowserTools",
-                    "handles": "Bond Market Reactions to Interest Rate Changes",
-                    "input_vars": [
-                        {
-                            "name": "bond_market_reactions_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand bond market reactions to interest rate changes.",
-                            "value": "How do bond markets react to interest rate changes?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "bond_market_reactions",
-                            "description": "Bond market reactions to interest rate changes.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "2": {
-                    "api": "BrowserTools",
-                    "handles": "Stock Market Volatility and Inflation",
-                    "input_vars": [
-                        {
-                            "name": "stock_market_volatility_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand stock market volatility and inflation.",
-                            "value": "How does inflation affect stock market volatility?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "stock_market_volatility",
-                            "description": "Stock market volatility and its relation to inflation.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "3": {
-                    "api": "BrowserTools",
-                    "handles": "Real Estate Market Dynamics",
-                    "input_vars": [
-                        {
-                            "name": "real_estate_dynamics_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand real estate market dynamics.",
-                            "value": "What are the dynamics of the real estate market in response to inflation and interest rate changes?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "real_estate_dynamics",
-                            "description": "Real estate market dynamics in response to inflation and interest rate changes.",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        },
-        "14": {
-            "panel_description": "Consumer Behavior and Spending",
-            "steps": {
-                "1": {
-                    "api": "BrowserTools",
-                    "handles": "Effects of Inflation on Consumer Purchasing Power",
-                    "input_vars": [
-                        {
-                            "name": "consumer_purchasing_power_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand the effects of inflation on consumer purchasing power.",
-                            "value": "How does inflation affect consumer purchasing power?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "consumer_purchasing_power",
-                            "description": "Effects of inflation on consumer purchasing power.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "2": {
-                    "api": "BrowserTools",
-                    "handles": "Interest Rates and Consumer Credit",
-                    "input_vars": [
-                        {
-                            "name": "consumer_credit_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand the relationship between interest rates and consumer credit.",
-                            "value": "How do interest rates affect consumer credit?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "consumer_credit",
-                            "description": "Relationship between interest rates and consumer credit.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "3": {
-                    "api": "BrowserTools",
-                    "handles": "Behavioral Economics Insights",
-                    "input_vars": [
-                        {
-                            "name": "behavioral_economics_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to find insights from behavioral economics.",
-                            "value": "What insights does behavioral economics provide about consumer behavior in response to inflation and interest rate changes?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "behavioral_economics",
-                            "description": "Insights from behavioral economics about consumer behavior in response to inflation and interest rate changes.",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        },
-        "15": {
-            "panel_description": "Technological and Structural Changes",
-            "steps": {
-                "1": {
-                    "api": "BrowserTools",
-                    "handles": "Impact of Technology on Inflation and Interest Rates",
-                    "input_vars": [
-                        {
-                            "name": "technology_impact_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand the impact of technology on inflation and interest rates.",
-                            "value": "How does technology impact inflation and interest rates?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "technology_impact",
-                            "description": "Impact of technology on inflation and interest rates.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "2": {
-                    "api": "BrowserTools",
-                    "handles": "Structural Economic Changes and Policy Adaptation",
-                    "input_vars": [
-                        {
-                            "name": "structural_changes_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand structural economic changes and policy adaptation.",
-                            "value": "What are the structural economic changes and how do policies adapt to them?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "structural_changes",
-                            "description": "Structural economic changes and policy adaptation.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "3": {
-                    "api": "BrowserTools",
-                    "handles": "Future Outlook for Inflation and Interest Rates",
-                    "input_vars": [
-                        {
-                            "name": "future_outlook_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand the future outlook for inflation and interest rates.",
-                            "value": "What is the future outlook for inflation and interest rates?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "future_outlook",
-                            "description": "Future outlook for inflation and interest rates.",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        },
-        "16": {
-            "panel_description": "Challenges and Risks",
-            "steps": {
-                "1": {
-                    "api": "BrowserTools",
-                    "handles": "Potential Risks of High Inflation or Deflation",
-                    "input_vars": [
-                        {
-                            "name": "inflation_deflation_risks_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand the potential risks of high inflation or deflation.",
-                            "value": "What are the potential risks of high inflation or deflation?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "inflation_deflation_risks",
-                            "description": "Potential risks of high inflation or deflation.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "2": {
-                    "api": "BrowserTools",
-                    "handles": "Economic Risks of Interest Rate Changes",
-                    "input_vars": [
-                        {
-                            "name": "interest_rate_risks_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to understand the economic risks of interest rate changes.",
-                            "value": "What are the economic risks of interest rate changes?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "interest_rate_risks",
-                            "description": "Economic risks of interest rate changes.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "3": {
-                    "api": "BrowserTools",
-                    "handles": "Mitigation Strategies for Policymakers",
-                    "input_vars": [
-                        {
-                            "name": "mitigation_strategies_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to find mitigation strategies for policymakers.",
-                            "value": "What are the mitigation strategies for policymakers to address inflation and interest rate risks?",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "mitigation_strategies",
-                            "description": "Mitigation strategies for policymakers to address inflation and interest rate risks.",
+                            "name": "future_remote_work",
+                            "description": "Information on future trends and predictions for remote work.",
                             "used_by": []
                         }
                     ]

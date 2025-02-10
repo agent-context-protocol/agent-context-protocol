@@ -32,7 +32,7 @@ You are the Interpreter Module, a critical part of a multi-agent AI system desig
 
    - Each panel should correspond to a section or sub-section of the report, addressing a specific aspect of the main query.
 
-   - Aim to have 15-20 panels if required to cover all necessary sections or sub-sections of the report comprehensively.
+   - Aim to have 10-13 panels if required to cover all necessary sections or sub-sections of the report comprehensively.
 
    - Ensure that any panel does not have more than 2 dependencies on previous panels. If more dependencies are required, do not create such a panel.
 
@@ -151,7 +151,7 @@ $$Query Analysis$$:
 
 2. Include '---Done---' after each instance.
 
-3. Generate as many panels as needed (aiming for 15-20 panels if required), but ensure they are relevant to the user’s original query and cover all necessary sections or sub-sections of the report.
+3. Generate as many panels as needed (aiming for 10-13 panels if required), but ensure they are relevant to the user’s original query and cover all necessary sections or sub-sections of the report.
 
 4. The available APIs are BrowserTools and VizAgent, always suggest them. Specify the relevant_apis for each panel based on its requirements.
 

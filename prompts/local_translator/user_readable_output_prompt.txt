@@ -90,6 +90,7 @@ $$FORMATTED_OUTPUT$$
 - If dealing with numerical data, ensure appropriate rounding and use of units.
 - For lists or collections of items, consider alphabetical or logical ordering.
 - If the output is particularly long, consider adding a brief table of contents or summary at the beginning of the panel output.
+- Else converting small text snippets or points to a table is also highly encouraged.
 - Only output the $$CHAIN_OF_THOUGHT$$ and then the user-ready presentation of the information under $$FORMATTED_OUTPUT$$. Do not mention anything else before or after strictly.
 - Use LaTeX syntax for all formatting.
 - For images:

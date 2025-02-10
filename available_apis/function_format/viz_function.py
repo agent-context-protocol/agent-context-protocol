@@ -10,7 +10,8 @@ import glob
 import os
 import shutil
 import tempfile
-from available_apis.browser_tools.main import browser_tools_function
+# from available_apis.browser_tools.main import browser_tools_function
+from available_apis.browser_tools_hf.GAIA.main import browser_tools_function
 
 from autogen import ConversableAgent
 from autogen.coding import LocalCommandLineCodeExecutor
