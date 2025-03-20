@@ -26,10 +26,10 @@ FUNCTION_APIS_FUNCTION_DICT = {
 
 FUNCTION_APIS_REQD_PARAMS_DICT = {
     "Perplexity": {"query": {"type": "string"}},
-    "VizAgent": {"query": {"type": "string"}, "response": {"type": "string"}, "index": {"type": "string"}},
+    "VizAgent": {"query": {"type": "string"}, "response": {"type": "string"}},
 }
 
 FUNCTION_APIS_PARAMS_DICT = {
     "Perplexity": {"query": {"type": "string"}, "preplexity_ai_key": {"type": "string"}},
-    "VizAgent": {"query": {"type": "string"}, "response": {"type": "string"}, "index": {"type": "string"}},
+    "VizAgent": {"query": {"type": "string"}, "response": {"type": "string"}},
 }

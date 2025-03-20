@@ -9,12 +9,22 @@ from openai import AzureOpenAI
 import os
 from dotenv import load_dotenv
 from utils import create_pdf_from_html, create_pdf_from_latex
+import re
+from together import Together
 
 # Load environment variables from .env file
 load_dotenv()
 
 client = OpenAI()
 # client = AzureOpenAI()
+
+# client = Together()
+
+# Model options:
+# o1-2024-12-17
+# deepseek-ai/DeepSeek-R1
+model_name = "o1-2024-12-17"
+
 
 # GLOBAL VARIABLE
 all_panel_outputs = {}
@@ -127,12 +137,19 @@ class Manager:
         group_done = False
         counter = 0
         prev_summary = f"This is additional context and not your main query. You are writing a detailed report on the topic: {self.user_query}.\nSummary from the previous sub-sections and sections of the report we are building, try to look at these summaries carefully and not search for similar things since we do not want repetitive information in the final report"
+        prev_search_queries = []
+        prev_img_links = []
+        prev_summary_viz_tab = f"This is additional context and not your main query. You are looking for data for detailed report on the topic: {self.user_query}.\nSummary for the tables/visualization from the previous sub-sections and sections of the report we are building, try to look at these summaries carefully and not search for similar things since we do not want repetitive information in the final report"
         while True and counter < 5:
             group_done = True
             for translator in self.groups[group_id]:
                 # try:
                 # if prev_summary != "":
                 translator.prev_summary = prev_summary + f"\n Summary for section {translator.panel_no}:\n"
+                translator.prev_summary_viz_tab = prev_summary_viz_tab + f"\nTables/Viz Summary for section {translator.panel_no}:\n"
+                translator.prev_sections_summary = translator.prev_summary
+                translator.prev_search_queries = prev_search_queries
+                translator.prev_img_links = prev_img_links
                 await translator.build_verify()
                 if translator.drop:
                     print('Dropping This Workflow...')
@@ -148,9 +165,12 @@ class Manager:
                         print(f"Dropping Translator {translator.panel_no} in group {group_id} due to excessive modifications.")
                         translator.drop = True
                         # return None
-                prev_summary = translator.prev_summary
                 group_results[translator.panel_no] =translator.get_results()
-                all_panel_outputs[translator.panel_no] = translator.get_results()['output']
+                all_panel_outputs[translator.panel_no] = group_results[translator.panel_no]['output']
+                prev_summary = translator.prev_summary
+                prev_sections_summary = translator.prev_sections_summary
+                prev_search_queries = translator.prev_search_queries
+                prev_img_links = translator.prev_img_links
                 # except Exception as e:
                 #     print(f"Error in translator {translator.panel_no}: {str(e)}")
 
@@ -226,42 +246,102 @@ class MainOrchestrator:
         section_details = self.main_translator.panel_details
         # for pidx, panel_out in enumerate(formatted_output):
         cntr_idx = 0
+        section_title_set = set()
         for pidx, panel_out in sorted_all_panel_outputs.items():
-            # report_iter += 1
-            cntr_idx += 1
-            if cntr_idx == 1:
-                frm_prmpt = final_report_formatting_system_prompt + '\nThis is the first panel. Include the latex preambles and begin document like in the examples provided.\n' +final_report_formatting_input_system_prompt.format(user_query=user_query, panel_steps=panel_out, panel_idx=pidx, report_so_far=report_so_far_main + report_so_far_ref, section_details=section_details)
-            else:
-                frm_prmpt = final_report_formatting_system_prompt + '\nThis is not the first panel. So do not repeat the things like latex preambles and begin document like in the examples provided.\n' +final_report_formatting_input_system_prompt.format(user_query=user_query, panel_steps=panel_out, panel_idx=pidx, report_so_far=report_so_far_main + report_so_far_ref, section_details=section_details)
-            print("frm_prmpt : ",frm_prmpt)
-            completion = client.chat.completions.create(
-                    model="gpt-4o-2024-08-06",
-                    messages=[
-                        {"role": "user", 
-                        "content": frm_prmpt}
-                        ],
-                    temperature = 0
-                )
+            run_final_format_success = False
+            counter_final_format = 0
+            error_message = ""
+            while not run_final_format_success and counter_final_format < 5:
+                try:
+                    # report_iter += 1
+                    counter_final_format += 1
+                    cntr_idx += 1
+                    if cntr_idx == 1:
+                        frm_prmpt = final_report_formatting_system_prompt + '\nThis is the first step. Include the latex preambles and begin document like in the examples provided. Your output for the current step should have $$CHAIN_OF_THOUGHT$$, $$REPORT_SECTION$$, and $$REFERENCES$$ sections.\n' +final_report_formatting_input_system_prompt.format(user_query=user_query, step_no=panel_out, step_idx=pidx, report_so_far=report_so_far_main + report_so_far_ref, error_message=error_message)
+                    else:
+                        frm_prmpt = final_report_formatting_system_prompt + '\nThis is step {pidx}, and you need to look at the provided steps output details to come up with your ouptut. Do not hallucinate the output content and adhere to the step {pidx} output details provided. Since this is not the first step, so do not repeat the things like latex preambles and begin document like in the examples provided. Your output for the current step should have $$CHAIN_OF_THOUGHT$$, $$REPORT_SECTION$$, and $$REFERENCES$$ sections.\n' +final_report_formatting_input_system_prompt.format(user_query=user_query, step_no=panel_out, step_idx=pidx, report_so_far=report_so_far_main + report_so_far_ref, error_message=error_message)
+                    print("frm_prmpt : ",frm_prmpt)
+                    completion = client.chat.completions.create(
+                            model=model_name,
+                            messages=[
+                                {"role": "user", 
+                                "content": frm_prmpt}
+                                ],
+                            # temperature = 0
+                        )
 
-            output = completion.choices[0].message.content
-            output = output.replace("```latex", "").replace("```", "")
-            # output = output.replace("```", "")
-            print("\noutput : ",output)
-            if "$$TERMINATE$$" in output:
-                break
-            elif "$$REPORT_SECTION" in output:
-                report_part = output.split("$$REPORT_SECTION$$")[1].split("$$REFERENCES$$")
-                report_part_main = report_part[0]
-                references = report_part[1]
-                report_so_far_main = report_so_far_main + "\n" + report_part_main
-                report_so_far_ref = report_so_far_ref + "\n" + references
-                # print("\nreport_so_far : ",report_so_far_main + report_so_far_ref)
+                    if 'deepseek' in model_name:
+                        output = completion.choices[0].message.content.split(r'</think>')[-1]
+                    else:
+                        output = completion.choices[0].message.content
+                    output = output.replace("```latex", "").replace("```", "")
+                    # output = output.replace("```", "")
+                    print("\noutput : ",output)
+
+                    ##################
+                    # Checking if the format is wrong
+                    chain_count = output.count("$$CHAIN_OF_THOUGHT$$") + output.count("%%%% START CHAIN_OF_THOUGHT")
+                    report_count = output.count("$$REPORT_SECTION$$") + output.count("%%%% START REPORT_SECTION")
+                    references_count = output.count("$$REFERENCES$$")
+
+                    if chain_count != 2 or report_count != 2: # or references_count != 1:
+                    # if chain_count == 0 or report_count == 0 or references_count == 0:
+                        raise ValueError("There is either more than one occurence or no occurence of the phrases: $$CHAIN_OF_THOUGHT$$, $$REPORT_SECTION$$, $$REFERENCES$$. Each output of yours should be made up of these blocks, and they should appear only once at the start of these blocks and not repeated again.")
+                    ##################
+
+                    # report_part = output.split("$$REPORT_SECTION$$")[-1].split("$$REFERENCES$$")
+                    # report_part_main = report_part[0]
+                    # references = report_part[1]
+                    output = output.strip()
+                    report_part_main = output.split("%%%% START REPORT_SECTION")[-1]
+                    report_part_main = report_part_main.split("$$REPORT_SECTION$$")[-1]
+                    report_part_main = report_part_main.split("%%%% START REFERENCES")[0].strip()
+                    report_part_main = report_part_main.split(r"\subsection{References}")[0].split(r"\subsection*{References}")[0].replace(r"./","")
+                    pattern = r'\\section\s*\{([^}]+)\}'
+                    match = re.search(pattern, report_part_main)
+                    if match:
+                        section_title = match.group(1) 
+                        if section_title in section_title_set:
+                            break
+
+                    references = output.split("%%%% START REFERENCES")[-1]
+                    references = references.split("$$REFERENCES$$")[-1].strip()
+
+                    ####################
+                    # Check to catch latex errors
+                    report_so_far_main_temp = report_so_far_main + "\n" + report_part_main
+                    report_so_far_ref_temp = report_so_far_ref + "\n" + references
+                    report_so_far_main_temp = report_so_far_main_temp.replace(r"\end{document}", "").replace(r"./","").replace(r"\end*{document}", "")
+                    report_so_far_ref_temp = report_so_far_ref_temp.replace(r"\end{document}", "").replace(r"./","").replace(r"\end*{document}", "")
+                    output_till_now = report_so_far_main_temp + report_so_far_ref_temp + "\n" + r"\end{document}"
+                    latex_run_bool, latex_error_message = create_pdf_from_latex(output_till_now, "save_reports/generated_report_syntax_check.pdf", True)
+                    if not (latex_run_bool or "Output written on save_reports/temp_latex_file.pdf" in latex_error_message):
+                        raise ValueError(latex_error_message)
+                    ####################
+
+                    report_so_far_main = report_so_far_main + "\n" + report_part_main
+                    report_so_far_ref = report_so_far_ref + "\n" + references
+                    # print("\nreport_so_far : ",report_so_far_main + report_so_far_ref)
+                    run_final_format_success = True
+                    if match:
+                        section_title_set.add(section_title)
+                except Exception as e:
+                    cntr_idx -= 1
+                    error_message = f"Please provide the correct whole output, and not just the corrected part. And avoid any internal comments or reasoning inside the blocks.\n\nError:{str(e)}"
+                    continue
+
+            if not run_final_format_success:
+                raise ValueError("Latex formatting failed")
 
         # Save the string to a pdf file
         # create_pdf_from_html(report_so_far_main + report_so_far_ref, "generated_report.pdf")
+        report_so_far_main = report_so_far_main.replace(r"\end{document}", "")
+        report_so_far_ref = report_so_far_ref.replace(r"\end{document}", "")
         final_output = report_so_far_main + report_so_far_ref + "\n" + r"\end{document}"
-        create_pdf_from_latex(final_output, "save_reports/generated_report.pdf")
+        latex_run_bool, latex_error_message = create_pdf_from_latex(final_output, "save_reports/generated_report.pdf")
         print("output : ",final_output) 
+        print("latex_run_bool : ",latex_run_bool)
+        print("latex_error_message : ",latex_error_message)
         
 
 

@@ -31,22 +31,38 @@ class InterpreterNode(BaseNode):
 
     def setup(self):
         if self.user_query:
-            # initial_message = fetch_user_data(self.personal_json, self.user_query)
-            # print('User Context: ',initial_message)
-            suggested_sections = browser_tools_function({"query": f"Please provide what sections/subsections should be kept for a detailed and comprehensive report being written on the topic (if the topic is technical then please include some in-depth technical sections, and if applicable try to add mathematical aspects to explain the technical concepts please.): {self.user_query}"}, True)
-            print(f"\nUser Query: {self.user_query} \n\n Suggested Sections and Sub-Sections for the report:\n{suggested_sections['text']}")
-            self.chat_history.append({"role": "user", "content": f'''User Query: {self.user_query} \n\n Suggested Sections and Sub-Sections for the report:\n{suggested_sections['text']}'''})
-            available_api_string = self.create_available_api_string()
-            print("available_api_string : ",available_api_string)
-            self.chat_history.append({"role": "user", "content": available_api_string})
-            output = self.generate()
-            print(output)
-            output = self.modify_message(output)
-            return output
+            # run_success = False
+            run_count=0
+            while run_count<5:
+                try:
+                    run_count += 1
+                    # initial_message = fetch_user_data(self.personal_json, self.user_query)
+                    # print('User Context: ',initial_message)
+                    suggested_sections = browser_tools_function({"query": f"Please provide what sections/subsections should be kept for a detailed and comprehensive report being written on the topic. You need to search the web on the topic (as if you were writing the report) to figure out the best sections to focus on based on the current trends and knowledge about the topic in the world.): {self.user_query}"}, True)
+                    print(f"\nUser Query: {self.user_query} \n\n Suggested Sections and Sub-Sections for the report:\n{suggested_sections['text']}")
+                    self.chat_history.append({"role": "user", "content": f'''User Query: {self.user_query} \n\n Suggested Sections and Sub-Sections for the report:\n{suggested_sections['text']}'''})
+                    available_api_string = self.create_available_api_string()
+                    print("available_api_string : ",available_api_string)
+                    self.chat_history.append({"role": "user", "content": available_api_string})
+                    output = self.generate()
+                    print(output)
+                    output = self.modify_message(output)
+                    return output
+                except Exception as e:
+                    continue
 
     def modify_message(self, message):
         # Define the JSON-like strings
         json_strings = message.split('---Done---')[1:-1]
+
+        # for json_string in json_strings:
+        #     print("json_string : ",json_string)
+        #     print("\n\n")
+        # if json_strings[0] != '':
+        #     json_strings = json_strings[:-1]
+        # else:
+        #     json_strings = json_strings[1:-1]
+        
         panels_list = []
         for json_string in json_strings:
             panel = json.loads(json_string)

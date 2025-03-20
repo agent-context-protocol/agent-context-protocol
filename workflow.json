@@ -1,29 +1,77 @@
 {
-    "user_query": "Examine how the shift to remote work environments has influenced productivity, team dynamics, and company culture in various industries.\n",
+    "user_query": "Analyze how cryptocurrencies and central bank digital currencies (CBDCs) are influencing traditional banking operations, regulatory environments, and financial stability.\n",
     "1": {
         "1": {
-            "panel_description": "Provide an introduction to remote work, including trends, historical context, and the importance of studying its impact.",
+            "panel_description": "Provide a general overview of the digital currency landscape.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Provides an introduction to remote work.",
+                    "handles": "Retrieves the history and current state of cryptocurrencies.",
                     "input_vars": [
                         {
-                            "name": "remote_work_intro_query",
+                            "name": "history_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to gather information on remote work trends, historical context, and importance.",
-                            "value": "Provide an overview of remote work trends, historical context, and the importance of studying the impact of remote work.",
+                            "description": "Query to get the history and current state of cryptocurrencies.",
+                            "value": "What is the history and current state of cryptocurrencies?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "remote_work_intro",
-                            "description": "Introduction to remote work, including trends, historical context, and importance.",
+                            "name": "crypto_history",
+                            "description": "History and current state of cryptocurrencies.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves key terms and definitions related to digital currencies.",
+                    "input_vars": [
+                        {
+                            "name": "terms_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get key terms and definitions related to digital currencies.",
+                            "value": "What are the key terms and definitions related to digital currencies?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "digital_currency_terms",
+                            "description": "Key terms and definitions related to digital currencies.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the significance of digital currencies in modern finance.",
+                    "input_vars": [
+                        {
+                            "name": "significance_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get the significance of digital currencies in modern finance.",
+                            "value": "What is the significance of digital currencies in modern finance?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "digital_currency_significance",
+                            "description": "Significance of digital currencies in modern finance.",
                             "used_by": []
                         }
                     ]
@@ -31,84 +79,76 @@
             }
         },
         "2": {
-            "panel_description": "Explore how remote work has influenced productivity, with a focus on measuring productivity, comparative analysis, and factors affecting productivity.",
+            "panel_description": "Delve into the evolution of cryptocurrencies.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Gathers data on productivity in remote settings.",
+                    "handles": "Retrieves the early development and milestones of cryptocurrencies.",
                     "input_vars": [
                         {
-                            "name": "productivity_query",
+                            "name": "development_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to gather data on productivity in remote settings.",
-                            "value": "Explore how remote work has influenced productivity, including measuring productivity, comparative analysis, and factors affecting productivity.",
+                            "description": "Query to get the early development and milestones of cryptocurrencies.",
+                            "value": "What are the early development and milestones of cryptocurrencies?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "productivity_data",
-                            "description": "Data on productivity in remote settings.",
-                            "used_by": [
-                                {
-                                    "panel": 2,
-                                    "step": 2
-                                }
-                            ]
+                            "name": "crypto_development",
+                            "description": "Early development and milestones of cryptocurrencies.",
+                            "used_by": []
                         }
                     ]
                 },
                 "2": {
-                    "api": "VizAgent",
-                    "handles": "Visualizes productivity data.",
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the growth of blockchain technologies.",
                     "input_vars": [
                         {
-                            "name": "productivity_data",
-                            "parameter": [
-                                "response"
-                            ],
-                            "type": "string",
-                            "source": "API_Output (Panel 2, Step 1)",
-                            "description": "Raw output of productivity_data from previous step. Please provide raw output.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 2,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "panel_num_2",
-                            "parameter": [
-                                "index"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Panel number goes to the index parameter.",
-                            "value": "2",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "visualization_query",
+                            "name": "blockchain_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query specifying the type of visualization. We will combine all context from the previous panel steps as it is without shortening.",
-                            "value": "Create a bar chart comparing productivity levels in remote and on-site work settings.",
+                            "description": "Query to get the growth of blockchain technologies.",
+                            "value": "What is the growth of blockchain technologies?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "productivity_visualization",
-                            "description": "Visualization of productivity data in remote settings.",
+                            "name": "blockchain_growth",
+                            "description": "Growth of blockchain technologies.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the societal and economic impact of cryptocurrencies.",
+                    "input_vars": [
+                        {
+                            "name": "impact_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get the societal and economic impact of cryptocurrencies.",
+                            "value": "What is the societal and economic impact of cryptocurrencies?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "crypto_impact",
+                            "description": "Societal and economic impact of cryptocurrencies.",
                             "used_by": []
                         }
                     ]
@@ -116,28 +156,76 @@
             }
         },
         "3": {
-            "panel_description": "Examine the impact of remote work on team dynamics, focusing on communication, collaboration, and trust.",
+            "panel_description": "Focus on Central Bank Digital Currencies (CBDCs).",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Gathers information on team dynamics in remote settings.",
+                    "handles": "Retrieves the motivations and objectives behind CBDCs.",
                     "input_vars": [
                         {
-                            "name": "team_dynamics_query",
+                            "name": "motivations_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to gather information on team dynamics in remote settings.",
-                            "value": "Examine the impact of remote work on team dynamics, including communication, collaboration, and trust.",
+                            "description": "Query to get the motivations and objectives behind CBDCs.",
+                            "value": "What are the motivations and objectives behind CBDCs?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "team_dynamics_impact",
-                            "description": "Impact of remote work on team dynamics.",
+                            "name": "cbdc_motivations",
+                            "description": "Motivations and objectives behind CBDCs.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the current global development and adoption of CBDCs.",
+                    "input_vars": [
+                        {
+                            "name": "development_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get the current global development and adoption of CBDCs.",
+                            "value": "What is the current global development and adoption of CBDCs?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "cbdc_development",
+                            "description": "Current global development and adoption of CBDCs.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the technology models and design choices of CBDCs.",
+                    "input_vars": [
+                        {
+                            "name": "technology_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get the technology models and design choices of CBDCs.",
+                            "value": "What are the technology models and design choices of CBDCs?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "cbdc_technology",
+                            "description": "Technology models and design choices of CBDCs.",
                             "used_by": []
                         }
                     ]
@@ -145,84 +233,76 @@
             }
         },
         "4": {
-            "panel_description": "Analyze how remote work influences company culture, focusing on defining culture, maintaining it, and employee engagement.",
+            "panel_description": "Analyze how cryptocurrencies and CBDCs are influencing traditional banking operations.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Gathers information on company culture in remote settings.",
+                    "handles": "Retrieves the shifts in payment and settlement systems.",
                     "input_vars": [
                         {
-                            "name": "culture_query",
+                            "name": "payment_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to gather information on company culture in remote settings.",
-                            "value": "Analyze how remote work influences company culture, including defining culture, maintaining it, and employee engagement.",
+                            "description": "Query to get the shifts in payment and settlement systems.",
+                            "value": "What are the shifts in payment and settlement systems due to cryptocurrencies and CBDCs?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "culture_data",
-                            "description": "Information on company culture in remote settings.",
-                            "used_by": [
-                                {
-                                    "panel": 4,
-                                    "step": 2
-                                }
-                            ]
+                            "name": "payment_shifts",
+                            "description": "Shifts in payment and settlement systems.",
+                            "used_by": []
                         }
                     ]
                 },
                 "2": {
-                    "api": "VizAgent",
-                    "handles": "Visualizes survey data on employee engagement.",
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the influence on retail and commercial banking services.",
                     "input_vars": [
                         {
-                            "name": "culture_data",
-                            "parameter": [
-                                "response"
-                            ],
-                            "type": "string",
-                            "source": "API_Output (Panel 4, Step 1)",
-                            "description": "Raw output of culture_data from previous step. Please provide raw output.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "panel": 4,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "panel_num_4",
-                            "parameter": [
-                                "index"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Panel number goes to the index parameter.",
-                            "value": "4",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "visualization_query",
+                            "name": "banking_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query specifying the type of visualization. We will combine all context from the previous panel steps as it is without shortening.",
-                            "value": "Create a pie chart showing employee engagement levels in remote work settings.",
+                            "description": "Query to get the influence on retail and commercial banking services.",
+                            "value": "What is the influence of cryptocurrencies and CBDCs on retail and commercial banking services?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "culture_visualization",
-                            "description": "Visualization of survey data on employee engagement.",
+                            "name": "banking_influence",
+                            "description": "Influence on retail and commercial banking services.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the emerging banking models integrating digital currencies.",
+                    "input_vars": [
+                        {
+                            "name": "models_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get the emerging banking models integrating digital currencies.",
+                            "value": "What are the emerging banking models integrating digital currencies?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "emerging_models",
+                            "description": "Emerging banking models integrating digital currencies.",
                             "used_by": []
                         }
                     ]
@@ -230,28 +310,76 @@
             }
         },
         "5": {
-            "panel_description": "Cover the technological infrastructure necessary for remote work, focusing on essential technologies and cybersecurity challenges.",
+            "panel_description": "Examine the current regulatory frameworks for cryptocurrencies and CBDCs.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Gathers information on technological infrastructure for remote work.",
+                    "handles": "Retrieves the current regulatory frameworks for cryptocurrencies.",
                     "input_vars": [
                         {
-                            "name": "tech_infrastructure_query",
+                            "name": "frameworks_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to gather information on technological infrastructure for remote work.",
-                            "value": "Cover the technological infrastructure necessary for remote work, including essential technologies and cybersecurity challenges.",
+                            "description": "Query to get the current regulatory frameworks for cryptocurrencies.",
+                            "value": "What are the current regulatory frameworks for cryptocurrencies?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "tech_infrastructure",
-                            "description": "Information on technological infrastructure for remote work.",
+                            "name": "crypto_frameworks",
+                            "description": "Current regulatory frameworks for cryptocurrencies.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the oversight and compliance for CBDCs.",
+                    "input_vars": [
+                        {
+                            "name": "compliance_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get the oversight and compliance for CBDCs.",
+                            "value": "What is the oversight and compliance for CBDCs?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "cbdc_compliance",
+                            "description": "Oversight and compliance for CBDCs.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the ongoing policy debates and proposed reforms.",
+                    "input_vars": [
+                        {
+                            "name": "debates_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get the ongoing policy debates and proposed reforms.",
+                            "value": "What are the ongoing policy debates and proposed reforms related to cryptocurrencies and CBDCs?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "policy_debates",
+                            "description": "Ongoing policy debates and proposed reforms.",
                             "used_by": []
                         }
                     ]
@@ -259,28 +387,76 @@
             }
         },
         "6": {
-            "panel_description": "Explore the impact of remote work on specific industries, providing case studies and examples.",
+            "panel_description": "Assess the financial stability implications of cryptocurrencies and CBDCs.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Gathers information on industry-specific impacts of remote work.",
+                    "handles": "Retrieves the volatility and systemic risk in crypto markets.",
                     "input_vars": [
                         {
-                            "name": "industry_impacts_query",
+                            "name": "volatility_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to gather information on industry-specific impacts of remote work.",
-                            "value": "Explore the impact of remote work on specific industries, including case studies and examples.",
+                            "description": "Query to get the volatility and systemic risk in crypto markets.",
+                            "value": "What is the volatility and systemic risk in crypto markets?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "industry_impacts",
-                            "description": "Information on industry-specific impacts of remote work.",
+                            "name": "crypto_volatility",
+                            "description": "Volatility and systemic risk in crypto markets.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the macroeconomic and monetary policy considerations.",
+                    "input_vars": [
+                        {
+                            "name": "macroeconomic_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get the macroeconomic and monetary policy considerations related to cryptocurrencies and CBDCs.",
+                            "value": "What are the macroeconomic and monetary policy considerations related to cryptocurrencies and CBDCs?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "policy_impact",
+                            "description": "Macroeconomic and monetary policy considerations.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the risk mitigation and resilience measures.",
+                    "input_vars": [
+                        {
+                            "name": "mitigation_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get the risk mitigation and resilience measures related to cryptocurrencies and CBDCs.",
+                            "value": "What are the risk mitigation and resilience measures for cryptocurrencies and CBDCs?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "risk_measures",
+                            "description": "Risk mitigation and resilience measures.",
                             "used_by": []
                         }
                     ]
@@ -288,28 +464,76 @@
             }
         },
         "7": {
-            "panel_description": "Analyze the economic implications of remote work, focusing on cost-benefit analysis and impact on economies.",
+            "panel_description": "Explore the technological and security considerations of cryptocurrencies and CBDCs.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Gathers information on economic implications of remote work.",
+                    "handles": "Retrieves the blockchain innovations and scalability.",
                     "input_vars": [
                         {
-                            "name": "economic_implications_query",
+                            "name": "innovations_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to gather information on economic implications of remote work.",
-                            "value": "Analyze the economic implications of remote work, including cost-benefit analysis and impact on economies.",
+                            "description": "Query to get the blockchain innovations and scalability.",
+                            "value": "What are the blockchain innovations and scalability solutions for cryptocurrencies and CBDCs?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "economic_implications",
-                            "description": "Information on economic implications of remote work.",
+                            "name": "blockchain_innovations",
+                            "description": "Blockchain innovations and scalability.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the cybersecurity and fraud prevention measures.",
+                    "input_vars": [
+                        {
+                            "name": "cybersecurity_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get the cybersecurity and fraud prevention measures for cryptocurrencies and CBDCs.",
+                            "value": "What are the cybersecurity and fraud prevention measures for cryptocurrencies and CBDCs?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "fraud_prevention",
+                            "description": "Cybersecurity and fraud prevention.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the privacy challenges and data protection measures.",
+                    "input_vars": [
+                        {
+                            "name": "privacy_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get the privacy challenges and data protection measures for cryptocurrencies and CBDCs.",
+                            "value": "What are the privacy challenges and data protection measures for cryptocurrencies and CBDCs?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "data_protection",
+                            "description": "Privacy challenges and data protection.",
                             "used_by": []
                         }
                     ]
@@ -317,28 +541,76 @@
             }
         },
         "8": {
-            "panel_description": "Examine the psychological and social aspects of remote work, focusing on mental health and social isolation.",
+            "panel_description": "Examine the adoption of cryptocurrencies and CBDCs by financial institutions.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Gathers information on psychological and social aspects of remote work.",
+                    "handles": "Retrieves the institutional investment strategies.",
                     "input_vars": [
                         {
-                            "name": "psychological_social_query",
+                            "name": "investment_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to gather information on psychological and social aspects of remote work.",
-                            "value": "Examine the psychological and social aspects of remote work, including mental health and social isolation.",
+                            "description": "Query to get the institutional investment strategies for cryptocurrencies and CBDCs.",
+                            "value": "What are the institutional investment strategies for cryptocurrencies and CBDCs?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "psychological_social_impact",
-                            "description": "Information on psychological and social aspects of remote work.",
+                            "name": "institutional_investment",
+                            "description": "Institutional investment strategies.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the cryptocurrency and CBDC implementation in banking operations.",
+                    "input_vars": [
+                        {
+                            "name": "implementation_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get the cryptocurrency and CBDC implementation in banking operations.",
+                            "value": "How are cryptocurrencies and CBDCs being implemented in banking operations?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "banking_implementation",
+                            "description": "Cryptocurrency and CBDC implementation in banking operations.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the partnerships, consortia, and collaborative initiatives.",
+                    "input_vars": [
+                        {
+                            "name": "partnerships_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get the partnerships, consortia, and collaborative initiatives related to cryptocurrencies and CBDCs.",
+                            "value": "What are the partnerships, consortia, and collaborative initiatives related to cryptocurrencies and CBDCs?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "collaborative_initiatives",
+                            "description": "Partnerships, consortia, and collaborative initiatives.",
                             "used_by": []
                         }
                     ]
@@ -346,28 +618,230 @@
             }
         },
         "9": {
-            "panel_description": "Explore future trends and predictions for remote work, focusing on trends, predictions, and policy considerations.",
+            "panel_description": "Present use cases and case studies of cryptocurrencies and CBDCs.",
             "steps": {
                 "1": {
                     "api": "BrowserTools",
-                    "handles": "Gathers information on future trends and predictions for remote work.",
+                    "handles": "Retrieves the country-specific CBDC pilots and launches.",
                     "input_vars": [
                         {
-                            "name": "future_remote_work_query",
+                            "name": "pilots_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Query to gather information on future trends and predictions for remote work.",
-                            "value": "Explore future trends and predictions for remote work, including trends, predictions, and policy considerations.",
+                            "description": "Query to get the country-specific CBDC pilots and launches.",
+                            "value": "What are the country-specific CBDC pilots and launches?",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "future_remote_work",
-                            "description": "Information on future trends and predictions for remote work.",
+                            "name": "cbdc_pilots",
+                            "description": "Country-specific CBDC pilots and launches.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the cross-border transactions and remittance solutions.",
+                    "input_vars": [
+                        {
+                            "name": "transactions_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get the cross-border transactions and remittance solutions using cryptocurrencies and CBDCs.",
+                            "value": "What are the cross-border transactions and remittance solutions using cryptocurrencies and CBDCs?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "cross_border_transactions",
+                            "description": "Cross-border transactions and remittance solutions.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the examples of cryptocurrency-driven services.",
+                    "input_vars": [
+                        {
+                            "name": "services_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get the examples of cryptocurrency-driven services.",
+                            "value": "What are the examples of cryptocurrency-driven services?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "crypto_services",
+                            "description": "Examples of cryptocurrency-driven services.",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        },
+        "10": {
+            "panel_description": "Analyze current and emerging market trends related to cryptocurrencies and CBDCs.",
+            "steps": {
+                "1": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the evolving role of stablecoins and DeFi.",
+                    "input_vars": [
+                        {
+                            "name": "stablecoins_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get the evolving role of stablecoins and DeFi.",
+                            "value": "What is the evolving role of stablecoins and DeFi?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "stablecoin_role",
+                            "description": "Evolving role of stablecoins and DeFi.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the ongoing innovations in digital asset infrastructure.",
+                    "input_vars": [
+                        {
+                            "name": "infrastructure_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get the ongoing innovations in digital asset infrastructure.",
+                            "value": "What are the ongoing innovations in digital asset infrastructure?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "asset_innovations",
+                            "description": "Ongoing innovations in digital asset infrastructure.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the interaction between regulated and unregulated markets.",
+                    "input_vars": [
+                        {
+                            "name": "markets_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get the interaction between regulated and unregulated markets related to cryptocurrencies and CBDCs.",
+                            "value": "What is the interaction between regulated and unregulated markets related to cryptocurrencies and CBDCs?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "market_interaction",
+                            "description": "Interaction between regulated and unregulated markets.",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        },
+        "11": {
+            "panel_description": "Provide a future outlook for cryptocurrencies and CBDCs.",
+            "steps": {
+                "1": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the potential scenarios for cryptocurrencies.",
+                    "input_vars": [
+                        {
+                            "name": "scenarios_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get the potential scenarios for cryptocurrencies.",
+                            "value": "What are the potential scenarios for cryptocurrencies?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "crypto_scenarios",
+                            "description": "Potential scenarios for cryptocurrencies.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the roadmaps for widespread CBDC adoption.",
+                    "input_vars": [
+                        {
+                            "name": "roadmaps_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get the roadmaps for widespread CBDC adoption.",
+                            "value": "What are the roadmaps for widespread CBDC adoption?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "cbdc_roadmaps",
+                            "description": "Roadmaps for widespread CBDC adoption.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "api": "BrowserTools",
+                    "handles": "Retrieves the expert forecasts and perspectives.",
+                    "input_vars": [
+                        {
+                            "name": "forecasts_query",
+                            "parameter": [
+                                "query"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Query to get the expert forecasts and perspectives on cryptocurrencies and CBDCs.",
+                            "value": "What are the expert forecasts and perspectives on cryptocurrencies and CBDCs?",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "expert_forecasts",
+                            "description": "Expert forecasts and perspectives.",
                             "used_by": []
                         }
                     ]

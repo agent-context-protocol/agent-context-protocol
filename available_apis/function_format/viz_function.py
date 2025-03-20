@@ -16,6 +16,8 @@ from available_apis.browser_tools_hf.GAIA.main import browser_tools_function
 from autogen import ConversableAgent
 from autogen.coding import LocalCommandLineCodeExecutor
 
+from together import Together
+
 # Utility function to delete files and directories matching a pattern
 def del_stuff_pattern(pattern):
     # Use glob to find all files and directories matching the pattern
@@ -36,7 +38,7 @@ def del_stuff_pattern(pattern):
 # should run at the start
 del_stuff_pattern('./save_viz/*')
 
-def visualization_agent(dict_body):
+def visualization_agent(dict_body, no_search_bool=False):
 
     response_dict = {}
 
@@ -49,10 +51,11 @@ def visualization_agent(dict_body):
     response = dict_body["response"]
     index = int(dict_body["index"])
 
-    # enhancing response with web agent
-    web_agent_in_dict = {"query" : f"Query: {query},\n Response: {response}\n Please try to search the web to collect enough information to plot what is asked for in the query while being in accordance with details provided in response, we have to make sure that we have enough datapoints (>2) and in the same units strictly to ensure good plots from the data. You dont have to plot on your own, just collect information please using which we can plot directly. Do not provide a plan for plotting, we need proper numbers we can use for plotting."}
-    web_agent_out_dict = browser_tools_function(web_agent_in_dict)
-    response = web_agent_out_dict["text"]
+    if not no_search_bool:
+        # enhancing response with web agent
+        web_agent_in_dict = {"query" : f"Query: {query},\n Response: {response}\n Please try to search the web to collect enough information to plot what is asked for in the query while being in accordance with details provided in response, we have to make sure that we have enough datapoints (>2) and in the same units strictly to ensure good plots from the data. You dont have to plot on your own, just collect information please using which we can plot directly. Do not provide a plan for plotting, we need proper numbers we can use for plotting. Do not make an Educated guess, if we have solid data with sources backing then only we should use them for plotting. In the query you have context for previous plots, so strictly dont provide data for plots similar to the ones already been made."}
+        web_agent_out_dict = browser_tools_function(web_agent_in_dict, visualization_bool=True)
+        response = web_agent_out_dict["text"]
 
     # List of directories to ensure exist
     directories = ['./save_viz/plot', './save_viz/illust']
@@ -65,13 +68,15 @@ def visualization_agent(dict_body):
             # print(f"Created directory: {dir_path}")
 
     llm_client = OpenAI()
+    # llm_client = Together()
 
     # load the system prompt
     file_path = './available_apis/function_format/visualization_prompt.txt'
     # Read the contents of the file and store it in a variable
     with open(file_path, 'r') as file:
         system_prompt = file.read()
-    system_prompt = system_prompt.format(index=index)
+    # system_prompt = system_prompt.format(index=index)
+    system_prompt = system_prompt.replace("{index}", str(index))
 
     run_success = False
     trial_num = 0
@@ -103,7 +108,8 @@ def visualization_agent(dict_body):
 
         # do the LLM call
         completion = llm_client.chat.completions.create(
-            model="gpt-4o",
+            model="o1-2024-12-17",
+            # model="gpt-4o-2024-08-06",
             messages=[
             {
             "role": "system",
@@ -116,7 +122,7 @@ def visualization_agent(dict_body):
 
         plot_respone = completion.choices[0].message.content
 
-        # print("\nplot_respone : ",plot_respone)
+        print("\nplot_respone : ",plot_respone)
 
         # reset the strings
         dalle_prompt = ""
@@ -129,7 +135,7 @@ def visualization_agent(dict_body):
         # retrieve the appropriate things from the plot_respone
         if '$$CODE$$' in plot_respone:
             code_string = plot_respone.split("$$CODE$$")[1].split("$$PLOTS_EXPLANATION$$")[0]
-            # print("\n code_string : ",code_string)
+            print("\n code_string : ",code_string)
             
             plots_explanation_string = plot_respone.split("$$CODE$$")[1].split("$$PLOTS_EXPLANATION$$")[1]
             # print("\n plots_explanation_string : ",plots_explanation_string)
@@ -150,18 +156,16 @@ def visualization_agent(dict_body):
 
             try:
                 reply = code_executor_agent.generate_reply(messages=[{"role": "user", "content": "```python\n"+code_string+"\n```"}])
-    
                 run_success = True
-                plt.clf()          # Clear the current figure
-                plt.close()        # Close the figure window
-                plt.rcdefaults()   # Reset matplotlib settings to defaults (optional)
+                print("reply : ",reply)
+
+                if "exitcode: 1 (execution failed)" in reply:
+                    raise ValueError(f"The execution failed with the following message: {reply}")
+    
                 break
             except Exception as e:
                 error_message = str(e)
                 print("error_message : ", error_message)
-                plt.clf()          # Clear the current figure
-                plt.close()        # Close the figure window
-                plt.rcdefaults()   # Reset matplotlib settings to defaults (optional)
                 trial_num += 1
                 continue      
 
@@ -210,7 +214,7 @@ def visualization_agent(dict_body):
         files = glob.glob(f'./save_viz/plot/plot_{index}_*')
         # Join the list into a single string, separated by newlines
         files_string = '\n'.join(files)
-        response_dict["text"] = plots_explanation_string + f"\nPlots saved at the following paths: {files_string}.\nMore Context and References: {response}." 
+        response_dict["text"] = plots_explanation_string + f"\nPlots saved at the following paths: {files_string}.\nMore Context on how the plot is connected to the text and References: {response}." 
     else:
         response_dict["text"] = f"\nNo Images were saved." 
 
@@ -230,7 +234,7 @@ def visualization_dalle_LLM_Agent(llm_client, prompt):
 
     return response, image_url
 
-VISUALIZATION_AGENT_FUNCTION_DOCS = """Function: visualization_agent
+VISUALIZATION_AGENT_FUNCTION_DOCS = """Function: VizAgent
 
 Description:
 This function generates visualizations (plots or images) based on a user's query and the system's response. It can create plots by executing generated code.
@@ -241,7 +245,6 @@ Use this function to create visual representations that complement textual infor
 Parameters:
 - query (string, required): The user's initial question or request that requires visualization.
 - response (string, required): The system's textual response to the query, providing context for generating the visualization.
-- index (string, required): An identifier used to save and reference the generated visualization files uniquely. We have to pass the current panel number.
 
 Expected Output:
 - response_content (string): An explanation of the generated plots or in the case when no plot was genrated it will output: No Images were saved.
@@ -251,10 +254,9 @@ Example Usage:
 dict_body = {
     "query": "Please plot the GDP growth of the top 5 economies over the last decade.",
     "response": "The GDP growth of the top 5 economies varies over the last decade, with some fluctuations.",
-    "index": 1
 }
 
-response = visualization_agent(dict_body)
+response = VizAgent(dict_body)
 print(response["text"])"""
 
 # VISUALIZATION_AGENT_FUNCTION_DOCS = """Function: visualization_agent
@@ -291,3 +293,4 @@ print(response["text"])"""
 # }
 # ex_out = visualization_agent(dict_body_ex)
 # print("ex_out : ",ex_out)
+

@@ -558,7 +558,7 @@ class MainTranslatorNode(BaseNode):
                 _, workflow_dict = self.parse_main_translator_workflow(llm_response_workflow)
                 run_success = True
             except Exception as e:
-                error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT and WORKFLOW without any other details before or after. Additionaly inlcude in your CHAIN_OF_THOUGHT about what went wrong in the format and rectify it basded on the given information:\n {str(e)}' 
+                error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT and WORKFLOW without any other details before or after. Additionaly inlcude in your CHAIN_OF_THOUGHT about what went wrong in the format and rectify it basded on the given information. Lastly it is very very important to remember that you have to always return the whole workflow in the exact format specified, without any text (like your internal reasoning or comments) before or after. Do not just return the corrected part naively.\n\nError:\n {str(e)}' 
                 self.chat_history.append({"role": "user", "content": error_message})
                 print("error_message : ",error_message)
             

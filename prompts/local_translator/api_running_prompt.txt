@@ -41,6 +41,7 @@ API Documentation:
    - Headers: Include all required headers, such as Authorization tokens and Content-Type, according to the API documentation. In case we are handling a Python function instead, then Headers should be empty.
    - Request Body: If the API requires a body, construct it in valid JSON format, ensuring that all required parameters are included. Handle dynamic values from the input variables (e.g., vacation_spots_list) correctly. In case we are handling a Python function instead, then the Body will contain the parameters of the Python function in a JSON format. If the query is referring to the file attachment then please provide the file attachment as well as it is to the BroswerTools APIs else they wont understand the context.
    - We have to strictly try and keep the number of API requests under 5. If there are more, then prioritize and only make the API requests for top 5 according to relevance and priority. Only allow BrowserTools API to have more than 5 API calls.
+   - For VizAgent and BrowserTools API if very long writeups are provided as parameters, then make sure that you dont copy the long writeups as it is in $$API_REQUEST$$, and instead summarize them and use them appropriately for defining the API_REQUEST.
 
 3. Output the Finalized API Request:
    - The output should be strictly structured under two main sections:
@@ -50,6 +51,7 @@ API Documentation:
        - The correctness of the endpoint URL and parameters.
        - The necessity of headers and their correctness.
        - The structure and content of the request body.
+       - For VizAgent and BrowserTools API if very long writeups are provided as parameters, then make sure that you dont copy the long writeups as it is in $$API_REQUEST$$, and instead summarize them and use them appropriately for defining the API_REQUEST.
      - $$API_REQUEST$$: This section should contain the actual API request that will be executed, including method, URL, headers, and body. Ensure that the body strictly follows the structure and format specified by the API documentation.
 
 4. Handle Errors Appropriately:
@@ -57,6 +59,8 @@ API Documentation:
    - 602 WRONG_STEP_DETAILS: Raise this error if the API step details are incomplete or incorrect, such as when invalid parameters are provided, or if the input variable values are in an incorrect format or data type, preventing the API request from being properly constructed.
    - 603 INVALID_PARAMETER_USAGE: Raised when a parameter is used incorrectly, such as including multiple values in a parameter that accepts only single values, or incorrect data formatting that doesn't align with the API's expectations.
    - Errors should only be raised in critical cases that cannot be resolved automatically. Minor issues, such as correctable formatting problems or missing optional data, should be handled internally without raising an error.
+
+- For VizAgent and BrowserTools API if very long writeups are provided as parameters, then make sure that you dont copy the long writeups as it is in $$API_REQUEST$$, and instead summarize them and use them appropriately for defining the API_REQUEST.
 
 ### Important Guidelines:
 
@@ -122,6 +126,8 @@ API Documentation:
   - 603 INVALID_PARAMETER_USAGE: Raised when a parameter is used incorrectly, such as including multiple values in a parameter that accepts only single values, or incorrect data formatting that doesn't align with the API's expectations.
   - Only raise errors for critical issues; minor problems should be handled internally.
   - Provide a clear explanation in the ERROR_EXPLANATION section.
+
+- For VizAgent and BrowserTools API if very long writeups are provided as parameters, then make sure that you dont copy the long writeups as it is in $$API_REQUEST$$, and instead summarize them and use them appropriately for defining the API_REQUEST.
 
 ---
     
@@ -223,7 +229,7 @@ ERROR_EXPLANATION
 
 ### Some More Example:
 
-#### Example 1:
+#### Example:
 
 # Input:
 
@@ -368,98 +374,7 @@ HEADERS
 }
 
 
-#### Example 2:
-
-# Input:
-
-Step Details:
-
-- API: Stack_Exchange_Questions
-- Handles: Retrieves specific C++ questions from Stack Exchange
-- Input Variables:
-  - Name: tagged
-    - Parameter: tagged
-    - Type: string
-    - Source: LLM_Generated
-    - Description: Filter questions by the C++ tag
-    - Value: "c++"
-- Output Variables:
-  - Name: cpp_questions_list
-    - Description: List of C++ questions from Stack Exchange
-
-API Documentation:
-
-[You will be given the api documentation]
-
-# Your Output:
-
-$$CHAIN_OF_THOUGHT$$
-
-Input Variables:
-
-- Name: tagged
-  - Parameter: tagged
-  - Type: string
-  - Source: LLM_Generated
-  - Description: Filter questions by the C++ tag
-  - Value: "c++"
-
-Verification of Input Variables:
-
-- The parameter tagged is optional and used to filter questions by a specific tag.
-- The type is correct (string), and the value "c++" is appropriate for filtering C++ questions.
-- The parameter name tagged matches the API documentation.
-
-Determining Single vs. Multiple API Requests:
-
-- Since there are not multiple things we will just do one api request
-
-HTTP Method & Endpoint URL:
-
-- The API method is GET, as specified in the API documentation for listing questions.
-- The base URL is https://api.stackexchange.com/2.2.
-- The endpoint is /questions.
-- We need to construct the full URL with required and optional query parameters.
-
-Required Query Parameters:
-
-- site (string, required): The site to query. Default is stackoverflow, but we need to include it explicitly. We will add the site=stackoverflow parameter ourselves instead of raising error 601 MISSING_REQUIRED_PARAMETERS.
-
-Optional Query Parameters:
-
-- tagged (string, optional): We'll use this to filter questions tagged with "c++".
-- pagesize (integer, optional): To limit the number of results, we'll set pagesize=15.
-- page (integer, optional): We'll set page=1 to retrieve the first page of results.
-
-Headers:
-
-- The API does not require any special headers for this request.
-
-Dependencies:
-
-- There are no dependencies on previous API outputs.
-
-Encoding Parameters:
-
-- The tag "c++" contains a + character, which needs to be URL-encoded as %2B.
-
-Final Decision:
-
-- Construct the GET request URL by including all required and optional parameters.
-- The final URL will be: https://api.stackexchange.com/2.2/questions?site=stackoverflow&tagged=c%2B%2B&pagesize=15&page=1
-
-$$API_REQUEST$$
-
-API_ENDPOINT
-
-Method: GET  
-URL: https://api.stackexchange.com/2.2/questions?site=stackoverflow&tagged=c%2B%2B&pagesize=15&page=1
-
-HEADERS
-
-BODY
-
-#### Example 3:
+#### Example:
 
 # Input:
 
@@ -527,107 +442,8 @@ ERROR_EXPLANATION
 
 The latitude of the location we want weather of is missing. We cannot get the weather from WeatherAPI.com_Realtime_Weather_Api without both longitude and latitude of the location
 
-#### Example 4:
 
-# Input:
-
-Step Details:
-
-- API: BrowserTools
-- Handles: Fetches latitude and longitude for each vacation spot
-- Input Variables:
-  - Name: vacation_spots_list
-    - Parameter: query
-    - Type: string
-    - Source: API_Output (Panel 1, Step 1)
-    - Description: List of vacation spots from Panel 1
-    - Value: "["The Dolomites, Italy", "Santorini, Greece", "Prague, Czech Republic", "Cinque Terre, Italy", "Barcelona, Spain", "London, UK", "Rome, Italy", "Amsterdam, Netherlands", "Munich, Germany", "Dublin, Irelad"]"
-- Output Variables:
-  - Name: latitude
-    - Description: Latitude for each vacation spot
-  - Name: longitude
-    - Description: Longitude for each vacation spot
-
-Input Details:
-
-API_KEY: YOUR_API_KEY
-
-API Documentation:
-
-[You will be given the api documentation]
-
-# Your Output:
-
-$$CHAIN_OF_THOUGHT$$
-
-Input Variables:
-
-- Name: vacation_spots_list
-  - Parameter: query
-  - Type: string
-  - Source: API_Output (Panel 1, Step 1)
-  - Description: List of vacation spots from Panel 1
-  - Value: ["The Dolomites, Italy", "Santorini, Greece", "Prague, Czech Republic", "Cinque Terre, Italy", "Barcelona, Spain", "London, UK", "Rome, Italy", "Amsterdam, Netherlands", "Munich, Germany", "Dublin, Ireland"]
-
-Verification of Input Variables:
-
-- The query parameter is required and expects a string representing the user's question or search term.
-- The vacation_spots_list is a list of vacation spot names.
-- Since the query parameter accepts a single string, and the API recommends not to ask too much information in one search, we should execute separate API requests for each vacation spot.
-
-Determining Single vs. Multiple API Requests:
-
-- The API documentation advises to break down queries and not ask for too much information in one search.
-- Therefore, we will execute individual API requests for each vacation spot to ensure accurate and concise responses.
-- We are keeping the number of API requests below 5 by getting latitude and longitude data of multiple cities at once. Only BroswerTools API is allowed to have more than 5 API calls.
-
-Method & Function Name:
-
-- The method is FUNCTION, and the function name is BrowserTools_api_response.
-
-Headers:
-
-- No headers are required for this function call.
-
-Request Body:
-
-- For each vacation spot, we will construct a query asking for the latitude and longitude of that specific place.
-
-Final Decision:
-
-- Create ten separate API requests, one for each vacation spot.
-- Each request will have its own query parameter formatted as "What are the latitude and longitude of [vacation spot]?"
-
-$$API_REQUEST$$
-
-API_ENDPOINT
-
-Method: FUNCTION  
-URL: BrowserTools_api_response
-
-HEADERS
-
-BODY
-{
-  "query": "What are the latitude and longitude for the following places: "The Dolomites, Italy", "Santorini, Greece", "Prague, Czech Republic", "Cinque Terre, Italy", "Barcelona, Spain"",
-}
-
-$$API_REQUEST$$
-
-API_ENDPOINT
-
-Method: FUNCTION  
-URL: BrowserTools_api_response
-
-HEADERS
-
-BODY
-{
-  "query": "What are the latitude and longitude for the following places: "London, UK", "Rome, Italy", "Amsterdam, Netherlands", "Munich, Germany", "Dublin, Ireland"",
-}
-
-
-#### Example 5:
+#### Example:
 
 # Input:
 
@@ -718,7 +534,7 @@ BODY
   "query": "What significant historical events happened on July 20, 1969?",
 }
 
-#### Example 6:
+#### Example:
 
 # Input:
 
@@ -809,7 +625,7 @@ BODY
   "query": "What are the official languages of Switzerland?",
 }
 
-#### Example 7:
+#### Example:
 
 # Input:
 
@@ -919,7 +735,7 @@ BODY
   "query": "Extract the key decisions about the new marketing strategy from the following board meeting transcript:[Transcript of the board meeting]Chairperson: 'We need to allocate more budget to digital marketing channels...'Marketing Director: 'Agreed, focusing on social media influencers could boost our brand...'[Further dialogue]"
 }
 
-#### Example 8:
+#### Example:
 
 -	User Query:
 “Based on the attached patient medical history, what are the recommended next steps for treatment? Please provide the recommendations as outlined in the history.”
@@ -1033,9 +849,9 @@ BODY
   "query": "What are the recommended next steps for treatment based on the following patient's medical history?[Patient Medical History]- Patient Name: John Doe- Age: 45- Diagnoses: Type 2 Diabetes, Hypertension- Previous Treatments: Metformin, Lisinopril- Recent Test Results: Elevated blood glucose levels, increased blood pressure[Further details]"
 }
 
-### Example 9:
+### Example:
 
-- User Query: a short report with 4-5 panels/sections on: Investigate how innovations in financial technology are transforming traditional banking services, including payments, lending, wealth management, and financial inclusion.
+- User Query: Investigate how innovations in financial technology are transforming traditional banking services, including payments, lending, wealth management, and financial inclusion.
 
 - Panel Description: Explore future trends and global perspectives on FinTech.
 Step Details:
@@ -1043,7 +859,7 @@ Step Details:
 - Handles: Visualizes future trends and global perspectives on FinTech.
 - Input Variables:
   - Name: future_trends_content
-    - Parameter: ['response']
+    - Parameter: response
     - Type: string
     - Source: API_Output (Panel 5, Step 1)
     - Description: Key insights from Step 1.
@@ -1078,14 +894,8 @@ Step Details:
     - McKinsey: The Future of Fintech Growth
     - DBS Bank: Future of Fintech: Top Trends 2023
     - Stratoflow: 11 Fintech Trends That Shape Financial Future in 2023""
-  - Name: panel_num_5
-    - Parameter: ['index']
-    - Type: string
-    - Source: LLM_Generated
-    - Description: Panel number goes to the index parameter.
-    - Value: "5"
   - Name: visualization_query
-    - Parameter: ['query']
+    - Parameter: query
     - Type: string
     - Source: LLM_Generated
     - Description: Query to visualize future trends and global perspectives on FinTech.
@@ -1102,7 +912,7 @@ $$CHAIN_OF_THOUGHT$$
 Input Variables:
 
 - Name: future_trends_content
-  - Parameter: ['response']
+  - Parameter: response
   - Type: string
   - Source: API_Output (Panel 5, Step 1)
   - Description: Key insights from Step 1.
@@ -1139,15 +949,8 @@ Input Variables:
     - DBS Bank: Future of Fintech: Top Trends 2023
     - Stratoflow: 11 Fintech Trends That Shape Financial Future in 2023*"
 
-- Name: panel_num_5
-  - Parameter: ['index']
-  - Type: string
-  - Source: LLM_Generated
-  - Description: Panel number goes to the index parameter.
-  - Value: "5"
-
 - Name: visualization_query
-  - Parameter: ['query']
+  - Parameter: query
   - Type: string
   - Source: LLM_Generated
   - Description: Query to visualize future trends and global perspectives on FinTech.
@@ -1156,7 +959,6 @@ Input Variables:
 Verification of Input Variables:
 
 - The parameter 'response' is required and expects a string representing the system's response to the query. The future_trends_content variable matches the expected parameter and is of the correct type (string).
-- The parameter 'index' is required and expects a string representing the panel number. The panel_num_5 variable matches the expected parameter and is of the correct type (string).
 - The parameter 'query' is required and expects a string representing the user's request for visualization. The visualization_query variable matches the expected parameter and is of the correct type (string).
 
 Dependencies:
@@ -1192,7 +994,7 @@ Headers:
 
 Request Body:
 
-- Include the constructed query, the full response content, and index:
+- Include the constructed query, the full response content:
 
 $$API_REQUEST$$
 
@@ -1208,5 +1010,132 @@ BODY
 {
   "query": "Based on the provided insights, create the following visualizations:1. A line chart showing the projected FinTech industry revenue growth from the current year to 2030, reaching $1.5 trillion.2. A bar chart illustrating the potential annual value addition of $1 trillion by AI and Machine Learning to the banking industry.3. A world map highlighting emerging markets with significant FinTech growth potential: Asia-Pacific, Africa, Latin America, and the Middle East.Ensure the visualizations accurately represent the data.",
   "response": "The future of FinTech and banking is poised for significant transformation driven by technological advancements and evolving market dynamics. Here are the key trends and global perspectives shaping this sector:1. Growth Projections: The fintech industry is expected to experience substantial growth, potentially reaching $1.5 trillion in annual revenue by 2030. This expansion is fueled by the increasing adoption of digital financial services and the penetration of fintech into emerging markets, particularly in Asia-Pacific, Africa, Latin America, and the Middle East.2. Emerging Technologies:   - Artificial Intelligence (AI) and Machine Learning (ML): Enhancing fraud detection, credit risk assessment, and providing personalized financial services. AI could add up to $1 trillion annually to the banking industry.   - Blockchain Technology: Transforming payments, remittances, asset management, and supply chain finance. Driving the growth of decentralized finance (DeFi) and enabling real-time transaction settlements.   - Internet of Things (IoT): Facilitating seamless payments and real-time monitoring of financial transactions, improving customer experience.   - Big Data Analytics and Quantum Computing: Impacting investment strategies and risk management by offering deeper insights and faster processing capabilities.3. Key Trends:   - Digital-Only Banking Platforms: The rise of neo-banks offering more convenient and accessible financial services.   - Embedded Finance and Banking as a Service (BaaS): Allowing non-financial companies to offer financial services, expanding the reach of fintech.   - Open Banking and APIs: Promoting greater transparency and competition by enabling third-party developers to build applications around financial institutions.   - Regulatory Technology (RegTech): Growing demand for technologies that help comply with regulations efficiently.4. Challenges and Opportunities:   - Facing challenges from macroeconomic conditions like higher interest rates and inflation.   - Opportunities to pivot towards more profitable revenue streams and explore cheaper capital sources.5. Global Perspectives:   - Emerging markets are expected to play a crucial role, with significant revenue growth supported by rapid digital adoption and e-commerce expansion.In summary, the future of fintech and banking is characterized by rapid technological advancements, significant growth potential, and a shift towards more sustainable and profitable business models.References:- BCG: Global Fintech 2023: Reimagining the Future of Finance- EY: Tech Trends Chapter VIII: Top FinTech Trends in 2023- SVB: Future of Fintech Report 2023- McKinsey: The Future of Fintech Growth- DBS Bank: Future of Fintech: Top Trends 2023- Stratoflow: 11 Fintech Trends That Shape Financial Future in 2023",
-  "index": "5"
+}
+
+
+#### Example:
+
+# Input:
+
+Step Details:
+
+- API: VizAgent  
+- Handles: Visualizes key findings from a comprehensive report on global health innovations.  
+- Input Variables:  
+  - Name: health_innovation_report  
+    - Parameter: response
+    - Type: string  
+    - Source: API_Output (Panel 5, Step 1)  
+    - Description: Text covering various global health innovation trends, their funding, and impact metrics.  
+    - Value: "According to the 2024 Global Health Innovation Report, investment in new medical devices and digital health platforms has grown by more than 65% since 2018. Key drivers include increased demand for telemedicine solutions in underserved regions, the rapid development of AI-assisted diagnostics, and global public-private partnerships aiming to reduce the cost of essential medicines. The report further examines innovations in gene therapy and wearable health tracking devices. These areas have seen breakthrough clinical trials, with some devices reducing hospitalization rates by up to 30%. Additional sections cover the importance of cross-border collaborations, the steady rise in philanthropic grants supporting early-stage biotech startups, and regional case studies across Africa, Southeast Asia, and Latin America demonstrating pilot programs that cut patient wait times in half. There is also a detailed outlook on how integrated patient data management systems could revolutionize preventive care. Overall, the report underscores the growing role of technology in bridging gaps in healthcare access, projecting that digital health solutions could save global health systems around $300 billion annually by 2030."  
+
+  - Name: health_viz_instructions  
+    - Parameter: query
+    - Type: string  
+    - Source: LLM_Generated  
+    - Description: Instructions for visualizing the content.  
+    - Value: "Create an infographic that highlights the top funding areas, major technological breakthroughs, and projected impact on global healthcare costs."
+
+- Output Variables:  
+  - Name: global_health_visualization  
+    - Description: Visualization illustrating major global health innovation trends.
+
+Input Details:
+
+API_KEY: YOUR_API_KEY
+
+API Documentation:
+
+[You will be given the api documentation]
+
+# Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+We have two parameters for VizAgent:
+1) "response" with a very detailed text on health innovations (funding growth, AI diagnostics, telemedicine, gene therapy).
+2) "query" requesting an infographic.  
+Instead of pasting the entire large text into the final body verbatim, we'll provide a concise version to give enough context.
+
+$$API_REQUEST$$
+
+API_ENDPOINT
+
+Method: FUNCTION  
+URL: visualization_agent
+
+HEADERS
+
+{}
+
+BODY
+
+{
+  "query": "Create an infographic that highlights the top funding areas, major technological breakthroughs, and projected impact on global healthcare costs.",
+  "response": "Global health innovations have grown 65% since 2018, driven by telemedicine demand, AI-assisted diagnostics, gene therapy breakthroughs, and cross-border collaborations. Some devices reduce hospitalization by 30%. Digital health solutions could save $300B by 2030."
+}
+
+
+---
+
+#### Example:
+
+# Input:
+
+Step Details:
+
+- API: VizAgent  
+- Handles: Provides visualization for a large write-up on recent developments in the renewable energy sector.  
+- Input Variables:  
+  - Name: renewables_long_text  
+    - Parameter: response 
+    - Type: string  
+    - Source: API_Output (Panel 2, Step 1)  
+    - Description: Text with insights on solar, wind, and other clean energy adoption rates worldwide.  
+    - Value: "This in-depth section of the Renewable Energy Global Outlook 2025 covers a surge in solar PV capacity in Asia, with China and India leading installations totaling 200 GW added in the past two years alone. Meanwhile, offshore wind is expanding rapidly in Northern Europe and parts of North America, supported by government subsidies and declining turbine costs. Battery storage technologies are emerging as critical in stabilizing grids with high renewable penetration, and new policy frameworks in various countries are incentivizing corporate investments in clean power. The report cites that global CO2 emissions could be cut by nearly 40% if the current pace of renewables deployment continues through 2030, aided by improved energy efficiency measures. Case studies detail how microgrids and distributed generation in Africa, Latin America, and Southeast Asia are boosting rural electrification. On the financial side, green bonds have surpassed $1 trillion in cumulative issuance, while climate-focused funds are reshaping capital markets toward more sustainable assets. Overall, this section highlights a transformative shift as nations prioritize renewable energy to meet both economic and climate goals."  
+
+  - Name: renewables_viz_query  
+    - Parameter: query
+    - Type: string  
+    - Source: LLM_Generated  
+    - Description: Request for a data visualization.  
+    - Value: "Construct a multi-part visual showing global renewable capacity growth, major innovations like battery storage, and the projected reduction in CO2 emissions."
+
+- Output Variables:  
+  - Name: energy_visualization  
+    - Description: Data visualization of renewable energy growth and impacts.
+
+Input Details:
+
+API_KEY: YOUR_API_KEY
+
+API Documentation:
+
+[You will be given the api documentation]
+
+# Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+There are two parameters for VizAgent again:
+1) "response" with lengthy details on solar, wind, battery storage, etc.
+2) "query" instructing a multi-part visual.  
+We'll condense the text in the final request body, preserving key points.
+
+$$API_REQUEST$$
+
+API_ENDPOINT
+
+Method: FUNCTION  
+URL: visualization_agent
+
+HEADERS
+
+{}
+
+BODY
+
+{
+  "query": "Construct a multi-part visual showing global renewable capacity growth, major innovations like battery storage, and the projected reduction in CO2 emissions.",
+  "response": "Solar and wind capacity has surged, especially in Asia and Europe. Battery storage is key for grid stability. Green bonds exceed $1T, and renewables could cut global CO2 by 40% by 2030 if current trends continue."
 }

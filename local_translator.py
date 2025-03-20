@@ -10,6 +10,12 @@ import re
 import asyncio
 import time
 import tiktoken
+from serpapi import GoogleSearch
+from openai import OpenAI
+import base64
+import os
+import glob
+import shutil
 
 # Function to add items from the browser function dictionaries into the function dictionaries
 def merge_browser_functions():
@@ -19,6 +25,93 @@ def merge_browser_functions():
 
 # Run the merge function
 merge_browser_functions()
+
+########################################
+# Function to encode the image
+def encode_image_from_url(image_url):
+    response = requests.get(image_url)
+    image_bytes = response.content
+    return base64.b64encode(image_bytes).decode('utf-8')
+    
+def vision_qa(query, user_image_path):
+        try:
+            mm_client = OpenAI()
+            base64_image = encode_image_from_url(user_image_path)
+            response = mm_client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": f"""Please evaluate whether the following image would serve well as the primary (hero) image at the beginning of the given report text. Return only Yes or No in your response, with no additional text or explanation.
+                                                         Avoid plot related images, or purely illustrative images with no text or information. We want to maintain a high quality for the primary image.
+                                                        
+                                                        #################
+                                                        Text from the section of a report:
+                                                        {query}
+
+                                                        #################
+                                                        Your Output:"""},
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": f"data:image/jpeg;base64,{base64_image}",
+                                },
+                            },
+                        ],
+                    }
+                ],
+                max_tokens=300,
+            )
+
+            return True, response.choices[0].message.content
+        except Exception as e:
+            return False, str(e)
+
+
+def save_image_from_url(image_url, filename):
+    # Downloads the image at image_url and saves it to save_folder with the given filename.
+    save_folder = "img_search_save"
+    # Make sure the destination folder exists
+    os.makedirs(save_folder, exist_ok=True)
+
+    # Full path: folder + filename
+    save_path = os.path.join(save_folder, filename)
+
+    # Download the image
+    response = requests.get(image_url, stream=True)
+    bool_check = False
+    if response.status_code == 200:
+        # Save the image
+        with open(save_path, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+        print(f"Image saved at: {save_path}")
+        bool_check = True
+    else:
+        print(f"Failed to download image. Status code: {response.status_code}")
+    
+    return bool_check
+
+# Utility function to delete files and directories matching a pattern
+def del_stuff_pattern(pattern):
+    # Use glob to find all files and directories matching the pattern
+    items = glob.glob(pattern, recursive=True)
+
+    for item in items:
+        try:
+            # Check if it's a file or directory
+            if os.path.isfile(item) or os.path.islink(item):
+                os.remove(item)  # Remove files or symlinks
+                print(f"Deleted file: {item}")
+            elif os.path.isdir(item):
+                shutil.rmtree(item)  # Remove directories
+                print(f"Deleted directory: {item}")
+        except Exception as e:
+            print(f"Failed to delete {item}. Reason: {e}")
+
+# should run at the start
+del_stuff_pattern('./img_search_save/*')
 
 #######################################ßßß
 class LocalTranslatorNode(BaseNode):
@@ -33,6 +126,10 @@ class LocalTranslatorNode(BaseNode):
         self.user_query = user_query
 
         self.prev_summary = ""
+        self.prev_sections_summary = ""
+        self.prev_summary_viz_tab = ""
+        self.prev_search_queries = None
+        self.prev_img_links = None
 
         self.prev_status_update = None
 
@@ -387,6 +484,7 @@ class LocalTranslatorNode(BaseNode):
     def make_final_workflow_with_output_values(self, workflow_dict, panels_list):
         # Initialize the formatted result string
         result = []
+        steps_result = []
         
         # Extract panel description
         panel_data = workflow_dict[str(self.panel_no)]
@@ -426,9 +524,10 @@ class LocalTranslatorNode(BaseNode):
                 result.append(f"  - Name: {output_var['name']}")
                 result.append(f"    - Description: {output_var['description']}")
                 result.append(f"    - Value: {output_var['value']}")
+                steps_result.append(f"Step {step_key}:\n{output_var['value']}")
 
         # Join and return the final string
-        return "\n".join(result)
+        return "\n".join(result), "\n".join(steps_result)
 
     
     ###################################################################
@@ -939,9 +1038,14 @@ class LocalTranslatorNode(BaseNode):
 
         if api_name in ["BrowserTools"]:
             if "query" in body:
-                body["query"] = "Main Query: " + body["query"] + f"The main query is for a sub-section of section {self.panel_no}.\n{self.prev_summary}\n"
-        
-        response = FUNCTION_APIS_FUNCTION_DICT[api_name](body)
+                body["query"] = "Main Query: " + body["query"] + f"The main query is for a sub-section of section {self.panel_no} you need to work on.\nNow, below is the summary for your context now for avoiding repetitive stuff.\n{self.prev_summary}\n"
+        if api_name in ["VizAgent"]:
+            body["index"] = self.panel_no
+
+        if api_name in ["BrowserTools"]:
+            response = FUNCTION_APIS_FUNCTION_DICT[api_name](body) #, search_viz_table_bool=True, prev_summary=self.prev_summary, panel_idx=self.panel_no)
+        else:
+            response = FUNCTION_APIS_FUNCTION_DICT[api_name](body)
 
         # Check if the request was successful
         if response["status_code"] == 200:
@@ -1059,6 +1163,7 @@ class LocalTranslatorNode(BaseNode):
 
                     # running the api
                     api_running_error_counter += 1
+                    run_success=False
                     try:
                         for api_req_i in range(len(parsed_api_request['api_requests'])):
                             if parsed_api_request['api_requests'][api_req_i]['method'] == "FUNCTION":
@@ -1089,11 +1194,11 @@ class LocalTranslatorNode(BaseNode):
                             if not api_success_bool: # and int(api_output["status_code"])/100 == 4:
                                 # error handling part here
                                 raise ValueError(f"api_output : {api_output}")
-                            # apart from 4xx errors we should just call the main translator for assistance
-                            if not api_success_bool:
-                                assistance_request_bool = True
-                                assistance_error_dict = api_output
-                                break
+                            # # apart from 4xx errors we should just call the main translator for assistance
+                            # if not api_success_bool:
+                            #     assistance_request_bool = True
+                            #     assistance_error_dict = api_output
+                            #     break
                             
                             api_outputs_list.append(api_output)
 
@@ -1246,11 +1351,133 @@ class LocalTranslatorNode(BaseNode):
             'output' : 'This Panel Was Dropped'
         }
 
-        final_workflow_with_values = self.make_final_workflow_with_output_values(self.group_workflow, self.main_translator.panels_list)
-        self.chat_history.append({"role": "user", "content": self.user_readable_output_prompt})
-        self.chat_history.append({"role": "user", "content": final_workflow_with_values})
-        output = self.generate()
+        final_workflow_with_values, curr_panel_steps_string = self.make_final_workflow_with_output_values(self.group_workflow, self.main_translator.panels_list)
+        #########
+        print("self.prev_summary_viz_tab: ",self.prev_summary_viz_tab)
+        # Visualization Part
+        viz_dict_body = {"query":f"Please find datapoints which we can plot (do not just provide plot ideas, give datapoints for the plot as well), if possible for the text found for the current section text.\nCurrent Section Text:\n{curr_panel_steps_string}\n\n And the summary of previous sections for your context:\n{self.prev_summary_viz_tab}"}
+        viz_plot_details = FUNCTION_APIS_FUNCTION_DICT["BrowserTools"](viz_dict_body, visualization_bool=True)
+        viz_dict_body_in = {
+            "query": "Please plot the following data if relevant and if there is any data.",
+            "response": viz_plot_details["text"],
+            "index": self.panel_no
+        }
+        viz_answer = FUNCTION_APIS_FUNCTION_DICT["VizAgent"](viz_dict_body_in, no_search_bool=True)
+        viz_answer = viz_answer['text']
+        print("\nviz_answer: ",viz_answer)
+        
+        # Table Part
+        table_dict_body = {"query":f"Please find relevant information for building extensive and data rich tables (tables having enough information to span multiple pages, but if that is not possible then smaller tables are also alright) if possible for the text found for the current section, please format the table in an appropriate manner.\nCurrent Section Text:\n{curr_panel_steps_string}\n\n And the summary of previous sections for your context:\n{self.prev_summary_viz_tab}"}
+        table_answer = FUNCTION_APIS_FUNCTION_DICT["BrowserTools"](table_dict_body, table_bool=True)
+        table_answer = table_answer["text"]
+        print("\ntable_answer : ",table_answer)
+
+        ###########
+        # Image Search Part
+        # Gettin a query to search for finding the right images using LLM
+        self.reset_chat_history()
+        prev_search_queries_string = "*\n".join(self.prev_search_queries)
+        self.chat_history.append({"role": "user", "content": f""""
+                                                                Your task is to produce a concise search query based on the text from a report section (provided below). When used as the query for an image search API, it should yield suitable image results that serve as the primary (hero) image for the section.
+                                                                Because there are multiple sections, avoid generic queries. Instead, make your query specific to each section’s context. You will also be given the report title and previous image section queries to ensure no duplicates and maintain diversity.
+
+                                                                Requirements:
+                                                                1. Reflect the core theme or topic of the text. Give it more depth than simply the report title, based on the specifcs of the text.
+                                                                2. End with the word “illustration” to increase the chances of finding a suitable primary image.
+                                                                3. Include no extra text or formatting—no prefixes like “query:” or further explanations.
+                                                                4. Keep it short and relevant for better results.
+                                                                5. Provide distinct queries for each section—don’t repeat.
+                                  
+                                                                ##############################
+                                                                # Report Title
+                                                                {self.user_query}
+
+                                                                ##############################
+                                                                {prev_search_queries_string}
+
+                                                                ###########################
+                                                                Text from the section:
+                                                                {curr_panel_steps_string}
+
+                                                                ###########################
+                                                                Your Output:
+                                                            """})
+        print("self.chat_history : ",self.chat_history)
+        search_query = self.generate()
+        # addingg to the prev_search_queries set
+        self.prev_search_queries.append(search_query)
+        print("image search query: ",search_query)
+        # Doing the search
+        search_params = {
+        "q": search_query,
+        "engine": "google_images",
+        "ijn": "0",
+        "api_key": os.environ["SERPAPI_API_KEY"]
+        }
+
+        # search_results = serpapi.search(search_params)
+        # image_results = search_results["images_results"][:10]
+        try:
+            search_results = GoogleSearch(search_params)
+            search_results_dict = search_results.get_dict()
+            images_results = search_results_dict["images_results"][:20]
+            image_links = [result["original"] for result in images_results]
+        except Exception as e:
+            print(f"SerpAPI failed. If its happening on every try then check. Error: {str(e)}")
+            image_links = []
+        print("serpapi retrieved image links : ",image_links)
+
+        # Calling multimodal LLM for getting the right image for the image search
+        selected_img_link = None
+        print("\nself.prev_img_links : ",self.prev_img_links)
+        for img_link in image_links:
+            if img_link in self.prev_img_links:
+                # To avoid same images from repeating
+                continue
+            success_bool, mllm_resp = vision_qa(curr_panel_steps_string, img_link)
+            if success_bool and "yes" in mllm_resp.lower():
+                selected_img_link = img_link
+                break
+        print("\nselected_img_link : ",selected_img_link)
+        if selected_img_link is not None:
+            success_bool = save_image_from_url(selected_img_link, f"img_search_{self.panel_no}.png")
+            if success_bool:
+                # adding to the prev_img_links set
+                self.prev_img_links.append(selected_img_link)
+                search_img_path = f"img_search_save/img_search_{self.panel_no}.png"
+                print("search_img_path: ",search_img_path)
+                final_workflow_with_values = f"Primary image for the section is saved at: {search_img_path}\n\n" + final_workflow_with_values 
+   
+        final_workflow_with_values = final_workflow_with_values + f"\nVisualization Attempt Response for this section:\n{viz_answer}\n" + f"\Table formulation Attempt Response for this section:\n{table_answer}\n"
+
+        #########
+        # Adding visualization and table findings to the summary
+        self.reset_chat_history()
+        self.chat_history.append({"role": "user", "content": f"Visualization Attempt Response for this section:\n{viz_answer}"})
+        self.chat_history.append({"role": "user", "content": f"Table formulation Attempt Response for this section:\n{table_answer}"})
+        self.chat_history.append({"role": "user", "content": self.step_summarizer_prompt})
+        step_summary = self.generate()
+        # print("\nstep_summary : ",step_summary)
+        self.prev_summary_viz_tab = self.prev_summary_viz_tab + f"\nVisualization and Table summary:\n{step_summary}"
+        #########
+        # Getting user readable output written in latex code
+        run_read_success=False
+        run_read_count = 0
+        while not run_read_success and run_read_count < 6:
+            try:
+                self.reset_chat_history()
+                self.chat_history.append({"role": "user", "content": self.user_readable_output_prompt})
+                self.chat_history.append({"role": "user", "content": final_workflow_with_values})
+                output = self.generate(o1_bool=True)
+                if not ('section' in output.split('$$FORMATTED_OUTPUT$$')[-1] or 'subsection' in output.split('$$FORMATTED_OUTPUT$$')[-1]):
+                    raise ValueError("Wrong Format")
+                run_read_success = True
+                run_read_count += 1
+            except Exception as e:
+                run_read_count += 1
+
         print("output.split('$$FORMATTED_OUTPUT$$')[-1] : ", output.split('$$FORMATTED_OUTPUT$$')[-1])
+        self.prev_sections_summary = self.prev_summary
         return {
             'panel_description' : self.panel_description,
             'output' : output.split('$$FORMATTED_OUTPUT$$')[-1]

@@ -1,142 +1,236 @@
-Instructions:
-Please write one section of the report at a time, based on the provided panel step output.
+Instruction Prompt:
 
-Important Formatting & Professionalism Guidelines:
+Please write one section of the report at a time, based on the provided step output. Remember that internal or "chain-of-thought" reasoning should appear only in the $$CHAIN_OF_THOUGHT$$ block and nowhere else. Likewise, the placeholders $$CHAIN_OF_THOUGHT$$, $$REPORT_SECTION$$, and $$REFERENCES$$ must only appear in their designated blocks and not in other parts of the output.
+Do not hallucinate the content of your output. You need to follow the current steps output details provided, and adhere to the content provided in that.
 
-- The report should always begin with a title at the start, before the introduction section. But remember that we are writing one section at a time, so only the first time you need to do this, and not again and again.
-- The final PDF report should have a professional look with reduced line spacing and consistent font sizes. Headings should be distinct and readable, but not excessively large. Use a clean, professional serif font (e.g., "Georgia" or "Times New Roman") for body text and a clean, professional sans-serif font (e.g., "Helvetica Neue") for headings.
-- The references, bullet points, and main text should be harmonized in terms of font size and spacing to ensure a consistent, professional look throughout the report.
-- The table should be white in color (white background) with contrasting text and borders for a professional look. In LaTeX, by default, tables have a white background. Ensure you use professional formatting (e.g., booktabs package for clean lines) and appropriate font choices.
-- Tables must fit within page boundaries. Always use the longtable environment for all tables so that if the content is too large to fit on one page, the table will automatically continue onto the next page. If the content is too wide, prefer vertical elongation or adjust column widths rather than cutting off horizontally. Include \usepackage{longtable} in the preamble.
-- Tables should include vertical lines between columns for better readability. Content in tables should be left-aligned by default and have sufficient spacing between rows for clarity. Adjust row spacing using commands like \renewcommand{\arraystretch}{1.5}.
-- Figures and tables must be accompanied by captions. Captions should be italicized, slightly smaller in font size than the body text, and centered beneath the figure/table. Each figure and table should be numbered (e.g., "Figure 1:" or "Table 1:"), and the text must refer to them explicitly (e.g., "As shown in Figure 1..." or "See Table 1 below...") to maintain a cohesive narrative. Always integrate figures and tables within the relevant subsection’s narrative; do not create a separate standalone subsection just for a figure.
-- Bullet points must use proper LaTeX environments such as itemize for clarity. Do not use `-` or other symbols to denote list items. Each item in the bullet list must appear on a new line.
-- References should always be formatted as hyperlinked text using the hyperref package, and long URLs must wrap correctly without exceeding page margins. Replace visible URLs with descriptive text (e.g., "Overview of Renewable Energy Sources").
-- If any subsection is related to visual data (figures, charts, or tables), do not create a new separate subsection for that figure/table. Instead, integrate the figure/table and its explanation directly within the previous subsection’s narrative. Always properly reference the figure/table in the narrative before it appears.
-- Excessive vertical spacing (e.g., between the title and Section 1) should be avoided. Use LaTeX preamble commands such as \setlength{\droptitle} or the titlesec package to optimize vertical spacing.
-- The styling changes and numbering of figures/tables must be followed consistently throughout the report. The examples provided at the end are illustrative; the instructions here are binding for the entire report.
-- For tables and figures, you need to keep a global count and accordingly tag them with the appropriate table number and figure number. Do not start a new table and figure numbering for each section.
-- Do not include a conclusion or summary paragraph in each section. The conclusion section will be included at the end of the entire report. Moroever do not create a new subsection for summary tables or visualization plots.
-- You have to strictly follow LaTeX formatting for everything and not get confused by HTML-formatted inputs. Inputs in `** **` or `-` are incorrect and must be properly converted to valid LaTeX formats such as \textbf{} and \item.
-- Do not add a \end{document} at the end anywhere, always. That will be done manually later.
+#######
+1. Overall Report Requirements
 
-Instructions for Each Iteration:
+- Report Title
+  - The report should begin with a title at the very start, before the Introduction section.
+  - Since the report is written one section at a time, only include the title the first time. Do not repeat the title in subsequent sections.
 
-1. Input and Output Context:
-   - You will be provided with:
-     - The user query for the report generation ({user_query})
-     - Section Details ({section_details}) that outline the desired structure of the report
-     - The current panel step output ({panel_steps}), which may represent a potential section or part of a section
-     - The report written so far ({report_so_far})
+- Professional Appearance
+  - Use a professional serif font (e.g., "Georgia" or "Times New Roman") for body text and a clean sans-serif font (e.g., "Helvetica Neue") for headings.
+  - Maintain consistent font size throughout.
+  - Employ slightly reduced line spacing for a professional look.
+  - Headings should be distinct but not overly large.
+  - Do not include section or sub-section numbers like Section X or Sub-Section X, just write the section or sub-section title
 
-   Your job is to produce one report section at a time, integrating the provided panel step content if it is relevant and does not duplicate previously included material.
+- Spacing and Consistency
+  - Keep references, bullet points, and main text harmonized in terms of font size and spacing.
+  - Avoid excessive vertical spacing (for instance, between the title and the first section). If needed, use \setlength{\droptitle} or the titlesec package to optimize spacing.
 
-2. Chain of Thought Section:
-   - Before writing the report section, produce a $$CHAIN_OF_THOUGHT$$ block where you reason about whether to use the current panel step.
-   - Mention the selected panel in the Chain of Thought (e.g., "Selected Panel for Current Section: Panel X").
-   - Explain why you are using or skipping the panel. If you use it, explain how it fits logically into the report.
-   - Confirm in your Chain of Thought that you will integrate the formatting and styling improvements (such as proper fonts, spacing, white background tables with contrasting text and borders, left-aligned and spacious table content with vertical lines, centered figure/table captions, properly formatted bullet points, professional referencing with hyperlinked text) and always use longtable for tables if needed.
-   - Confirm that if the table content is large, you will consider using longtable to allow the table to flow to the next page rather than getting cut off, ensuring vertical elongation instead of horizontal cutting.
-   - Confirm that you will integrate figures and tables within the narrative, referencing them properly before they appear and not placing them in separate standalone subsections. Each section written should be well integrated into the overall report.
-   - In your Chain of Thought, always keep track of how many tables and figures have appeared before in the report. If in the current section there is any table or figure, assign the next appropriate number.
-   - Do not include a conclusion or summary paragraph in each section. The conclusion will be included only at the end of the entire report.
-   - Moroever do not create a new subsection for summary tables or visualization plots.
-   - Strictly follow LaTeX formatting for everything. Inputs like `** **` or `-` must be converted to \textbf{} or \item.
-   - Do not add a \end{document} at the end anywhere.
+- LaTeX Usage and Compatibility
+  - You must strictly use LaTeX formatting, to avoid latex syntax related errors.
+  - Converting ** ** or - to proper LaTeX macros (e.g., \textbf{} for bold, \item for bullet points) is mandatory.
+  - Do not add \end{document} at any point—this will be handled later.
+  - Use only packages compatible with pdflatex (e.g., do not use fontspec, which requires xelatex).
+  - To avoid the error ""Illegal unit of measure (pt inserted)", be careful of the places where a unit specification might be required in the latex code.
 
-   Important Note for Introduction:
-   - For the introduction section, always use the Section Details as the authoritative source for the structure of the report. Ignore any potentially conflicting structure suggested by the panel content.
-   - Confirm in your Chain of Thought that you will follow the Section Details, maintain the improved formatting and referencing style, and ensure any figures or tables introduced are properly referenced and integrated into the narrative.
+- Figures and Tables
+  - Refer to each figure/table in the main text before it appears.
+  - Place figures and tables within the subsection that discusses them (avoid standalone subsections solely for a figure/table).
+  - Use captions that are italicized, slightly smaller in font size, and centered beneath the figure or table.
+  - For figures, use the [H] placement specifier so they remain exactly where you place them in the report.
+  - Each figure/table must be numbered sequentially across the entire report (e.g., Table 1, Table 2, Figure 1, Figure 2).
+  - Do not repeat the numbering for each section.
+  - Never duplicate "Table X: Table X..." or "Figure X: Figure X..." in captions. Simply write the caption text; LaTeX adds "Table X" or "Figure X" automatically.
+  - Figure paths are either like img_search_save/some_image_name.png or save_viz/plot/some_image_name.png, dont turn them into ./img_search_save/some_image_name.png or ./save_viz/plot/some_image_name.png
 
-3. Writing the Report Section:
-   - Produce a $$REPORT_SECTION$$ block containing the new section of the report in LaTeX form.
-   - At the very beginning of the entire report (in the first iteration), include a LaTeX preamble that sets up fonts, spacing, and other styling once. Do not repeat the preamble in subsequent sections.
-   - Use \section{}, \subsection{}, and normal LaTeX paragraphs to structure the report instead of HTML tags. We have to strictly follow LaTeX formatting for everything and not get confused by HTML-formatted inputs.
-   - Inputs in `** **` or `-` are not the correct way to format bold text or lists in LaTeX. Always use proper LaTeX environments, such as \textbf{} for bold text and itemize for lists.
-   - Ensure the text is well-spaced and uses consistent fonts throughout. Avoid unnecessary vertical spacing, especially between the title and the first section.
-   - When including tables or figures:
-     - Refer to them in the text before displaying them.
-     - Use the longtable environment for all tables. If the table is long, longtable will allow it to continue across pages.
-     - Include visible vertical and horizontal cell borders for clarity. Ensure sufficient row spacing using:
-       \renewcommand{\arraystretch}{1.5}
-       \usepackage{array, longtable}
-       \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
-     - Include captions with \caption{\textit{...}}
-     - Ensure tables have a white background, contrasting text, and visible borders for a professional look. Bold text for headers if needed.
-     - For figures, ensure they are properly referenced in the text, integrated in the same subsection, and do not form a standalone subsection. Use consistent numbering and ensure figures have adequate explanatory captions.
-   - Bullet points must use the itemize environment.
-   - For references, always ensure hyperlinks wrap properly using the hyperref package. Replace visible URLs with descriptive hyperlink text.
-   - After writing the section content, include a $$REFERENCES$$ block at the end of the report:
-     - For each section, create a subsection heading for references, e.g., \subsection*{Section X: [Section Title]}
-     - List references relevant to that section using descriptive hyperlinks.
-     - Do not merge references from different sections.
-   
-   Format for Report Section (LaTeX skeleton):
-   $$REPORT_SECTION$$
+- Tables: Specific Formatting
+  - All tables must use a white background (which is default in LaTeX).
+  - Prefer the threeparttable, threeparttablex for making the table. booktabs package (for professional lines) or standard rules, but vertical lines may be included if desired for clarity. Strictly do not use verbatim, that is not allowed, rather use longtable, threeparttable, threeparttablex, etc as mentioned and shown in examples.
+  - Always use the longtable environment so the table can continue across pages if it is too long. Include \usepackage{longtable} in the preamble.
+  - If the table is too wide, reduce column widths or span it vertically. Do not cut horizontally.
+  - Left-align table content by default. Increase spacing between rows using something like \renewcommand{\arraystretch}{1.5}.
+  - Each table must have a caption with \caption{\textit{...}}, placed directly beneath it.
+  - Inlcude the custom column types and custom colors in the preamble as shown in the examples.
+  - For tables set the column width appropriately small such that it fits withing the page limits and does not over-extend. Be on the very conservative side for this to avoid going out of page limits.
 
-   % Preamble only included once at the start of the entire report if this is the first section
+- Figures: Specific Formatting
+  - Include a caption with \caption{\textit{...}} for all figures.
+  - Integrate figures in the narrative (not as standalone subsections).
+  - Reference them in the text using the correct figure number (e.g., "See Figure 2").
+  - For figures, use the [H] placement specifier so they remain exactly where you place them in the report.
+  - Keep the width of images as 1.0
+  - If there is an image right after the \section, then let it be there and not rearrange.
 
-   \section{Section {X}: [Section Title]}
-   % Content
+- Bullet Points
+  - Use the itemize environment for bullet lists.
+  - Each bullet item (\item) should be on its own line.
 
-   \subsection{Subsection {X.Y}: [Subsection Title]}
-   % Content and tables/figures integrated in narrative
+- Referencing
+  - Hyperlink references with \href{...}{...} or similar (using the hyperref package).
+  - Replace raw URLs with descriptive hyperlink text whenever possible.
+  - Long URLs must wrap properly and not overflow.
 
-   \section{Section {X+1}: [Section Title]}
-   % Content
+- No Conclusion or Summary in Each Section
+  - Do not add concluding or summary paragraphs at the end of each section.
+  - The final Conclusion will be included once, after the entire report is complete.
 
-   \subsection{Subsection {X+1.Y}: [Subsection Title]}
-   % Content and tables/figures integrated in narrative
+####
+2. Instructions for Each Iteration
 
-   $$REFERENCES$$
-   \subsection*{Section {X}: [Section Title]}
-   % References here
+Input and Output Context
+1. You are given:
+   - {user_query}: The user's query for report generation.
+   - {section_details}: The authoritative structure for the report.
+   - {step_no}: Potential content to integrate into the current section.
+   - {error_message}: Any error which came when you tried for this section/step before
+   - {report_so_far}: The already-written sections.
 
-   \subsection*{Section {X+1}: [Section Title]}
-   % References here
+2. Produce Exactly One Section
+   - At each iteration, output a new section (or update an existing one) in LaTeX.
+   - Integrate the current {step_no} content if relevant, avoiding duplication of earlier material.
 
-4. Conclusion Section:
-   - When the panel output is "Conclusion," write a comprehensive conclusion summarizing the entire report using the content written so far.
-   - Follow the same referencing style in the conclusion. If no references are cited, include an empty references subsection.
-   - Avoid including a summary or conclusion in individual sections, only in the final conclusion.
+3. Output Sections
+   Each iteration's output must have:
+   - $$CHAIN_OF_THOUGHT$$: A block with your internal reasoning.
+   - $$REPORT_SECTION$$: A block containing the new or updated LaTeX section.
+   - $$REFERENCES$$: References for this iteration's section only (in hyperlinked form).
+   - Important: Use these placeholders only in the correct locations. The words $$CHAIN_OF_THOUGHT$$, $$REPORT_SECTION$$, and $$REFERENCES$$ must not appear anywhere else.
 
-5. References Section Handling:
-   - Each section must have its own $$REFERENCES$$ block.
-   - Use hyperref for all references.
+#######
+3. Chain of Thought Section (Internal Reasoning)
 
-6. Termination Condition:
-   - When all sections are processed, output $$TERMINATE$$ in the final iteration.
-   - Include a $$CHAIN_OF_THOUGHT$$ block before $$TERMINATE$$ confirming all panels processed.
+- In the $$CHAIN_OF_THOUGHT$$ block, you should:
+  - Indicate which step is selected and being processed (e.g., "Selected Step for Current Section: Step X").
+  - Explain how (and why) you are using it or skipping it.
+  - Confirm that you will maintain consistent formatting (fonts, spacing, LaTeX rules, references, etc.).
+  - If you include any tables/figures in the new section, note the current global counts to assign the correct numbering.
+  - Emphasize you will not create extra standalone subsections for figures/tables or for summary segments.
+  - Mention that you will follow the structure from {section_details}, especially for the Introduction.
+  - Do not include any real agent constraints, rule following, or mention of failed attempts in the user-facing final text. Similarly do not mention things like step or panel in the final text, as we have to provide a professional report and not explain our internal reasoning.
+  Try to be careful about latex syntax, to avoid errors.
 
-7. Avoiding Confusion:
-   - Do not confuse panel step outputs with the report itself.
+- No conclusion paragraphs in the chain-of-thought or the section itself.
+- Do not place references inside this block.
+- Keep any internal reasoning or justification strictly here. This block is never part of the main report text.
+- Strictly do not include the words $$CHAIN_OF_THOUGHT$$, $$REPORT_SECTION$$, or $$REFERENCES$$ inside the chain-of-thought text, else there will be an error.
 
-8. No Mention of External Agents:
-   - Do not attribute tables or figures to any agent.
+#######
+4. Writing the Report Section
 
-Additional Guidelines:
-- Process panels in sequence. If irrelevant, produce empty $$REPORT_SECTION$$ and references structure.
-- For introduction, follow Section Details strictly. For conclusion, summarize entire report.
+Inside the $$REPORT_SECTION$$ block:
 
-- Do not add \end{document} at the end.
+1. Preamble (Only Once)
+   - Include a LaTeX preamble (fonts, spacing, etc.) only in the very first section you produce. Do not repeat this for subsequent sections. On the first iteration include \tableofcontents after begin document.
 
----
+2. Structure
+   - Use standard LaTeX sectioning (\section{}, \subsection{}, etc.).
+   - No HTML tags.
+   - Follow {section_details} for the official structure if there's any conflict.
+   - Ensure each sub-part is well spaced and logically placed.
+   - Do not include section or sub-section numbers like Section X or Sub-Section X, just write the section or sub-section title
 
+3. Tables/Figures
+   - Refer to each table/figure before it appears.
+   - Assign the next global numbering (e.g., "Table 3" or "Figure 2")—do not restart numbering per section.
+   - Inlcude the custom column types and custom colors in the preamble as shown in the examples.
+   - Use longtable for all tables:
+     
+     \usepackage{array, longtable}
+     \renewcommand{\arraystretch}{1.5}
+     \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+     
+   - Captions must be italicized via \caption{\textit{...}}.
+   - For tables set the column width appropriately small such that it fits withing the page limits and does not over-extend. Be on the very conservative side for this to avoid going out of page limits.
+
+4. Bullet Points
+   - Always use the itemize environment:
+     
+     \begin{itemize}
+       \item ...
+       \item ...
+     \end{itemize}
+
+5. References
+   - No references go here.
+   - The references for this section only go in the $$REFERENCES$$ block.
+
+6. No Conclusions
+   - Do not include a conclusion or summary in each section.
+   - The overall conclusion of the entire report is reserved for the final iteration.
+
+#######
+5. References Section (for Each Iteration)
+
+- After $$REPORT_SECTION$$, provide a $$REFERENCES$$ block with references relevant only to the current step's content.
+
+- Formatting Guidelines for $$REFERENCES$$:
+  1. Each section's references must be placed under a single subsection heading exactly same as the current section's title and nothing else:
+     
+     $$REFERENCES$$
+     \subsection{Section Title}
+     % List of references
+     
+  2. Use descriptive hyperlinked text for URLs:
+     
+     \href{http://example.com}{Descriptive Link Text}
+     
+  3. Do not merge references from previous sections or future sections.
+  4. If no references are used in the current section, provide an empty references subsection.
+
+#######
+6. Conclusion Section
+
+- When the step output indicates "Conclusion," you will:
+  - Summarize the entire report content.
+  - Continue using LaTeX formatting standards.
+  - Provide a final $$REFERENCES$$ subsection if there are any references in the conclusion; otherwise, it can remain empty.
+  - Do not insert partial references for earlier sections. Each section's references are handled only within that section.
+
+#######
+7. Additional Reminders
+
+- If a step's content is irrelevant, simply skip it or produce an empty $$REPORT_SECTION$$ and $$REFERENCES$$ structure.
+- Do not mention external agents in the final text (e.g., "the agent says..."). Similarly do not mention things like step or panel in the final text, as we have to provide a professional report and not explain our internal reasoning.
+- Never insert \end{document}.
+- Keep using the correct table/figure numbering throughout the entire report.
+- Do not include section or sub-section numbers like Section X or Sub-Section X, just write the section or sub-section title
+- Ensure you do not use the placeholders $$CHAIN_OF_THOUGHT$$, $$REPORT_SECTION$$, and $$REFERENCES$$ anywhere other than their respective designated blocks. This prevents parsing issues. Do not use the words $$REPORT_SECTION$$, and $$REFERENCES$$ inside the $$CHAIN_OF_THOUGHT$$ else there will be an error.
+- Each section's references must be placed in the $$REFERENCES$$ portion of your output under a single subsection heading exactly same as the current section's title and nothing else.
+- For tables set the column width appropriately small such that it fits withing the page limits and does not over-extend. Be on the very conservative side for this to avoid going out of page limits.
+- Avoid making syntactical errors in latex for example you sometimes do \begin{itemize>...some content..\end{itemize> instead of \begin{itemize}...some content..\end{itemize}. Also in tables and figures take care and avoid any syntactcal errors.
+- For points use \item or something apppropriately for latex, and nothing else like - or * or circle pointer.
+- Figure paths are either like img_search_save/some_image_name.png or save_viz/plot/some_image_name.png, dont turn them into ./img_search_save/some_image_name.png or ./save_viz/plot/some_image_name.png
+
+#######
+8. Strict Usage of Blocks
+
+- Each iteration's output must contain exactly three blocks, in this order:
+  1. %%%% START CHAIN_OF_THOUGHT (on its own line) then $$CHAIN_OF_THOUGHT$$
+  2. %%%% START REPORT_SECTION (on its own line) then $$REPORT_SECTION$$
+  3. %%%% START REFERENCES (on its own line) then $$REFERENCES$$
+
+- Example:
+
+%%%% START CHAIN_OF_THOUGHT
+$$CHAIN_OF_THOUGHT$$
+[chain of thought text]
+
+%%%% START REPORT_SECTION
+$$REPORT_SECTION$$
+[report section text in latex]
+
+%%%% START REFERENCES
+$$REFERENCES$$
+\subsection{Section Title}
+[references]
+
+- The words $$CHAIN_OF_THOUGHT$$, $$REPORT_SECTION$$, and $$REFERENCES$$ signify the start of each block. Do not use them as closing statements or repeat them inside any block.
+
+- Do not mention these placeholders anywhere in the chain-of-thought text, the LaTeX report section, or in the references themselves. Only place them once at the top of each block.
+
+################################
 ### Example:
 
 User Query:
 Analyze how the increased use of renewable energy sources like solar and wind power has affected carbon emission levels worldwide over the past decade.
 
-Section Details:
-1. Introduction to Renewable Energy and Carbon Emissions
-2. Historical Context of Energy Use
-3. Growth Trends in Renewable Energy (2014-2023)
-4. Solar Power Developments
-5. Wind Power Developments
-6. Impact on Carbon Emission Levels
-
-Panel Step 1 Output:
-Panel 1: Introduction
+Step 1 Output:
+Step 1: Introduction
 - Background
 - Importance
 - Overview
@@ -145,13 +239,16 @@ Report Written So Far: None
 
 Your Output:
 
+%%%% START CHAIN_OF_THOUGHT
 $$CHAIN_OF_THOUGHT$$
-Selected Panel for Current Section: Panel 1
+Selected Step for Current Section: Step 1
 Use it for Section 1 as it matches introduction
 No figures/tables yet
 Will follow formatting rules
 No \end{document}
+I will not use the placehodler names anywhere else apart from the block starting to signify their start.
 
+%%%% START REPORT_SECTION
 $$REPORT_SECTION$$
 
 \documentclass[12pt]{article}
@@ -160,16 +257,30 @@ $$REPORT_SECTION$$
 \usepackage{lmodern}
 \usepackage[T1]{fontenc}
 \usepackage{amsmath, amssymb, graphicx, booktabs, caption, url, hyperref, longtable, array, xcolor, titling, sectsty, titlesec}
+\usepackage{float}
+\usepackage{pdflscape}
+\usepackage{colortbl}
+\usepackage{ragged2e}
+\usepackage{threeparttablex}
+\usepackage{threeparttable}
+\usepackage{siunitx}
 
 \allsectionsfont{\sffamily\bfseries}
 \setstretch{1.1}
 \captionsetup{font={small,it},justification=centering}
 \setlength{\droptitle}{-2cm}
-\titlespacing*{\section}{0pt}{*1}{*0.5}
+\titlespacing{\section}{0pt}{1ex}{0.5ex}
 
+% Define custom column types
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
-\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+\newcolumntype{J}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+% Define colors for table rows
+\definecolor{tableHeader}{RGB}{220,230,240}
+\definecolor{tableRow1}{RGB}{255,255,255}
+\definecolor{tableRow2}{RGB}{245,245,245}
+\definecolor{myblue}{RGB}{65,105,225}
 
 \hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue,breaklinks=true}
 
@@ -179,16 +290,18 @@ $$REPORT_SECTION$$
 
 \begin{document}
 \maketitle
+\tableofcontents
 
-\section{Section 1: Introduction to Renewable Energy and Carbon Emissions}
+\section{Introduction to Renewable Energy and Carbon Emissions}
 Renewable energy sources—such as solar and wind—have emerged as critical drivers in the global effort to combat climate change. Over the past decade, improvements in technology, declining costs, and supportive policies have facilitated a rapid increase in the adoption of these cleaner energy sources. Unlike fossil fuels, renewable energy provides a sustainable means of electricity generation without significantly contributing to greenhouse gas emissions.
 
 Carbon emissions, primarily in the form of carbon dioxide (CO$_2$), are central to climate change discussions. Conventional energy generation methods have relied heavily on coal, oil, and natural gas, resulting in substantial emissions contributing to global warming and environmental degradation. By analyzing how the expansion of solar and wind power has influenced carbon emission levels, we can better understand the role of renewable energy in building a more sustainable future.
 
 Following this introduction, the report will present a historical context of energy use, examine growth trends in renewable energy from 2014 to 2023, explore the development of solar and wind power, and assess their collective impact on carbon emissions. Additionally, it will consider regional patterns, policy frameworks, and economic factors shaping the global renewable energy landscape.
 
+%%%% START REFERENCES
 $$REFERENCES$$
-\subsection*{Section 1: Introduction to Renewable Energy and Carbon Emissions}
+\subsection{Introduction to Renewable Energy and Carbon Emissions}
 \begin{itemize}
 \item \href{https://www.example.com/reference1}{Overview of Renewable Energy Sources}
 \item \href{https://www.example.com/reference2}{Impact of Fossil Fuels on Carbon Emissions}
@@ -199,22 +312,46 @@ $$REFERENCES$$
 
 #### Example 2: Short Illustrative Snippet (Not the Entire Prompt Output)
 
+%%%% START CHAIN_OF_THOUGHT
+$$CHAIN_OF_THOUGHT$$
+No figures/tables yet
+Will follow formatting rules
+No \end{document}
+I will not use the placehodler names anywhere else apart from the block starting to signify their start.
+
+%%%% START REPORT_SECTION
+$$REPORT_SECTION$$
+
 \documentclass[12pt]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{setspace}
 \usepackage{lmodern}
 \usepackage[T1]{fontenc}
 \usepackage{amsmath, amssymb, graphicx, booktabs, caption, url, hyperref, longtable, array, xcolor, titling, sectsty, titlesec}
+\usepackage{float}
+\usepackage{pdflscape}
+\usepackage{colortbl}
+\usepackage{ragged2e}
+\usepackage{threeparttablex}
+\usepackage{threeparttable}
+\usepackage{siunitx}
 
 \allsectionsfont{\sffamily\bfseries}
 \setstretch{1.1}
 \captionsetup{font={small,it},justification=centering}
 \setlength{\droptitle}{-2cm}
-\titlespacing*{\section}{0pt}{*1}{*0.5}
+\titlespacing{\section}{0pt}{1ex}{0.5ex}
 
+% Define custom column types
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
-\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+\newcolumntype{J}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+% Define colors for table rows
+\definecolor{tableHeader}{RGB}{220,230,240}
+\definecolor{tableRow1}{RGB}{255,255,255}
+\definecolor{tableRow2}{RGB}{245,245,245}
+\definecolor{myblue}{RGB}{65,105,225}
 
 \hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue,breaklinks=true}
 
@@ -224,44 +361,75 @@ $$REFERENCES$$
 
 \begin{document}
 \maketitle
+\tableofcontents
 
-\section{Section 2: Historical Context of Energy Use}
-As shown in Table~\ref{tab:fossil_consumption}, historical reliance on fossil fuels formed a baseline for today’s energy production challenges.
+\section{Historical Context of Energy Use}
+As shown in Table 2, historical reliance on fossil fuels formed a baseline for today’s energy production challenges.
 
-\renewcommand{\arraystretch}{1.5}
+\begin{ThreePartTable}
+{\fontsize{6pt}{7pt}\selectfont
+\renewcommand{\arraystretch}{1.1}
+\begin{longtable}{
+    L{0.5cm}  % Year
+    L{1.0cm}  % Coal
+    L{1.0cm}  % Oil
+    L{1.0cm}  % Natural Gas
+}
+    \caption{\textit{Fossil fuel consumption trends (2005--2010).}} \label{tab:fossil_consumption} \\
+    \toprule
+    \rowcolor{tableHeader}
+    \textbf{Year} &
+    \textbf{Coal Consumption (EJ)} &
+    \textbf{Oil Consumption (EJ)} &
+    \textbf{Natural Gas Consumption (EJ)} \\
+    \midrule
+    \endfirsthead
 
-\begin{longtable}{|L{4cm}|C{3cm}|C{3cm}|C{3cm}|}
-\caption{\textit{Fossil fuel consumption trends (2005–2010).}}\label{tab:fossil_consumption}\\
-\hline
-\textbf{Year} & \textbf{Coal Consumption (EJ)} & \textbf{Oil Consumption (EJ)} & \textbf{Natural Gas Consumption (EJ)} \\
-\hline
-\endfirsthead
-\caption*{\textit{(Continued)}}\\
-\hline
-\textbf{Year} & \textbf{Coal Consumption (EJ)} & \textbf{Oil Consumption (EJ)} & \textbf{Natural Gas Consumption (EJ)} \\
-\hline
-\endhead
+    \multicolumn{4}{c}{{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+    \toprule
+    \rowcolor{tableHeader}
+    \textbf{Year} &
+    \textbf{Coal Consumption (EJ)} &
+    \textbf{Oil Consumption (EJ)} &
+    \textbf{Natural Gas Consumption (EJ)} \\
+    \midrule
+    \endhead
 
-2005 & 130 & 160 & 90 \\
-\hline
-2010 & 150 & 175 & 100 \\
-\hline
+    \midrule
+    \multicolumn{4}{r}{{\textit{(Continued on next page)}}} \\
+    \endfoot
+
+    \bottomrule
+    \endlastfoot
+
+    % ------------------------------ ROWS BEGIN ------------------------------
+    \rowcolor{tableRow1}
+    2005 & 130 & 160 & 90 \\
+    
+    \rowcolor{tableRow2}
+    2010 & 150 & 175 & 100 \\
+    % ------------------------------ ROWS END --------------------------------
+
 \end{longtable}
+} % end of \fontsize
+\end{ThreePartTable}
 
-In Figure~\ref{fig:energy_mix}, the gradual decline of coal and the rise of renewable sources are visually represented.
+In Figure 3, the gradual decline of coal and the rise of renewable sources are visually represented.
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{path_to_figure/figure1.png}
+\includegraphics[width=1.0\textwidth]{path_to_figure/figure1.png}
 \caption{\textit{Evolution of the global energy mix, showing a decrease in coal reliance and an increase in wind and solar.}}
 \label{fig:energy_mix}
 \end{figure}
 
 To model the transition to renewable energy, we often analyze probabilistic behavior. Optimization techniques such as minimizing the cross-entropy loss are critical in forecasting models.
 
+%%%% START REFERENCES
 $$REFERENCES$$
-\subsection*{Section 2: Historical Context of Energy Use}
+\subsection{Historical Context of Energy Use}
 \begin{itemize}
 \item \href{https://example.com/historical_energy_data}{Historical Energy Data}
 \item \href{https://example.com/energy_mix_trends}{Energy Mix Trends: A Decade of Transition}
 \end{itemize}
+################################

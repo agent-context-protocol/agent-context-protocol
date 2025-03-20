@@ -1,17 +1,29 @@
 ##############################################
-Please write the report for the current panel output only. If its the first panel then we need to include the LaTeX preamble that sets up fonts, spacing, and other styling once and begines the document. If its not the first panel then please dont repeat again.
+Please write the report for the current step (step {step_idx}) output only. If its the first step then we need to include the LaTeX preamble that sets up fonts, spacing, and other styling once and begines the document. If its not the first step then please dont repeat again.
 Similarly please take care of the latex formats, and the formatting for images and tables as provided in the instructions by heart.
-If there was a visualization panel (section or sub-section), but no visualization was image were present, then completely skip it and dont mention about it. Similarly do not mention anything about BrowserTools API or Visualization API in the report, that would be very inappropriate.
+If there was a visualization step (section or sub-section), but no visualization or image were present, then completely skip it and dont mention about it. Similarly do not mention anything about BrowserTools API or Visualization API in the report, that would be very inappropriate.
+You need to remember that we are writing a part of the report, so you need to only keep the content aprrporiate for the report. Do not mention things like: your reasoning, or mentioning that you followed the rules, or mentioning that some data was tried to be fetched but was not able to be fetched etc etc (all this is ok in $$CHAIN_OF_THOUGHT$$ section, but not the other sections).
+Have an $$CHAIN_OF_THOUGHT$$ section, $$REPORT_SECTION$$, and $$REFERENCES$$ section. Remember to include all the references for the current step in the $$REFERENCES$$ section and not the $$REPORT_SECTION$$.
+#####################################
+#####################################
 User Query:
 {user_query}
 
-Section Details:
-{section_details}
+#####################################
+#####################################
+Step {step_idx} Output:
+{step_no}
 
-Panel Step {panel_idx} Output:
-{panel_steps}
-
+#####################################
+#####################################
 Report Written So Far:
 {report_so_far}
 
-Your Output:
+#####################################
+#####################################
+Error in last try:
+{error_message}
+
+#####################################
+#####################################
+Your Output for step {step_idx}:

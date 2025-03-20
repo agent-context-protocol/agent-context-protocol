@@ -6,19 +6,52 @@ import asyncio
 import time
 from concurrent.futures import ThreadPoolExecutor
 import signal
+from together import Together
 
 # Load environment variables from .env file
 load_dotenv()
 
+# o1_client = OpenAI()
+
 client = OpenAI()
-client_async = AsyncOpenAI()
+# client_async = AsyncOpenAI()
+client_async = None
+
+# client = OpenAI(
+#     api_key=os.getenv("GEMINI_API_KEY"),
+#     base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+# )
+
+# client = Together()
+
 # client_async = AsyncAzureOpenAI()
 # client = AzureOpenAI()
 
 # Calculate cost (update with actual pricing as per OpenAI's documentation)
+# 4o cost
 input_cost = 2.5
 output_cost = 10
+# O1 cost
+# input_cost = 15
+# output_cost = 60
+
 tokens = 1000000
+
+model_name = 'gpt-4o-2024-08-06'
+
+"""
+Model Options:
+# OpenAI
+gpt-4o-2024-08-06
+gpt-4-turbo-2024-04-09
+o1-2024-12-17
+
+# Together
+deepseek-ai/DeepSeek-R1
+
+# Google:
+gemini-2.0-flash
+"""
 
 class TimeoutException(Exception):
     pass
@@ -44,9 +77,9 @@ class BaseNode:
                 
                 # Set a timeout of 150 seconds for the chat completion
                 task = asyncio.create_task(client_async.chat.completions.create(
-                    model="gpt-4o-2024-08-06",
+                    model=model_name,
                     messages=self.chat_history,
-                    temperature=0
+                    temperature=0.5
                 ))
 
                 # Use asyncio.wait_for to enforce the timeout
@@ -81,15 +114,22 @@ class BaseNode:
             # Wait a short time before retrying to avoid immediate re-execution
             await asyncio.sleep(2)
 
-    def generate(self):
+    def generate(self, o1_bool=False):
         max_retries = 5
         timeout = 350
         def run_completion():
-            completion = client.chat.completions.create(
-                model="gpt-4o-2024-08-06",
-                messages=self.chat_history,
-                temperature=0
-            )
+            if o1_bool and 'gemini' not in model_name:
+                completion = client.chat.completions.create(
+                    model='o1-2024-12-17',
+                    messages=self.chat_history,
+                    # temperature=0.5
+                )
+            else:
+                completion = client.chat.completions.create(
+                    model=model_name,
+                    messages=self.chat_history,
+                    temperature=0.5
+                )
             token_usage = completion.usage  # Typically contains 'prompt_tokens', 'completion_tokens', and 'total_tokens'
             # print(token_usage)
             prompt_tokens = token_usage.prompt_tokens
@@ -97,7 +137,10 @@ class BaseNode:
                 
             # Calculate cost (update with actual pricing as per OpenAI's documentation)
             BaseNode.total_cost += (input_cost*prompt_tokens + output_cost*completion_tokens)/tokens
-            return completion.choices[0].message.content
+            if 'deepseek' in model_name:
+                return completion.choices[0].message.content.split(r'</think>')[-1]
+            else:
+                return completion.choices[0].message.content
 
         for attempt in range(1, max_retries + 1):
             try:

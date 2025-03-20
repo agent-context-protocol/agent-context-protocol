@@ -3,13 +3,13 @@ Your Current Role is: WORKFLOW_CREATION_REQUEST
 ### Your Task:
 
 1. Determine the APIs:
-   - For each panel, decide which APIs should be used. You are expected to select at least two APIs per panel. Frequently used APIs, such and Browser Tools, can always be considered, but you can also use other relevant APIs based on the panel's description.
+   - For each panel, decide which APIs should be used (Use only APIs which have been suggested as relevant apis. For eg., if VizAgent is not suggested then strictly dont use it.). You are expected to select at least two APIs per panel. Frequently used APIs, such and Browser Tools, can always be considered, but you can also use other relevant APIs based on the panel's description.
 
 2. Explain Your Chain of Thought:
    Before creating the workflow, explain your reasoning regarding how you are thinking about the workflow. Consider the following:
 
    - API Selection:
-     - Which APIs to choose for each panel.
+     - Which APIs to choose for each panel. If VizAgent is not suggested then strictly dont use it.
 
    - Input Parameters:
      - What are the input parameters of the APIs being used? What is the type of data each input parameter expects?
@@ -66,7 +66,7 @@ Your Current Role is: WORKFLOW_CREATION_REQUEST
    - Always choose the most straightforward, simple, and minimal workflow for each panel.
    - If there are more than 6 panels then we will put everything in the same group for simplicity. There should strictly be only 1 group in such situations.
 
-8. For Reports: If the topic is technical in nature then we should try to keep an appropriate amount of technical and mathematical aspects as well. And if applicable it is strongly recommended to explain engineering, finance, computer science or machine learning related things using mathematical aspects and equations to explain the technical concepts please
+8. Do not output things like [... remaining panels follow identical structure with full input variable descriptions and technical specificity ...]....when you have been told to correct an error. You have to output the whole workflow everytime, else the parsing wont happen properly.
 
 ### Important Note:
 
@@ -151,6 +151,7 @@ Your Current Role is: WORKFLOW_CREATION_REQUEST
 
 - Do not use ** or ` or # in your output strictly.
 
+- Do not output things like [... remaining panels follow identical structure with full input variable descriptions and technical specificity ...]....when you have been told to correct an error. You have to output the whole workflow everytime, else the parsing wont happen properly.
 
 ### Your Input:
 
@@ -1216,12 +1217,6 @@ Step 2
     - Source: API_Output (Panel 2, Step 1)
     - Description: Raw output of solar_wind_growth_data from previous step. Please provide raw output.
     - Value: None
-  - Name: panel_num_2
-    - Parameter: index
-    - Type: string
-    - Source: LLM_Generated
-    - Description: Panel number goes to the index parameter.
-    - Value: "2"
   - Name: visualization_query
     - Parameter: query
     - Type: string
@@ -1262,12 +1257,6 @@ Step 2
     - Source: API_Output (Panel 3, Step 1)
     - Description: Raw output of carbon_emission_data from previous step. Please provide raw output.
     - Value: None
-  - Name: panel_num_3
-    - Parameter: index
-    - Type: string
-    - Source: LLM_Generated
-    - Description: Panel number goes to the index parameter.
-    - Value: "3"
   - Name: visualization_query
     - Parameter: query
     - Type: string
@@ -1320,12 +1309,6 @@ Step 2
     - Source: API_Output (Panel 4, Step 1)
     - Description: Raw output of correlation_analysis from previous step. Please provide raw output.
     - Value: None
-  - Name: panel_num_4
-    - Parameter: index
-    - Type: string
-    - Source: LLM_Generated
-    - Description: Panel number goes to the index parameter.
-    - Value: "4"
   - Name: visualization_query
     - Parameter: query
     - Type: string
