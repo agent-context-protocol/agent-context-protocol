@@ -1,36 +1,36 @@
 import asyncio
 import json
-from interpreter import InterpreterNode
-from main_translator import MainTranslatorNode
-from local_translator import LocalTranslatorNode
+from task_decomposer import TaskDecompositionNode
+from dag_compiler import DAGCompilerNode
+from agent import AgentNode
 from concurrent.futures import ThreadPoolExecutor
 
-class Manager:
-    def __init__(self, workflow, main_translator, local_translator_system_prompt):
-        self.main_translator = main_translator
-        self.local_translator_system_prompt = local_translator_system_prompt
+class ACPManager:
+    def __init__(self, workflow, dag_compiler, agent_system_prompt):
+        self.dag_compiler = dag_compiler
+        self.agent_system_prompt = agent_system_prompt
         self.groups = {}
-        self.local_translators = {}
+        self.agents = {}
         self.thread_pool = ThreadPoolExecutor()
         
         for group_id, group_data in workflow.items():
             group_translators = []
             for translator_id, translator_data in group_data.items():
-                translator = LocalTranslatorNode(
+                translator = AgentNode(
                     int(translator_id),
                     translator_data["panel_description"],
-                    system_prompt=local_translator_system_prompt,
-                    main_translator=self.main_translator
+                    system_prompt=agent_system_prompt,
+                    dag_compiler=self.dag_compiler
                 )
                 translator.group_workflow = group_data
                 translator.group_id = group_id
                 translator.panel_workflow = translator_data["steps"]
-                self.local_translators[translator_id] = translator
+                self.agents[translator_id] = translator
                 group_translators.append(translator)
             self.groups[group_id] = group_translators
 
     async def run(self):
-        main_translator_task = asyncio.create_task(self.main_translator.process_queue())
+        dag_compiler_task = asyncio.create_task(self.dag_compiler.process_queue())
 
         group_tasks = []
         for group_id in self.groups.keys():
@@ -41,9 +41,9 @@ class Manager:
             group_id, group_results = await completed_task
             yield group_id, group_results
 
-        main_translator_task.cancel()
+        dag_compiler_task.cancel()
         try:
-            await main_translator_task
+            await dag_compiler_task
         except asyncio.CancelledError:
             pass
 
@@ -51,16 +51,16 @@ class Manager:
         for group_id, group_data in modified_workflow.items():
             group_translators = []
             for translator_id, translator_data in group_data.items():
-                translator = LocalTranslatorNode(
+                translator = AgentNode(
                     int(translator_id),
                     translator_data["panel_description"],
-                    system_prompt=self.local_translator_system_prompt,
-                    main_translator=self.main_translator
+                    system_prompt=self.agent_system_prompt,
+                    dag_compiler=self.dag_compiler
                 )
                 translator.group_workflow = group_data
                 translator.group_id = group_id
                 translator.panel_workflow = translator_data["steps"]
-                self.local_translators[translator_id] = translator
+                self.agents[translator_id] = translator
                 group_translators.append(translator)
             self.groups[group_id] = group_translators
 
@@ -100,33 +100,33 @@ class Manager:
     def __del__(self):
         self.thread_pool.shutdown(wait=True)
 
-class MainOrchestrator:
+class ACPOrchestrator:
     def __init__(self):
         self.get_system_prompts()
-        self.interpreter = InterpreterNode('interpreter', system_prompt=self.interpreter_system_prompt)
-        self.main_translator = MainTranslatorNode('main_translator', self.main_translator_system_prompt)
+        self.task_decomposer = TaskDecompositionNode('task_decomposer', system_prompt=self.task_decomposer_system_prompt)
+        self.dag_compiler = DAGCompilerNode('dag_compiler', self.dag_compiler_system_prompt)
 
     def get_system_prompts(self):
-        with open('prompts/interpreter_system_prompt.txt', 'r') as file:
-            self.interpreter_system_prompt = file.read()
+        with open('prompts/task_decomposer_system_prompt.txt', 'r') as file:
+            self.task_decomposer_system_prompt = file.read()
 
-        with open('prompts/main_translator/main_translator_system_prompt.txt', 'r') as file:
-            self.main_translator_system_prompt = file.read()
+        with open('prompts/dag_compiler/dag_compiler_system_prompt.txt', 'r') as file:
+            self.dag_compiler_system_prompt = file.read()
         
-        with open('prompts/local_translator/local_translator_system_prompt.txt', 'r') as file:
-            self.local_translator_system_prompt = file.read()
+        with open('prompts/agent/agent_system_prompt.txt', 'r') as file:
+            self.agent_system_prompt = file.read()
 
     async def initialise(self, user_query):
-        self.interpreter.user_query = user_query
-        panels_list = self.interpreter.setup()
-        workflow = self.main_translator.setup(user_query, panels_list)
+        self.task_decomposer.user_query = user_query
+        panels_list = self.task_decomposer.setup()
+        workflow = self.dag_compiler.setup(user_query, panels_list)
         return workflow
 
     async def run(self, user_query, workflow):
-        # Get initial setup from interpreter and send to main translator
-        # self.interpreter.user_query = user_query
-        # panels_list = self.interpreter.setup()
-        # workflow = self.main_translator.setup(user_query, panels_list)
+        # Get initial setup from task_decomposer and send to main translator
+        # self.task_decomposer.user_query = user_query
+        # panels_list = self.task_decomposer.setup()
+        # workflow = self.dag_compiler.setup(user_query, panels_list)
         
         # For now, we're loading the workflow from a file
         with open("workflow.json", "r") as json_file:
@@ -134,7 +134,7 @@ class MainOrchestrator:
 
         print("Workflow:", workflow)
 
-        communication_manager = Manager(workflow, self.main_translator, self.local_translator_system_prompt)
+        communication_manager = ACPManager(workflow, self.dag_compiler, self.agent_system_prompt)
         
         # Modify the Manager to yield results as groups complete
         # await communication_manager.run()
@@ -144,7 +144,7 @@ class MainOrchestrator:
 
 
 async def main():
-    orchestrator = MainOrchestrator()
+    orchestrator = ACPOrchestrator()
     await orchestrator.run("what is the weather in seattle, usa", '')
 
 if __name__ == "__main__":
