@@ -5,37 +5,37 @@ import asyncio
 from available_apis.rapid_apis_format.return_dict import RAPID_APIS_DICT, RAPID_REQD_PARAMS_DICT, RAPID_PARAMS_DICT
 from available_apis.function_format.return_dict import FUNCTION_APIS_DOCUMENTATION_DICT, FUNCTION_APIS_REQD_PARAMS_DICT, FUNCTION_APIS_PARAMS_DICT
 
-class MainTranslatorNode(BaseNode):
+class DAGCompilerNode(BaseNode):
     def __init__(self, node_name, system_prompt = None):
         super().__init__(node_name, system_prompt)
         self.get_system_prompts()
         self.clusters = {}
         self.lock = asyncio.Lock()
         self.queue = asyncio.Queue()
-        self.workflow = None
+        self.execution_blueprint = None
 
         self.unique_apis = {}
 
     def get_system_prompts(self):
-        # workflow_creation_prompt
-        with open('prompts/main_translator/workflow_creation_prompt.txt', 'r') as file:
-            self.workflow_creation_prompt = file.read()
+        # execution_blueprint_creation_prompt
+        with open('prompts/dag_compiler/execution_blueprint_creation_prompt.txt', 'r') as file:
+            self.execution_blueprint_creation_prompt = file.read()
 
-        # workflow_creation_prompt
-        with open('prompts/main_translator/status_assistance_prompt.txt', 'r') as file:
+        # execution_blueprint_creation_prompt
+        with open('prompts/dag_compiler/status_assistance_prompt.txt', 'r') as file:
             self.status_assistance_prompt = file.read()
 
     ########################
     # ALL THE PARSING FUNCTIONS WILL BE HERE
 
-    def parse_main_translator_workflow(self, text, restrict_one_group = False, modified_workflow_bool = False):
-        # First, split the text into CHAIN_OF_THOUGHT and WORKFLOW sections
-        sections = re.split(r"\$\$WORKFLOW\$\$", text)
+    def parse_dag_compiler_execution_blueprint(self, text, restrict_one_group = False, modified_execution_blueprint_bool = False):
+        # First, split the text into CHAIN_OF_THOUGHT and execution_blueprint sections
+        sections = re.split(r"\$\$execution_blueprint\$\$", text)
         if len(sections) != 2:
-            raise ValueError("The text does not contain exactly one CHAIN_OF_THOUGHT and one WORKFLOW section.")
+            raise ValueError("The text does not contain exactly one CHAIN_OF_THOUGHT and one execution_blueprint section.")
 
         chain_of_thought_text = sections[0].replace("$$CHAIN_OF_THOUGHT$$", "").strip()
-        workflow_text = sections[1].strip()
+        execution_blueprint_text = sections[1].strip()
 
         # Extract the CHAIN_OF_THOUGHT
         chain_of_thought = chain_of_thought_text
@@ -46,10 +46,10 @@ class MainTranslatorNode(BaseNode):
                 index += 1
             return index
 
-        # Now parse the WORKFLOW section
+        # Now parse the execution_blueprint section
         # Split based on "Group X:" separator
-        group_blocks = re.split(r"(Group \d+:)", workflow_text)
-        workflows = {}
+        group_blocks = re.split(r"(Group \d+:)", execution_blueprint_text)
+        execution_blueprints = {}
 
         for i in range(1, len(group_blocks), 2):
             group_header = group_blocks[i]
@@ -57,7 +57,7 @@ class MainTranslatorNode(BaseNode):
 
             # Extract group number
             current_group = int(re.search(r'\d+', group_header).group(0))
-            workflows[current_group] = {}
+            execution_blueprints[current_group] = {}
 
             group_lines = group_content.strip().split('\n')
             panels_in_group = []
@@ -72,23 +72,23 @@ class MainTranslatorNode(BaseNode):
 
                 line = group_lines[j].strip()
 
-                if line.startswith("Workflow for Panel"):
+                if line.startswith("execution_blueprint for Panel"):
                     # Extract panel ID
                     panel_id = int(re.search(r'\d+', line).group(0))
-                    workflows[current_group][panel_id] = {"panel_description": None, "steps": {}}
-                    steps = workflows[current_group][panel_id]["steps"]
+                    execution_blueprints[current_group][panel_id] = {"panel_description": None, "steps": {}}
+                    steps = execution_blueprints[current_group][panel_id]["steps"]
                     panels_in_group.append(panel_id)
                     j += 1
 
                     # Skip empty lines
                     j = skip_empty_lines(group_lines, j)
                     if j >= len(group_lines):
-                        raise ValueError(f"Missing content after 'Workflow for Panel {panel_id}'")
+                        raise ValueError(f"Missing content after 'execution_blueprint for Panel {panel_id}'")
 
                     # Parse Panel Description
                     if group_lines[j].strip().startswith("Panel Description:"):
                         panel_desc = group_lines[j].split("Panel Description:")[1].strip()
-                        workflows[current_group][panel_id]["panel_description"] = panel_desc
+                        execution_blueprints[current_group][panel_id]["panel_description"] = panel_desc
                         j += 1
                     else:
                         raise ValueError(f"Missing Panel Description for Panel {panel_id}")
@@ -98,11 +98,11 @@ class MainTranslatorNode(BaseNode):
                     if j >= len(group_lines):
                         raise ValueError(f"Missing content after Panel Description for Panel {panel_id}")
 
-                    # Check for 'Workflow Steps:'
-                    if group_lines[j].strip() == "Workflow Steps:":
+                    # Check for 'execution_blueprint Steps:'
+                    if group_lines[j].strip() == "execution_blueprint Steps:":
                         j += 1
                     else:
-                        raise ValueError(f"Missing 'Workflow Steps:' section for Panel {panel_id}")
+                        raise ValueError(f"Missing 'execution_blueprint Steps:' section for Panel {panel_id}")
 
                     # Parse Steps
                     while j < len(group_lines):
@@ -112,7 +112,7 @@ class MainTranslatorNode(BaseNode):
                             break
 
                         line = group_lines[j].strip()
-                        if line.startswith("Workflow for Panel") or line.startswith("Group"):
+                        if line.startswith("execution_blueprint for Panel") or line.startswith("Group"):
                             break  # Move to the next panel or group
 
                         # Parse Step
@@ -135,7 +135,7 @@ class MainTranslatorNode(BaseNode):
                                     break
 
                                 line = group_lines[j].strip()
-                                if line.startswith("Step") or line.startswith("Workflow for Panel") or line.startswith("Group"):
+                                if line.startswith("Step") or line.startswith("execution_blueprint for Panel") or line.startswith("Group"):
                                     break  # Next step, panel, or group
 
                                 if line.startswith("- API:"):
@@ -159,7 +159,7 @@ class MainTranslatorNode(BaseNode):
                                         if j >= len(group_lines):
                                             break
                                         line = group_lines[j].strip()
-                                        if line.startswith("- Output Variables:") or line.startswith("Step") or line.startswith("Workflow for Panel") or line.startswith("Group"):
+                                        if line.startswith("- Output Variables:") or line.startswith("Step") or line.startswith("execution_blueprint for Panel") or line.startswith("Group"):
                                             break
                                         if line.startswith("- Name:"):
                                             input_var = {}
@@ -252,10 +252,10 @@ class MainTranslatorNode(BaseNode):
                                                         "panel": dependent_panel,
                                                         "step": dependent_step
                                                     })
-                                                    # Go to the referenced panel and step in workflows to update "used_by"
-                                                    if dependent_panel in workflows[current_group]:
-                                                        if dependent_step in workflows[current_group][dependent_panel]["steps"]:
-                                                            used_step = workflows[current_group][dependent_panel]["steps"][dependent_step]
+                                                    # Go to the referenced panel and step in execution_blueprints to update "used_by"
+                                                    if dependent_panel in execution_blueprints[current_group]:
+                                                        if dependent_step in execution_blueprints[current_group][dependent_panel]["steps"]:
+                                                            used_step = execution_blueprints[current_group][dependent_panel]["steps"][dependent_step]
                                                             # Find the relevant output variable in the dependent step
                                                             used_by_check_bool = False
                                                             for output_var in used_step["output_vars"]:
@@ -271,7 +271,7 @@ class MainTranslatorNode(BaseNode):
                                                                 valid_out_var_name_options = [output_var for output_var in used_step["output_vars"]]
                                                                 raise ValueError(f"In Step {dependent_step} Panel {dependent_panel}, dependent input variable ({input_var['name']}) has a different name. If there is dependancy between this and Panel {panel_id}, Step {step_counter}, then they should be same. The valid options for the input variable name for Panel {panel_id}, Step {step_counter} considering the dependency is valid are {valid_out_var_name_options}.")
                                                         else:
-                                                            raise ValueError(f"Step {dependent_step} not found in Panel {dependent_panel} for the dependency mentioned in Panel {panel_id}, Step {step_counter}. Please check the dependencies in your workflow carefully.")
+                                                            raise ValueError(f"Step {dependent_step} not found in Panel {dependent_panel} for the dependency mentioned in Panel {panel_id}, Step {step_counter}. Please check the dependencies in your execution_blueprint carefully.")
                                                     else:
                                                         if dependent_panel > panel_id:
                                                             raise ValueError(f"Current panel (panel no {panel_id}) is referencing a future Panel (panel no {dependent_panel}). Please order the panels such that a panel is not dependent on a future panel.")
@@ -293,7 +293,7 @@ class MainTranslatorNode(BaseNode):
                                         if j >= len(group_lines):
                                             break
                                         line = group_lines[j].strip()
-                                        if line.startswith("Step") or line.startswith("Workflow for Panel") or line.startswith("Group"):
+                                        if line.startswith("Step") or line.startswith("execution_blueprint for Panel") or line.startswith("Group"):
                                             break
                                         if line.startswith("- Name:"):
                                             output_var = {}
@@ -331,22 +331,22 @@ class MainTranslatorNode(BaseNode):
                     j += 1  # Skip any lines outside of recognized blocks
 
             # Check for interdependencies. If we are modifying then we cant update panels in the group, so lets allow if there are no interdependencies but still they are in the same group
-            if not(modified_workflow_bool) and len(panels_in_group) > 1 and not panel_interdependencies_found:
+            if not(modified_execution_blueprint_bool) and len(panels_in_group) > 1 and not panel_interdependencies_found:
                 raise ValueError(f"Not all panels have interdependencies in Group {current_group}. Please put them in different groups if no interdependencies are there.")
 
-        # Return the chain_of_thought and workflows
-        return chain_of_thought, workflows
+        # Return the chain_of_thought and execution_blueprints
+        return chain_of_thought, execution_blueprints
     
-    def parse_status_assistance_output(self, updated_workflow):
+    def parse_status_assistance_output(self, updated_execution_blueprint):
         # Initialize the result dictionary
         result = {
             'chain_of_thought': '',
             'chosen_action': '',
-            'workflow': None  # This will only be filled if the chosen action is MODIFY
+            'execution_blueprint': None  # This will only be filled if the chosen action is MODIFY
         }
 
         # Split the input string into sections using regular expressions
-        sections = re.split(r'\$\$CHAIN_OF_THOUGHT\$\$|\$\$CHOSEN_ACTION\$\$|\$\$WORKFLOW\$\$', updated_workflow)
+        sections = re.split(r'\$\$CHAIN_OF_THOUGHT\$\$|\$\$CHOSEN_ACTION\$\$|\$\$execution_blueprint\$\$', updated_execution_blueprint)
 
         # Check that at least $$CHAIN_OF_THOUGHT$$ and $$CHOSEN_ACTION$$ exist
         if len(sections) < 3:
@@ -364,29 +364,21 @@ class MainTranslatorNode(BaseNode):
         else:
             raise ValueError("The $$CHOSEN_ACTION$$ section must specify either MODIFY or DROP_PANEL.")
 
-        # If the action is MODIFY, we should also parse the workflow section
+        # If the action is MODIFY, we should also parse the execution_blueprint section
         if result['chosen_action'] == 'MODIFY':
             if len(sections) < 4:
-                raise ValueError("The output must contain a $$WORKFLOW$$ section if MODIFY is chosen.")
-            workflow_text = sections[3].strip()
+                raise ValueError("The output must contain a $$execution_blueprint$$ section if MODIFY is chosen.")
+            execution_blueprint_text = sections[3].strip()
 
-            # Parse the workflow section by passing it to the existing workflow parser
+            # Parse the execution_blueprint section by passing it to the existing execution_blueprint parser
             dummy_chain_of_thought = "$$CHAIN_OF_THOUGHT$$\nFiller space"
-            full_workflow_text = f"{dummy_chain_of_thought}\n$$WORKFLOW$$\n{workflow_text}"
+            full_execution_blueprint_text = f"{dummy_chain_of_thought}\n$$execution_blueprint$$\n{execution_blueprint_text}"
 
-            # Call the existing workflow parser and save the parsed workflow
-            _, result['workflow'] = self.parse_main_translator_workflow(full_workflow_text, modified_workflow_bool = True)
+            # Call the existing execution_blueprint parser and save the parsed execution_blueprint
+            _, result['execution_blueprint'] = self.parse_dag_compiler_execution_blueprint(full_execution_blueprint_text, modified_execution_blueprint_bool = True)
 
         return result
 
-
-
-
-
-
-
-        
-    ########################
     # ALL THE CREATING INPUT FOR LLM FUNCTIONS WILL BE HERE
     
     # create input string
@@ -447,27 +439,27 @@ class MainTranslatorNode(BaseNode):
 
         return formatted_string
     
-    def make_input_status_update(self, group_workflow_dict, group_no, status_update_dict):
+    def make_input_status_update(self, group_execution_blueprint_dict, group_no, status_update_dict):
         result = []
 
         # # Add the panel descriptions along with the relevant API names
-        # for panel_no in list(group_workflow_dict.keys()):
+        # for panel_no in list(group_execution_blueprint_dict.keys()):
         #     panel = self.panels_list[panel_no]
         #     # print("panellllll : ",panel)
         #     formatted_string += f"{panel['instance_id']}. Panel {panel['instance_id']}: {panel['panel_description']}\n"
         #     formatted_string += f"Details: {panel['request']['description']}"
         #     formatted_string += "\nList of Relevant APIs:\n"
 
-        # Add Group Workflow header
-        result.append(f"Group Workflow:\n")
+        # Add Group execution_blueprint header
+        result.append(f"Group execution_blueprint:\n")
 
         result.append(f"\nGroup {group_no}:\n")
 
-        # Process each panel's workflow
-        for panel_no, panel_data in group_workflow_dict.items():
-            result.append(f"Workflow for Panel {panel_no}:\n")
+        # Process each panel's execution_blueprint
+        for panel_no, panel_data in group_execution_blueprint_dict.items():
+            result.append(f"execution_blueprint for Panel {panel_no}:\n")
             result.append(f"Panel Description: {panel_data['panel_description']}\n")
-            result.append("\nWorkflow Steps:\n")
+            result.append("\nexecution_blueprint Steps:\n")
 
             # Process each step in the panel
             for step_no, step_data in panel_data['steps'].items():
@@ -491,7 +483,7 @@ class MainTranslatorNode(BaseNode):
                     result.append(f"  - Name: {output_var['name']}")
                     result.append(f"    - Description: {output_var['description']}")
 
-            result.append("\n")  # Add spacing between workflows
+            result.append("\n")  # Add spacing between execution_blueprints
 
         # Add Available API Descriptions section
         if hasattr(self, 'unique_apis'):
@@ -526,115 +518,46 @@ class MainTranslatorNode(BaseNode):
     ########################
     def setup(self, query, panels_list):
         self.panels_list = panels_list
-        # Logic to create workflow and initialize local translator instances
+        # Logic to create execution_blueprint and initialize local translator instances
         # We can use self.chat_history to provide context
         formatted_string = self.create_first_input_data(query, panels_list)
         print("\nformatted_string : \n",formatted_string)
 
-        # generating the workflow from the LLM
-        self.chat_history.append({"role": "user", "content": self.workflow_creation_prompt}) # system prompt for workflow_creation
+        # generating the execution_blueprint from the LLM
+        self.chat_history.append({"role": "user", "content": self.execution_blueprint_creation_prompt}) # system prompt for execution_blueprint_creation
         self.chat_history.append({"role": "user", "content": formatted_string})
         run_success = False
         counter = 0
         while not run_success and counter < 5:
             try:
-                llm_response_workflow = self.generate()
-                print("llm_response_workflow : \n",llm_response_workflow)
-                llm_response_workflow = llm_response_workflow.replace("**", "").replace("`", "").replace("#","")
-                _, workflow_dict = self.parse_main_translator_workflow(llm_response_workflow)
+                llm_response_execution_blueprint = self.generate()
+                print("llm_response_execution_blueprint : \n",llm_response_execution_blueprint)
+                llm_response_execution_blueprint = llm_response_execution_blueprint.replace("**", "").replace("`", "").replace("#","")
+                _, execution_blueprint_dict = self.parse_dag_compiler_execution_blueprint(llm_response_execution_blueprint)
                 run_success = True
             except Exception as e:
-                error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT and WORKFLOW without any other details before or after. Additionaly inlcude in your CHAIN_OF_THOUGHT about what went wrong in the format and rectify it basded on the given information:\n {str(e)}' 
+                error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT and execution_blueprint without any other details before or after. Additionaly inlcude in your CHAIN_OF_THOUGHT about what went wrong in the format and rectify it basded on the given information:\n {str(e)}' 
                 self.chat_history.append({"role": "user", "content": error_message})
                 print("error_message : ",error_message)
             
             counter += 1
         
         if not run_success:
-            raise ValueError("SOmething is wrong with the LLM or the parsing main translator workflow. An error is not expected here")
+            raise ValueError("SOmething is wrong with the LLM or the parsing main translator execution_blueprint. An error is not expected here")
             
-        # print("\llm_response_workflow:\n")
-        # print(llm_response_workflow)
-        # print("\nworkflows:\n")
-        # print(workflow_dict)
+        # print("\llm_response_execution_blueprint:\n")
+        # print(llm_response_execution_blueprint)
+        # print("\nexecution_blueprints:\n")
+        # print(execution_blueprint_dict)
         # Write to a JSON file
-        with open("workflow.json", "w") as json_file:
-            json.dump(workflow_dict, json_file, indent=4)
-        # For now, we're loading the workflow from a file
-        with open("workflow.json", "r") as json_file:
-            workflow_dict = json.load(json_file)
-        self.workflow = workflow_dict
-        return workflow_dict
-    
-    # async def communicate(self, update, local_translator_id, local_translator_object):
-    #     await self.queue.put((update, local_translator_id, local_translator_object))
-        
-    # async def process_queue(self):
-    #     while True:
-    #         async with self.lock:
-    #             if self.queue.empty():
-    #                 await asyncio.sleep(0.1)
-    #                 continue
-    #             status_update_dict, local_translator_id, local_translator_object = await self.queue.get()
-    #             print("status_update_dict : ",status_update_dict)
-                
-    #             # Process the update here
-    #             # This is where you'd put the logic to handle the communication
-    #             print(f"Processing update from Local Translator {local_translator_id}")
+        with open("execution_blueprint.json", "w") as json_file:
+            json.dump(execution_blueprint_dict, json_file, indent=4)
+        # For now, we're loading the execution_blueprint from a file
+        with open("execution_blueprint.json", "r") as json_file:
+            execution_blueprint_dict = json.load(json_file)
+        self.execution_blueprint = execution_blueprint_dict
+        return execution_blueprint_dict
 
-    #             # Simulate some processing time
-    #             await asyncio.sleep(1)
-
-    #             status_assistance_llm_input = self.make_input_status_update(local_translator_object.group_workflow, local_translator_object.group_id, status_update_dict)
-
-    #             print("status_assistance_llm_input : ",status_assistance_llm_input)
-
-    #             # generating the workflow from the LLM
-    #             self.chat_history.append({"role": "user", "content": self.status_assistance_prompt}) # system prompt for workflow_creation
-    #             self.chat_history.append({"role": "user", "content": status_assistance_llm_input})
-
-    #             run_success = False
-    #             counter = 0
-    #             while not run_success and counter < 5:
-    #                 counter += 1
-    #                 try:
-    #                     updated_workflow = self.generate()
-    #                     updated_workflow = updated_workflow.replace("**", "")
-    #                     updated_workflow = updated_workflow.replace("`", "")
-    #                     print("updated_workflow : ",updated_workflow)
-    #                     parsed_updated_workflow = self.parse_status_assistance_output(updated_workflow)
-    #                     # print("parsed_updated_workflow : ", parsed_updated_workflow)
-    #                     run_success = True
-    #                 except Exception as e:
-    #                     error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT, CHOSEN_ACTION and/or WORKFLOW without any other details before or after.:\n {str(e)}' 
-    #                     self.chat_history.append({"role": "user", "content": error_message})
-    #                     print("error_message : ",error_message)
-
-    #             if not run_success:
-    #                 raise ValueError("Something is wrong with the LLM or the parsing status_assistance in main translator. An error is not expected here")
-                
-    #             print("parsed_updated_workflow['chosen_action'] :",parsed_updated_workflow['chosen_action'])
-
-    #             if parsed_updated_workflow['chosen_action'] == "DROP_PANEL":
-    #                 print('Sent Request to Drop Panel')
-    #                 local_translator_object.drop = True
-    #             elif parsed_updated_workflow['chosen_action'] == "MODIFY":
-    #                 with open(f"updated_workflow_group_{local_translator_object.group_id}.json", "w") as json_file:
-    #                     json.dump(parsed_updated_workflow['workflow'], json_file, indent=4)
-    #                 with open("updated_workflow_group_{local_translator_object.group_id}.json", "r") as json_file:
-    #                     updated_workflow_dict = json.load(json_file)
-    #                 print("updated_workflow_dict after loading : ",updated_workflow_dict)
-    #                 local_translator_object.group_workflow = updated_workflow_dict
-    #                 print('Sent Request to Modify Panel')
-    #                 local_translator_object.modify = True
-    #             else:
-    #                 print("In the else statment")
-    #                 raise ValueError("The chosen_action key must specify either MODIFY or DROP_PANEL.")
-                
-    #             print(f"Finished processing update from Local Translator {local_translator_id}")
-            
-    #         # Release the lock and allow a short time for other tasks to acquire it
-    #         await asyncio.sleep(0.1)
 
     async def communicate(self, update, local_translator_id, local_translator_object):
         await self.queue.put((update, local_translator_id, local_translator_object))
@@ -650,15 +573,15 @@ class MainTranslatorNode(BaseNode):
 
             # Prepare the input for the LLM
             status_assistance_llm_input = self.make_input_status_update(
-                self.workflow[str(local_translator_object.group_id)], 
+                self.execution_blueprint[str(local_translator_object.group_id)], 
                 local_translator_object.group_id, 
                 status_update_dict
             )
 
             print("status_assistance_llm_input:", status_assistance_llm_input)
 
-            # Generate the workflow from the LLM
-            self.chat_history.append({"role": "user", "content": self.status_assistance_prompt})  # System prompt for workflow creation
+            # Generate the execution_blueprint from the LLM
+            self.chat_history.append({"role": "user", "content": self.status_assistance_prompt})  # System prompt for execution_blueprint creation
             self.chat_history.append({"role": "user", "content": status_assistance_llm_input})
 
             run_success = False
@@ -667,13 +590,13 @@ class MainTranslatorNode(BaseNode):
                 counter += 1
                 try:
                     # If self.generate() is blocking, run it in a separate thread
-                    updated_workflow = await asyncio.to_thread(self.generate)
-                    print("updated_workflow:", updated_workflow)
-                    updated_workflow = updated_workflow.replace("**", "").replace("`", "").replace("#","")
-                    parsed_updated_workflow = self.parse_status_assistance_output(updated_workflow)
+                    updated_execution_blueprint = await asyncio.to_thread(self.generate)
+                    print("updated_execution_blueprint:", updated_execution_blueprint)
+                    updated_execution_blueprint = updated_execution_blueprint.replace("**", "").replace("`", "").replace("#","")
+                    parsed_updated_execution_blueprint = self.parse_status_assistance_output(updated_execution_blueprint)
                     run_success = True
                 except Exception as e:
-                    error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT, CHOSEN_ACTION and/or WORKFLOW without any other details before or after. Additionaly inlcude in your CHAIN_OF_THOUGHT about what went wrong in the format and rectify it basded on the given information:\n {str(e)}' 
+                    error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT, CHOSEN_ACTION and/or execution_blueprint without any other details before or after. Additionaly inlcude in your CHAIN_OF_THOUGHT about what went wrong in the format and rectify it basded on the given information:\n {str(e)}' 
                     self.chat_history.append({"role": "user", "content": error_message})
                     print("error_message:", error_message)
 
@@ -683,26 +606,26 @@ class MainTranslatorNode(BaseNode):
                     "An error is not expected here."
                 )
             
-            print("parsed_updated_workflow['chosen_action']:", parsed_updated_workflow['chosen_action'])
+            print("parsed_updated_execution_blueprint['chosen_action']:", parsed_updated_execution_blueprint['chosen_action'])
 
-            if parsed_updated_workflow['chosen_action'] == "DROP_PANEL":
+            if parsed_updated_execution_blueprint['chosen_action'] == "DROP_PANEL":
                 # Acquire the lock only when modifying shared resources
                 async with self.lock:
 
                     local_translator_object.drop = True
                 print('Sent Request to Drop Panel')
 
-            elif parsed_updated_workflow['chosen_action'] == "MODIFY":
+            elif parsed_updated_execution_blueprint['chosen_action'] == "MODIFY":
                 # Perform file I/O in a separate thread to avoid blocking the event loop
-                updated_workflow_dict = await asyncio.to_thread(
-                    self.save_and_load_workflow, 
+                updated_execution_blueprint_dict = await asyncio.to_thread(
+                    self.save_and_load_execution_blueprint, 
                     local_translator_object.group_id, 
-                    parsed_updated_workflow['workflow']
+                    parsed_updated_execution_blueprint['execution_blueprint']
                 )
-                print("updated_workflow_dict after loading:", updated_workflow_dict)
+                print("updated_execution_blueprint_dict after loading:", updated_execution_blueprint_dict)
                 # Acquire the lock when updating shared resources
                 async with self.lock:
-                    local_translator_object.group_workflow = updated_workflow_dict
+                    local_translator_object.group_execution_blueprint = updated_execution_blueprint_dict
                     local_translator_object.modify = True
                 print('Sent Request to Modify Panel')
 
@@ -715,13 +638,13 @@ class MainTranslatorNode(BaseNode):
             # Yield control to other tasks
             await asyncio.sleep(0.1)  # Use sleep(0) to yield control without delay
 
-    def save_and_load_workflow(self, group_id, workflow):
-        # Save the workflow to a file
-        filename = f"updated_workflow_group_{group_id}.json"
+    def save_and_load_execution_blueprint(self, group_id, execution_blueprint):
+        # Save the execution_blueprint to a file
+        filename = f"updated_execution_blueprint_group_{group_id}.json"
         with open(filename, "w") as json_file:
-            json.dump(workflow, json_file, indent=4)
-        # Load the workflow back from the file
+            json.dump(execution_blueprint, json_file, indent=4)
+        # Load the execution_blueprint back from the file
         with open(filename, "r") as json_file:
-            updated_workflow_dict = json.load(json_file)
-        self.workflow[str(group_id)] = updated_workflow_dict
-        return updated_workflow_dict
+            updated_execution_blueprint_dict = json.load(json_file)
+        self.execution_blueprint[str(group_id)] = updated_execution_blueprint_dict
+        return updated_execution_blueprint_dict

@@ -48,20 +48,6 @@ class Manager:
             pass
 
     async def modify_group(self, modified_workflow, group_id):
-        # group_translators = []
-        # print(modified_workflow)
-        # for translator_id, translator_data in modified_workflow.items():
-        #     translator = LocalTranslatorNode(
-        #         int(translator_id),
-        #         translator_data["panel_description"],
-        #         system_prompt=local_translator_system_prompt,
-        #         main_translator=self.main_translator
-        #     )
-        #     translator.group_workflow = group_data
-        #     translator.panel_workflow = translator_data["steps"]
-        #     self.local_translators[translator_id] = translator
-        #     group_translators.append(translator)
-        # self.groups[group_id] = group_translators
         for group_id, group_data in modified_workflow.items():
             group_translators = []
             for translator_id, translator_data in group_data.items():
@@ -160,12 +146,6 @@ class MainOrchestrator:
 async def main():
     orchestrator = MainOrchestrator()
     await orchestrator.run("what is the weather in seattle, usa", '')
-    # await orchestrator.run("what is the weather in seattle, usa. Also what are the best spots to visit in seattle?")
-    # await orchestrator.run("tell me top 30 vacation spots in europe and current weather there no illustrations")
-    # await orchestrator.run("What are the top 5 most rainy areas in the world?.")
-    # await orchestrator.run("what are top news headlines for today? What is the weather at some of the top news headline locations")
-    # await orchestrator.run("where in the world should i go for travelling? What is the weather and current news at those places? Also i want to understand what generally causes null pointer errors in java")
-
 
 if __name__ == "__main__":
     asyncio.run(main())
