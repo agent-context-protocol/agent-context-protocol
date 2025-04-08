@@ -6,7 +6,7 @@ import faiss
 import torch
 from transformers import AutoTokenizer, AutoModel
 
-# def update_interpreter_with_similar_apis(interpreter_message, faiss_index_path='faiss_index.index', model_name='sentence-transformers/all-MiniLM-L6-v2', api_json_path='external_env_details/brief_details.json', k=5):
+# def update_interpreter_with_similar_tools(interpreter_message, faiss_index_path='faiss_index.index', model_name='sentence-transformers/all-MiniLM-L6-v2', tool_json_path='external_env_details/brief_details.json', k=5):
 #     # Load the FAISS index
 #     index = faiss.read_index(faiss_index_path)
 
@@ -25,36 +25,36 @@ from transformers import AutoTokenizer, AutoModel
 #     distances, indices = index.search(interpreter_embedding, k)
 
 #     # Load the API descriptions
-#     with open(api_json_path, 'r') as file:
-#         api_data = json.load(file)
+#     with open(tool_json_path, 'r') as file:
+#         tool_data = json.load(file)
     
 #     # Prepare the results
 #     similar_apis = []
-#     api_keys = list(api_data.keys())  # Extract API keys from the data
+#     api_keys = list(tool_data.keys())  # Extract API keys from the data
 #     for i, idx in enumerate(indices[0]):
 #         if idx < len(api_keys):  # Ensure index is within bounds
 #             api_key = api_keys[idx]
-#             temp_dict = api_data[api_key]
-#             temp_dict['api_name'] = api_key
+#             temp_dict = tool_data[api_key]
+#             temp_dict['tool_name'] = api_key
 #             similar_apis.append(temp_dict)
 
 #     # Update the interpreter message dictionary
 #     if 'request' not in interpreter_message:
 #         interpreter_message['request'] = {}
-#     interpreter_message['request']['relevant_apis'] = similar_apis
+#     interpreter_message['request']['relevant_tools'] = similar_apis
 #     return interpreter_message
 
-def update_interpreter_with_similar_apis(interpreter_message, faiss_index_path='faiss_index.index', model_name='sentence-transformers/all-MiniLM-L6-v2', api_json_path='external_env_details/brief_details.json', k=5):
-    # Load the API descriptions
-    with open(api_json_path, 'r') as file:
-        api_data = json.load(file)
-    api_details = []
-    for api_name in interpreter_message['request']['relevant_apis']:
-        api_details.append({
-            'api_name': api_name,
-            # 'Input': api_data[api_name]['Input'],
-            # 'Output': api_data[api_name]['Output'],
-            'Use': api_data[api_name]['Use']
+def update_interpreter_with_similar_tools(interpreter_message, faiss_index_path='faiss_index.index', model_name='sentence-transformers/all-MiniLM-L6-v2', tool_json_path='external_env_details/brief_details.json', k=5):
+    # Load the TOOL descriptions
+    with open(tool_json_path, 'r') as file:
+        tool_data = json.load(file)
+    tool_details = []
+    for tool_name in interpreter_message['request']['relevant_tools']:
+        tool_details.append({
+            'tool_name': tool_name,
+            # 'Input': tool_data[tool_name]['Input'],
+            # 'Output': tool_data[tool_name]['Output'],
+            'Use': tool_data[tool_name]['Use']
             })
-    interpreter_message['request']['relevant_apis'] = api_details
+    interpreter_message['request']['relevant_tools'] = tool_details
     return interpreter_message

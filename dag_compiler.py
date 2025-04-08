@@ -2,8 +2,8 @@ from base import BaseNode
 import re
 import json
 import asyncio
-from available_apis.rapid_apis_format.return_dict import RAPID_APIS_DICT, RAPID_REQD_PARAMS_DICT, RAPID_PARAMS_DICT
-from available_apis.function_format.return_dict import FUNCTION_APIS_DOCUMENTATION_DICT, FUNCTION_APIS_REQD_PARAMS_DICT, FUNCTION_APIS_PARAMS_DICT
+from available_tools.rapid_apis_format.return_dict import RAPIDAPI_TOOLS_DICT, RAPIDAPI_REQD_PARAMS_DICT, RAPIDAPI_PARAMS_DICT
+from available_tools.function_format.return_dict import FUNCTION_TOOLS_DOCUMENTATION_DICT, FUNCTION_TOOLS_REQD_PARAMS_DICT, FUNCTION_TOOLS_PARAMS_DICT
 
 class DAGCompilerNode(BaseNode):
     def __init__(self, node_name, system_prompt = None):
@@ -30,7 +30,7 @@ class DAGCompilerNode(BaseNode):
 
     def parse_dag_compiler_execution_blueprint(self, text, restrict_one_group = False, modified_execution_blueprint_bool = False):
         # First, split the text into CHAIN_OF_THOUGHT and execution_blueprint sections
-        sections = re.split(r"\$\$execution_blueprint\$\$", text)
+        sections = re.split(r"\$\$EXECUTION_BLUEPRINT\$\$", text)
         if len(sections) != 2:
             raise ValueError("The text does not contain exactly one CHAIN_OF_THOUGHT and one EXECUTION_BLUEPRINT section.")
 
@@ -140,11 +140,11 @@ class DAGCompilerNode(BaseNode):
 
                                 if line.startswith("- TOOL:"):
                                     current_step['tool'] = line.split("- TOOL:")[1].strip()
-                                    if current_step['tool'] in RAPID_REQD_PARAMS_DICT:
-                                        reqd_params_for_this_tool = list(RAPID_REQD_PARAMS_DICT[current_step['tool']].keys())
-                                    elif current_step['tool'] in FUNCTION_APIS_REQD_PARAMS_DICT:
-                                        reqd_params_for_this_tool = list(FUNCTION_APIS_REQD_PARAMS_DICT[current_step['tool']].keys())
-                                    elif current_step['tool'] not in RAPID_PARAMS_DICT or current_step['tool'] not in FUNCTION_APIS_PARAMS_DICT:
+                                    if current_step['tool'] in RAPIDAPI_REQD_PARAMS_DICT:
+                                        reqd_params_for_this_tool = list(RAPIDAPI_REQD_PARAMS_DICT[current_step['tool']].keys())
+                                    elif current_step['tool'] in FUNCTION_TOOLS_REQD_PARAMS_DICT:
+                                        reqd_params_for_this_tool = list(FUNCTION_TOOLS_REQD_PARAMS_DICT[current_step['tool']].keys())
+                                    elif current_step['tool'] not in RAPIDAPI_PARAMS_DICT or current_step['tool'] not in FUNCTION_TOOLS_PARAMS_DICT:
                                         raise ValueError(f"Invalid TOOL Name {current_step['tool']}, there is no such TOOL name. Please use a valid TOOL name.")
                                     print(f"current_step['tool']: {current_step['tool']} reqd_params_for_this_tool : {reqd_params_for_this_tool}")
                                     j += 1
@@ -179,10 +179,10 @@ class DAGCompilerNode(BaseNode):
                                                 parameters = [param.strip() for param in param_str.split(",") if param.strip()]
 
                                                 for param_ in parameters:
-                                                    if current_step['tool'] in RAPID_PARAMS_DICT and param_ not in RAPID_PARAMS_DICT[current_step['tool']]:
-                                                        raise ValueError(f"Given parameter name {param_} is invalid parameter for TOOL {current_step['tool']}, there is no such parameter for this TOOL. The valid parameters for this tool are {RAPID_PARAMS_DICT[current_step['tool']]}.")
-                                                    elif current_step['tool'] in FUNCTION_APIS_PARAMS_DICT and param_ not in FUNCTION_APIS_PARAMS_DICT[current_step['tool']]:
-                                                        raise ValueError(f"Given parameter name {param_} is invalid parameter for TOOL {current_step['tool']}, there is no such parameter for this TOOL. Please use a valid parameter for this TOOL {FUNCTION_APIS_PARAMS_DICT[current_step['tool']]}.")
+                                                    if current_step['tool'] in RAPIDAPI_PARAMS_DICT and param_ not in RAPIDAPI_PARAMS_DICT[current_step['tool']]:
+                                                        raise ValueError(f"Given parameter name {param_} is invalid parameter for TOOL {current_step['tool']}, there is no such parameter for this TOOL. The valid parameters for this tool are {RAPIDAPI_PARAMS_DICT[current_step['tool']]}.")
+                                                    elif current_step['tool'] in FUNCTION_TOOLS_PARAMS_DICT and param_ not in FUNCTION_TOOLS_PARAMS_DICT[current_step['tool']]:
+                                                        raise ValueError(f"Given parameter name {param_} is invalid parameter for TOOL {current_step['tool']}, there is no such parameter for this TOOL. Please use a valid parameter for this TOOL {FUNCTION_TOOLS_PARAMS_DICT[current_step['tool']]}.")
                                                     
                                                 
                                                 # Assign the list of parameters to input_var['parameter']
@@ -418,22 +418,22 @@ class DAGCompilerNode(BaseNode):
         formatted_string += "**Description of Tools:**\n"
         tool_id = 1
         for tool_name, tool_details in unique_tools.items():
-            if tool_name in RAPID_APIS_DICT:
+            if tool_name in RAPIDAPI_TOOLS_DICT:
                 formatted_string += (
                     f"{tool_id}. {tool_name}\n"
                     f"   - **Use:** {tool_details['Use']}\n\n"
-                    f"   - **Documentation:** {RAPID_APIS_DICT[tool_name]}\n\n"
-                    f"   - **Required Parameters (If not specified then error will be raised):** {RAPID_REQD_PARAMS_DICT[tool_name]}\n\n"
+                    f"   - **Documentation:** {RAPIDAPI_TOOLS_DICT[tool_name]}\n\n"
+                    f"   - **Required Parameters (If not specified then error will be raised):** {RAPIDAPI_REQD_PARAMS_DICT[tool_name]}\n\n"
                 )
-            elif tool_name in FUNCTION_APIS_DOCUMENTATION_DICT:
+            elif tool_name in FUNCTION_TOOLS_DOCUMENTATION_DICT:
                 formatted_string += (
                     f"{tool_id}. {tool_name}\n"
                     f"   - **Use:** {tool_details['Use']}\n\n"
-                    f"   - **Documentation:** {FUNCTION_APIS_DOCUMENTATION_DICT[tool_name]}\n\n"
-                    f"   - **Required Parameters (If not specified then error will be raised):** {FUNCTION_APIS_REQD_PARAMS_DICT[tool_name]}\n\n"
+                    f"   - **Documentation:** {FUNCTION_TOOLS_DOCUMENTATION_DICT[tool_name]}\n\n"
+                    f"   - **Required Parameters (If not specified then error will be raised):** {FUNCTION_TOOLS_REQD_PARAMS_DICT[tool_name]}\n\n"
                 )
             else:
-                raise ValueError(f"Invalid TOOL Name {tool_name}. It is not there in RAPID_APIS_DICT or FUNCTION_APIS_FUNCTION_DICT. This error is inside create_first_input_data")
+                raise ValueError(f"Invalid TOOL Name {tool_name}. It is not there in RAPIDAPI_TOOLS_DICT or FUNCTION_APIS_FUNCTION_DICT. This error is inside create_first_input_data")
             tool_id += 1
 
         return formatted_string
@@ -481,18 +481,18 @@ class DAGCompilerNode(BaseNode):
             result.append("Available TOOL Descriptions:\n")
             tool_id = 1
             for tool_name, tool_details in self.unique_tools.items():
-                if tool_name in RAPID_APIS_DICT:
+                if tool_name in RAPIDAPI_TOOLS_DICT:
                     result.append(f"{tool_id}. {tool_name}")
                     result.append(f"   - **Use:** {tool_details['Use']}\n")
-                    result.append(f"   - **Documentation:** {RAPID_APIS_DICT[tool_name]}\n")
+                    result.append(f"   - **Documentation:** {RAPIDAPI_TOOLS_DICT[tool_name]}\n")
                     tool_id += 1
-                elif tool_name in FUNCTION_APIS_DOCUMENTATION_DICT:
+                elif tool_name in FUNCTION_TOOLS_DOCUMENTATION_DICT:
                     result.append(f"{tool_id}. {tool_name}")
                     result.append(f"   - **Use:** {tool_details['Use']}\n")
-                    result.append(f"   - **Documentation:** {FUNCTION_APIS_DOCUMENTATION_DICT[tool_name]}\n")
+                    result.append(f"   - **Documentation:** {FUNCTION_TOOLS_DOCUMENTATION_DICT[tool_name]}\n")
                     tool_id += 1
                 else:
-                    raise ValueError(f"Invalid TOOL Name {tool_name}. It is not there in RAPID_APIS_DICT or FUNCTION_APIS_FUNCTION_DICT.")
+                    raise ValueError(f"Invalid TOOL Name {tool_name}. It is not there in RAPIDAPI_TOOLS_DICT or FUNCTION_APIS_FUNCTION_DICT.")
             result.append("\n")  # Add spacing
 
         # Add Status Update section

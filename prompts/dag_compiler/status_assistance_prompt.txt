@@ -99,7 +99,7 @@ $$CHOSEN_ACTION$$
   - MODIFY
   - DROP_SUBTASK
 
-$$execution_blueprint$$ (Include only if you chose MODIFY)
+$$EXECUTION_BLUEPRINT$$ (Include only if you chose MODIFY)
 
 - Present the updated execution_blueprint using the following format:
 
@@ -213,7 +213,7 @@ Status Update:
 
 Assistance Request:
 
-- Error Type: 603 INCOMPLETE_INFORMATION
+- Error Type: 605 INCOMPLETE_INFORMATION
 - Error Step: sub_task 1, Step 1
 - Error TOOL: TripadvisorSearchLocation
 - Error Description:
@@ -280,7 +280,7 @@ $$CHOSEN_ACTION$$
 
 MODIFY
 
-$$execution_blueprint$$
+$$EXECUTION_BLUEPRINT$$
 
 Group 1:
 
@@ -406,7 +406,7 @@ Status Update:
 
 Assistance Request:
 
-- Error Type: 603 INCOMPLETE_INFORMATION
+- Error Type: 605 INCOMPLETE_INFORMATION
 - Error Step: sub_task 2, Step 2
 - Error TOOL: WeatherTOOL.com_Forecast_Weather_TOOL
 - Error Description:
@@ -522,7 +522,7 @@ $$CHOSEN_ACTION$$
 
 MODIFY
 
-$$execution_blueprint$$
+$$EXECUTION_BLUEPRINT$$
 
 Group 2:
 

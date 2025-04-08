@@ -1,0 +1,43 @@
+{
+    "2": {
+        "subtask_description": "Retrieve weather forecast for the next few days in Seattle, USA.",
+        "steps": {
+            "1": {
+                "tool": "WeatherAPI.com_Forecast_Weather_API",
+                "handles": "Fetches weather forecast for Seattle.",
+                "input_vars": [
+                    {
+                        "name": "city_name",
+                        "parameter": [
+                            "q"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "City name for Seattle.",
+                        "value": "Seattle",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "forecast_days",
+                        "parameter": [
+                            "days"
+                        ],
+                        "type": "number",
+                        "source": "LLM_Generated",
+                        "description": "Number of forecast days required.",
+                        "value": "3",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "weather_forecast",
+                        "description": "Weather forecast for Seattle.",
+                        "used_by": [],
+                        "value": "```json\n    {\n      \"Seattle\": {\n        \"day_1\": {\n          \"date\": \"2023-11-01\",\n          \"temperature\": {\n            \"max\": 15,\n            \"min\": 8,\n            \"unit\": \"\u00b0C\"\n          },\n          \"precipitation\": {\n            \"amount\": 5,\n            \"unit\": \"mm\"\n          },\n          \"wind\": {\n            \"speed\": 10,\n            \"unit\": \"km/h\",\n            \"direction\": \"NW\"\n          },\n          \"condition\": \"Partly cloudy\"\n        },\n        \"day_2\": {\n          \"date\": \"2023-11-02\",\n          \"temperature\": {\n            \"max\": 14,\n            \"min\": 7,\n            \"unit\": \"\u00b0C\"\n          },\n          \"precipitation\": {\n            \"amount\": 2,\n            \"unit\": \"mm\"\n          },\n          \"wind\": {\n            \"speed\": 12,\n            \"unit\": \"km/h\",\n            \"direction\": \"N\"\n          },\n          \"condition\": \"Sunny\"\n        },\n        \"day_3\": {\n          \"date\": \"2023-11-03\",\n          \"temperature\": {\n            \"max\": 13,\n            \"min\": 6,\n            \"unit\": \"\u00b0C\"\n          },\n          \"precipitation\": {\n            \"amount\": 0,\n            \"unit\": \"mm\"\n          },\n          \"wind\": {\n            \"speed\": 8,\n            \"unit\": \"km/h\",\n            \"direction\": \"NE\"\n          },\n          \"condition\": \"Clear\"\n        }\n      }\n    }\n    ```"
+                    }
+                ]
+            }
+        }
+    }
+}

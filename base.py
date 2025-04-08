@@ -1,4 +1,4 @@
-from openai import OpenAI
+from openai import OpenAI, AsyncOpenAI
 from openai import AsyncAzureOpenAI, AzureOpenAI
 import os
 from dotenv import load_dotenv
@@ -8,7 +8,7 @@ import asyncio
 load_dotenv()
 
 client = OpenAI()
-client_async = AsyncAzureOpenAI()
+client_async = AsyncOpenAI()
 # client = AzureOpenAI()
 
 

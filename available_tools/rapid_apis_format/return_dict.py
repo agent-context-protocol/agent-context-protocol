@@ -70,9 +70,9 @@ def create_required_params_dict(json_file, required_params_bool = False):
     return required_query_parameters
 
 # Example usage
-json_file = './available_apis/rapid_apis_format/executable-spec-converted.json'
+json_file = './available_tools/rapid_apis_format/executable-spec-converted.json'
 # json_file = 'executable-spec-converted.json'
-RAPID_APIS_DICT = create_rapid_apis_dict(json_file)
-RAPID_REQD_PARAMS_DICT = create_required_params_dict(json_file, True)
-RAPID_PARAMS_DICT = create_required_params_dict(json_file)
-print("RAPID_PARAMS_DICT:",RAPID_PARAMS_DICT)
+RAPIDAPI_TOOLS_DICT = create_rapid_apis_dict(json_file)
+RAPIDAPI_REQD_PARAMS_DICT = create_required_params_dict(json_file, True)
+RAPIDAPI_PARAMS_DICT = create_required_params_dict(json_file)
+print("RAPID_PARAMS_DICT:",RAPIDAPI_PARAMS_DICT)

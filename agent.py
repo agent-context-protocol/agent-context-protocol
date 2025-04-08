@@ -1,8 +1,8 @@
 from base import BaseNode
-from available_tools.hardcoded_format.return_dict import HARDCODED_toolS_DICT
-from available_tools.opentool_format.return_dict import OPEN_toolS_DICT
-from available_tools.function_format.return_dict import FUNCTION_toolS_DOCUMENTATION_DICT, FUNCTION_toolS_FUNCTION_DICT
-from available_tools.rtoold_tools_format.return_dict import RtoolD_toolS_DICT
+from available_tools.hardcoded_format.return_dict import HARDCODED_TOOLS_DICT
+from available_tools.openapi_format.return_dict import OPENAPI_TOOLS_DICT
+from available_tools.function_format.return_dict import FUNCTION_TOOLS_DOCUMENTATION_DICT, FUNCTION_TOOLS_FUNCTION_DICT
+from available_tools.rapid_apis_format.return_dict import RAPIDAPI_TOOLS_DICT
 import json
 import requests
 import re
@@ -29,13 +29,13 @@ class AgentNode(BaseNode):
         self.modify = False
 
     def get_system_prompts(self):
-        # tool_running_prompt
-        with open('prompts/agent/tool_running_prompt.txt', 'r') as file:
-            self.tool_running_prompt = file.read()
+        # agent_request_prompt
+        with open('prompts/agent/agent_request_prompt.txt', 'r') as file:
+            self.agent_request_prompt = file.read()
         
-        # tool_output_prompt
-        with open('prompts/agent/tool_output_prompt.txt', 'r') as file:
-            self.tool_output_prompt = file.read()
+        # agent_response_prompt
+        with open('prompts/agent/agent_response_prompt.txt', 'r') as file:
+            self.agent_response_prompt = file.read()
 
         # status/assistance prompt
         with open('prompts/agent/status_assistance_prompt.txt', 'r') as file:
@@ -70,7 +70,7 @@ class AgentNode(BaseNode):
         input_string = "\nPlease generate output for this input:\n"
         input_string += "Step Details:\n"
 
-        input_string += f"- tool: {step['tool']}\n"
+        input_string += f"- Tool: {step['tool']}\n"
         input_string += f"- Handles: {step['handles']}\n"
         
         # Input variables section
@@ -89,26 +89,18 @@ class AgentNode(BaseNode):
             input_string += f"  - Name: {var['name']}\n"
             input_string += f"    - Description: {var['description']}\n"
 
-        # # Add dependencies if any
-        # if step.get("dependencies"):
-        #     input_string += "- Dependencies:\n"
-        #     dependencies_str = ', '.join([f"sub_task {d['sub_task']}, Step {d['step']}" for d in step['dependencies']])
-        #     input_string += f"  - {dependencies_str}\n"
-        # else:
-        #     input_string += "- Dependencies: None\n"
-
         # Add the input details
         if step['tool'] in self.tool_keys:
             input_string += "\nAdditonal Input Details:\n"
-            input_string += f"tool_KEY: {self.tool_keys[step['tool']]}\n"
+            input_string += f"TOOL_KEY: {self.tool_keys[step['tool']]}\n"
         # in case its a rtoold tool
-        elif step['tool'] in RtoolD_toolS_DICT:
+        elif step['tool'] in RAPIDAPI_TOOLS_DICT:
             input_string += "\nAdditonal Input Details:\n"
-            rtoold_tool_key = self.tool_keys["Rtoold_tool_Key"]
-            input_string += f"tool_KEY: {rtoold_tool_key}\n"
+            rapidapi_tool_key = self.tool_keys["Rapid_API_Key"]
+            input_string += f"TOOL_KEY: {rapidapi_tool_key}\n"
 
         # Add the tool documentation provided
-        input_string += "\ntool Documentation:\n"
+        input_string += "\nTOOL Documentation:\n"
         input_string += tool_documentation
 
         return input_string
@@ -166,7 +158,7 @@ class AgentNode(BaseNode):
                     dependent_step_data = dependent_sub_task_data['steps'][str(dependent_step_no)]
 
                     result_str += f"\nsub_task {dependent_sub_task_no}, Step {dependent_step_no}:\n"
-                    result_str += f"- tool: {dependent_step_data['tool']}\n"
+                    result_str += f"- TOOL: {dependent_step_data['tool']}\n"
                     result_str += f"- Handles: {dependent_step_data['handles']}\n"
                     result_str += "- Input Variables:\n"
 
@@ -180,7 +172,7 @@ class AgentNode(BaseNode):
 
         # Append the tool Response at the end
         for tool_ind, tool_resp in enumerate(tool_response):
-            result_str += f"\ntool Response {tool_ind}:\n\n{tool_resp}\n"
+            result_str += f"\nTOOL Response {tool_ind}:\n\n{tool_resp}\n"
         
         return result_str
     
@@ -213,7 +205,7 @@ class AgentNode(BaseNode):
                     dependent_step_data = dependent_sub_task_data['steps'][str(dependent_step_no)]
 
                     result_str += f"\nsub_task {dependent_sub_task_no}, Step {dependent_step_no}:\n"
-                    result_str += f"- tool: {dependent_step_data['tool']}\n"
+                    result_str += f"- TOOL: {dependent_step_data['tool']}\n"
                     result_str += f"- Handles: {dependent_step_data['handles']}\n"
                     result_str += "- Input Variables:\n"
 
@@ -226,7 +218,7 @@ class AgentNode(BaseNode):
                         result_str += f"    - Value: {dep_input_var['value']}\n"
 
         # Append the tool Response at the end
-        result_str += f"\ntool Response :\n\n{tool_response}\n"
+        result_str += f"\nTOOL Response :\n\n{tool_response}\n"
         
         return result_str
 
@@ -236,7 +228,7 @@ class AgentNode(BaseNode):
         
         # Extract sub_task description
         sub_task_data = execution_blueprint_dict[str(self.sub_task_no)]
-        sub_task_description = sub_task_data["sub_task_description"]
+        sub_task_description = sub_task_data["subtask_description"]
         
         # execution_blueprint details
         result.append("execution_blueprint:")
@@ -251,7 +243,7 @@ class AgentNode(BaseNode):
             
             # Add step details
             result.append(f"\nStep {step_key}")
-            result.append(f"- tool: {step_data['tool']}")
+            result.append(f"- TOOL: {step_data['tool']}")
             result.append(f"- Handles: {step_data['handles']}")
             
             # Input Variables
@@ -298,7 +290,7 @@ class AgentNode(BaseNode):
         
         # Extract sub_task description
         sub_task_data = execution_blueprint_dict[str(self.sub_task_no)]
-        sub_task_description = sub_task_data["sub_task_description"]
+        sub_task_description = sub_task_data["subtask_description"]
         
         # execution_blueprint details
         result.append("Please make user readable output for this execution_blueprint:\n")
@@ -315,7 +307,7 @@ class AgentNode(BaseNode):
             
             # Add step details
             result.append(f"\nStep {step_key}")
-            result.append(f"- tool: {step_data['tool']}")
+            result.append(f"- TOOL: {step_data['tool']}")
             result.append(f"- Handles: {step_data['handles']}")
             
             # Input Variables
@@ -338,11 +330,11 @@ class AgentNode(BaseNode):
         # Join and return the final string
         return "\n".join(result)
 
-    def parse_tool_request(self, text):
+    def parse_agent_request(self, text):
         # Initialize the result dictionary
         result = {
             'chain_of_thought': '',
-            'tool_requests': []
+            'agent_requests': []
         }
         
         # First, split the text by $$CHAIN_OF_THOUGHT$$
@@ -354,104 +346,104 @@ class AgentNode(BaseNode):
         # cot_sections[0]: text before $$CHAIN_OF_THOUGHT$$ (likely empty)
         # cot_sections[1]: chain_of_thought and the rest
         
-        # Now, from cot_sections[1], split off the chain_of_thought and the $$tool_REQUEST$$ sections
-        parts_after_cot = re.split(r"\$\$tool_REQUEST\$\$", cot_sections[1])
+        # Now, from cot_sections[1], split off the chain_of_thought and the $$AGENT_REQUEST$$ sections
+        parts_after_cot = re.split(r"\$\$AGENT_REQUEST\$\$", cot_sections[1])
         
         # The chain_of_thought is the first part
         result['chain_of_thought'] = parts_after_cot[0].strip()
         
-        # The rest are the tool_REQUEST sections
-        tool_request_sections = parts_after_cot[1:]
+        # The rest are the AGENT_REQUEST sections
+        agent_request_sections = parts_after_cot[1:]
 
-        tool_request_error_bool = False
+        agent_request_error_bool = False
         
-        # Process each tool_REQUEST section
-        for tool_request_text in tool_request_sections:
-            tool_request_text = tool_request_text.strip()
+        # Process each AGENT_REQUEST section
+        for agent_request_text in agent_request_sections:
+            agent_request_text = agent_request_text.strip()
             
             # Initialize a dictionary to hold the tool request details
-            tool_request = {}
+            agent_request = {}
             
-            if 'STATUS_CODE' in tool_request_text and 'ERROR_EXPLANATION' in tool_request_text:
+            if 'STATUS_CODE' in agent_request_text and 'ERROR_EXPLANATION' in agent_request_text:
                 # Extract status code and error explanation with improved regex patterns
                 status_match = re.search(
                     r"STATUS_CODE\s*[\r\n]+(\d+)\s+([A-Z_]+)",
-                    tool_request_text,
+                    agent_request_text,
                     re.IGNORECASE
                 )
                 error_match = re.search(
                     r"ERROR_EXPLANATION\s*[\r\n]+([\s\S]+)",
-                    tool_request_text,
+                    agent_request_text,
                     re.IGNORECASE
                 )
                 if status_match and error_match:
-                    tool_request['status_code'] = int(status_match.group(1).strip())
-                    tool_request['status_text'] = status_match.group(2).strip()
+                    agent_request['status_code'] = int(status_match.group(1).strip())
+                    agent_request['status_text'] = status_match.group(2).strip()
                     # Clean up the error explanation by removing any leading hyphens or bullets
                     error_explanation = error_match.group(1).strip()
                     error_explanation = re.sub(r'^[-\*\s]+', '', error_explanation, flags=re.MULTILINE)
-                    tool_request['error_explanation'] = error_explanation
-                    tool_request_error_bool = True
-                    return tool_request_error_bool, tool_request
+                    agent_request['error_explanation'] = error_explanation
+                    agent_request_error_bool = True
+                    return agent_request_error_bool, agent_request
                 else:
                     raise ValueError("Error response format is incorrect.")
             else:
                 # Extract method and URL
                 endpoint_match = re.search(
                     r"tool_ENDPOINT\s+Method:\s*(GET|POST|PUT|PATCH|DELETE|FUNCTION)\s+URL:\s*(\S+)",
-                    tool_request_text
+                    agent_request_text
                 )
                 if endpoint_match:
-                    tool_request['method'] = endpoint_match.group(1).strip()
-                    tool_request['url'] = endpoint_match.group(2).strip()
+                    agent_request['method'] = endpoint_match.group(1).strip()
+                    agent_request['url'] = endpoint_match.group(2).strip()
                 else:
-                    raise ValueError("tool_ENDPOINT section is missing or improperly formatted.")
+                    raise ValueError("TOOL_ENDPOINT section is missing or improperly formatted.")
                 
                 # Extract headers
-                headers_match = re.search(r"HEADERS\s*(\{\s*\}|\{.*?\})?", tool_request_text, re.DOTALL)
+                headers_match = re.search(r"HEADERS\s*(\{\s*\}|\{.*?\})?", agent_request_text, re.DOTALL)
                 if headers_match and headers_match.group(1):
                     headers_str = headers_match.group(1).strip()
                     try:
-                        tool_request['headers'] = json.loads(headers_str)
+                        agent_request['headers'] = json.loads(headers_str)
                     except json.JSONDecodeError:
-                        tool_request['headers'] = {}
+                        agent_request['headers'] = {}
                 else:
-                    tool_request['headers'] = {}
+                    agent_request['headers'] = {}
                 
                 # Extract body
-                body_match = re.search(r"BODY\s*(\{.*\})", tool_request_text, re.DOTALL)
+                body_match = re.search(r"BODY\s*(\{.*\})", agent_request_text, re.DOTALL)
                 if body_match:
                     body_str = body_match.group(1).strip()
                     try:
-                        tool_request['body'] = json.loads(body_str)
+                        agent_request['body'] = json.loads(body_str)
                     except json.JSONDecodeError:
-                        tool_request['body'] = {}
+                        agent_request['body'] = {}
                 else:
-                    tool_request['body'] = {}
+                    agent_request['body'] = {}
             
-            # Append the tool_request to the result list
-            result['tool_requests'].append(tool_request)
+            # Append the agent_request to the result list
+            result['agent_requests'].append(agent_request)
         
-        return tool_request_error_bool, result
+        return agent_request_error_bool, result
 
 
 
-    def parse_and_store_tool_response(self, tool_response_text, sub_task_no, step_no):
-        # Split the text into CHAIN_OF_THOUGHT and tool_RESPONSE sections
-        sections = re.split(r"\$\$tool_RESPONSE\$\$", tool_response_text)
+    def parse_and_store_agent_response(self, agent_response_text, sub_task_no, step_no):
+        # Split the text into CHAIN_OF_THOUGHT and AGENT_RESPONSE sections
+        sections = re.split(r"\$\$AGENT_RESPONSE\$\$", agent_response_text)
         if len(sections) != 2:
-            raise ValueError("The text does not contain exactly one CHAIN_OF_THOUGHT and one tool_RESPONSE section.")
+            raise ValueError("The text does not contain exactly one CHAIN_OF_THOUGHT and one AGENT_RESPONSE section.")
 
         # Extract CHAIN_OF_THOUGHT section
         chain_of_thought_text = sections[0].strip()
         if not re.search(r"\$\$CHAIN_OF_THOUGHT\$\$", chain_of_thought_text):
             raise ValueError("CHAIN_OF_THOUGHT section not found or improperly formatted.")
 
-        # Extract tool_RESPONSE section
-        tool_response_text = sections[1].strip()
+        # Extract AGENT_RESPONSE section
+        agent_response_text = sections[1].strip()
 
         # Parse the status code and status text
-        match_status = re.search(r"Status_Code\s*\n\s*(\d+)\s*(.*)", tool_response_text)
+        match_status = re.search(r"Status_Code\s*\n\s*(\d+)\s*(.*)", agent_response_text)
         if not match_status:
             raise ValueError("Status_Code section not found or improperly formatted.")
         
@@ -463,14 +455,14 @@ class AgentNode(BaseNode):
 
         if status_code == 200 and status_text in ["OK", "Success"]:
             # Parse and validate the Output_Variables section
-            match_output_vars = re.search(r"Output_Variables\s*(.*?)(?=\nDependent_Input_Variables|\ntool Response|$)", tool_response_text, re.DOTALL)
+            match_output_vars = re.search(r"Output_Variables\s*(.*?)(?=\nDependent_Input_Variables|\nTOOL Response|$)", agent_response_text, re.DOTALL)
             if not match_output_vars:
                 raise ValueError("Output_Variables section not found or improperly formatted.")
             
             output_vars_section = match_output_vars.group(1).strip()
 
             # Capture multiline content until the next variable or section
-            output_vars = re.findall(r"- Variable Name: ([\w_]+)\s*- Content:\s*(.*?)(?=\n- Variable Name:|\nDependent_Input_Variables|\ntool Response|$)", output_vars_section, re.DOTALL)
+            output_vars = re.findall(r"- Variable Name: ([\w_]+)\s*- Content:\s*(.*?)(?=\n- Variable Name:|\nDependent_Input_Variables|\nTOOL Response|$)", output_vars_section, re.DOTALL)
             if not output_vars:
                 raise ValueError("No output variables found in the Output_Variables section.")
 
@@ -500,12 +492,12 @@ class AgentNode(BaseNode):
                 raise ValueError(f"Missing output variables for sub_task {sub_task_no}, Step {step_no}: {', '.join(missing_vars)}")
 
             # Now process Dependent_Input_Variables
-            match_dependent_vars = re.search(r"Dependent_Input_Variables\s*(.*?)(?=\ntool Response|$)", tool_response_text, re.DOTALL)
+            match_dependent_vars = re.search(r"Dependent_Input_Variables\s*(.*?)(?=\nTOOL Response|$)", agent_response_text, re.DOTALL)
             if match_dependent_vars and len(used_by_list) > 0:
                 dependent_vars_section = match_dependent_vars.group(1).strip()
 
                 # Capture multiline content until the next variable or section
-                dependent_vars = re.findall(r"- Variable Name: ([\w_]+)\s*- sub_task: (\d+)\s*- Step: (\d+)\s*- Type: (\w+)\s*- Content:\s*(.*?)(?=\n- Variable Name:|\ntool Response|$)", dependent_vars_section, re.DOTALL)
+                dependent_vars = re.findall(r"- Variable Name: ([\w_]+)\s*- sub_task: (\d+)\s*- Step: (\d+)\s*- Type: (\w+)\s*- Content:\s*(.*?)(?=\n- Variable Name:|\nTOOL Response|$)", dependent_vars_section, re.DOTALL)
                 if not dependent_vars:
                     raise ValueError("No dependent input variables found in the Dependent_Input_Variables section.")
 
@@ -541,7 +533,7 @@ class AgentNode(BaseNode):
                 raise ValueError(f"Missing Dependent_Input_Variables for {sub_task_no}, Step {step_no}")
         else:
             # Handle error cases
-            match_error = re.search(r"Error_Explanation\s*\n\s*(.*)", tool_response_text, re.DOTALL)
+            match_error = re.search(r"Error_Explanation\s*\n\s*(.*)", agent_response_text, re.DOTALL)
             if not match_error:
                 raise ValueError("Error_Explanation section not found for error response.")
 
@@ -617,7 +609,7 @@ class AgentNode(BaseNode):
     # for running functions
     def function_call(self, tool_name, body = None):
         
-        response = FUNCTION_toolS_FUNCTION_DICT[tool_name](body)
+        response = FUNCTION_TOOLS_FUNCTION_DICT[tool_name](body)
 
         # Check if the request was successful
         if response["status_code"] == 200:
@@ -647,7 +639,7 @@ class AgentNode(BaseNode):
         start_time = time.time()
         while not (self.drop or self.modify):
             if time.time() - start_time > timeout:
-                raise TimeoutError("Timeout waiting for MainTranslator response")
+                raise TimeoutError("Timeout waiting for DAG Compiler response")
             await asyncio.sleep(0.1)
         
     ###################################################################
@@ -672,6 +664,7 @@ class AgentNode(BaseNode):
             
             num_steps = len(self.sub_task_execution_blueprint)
             
+            #########################################################
             # preperation of input data for detailed execution_blueprint creation
             assistance_request_bool = False
             assistance_error_dict = None
@@ -681,70 +674,67 @@ class AgentNode(BaseNode):
                 tool_outputs_list = []
                 print(f"Processing Step {step_no} for tool: {step['tool']}")
 
-                ###########
+                #########################################################
                 # At the start of each step we will reset the self.chat_history
                 # print("\nself.chat_history : ",self.chat_history)
                 self.reset_chat_history()
             
-                ###########
-                # tool_RUNNING Part with Error Handling
+                #########################################################
+                # TOOL_RUNNING Part with Error Handling --> Includes AGENT REQUEST & TOOL CALL
 
                 # Call the function to prepare the input for the current step
-                if step['tool'] in RtoolD_toolS_DICT:
-                    tool_documentation = RtoolD_toolS_DICT[step['tool']]
-                elif step['tool'] in FUNCTION_toolS_DOCUMENTATION_DICT:
-                    tool_documentation = FUNCTION_toolS_DOCUMENTATION_DICT[step['tool']]
+                if step['tool'] in RAPIDAPI_TOOLS_DICT:
+                    tool_documentation = RAPIDAPI_TOOLS_DICT[step['tool']]
+                elif step['tool'] in FUNCTION_TOOLS_DOCUMENTATION_DICT:
+                    tool_documentation = FUNCTION_TOOLS_DOCUMENTATION_DICT[step['tool']]
                 else:
                     raise ValueError("tool Documentation Not Found.")
                 input_data = self.prepare_input_for_tool_running_step(step, tool_documentation)
-                # print(f"Prepared input for step {step['step']}: {input_data}")
 
-                # print("input_data : ",input_data)
-
-                # generating the tool request from the LLM
-                self.chat_history.append({"role": "user", "content": self.tool_running_prompt}) # system prompt for execution_blueprint_creation
+                # generating the Agent request from the LLM
+                self.chat_history.append({"role": "user", "content": self.agent_request_prompt})
                 self.chat_history.append({"role": "user", "content": input_data})
 
+                #########################################################
                 # running the llm and if the format is wrong then we will ask it to retry.
                 run_success = False
-                tool_input_error_counter = 0
-                tool_running_error_counter = 0
+                agent_request_error_counter = 0
+                tool_call_error_counter = 0
                 parse_error_bool = False
-                tool_success_bool = False
-                while not run_success and tool_input_error_counter < 5 and tool_running_error_counter < 3:
-                    # preparing the input to the tool
-                    tool_input_error_counter += 1
+                tool_call_success_bool = False
+                while not run_success and agent_request_error_counter < 5 and tool_call_error_counter < 3:
+                    #########################################################
+                    # preparing the input to the tool i.e, AGENT REQUEST
+                    agent_request_error_counter += 1
                     try:
-                        tool_request_llm = await self.async_generate()
-                        # print("tool_request_llm : ",tool_request_llm)
-                        parse_error_bool, parsed_tool_request = self.parse_tool_request(tool_request_llm)
+                        agent_request_llm = await self.async_generate()
+                        parse_error_bool, parsed_agent_request = self.parse_agent_request(agent_request_llm)
                         if parse_error_bool:
-                            # need to call main translator module for assistance
-                            # print("\nparsed_tool_request : ",parsed_tool_request)
+                            # need to call dag compiler module for assistance
                             assistance_request_bool = True
-                            assistance_error_dict = parsed_tool_request
+                            assistance_error_dict = parsed_agent_request
                             break
-                        # print("parsed_tool_request : ",parsed_tool_request)
                         run_success = True
                     except Exception as e:
-                        error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT and tool_REQUEST without any other details before or after.:\n {str(e)}' 
+                        error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT and AGENT_REQUEST without any other details before or after.:\n {str(e)}' 
                         self.chat_history.append({"role": "user", "content": error_message})
                         # print("tool input error_message : ",error_message)
                         continue
 
-                    # running the tool
-                    tool_running_error_counter += 1
+                    #########################################################
+                    # running the tool i.e., TOOL CALL
+                    tool_call_error_counter += 1
                     try:
-                        for tool_req_i in range(len(parsed_tool_request['tool_requests'])):
-                            if parsed_tool_request['tool_requests'][tool_req_i]['method'] == "FUNCTION":
-                                tool_success_bool, tool_output = self.function_call(step['tool'], parsed_tool_request['tool_requests'][tool_req_i]['body'])
+                        for tool_req_i in range(len(parsed_agent_request['agent_requests'])):
+                            if parsed_agent_request['agent_requests'][tool_req_i]['method'] == "FUNCTION":
+                                tool_call_success_bool, tool_output = self.function_call(step['tool'], parsed_agent_request['agent_requests'][tool_req_i]['body'])
                             else:
-                                tool_success_bool, tool_output = self.requests_func(parsed_tool_request['tool_requests'][tool_req_i]['method'], parsed_tool_request['tool_requests'][tool_req_i]['url'], parsed_tool_request['tool_requests'][tool_req_i]['headers'], parsed_tool_request['tool_requests'][tool_req_i]['body'])
+                                tool_call_success_bool, tool_output = self.requests_func(parsed_agent_request['agent_requests'][tool_req_i]['method'], parsed_agent_request['agent_requests'][tool_req_i]['url'], parsed_agent_request['agent_requests'][tool_req_i]['headers'], parsed_agent_request['agent_requests'][tool_req_i]['body'])
 
-                            # if tool_output is too big then we will summarize here itslef else it would take a lot of context
-                            # _ = tiktoken.get_encoding("cl100k_base")
+                            # if tool_output is too big then we will truncate if required and then summarize here itself else it would take a lot of context
+                            # Truncating the tool output to 80000 characters
                             if len(str(tool_output)) > 80000:
-                                print("Earlier character length was more than 80000, to be precisely it was: ",len(str(tool_output)))
+                                print("Earlier character length was more than 80000, to be precise it was: ",len(str(tool_output)))
                                 tool_output = str(tool_output)[:80000]
                                 print("After the length became: ", len(str(tool_output)))
                             print("num of tokens : ",self.num_tokens_from_string(f"{tool_output}"))
@@ -760,12 +750,12 @@ class AgentNode(BaseNode):
                                 tool_output = llm_output_tool_output_summarize
                                 print("after summarize num of tokens : ",self.num_tokens_from_string(f"{tool_output}"))
 
-                            # if its a 4xx error then we can retry as it is possible that llm made a wrong tool request
-                            if not tool_success_bool: # and int(tool_output["status_code"])/100 == 4:
+                            # if its tool call failed then we can retry as it is possible that llm made a wrong agent request
+                            if not tool_call_success_bool:
                                 # error handling part here
                                 raise ValueError(f"tool_output : {tool_output}")
-                            # apart from 4xx errors we should just call the main translator for assistance
-                            if not tool_success_bool:
+                            # apart from tool call failure errors we should just call the dag compiler for assistance
+                            if not tool_call_success_bool:
                                 assistance_request_bool = True
                                 assistance_error_dict = tool_output
                                 break
@@ -774,28 +764,25 @@ class AgentNode(BaseNode):
 
                         run_success = True
                     except Exception as e:
-                        error_message = f'There was an error while running the tool, please rectify based on this error message, only output the CHAIN_OF_THOUGHT and tool_REQUEST without any other details before or after. Carefully review the tool call and its documentation to identify and then rectify it.:\n {str(e)}' 
+                        error_message = f'There was an error while running the tool, please rectify based on this error message, only output the CHAIN_OF_THOUGHT and AGENT_REQUEST without any other details before or after. Carefully review the tool call and its documentation to identify and then rectify it.:\n {str(e)}' 
                         self.chat_history.append({"role": "user", "content": error_message})
                         print("tool running error_message : ",error_message)
-
                         tool_outputs_list = []
 
                 if assistance_request_bool:
                     break
 
                 if not run_success:
-                    raise ValueError("Something is going wrong with the llm or the parsing function or tool running fucntion. It is not an expected kind of error.")
+                    raise ValueError("Something is going wrong with the llm or the parsing function or tool calling fucntion. It is not an expected kind of error.")
                     
-                ###########
-                # tool_OUTPUT, tool_OUTPUT_DEPENDENCY Part with Error Handling
+                #########################################################
+                # AGENT RESPONSE Part with Error Handling
 
                 # give the tool_output to LLM and ask it to first verify if it seems plausile for our expectations from the tool, then save the relevant part in the right format
                 # additionally the LLM Agent will check if the tool output has enough information such that we can fulfil the input variable requirement for future steps which depend on its output, and retrieve the relevant information and save it in the right format
-                # tool_output_llm_input = self.prepare_input_for_tool_output(tool_outputs_list[0], self.sub_task_no, step_no)
                 tool_output_llm_input = self.prepare_input_for_tool_output(tool_outputs_list, self.sub_task_no, step_no)
-                # print("\ntool_output_llm_input : ",tool_output_llm_input)
-                # generating the tool response format from the LLM
-                self.chat_history.append({"role": "user", "content": self.tool_output_prompt}) # system prompt for execution_blueprint_creation
+                # generating the AGENT RESPONSE format from the LLM
+                self.chat_history.append({"role": "user", "content": self.agent_response_prompt}) 
                 self.chat_history.append({"role": "user", "content": tool_output_llm_input })
 
 
@@ -804,21 +791,21 @@ class AgentNode(BaseNode):
                 while not run_success and counter < 5:
                     counter += 1
                     try:
-                        tool_output_llm_output = await self.async_generate()
-                        # print("\ntool_output_llm_output : ",tool_output_llm_output)
-                        tool_parsed_output = self.parse_and_store_tool_response(tool_output_llm_output, self.sub_task_no, step_no)
-                        # if a 6xx error was raised then status_code key will be there in tool_parsed_output
-                        if 'status_code' in tool_parsed_output:
+                        agent_response_llm_output = await self.async_generate()
+                        # print("\nagent_response_llm_output : ",agent_response_llm_output)
+                        agent_response_parsed_output = self.parse_and_store_agent_response(agent_response_llm_output, self.sub_task_no, step_no)
+                        # if a 6xx error was raised then status_code key will be there in agent_response_parsed_output
+                        if 'status_code' in agent_response_parsed_output:
                             # call for assistance request along with giving error description
                             assistance_request_bool =  True
-                            assistance_error_dict = tool_parsed_output
+                            assistance_error_dict = agent_response_parsed_output
                             break
 
-                        print("tool_parsed_output : ",tool_parsed_output)
+                        print("agent_response_parsed_output : ",agent_response_parsed_output)
 
                         run_success = True
                     except Exception as e:
-                        error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT and tool_RESPONSE without any other details before or after.:\n {str(e)}' 
+                        error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT and AGENT_RESPONSE without any other details before or after.:\n {str(e)}' 
                         self.chat_history.append({"role": "user", "content": error_message})
                         # print("error_message : ",error_message)
 
@@ -827,20 +814,22 @@ class AgentNode(BaseNode):
 
             
                 if not run_success:
-                    raise ValueError("Something is going wrong with the llm or the parsing function in tool_output. It is not an expected kind of error.")
+                    raise ValueError("Something is going wrong with the llm or the parsing function in AGENT RESPONSE. It is not an expected kind of error.")
                     
-
+                #########################################################
+                # Saving the updated execution_blueprint with tool output values
                 with open(f"execution_blueprint_updated_{self.sub_task_no}.json", "w") as json_file:
                     json.dump(self.group_execution_blueprint, json_file, indent=4)
 
-
-                # running status update part
+                #########################################################
+                # Running STATUS UPDATE part
                 status_assist_input = self.prepare_status_assistance_input(self.group_execution_blueprint, step_no)
                 print("\nstatus_assist_input : ",status_assist_input)
                 
-                self.chat_history.append({"role": "user", "content": self.status_assistance_prompt}) # system prompt for execution_blueprint_creation
-                self.chat_history.append({"role": "user", "content": status_assist_input}) # system prompt for execution_blueprint_creation
+                self.chat_history.append({"role": "user", "content": self.status_assistance_prompt}) 
+                self.chat_history.append({"role": "user", "content": status_assist_input}) 
 
+                # STATUS UPDATE
                 run_success = False
                 counter = 0
                 while not run_success and counter < 5:
@@ -857,18 +846,20 @@ class AgentNode(BaseNode):
                         print("error_message : ",error_message)
                 
                 if not run_success:
-                    raise ValueError("Something is going wrong with the llm or the parsing function in status_update send without assistance request. It is not an expected kind of error.")
+                    raise ValueError("Something is going wrong with the llm or the parsing function in status_update without assistance request. It is not an expected kind of error.")
                 
                 # updating the prev_status_update
                 self.prev_status_update = parsed_status_update['status_update']
 
-            
+            #########################################################
+            # ASSISTANCE REQUEST
             if assistance_request_bool:
                 status_assist_input = self.prepare_status_assistance_input(self.group_execution_blueprint, step_no, assistance_error_dict)
                 print("\nstatus_assist_input : ",status_assist_input)
-                self.chat_history.append({"role": "user", "content": self.status_assistance_prompt}) # system prompt for execution_blueprint_creation
-                self.chat_history.append({"role": "user", "content": status_assist_input}) # system prompt for execution_blueprint_creation
+                self.chat_history.append({"role": "user", "content": self.status_assistance_prompt}) 
+                self.chat_history.append({"role": "user", "content": status_assist_input}) 
 
+                # Preparing the ASSISTANCE_REQUEST message
                 run_success = False
                 counter = 0
                 while not run_success and counter < 5:
@@ -885,18 +876,20 @@ class AgentNode(BaseNode):
                         print("error_message : ",error_message)
                 
                 if not run_success:
-                    raise ValueError("Something is going wrong with the llm or the parsing function in status_update send with assistance request. It is not an expected kind of error.")
+                    raise ValueError("Something is going wrong with the llm or the parsing function in status_update with assistance request. It is not an expected kind of error.")
 
+                # Communicating with the DAG Compiler for modificiation of execution blueprint based on the context of the error
                 await self.dag_compiler.communicate(parsed_status_update, self.sub_task_no, self)
                 print("\nafter self.dag_compiler.communicate(parsed_status_update, self.sub_task_no, self)")
                 try:
                     await self.wait_for_response()
                 except TimeoutError:
-                    print(f"Timeout waiting for response from MainTranslator for sub_task {self.sub_task_no}")
+                    print(f"Timeout waiting for response from DAG Compiler for sub_task {self.sub_task_no}")
                     return None
                 
                 print("after try and timeout")
 
+                # Two possibilites after execution bluepring modification; either the sub_task is dropped or is modified to avoid error
                 if self.drop:
                     return None
                 if self.modify:
@@ -908,9 +901,11 @@ class AgentNode(BaseNode):
                 # overall this step was succesful
                 overall_success_bool = True
 
+        # Overall execution blueprint failed
         if not overall_success_bool:
             raise ValueError(f"Overall the execution_blueprint failed for {self.sub_task_no}")
-        
+
+    # Compile SUB TASK ouptut   
     def get_results(self):
         if self.drop:
             return {
@@ -918,7 +913,7 @@ class AgentNode(BaseNode):
             'output' : 'This sub_task Was Dropped'
         }
 
-        final_execution_blueprint_with_values = self.make_final_execution_blueprint_with_output_values(self.group_execution_blueprint, self.dag_compiler.sub_tasks_list)
+        final_execution_blueprint_with_values = self.make_final_execution_blueprint_with_output_values(self.group_execution_blueprint, self.dag_compiler.subtask_list)
         self.chat_history.append({"role": "user", "content": self.user_readable_output_prompt})
         self.chat_history.append({"role": "user", "content": final_execution_blueprint_with_values})
         output = self.generate()

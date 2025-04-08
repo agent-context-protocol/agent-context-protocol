@@ -100,7 +100,7 @@ class ACPManager:
     def __del__(self):
         self.thread_pool.shutdown(wait=True)
 
-class ACPOrchestrator:
+class ACP:
     def __init__(self):
         self.get_system_prompts()
         self.task_decomposer = TaskDecompositionNode('task_decomposer', system_prompt=self.task_decomposer_system_prompt)
@@ -141,8 +141,12 @@ class ACPOrchestrator:
 
 
 async def main():
-    orchestrator = ACPOrchestrator()
-    await orchestrator.run("what is the weather in seattle, usa", '')
+    acp = ACP()
+    # await acp.run("what is the weather in seattle, usa", '')
+    user_query = "what is the weather in seattle, usa"
+    execution_blueprint = await acp.initialise(user_query)
+    async for group_id, group_results in acp.run(user_query, execution_blueprint):
+        print(f"\n\nGroupID: {group_id}:\n{group_results}")
 
 if __name__ == "__main__":
     asyncio.run(main())

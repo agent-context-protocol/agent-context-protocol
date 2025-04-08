@@ -1,0 +1,32 @@
+{
+    "1": {
+        "subtask_description": "Retrieve current weather conditions in Seattle, USA.",
+        "steps": {
+            "1": {
+                "tool": "WeatherAPI.com_Realtime_Weather_Api",
+                "handles": "Fetches current weather conditions in Seattle.",
+                "input_vars": [
+                    {
+                        "name": "location_query",
+                        "parameter": [
+                            "q"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Query parameter for Seattle, USA.",
+                        "value": "Seattle, USA",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "current_weather",
+                        "description": "Current weather conditions in Seattle.",
+                        "used_by": [],
+                        "value": "```json\n    {\n      \"temperature\": \"15\u00b0C\",\n      \"wind_speed\": \"10 km/h\",\n      \"humidity\": \"80%\",\n      \"condition\": \"Partly cloudy\",\n      \"wind_direction\": \"NW\",\n      \"pressure\": \"1015 hPa\",\n      \"precipitation\": \"0 mm\",\n      \"visibility\": \"10 km\"\n    }\n    ```"
+                    }
+                ]
+            }
+        }
+    }
+}

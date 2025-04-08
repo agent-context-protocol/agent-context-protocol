@@ -64,9 +64,9 @@ TOOL Response:
    - Extract and format the necessary data for each dependent step's Input Variables, matching the expected data types and formats.
 
 4. Handle Errors Appropriately:
-   - 603 INCOMPLETE_INFORMATION: Raise this error if most or all of the information is missing, and the TOOL response is insufficient to fill in the Output_Variables or Dependent_Input_Variables.
-   - 604 DEPENDENCY_INCOMPLETE_INFORMATION: Raise this error if most or all of the information is missing for dependent steps, and the TOOL response lacks sufficient information to fulfill the dependencies for future steps.
-   - 605 WRONG_INFORMATION: Raise this error if the TOOL output is not at all related to what was intended. This error should be raised very rarely when everything is wrong.
+   - 605 INCOMPLETE_INFORMATION: Raise this error if most or all of the information is missing, and the TOOL response is insufficient to fill in the Output_Variables or Dependent_Input_Variables.
+   - 606 DEPENDENCY_INCOMPLETE_INFORMATION: Raise this error if most or all of the information is missing for dependent steps, and the TOOL response lacks sufficient information to fulfill the dependencies for future steps.
+   - 607 WRONG_INFORMATION: Raise this error if the TOOL output is not at all related to what was intended. This error should be raised very rarely when everything is wrong.
    - Only raise errors in extreme cases when the missing information is significant.
    - When an error is raised, do not include Output_Variables or Dependent_Input_Variables after the Error_Explanation.
 
@@ -96,12 +96,12 @@ TOOL Response:
   - Extract and format the required data for each dependent step's Input Variables.
   - Think about what information from the TOOL output should be extracted so that things are understandable and complete.
   - Utilize the TOOL documentation present in the chat history.
-  - Incorporate considerations about error handling: only raise errors (603, 604, 605) in extreme cases when missing information is significant or when the TOOL response is entirely incorrect.
+  - Incorporate considerations about error handling: only raise errors (605, 606, 607) in extreme cases when missing information is significant or when the TOOL response is entirely incorrect.
 
 - Error Handling:
-  - 603 INCOMPLETE_INFORMATION: Raise this error if most or all of the information is missing, and the TOOL response is insufficient for the current step.
-  - 604 DEPENDENCY_INCOMPLETE_INFORMATION: Raise this error if most or all of the information is missing for dependent steps.
-  - 605 WRONG_INFORMATION: Raise this error if the TOOL response is not at all related to what was intended. This error should be raised very rarely when everything is wrong.
+  - 605 INCOMPLETE_INFORMATION: Raise this error if most or all of the information is missing, and the TOOL response is insufficient for the current step.
+  - 606 DEPENDENCY_INCOMPLETE_INFORMATION: Raise this error if most or all of the information is missing for dependent steps.
+  - 607 WRONG_INFORMATION: Raise this error if the TOOL response is not at all related to what was intended. This error should be raised very rarely when everything is wrong.
   - Provide a clear explanation in the Error_Explanation section.
   - Only raise errors in extreme cases, not for minor or partial data issues.
   - When an error is raised, do not include Output_Variables or Dependent_Input_Variables after the Error_Explanation.
@@ -131,7 +131,7 @@ $$CHAIN_OF_THOUGHT$$
 
 - Detail your reasoning and steps taken to process the TOOL response for both the current step and dependencies.
 
-$$TOOL_RESPONSE$$
+$$AGENT_RESPONSE$$
 
 Status_Code
 
@@ -156,7 +156,7 @@ $$CHAIN_OF_THOUGHT$$
 
 - Explain your reasoning leading to the error.
 
-$$TOOL_RESPONSE$$
+$$AGENT_RESPONSE$$
 
 Status_Code
 
@@ -233,7 +233,7 @@ $$CHAIN_OF_THOUGHT$$
 - For the dependent step, "top_headlines" requires an array of top headlines for each location.
 - Extract the "title", "description", and "url" from each article to create the "news_articles" array.
 
-$$TOOL_RESPONSE$$
+$$AGENT_RESPONSE$$
 
 Status_Code
 
@@ -314,7 +314,7 @@ $$CHAIN_OF_THOUGHT$$
 - For the dependent step (sub_task 2, Step 1), the Input Variable "vacation_spots_list_usa" requires a list of vacation spots to retrieve geographic coordinates for each location. The extracted list of vacation spots from the current step meets the requirement of the dependent input and is formatted as a string array, making it compatible for use in the subsequent TOOL call.
 - The data is structured appropriately for both the current step's output and the dependent step’s input. The list of vacation spots is formatted as an array of strings, ready to be passed as input to retrieve latitude and longitude.
 
-$$TOOL_RESPONSE$$
+$$AGENT_RESPONSE$$
 
 Status_Code
 
@@ -414,7 +414,7 @@ $$CHAIN_OF_THOUGHT$$
 - For the dependent step (sub_task 1, Step 2), the input variables "latitudes_data" and "longitudes_data" need to be passed as floats to retrieve the current weather data for these locations. These extracted values meet the requirements for the dependent step.
 - Both the output variables for the current step and the dependent input variables for the future step are extracted correctly and formatted as floats, ensuring they can be used in the next TOOL call for weather data.
 
-$$TOOL_RESPONSE$$
+$$AGENT_RESPONSE$$
 
 Status_Code
 
@@ -603,7 +603,7 @@ Step 5: Decide on Error Handling
 - As most of the information is available, and missing data is minimal, we will not raise an error.
 - Proceed to provide the extracted details for the available locations.
 
-$$TOOL_RESPONSE$$
+$$AGENT_RESPONSE$$
 
 Status_Code
 
@@ -725,13 +725,13 @@ Step 5: Decide on Error Handling
 
 - All information is missing for the current step.
 - As per guidelines, when most or all information is missing, we should raise an error.
-- Therefore, we will raise 603 INCOMPLETE_INFORMATION.
+- Therefore, we will raise 605 INCOMPLETE_INFORMATION.
 
-$$TOOL_RESPONSE$$
+$$AGENT_RESPONSE$$
 
 Status_Code
 
-603 INCOMPLETE_INFORMATION
+605 INCOMPLETE_INFORMATION
 
 Error_Explanation
 
@@ -787,7 +787,7 @@ $$CHAIN_OF_THOUGHT$$
 - The data is complete and matches the expected output for the current step, which is to retrieve current weather conditions for each area.
 - The extracted data will be formatted into a JSON structure for the output variable `current_weather_data`.
 
-$$TOOL_RESPONSE$$
+$$AGENT_RESPONSE$$
 
 Status_Code
 
@@ -865,14 +865,14 @@ Step 3: Decide on Error Handling
 
 - Although we generally avoid raising errors unless the discrepancy is significant, in this case, the TOOL has returned weather information for an entirely different country. This makes the data completely inaccurate for our purposes.
 - Given that the issue is not a minor difference (like a wrong time or small temperature variance), but a country mismatch, it severely impacts the dependent steps’ ability to provide accurate results.
-- As per the guidelines, when the TOOL response contains entirely wrong information, we raise error code 605 WRONG_INFORMATION.
+- As per the guidelines, when the TOOL response contains entirely wrong information, we raise error code 607 WRONG_INFORMATION.
 - Therefore, in this case, we will raise the error because the response is unrelated to the intended input location, Washington, D.C., USA.
 
-$$TOOL_RESPONSE$$
+$$AGENT_RESPONSE$$
 
 Status_Code
 
-605 WRONG_INFORMATION
+607 WRONG_INFORMATION
 
 Error_Explanation
 
