@@ -187,7 +187,7 @@ $$CHAIN_OF_THOUGHT$$
 
 For each group and sub_task, first provide your chain of thought, explaining your reasoning in determining the TOOLs to use, their parameters, types of the parameters, the flow, any interdependencies, and how groups should be formed. Ensure that each TOOL depends on at most one previous TOOL's output. Variable names should strictly be unique for all the variables in the execution_blueprint (across sub_tasks in a group). Exception: If the input variable for the current step depends on the output from a previous step, the input variable name must be exactly the same as the output variable name (from which we will fill the input variable value) to ensure consistency. The dependency should be such that a sub_tasks step can only be dependent on a previous sub_tasks step output and not on a future sub_tasks step output. It is not necessary to follow the input sub_tasks order as that can be wrong.
 
-$$execution_blueprint$$
+$$EXECUTION_BLUEPRINT$$
 
 Group [Group ID]:
 
@@ -506,7 +506,7 @@ execution_blueprint Efficiency
   - Using city names directly when possible.
   - Limiting each sub_task to essential steps only.
 
-$$execution_blueprint$$
+$$EXECUTION_BLUEPRINT$$
 
 Group 1:
 
@@ -794,7 +794,7 @@ execution_blueprint Efficiency
   - Avoiding unnecessary steps like additional Perplexity calls.
   - Extracting dates directly from the user's query without additional processing.
 
-$$execution_blueprint$$
+$$EXECUTION_BLUEPRINT$$
 
 Group 1:
 
@@ -956,7 +956,7 @@ sub_task 1: News in the Netherlands
   - By avoiding unnecessary parameters like region, we reduce the risk of errors and ensure we retrieve the most comprehensive set of news articles.
 
 
-$$execution_blueprint$$
+$$EXECUTION_BLUEPRINT$$
 
 - TOOL: NewsTOOLSearchByKeyWord
 - Handles: Fetches news articles for Netherlands
@@ -1182,7 +1182,7 @@ execution_blueprint Efficiency
   - Ensuring data flows efficiently between steps.
   - Matching variable names to maintain consistency and avoid errors.
 
-$$execution_blueprint$$
+$$EXECUTION_BLUEPRINT$$
 
 Group 1:
 
@@ -1473,7 +1473,7 @@ execution_blueprint Efficiency
   - Avoiding unnecessary TOOL calls.
   - Ensuring data flows efficiently between steps.
 
-$$execution_blueprint$$
+$$EXECUTION_BLUEPRINT$$
 
 Group 1:
 
@@ -1749,7 +1749,7 @@ execution_blueprint Efficiency
 - Used Perplexity efficiently to handle multiple information retrieval tasks.
 - Avoided unnecessary TOOLs, keeping the execution_blueprint minimal and straightforward.
 
-$$execution_blueprint$$
+$$EXECUTION_BLUEPRINT$$
 
 Group 1:
 

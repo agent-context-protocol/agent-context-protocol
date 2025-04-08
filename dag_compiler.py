@@ -14,7 +14,7 @@ class DAGCompilerNode(BaseNode):
         self.queue = asyncio.Queue()
         self.execution_blueprint = None
 
-        self.unique_apis = {}
+        self.unique_tools = {}
 
     def get_system_prompts(self):
         # execution_blueprint_creation_prompt
@@ -32,7 +32,7 @@ class DAGCompilerNode(BaseNode):
         # First, split the text into CHAIN_OF_THOUGHT and execution_blueprint sections
         sections = re.split(r"\$\$execution_blueprint\$\$", text)
         if len(sections) != 2:
-            raise ValueError("The text does not contain exactly one CHAIN_OF_THOUGHT and one execution_blueprint section.")
+            raise ValueError("The text does not contain exactly one CHAIN_OF_THOUGHT and one EXECUTION_BLUEPRINT section.")
 
         chain_of_thought_text = sections[0].replace("$$CHAIN_OF_THOUGHT$$", "").strip()
         execution_blueprint_text = sections[1].strip()
@@ -60,8 +60,8 @@ class DAGCompilerNode(BaseNode):
             execution_blueprints[current_group] = {}
 
             group_lines = group_content.strip().split('\n')
-            panels_in_group = []
-            panel_interdependencies_found = False
+            subtasks_in_group = []
+            subtasks_interdependencies_found = False
 
             j = 0
             while j < len(group_lines):
@@ -72,37 +72,37 @@ class DAGCompilerNode(BaseNode):
 
                 line = group_lines[j].strip()
 
-                if line.startswith("execution_blueprint for Panel"):
-                    # Extract panel ID
-                    panel_id = int(re.search(r'\d+', line).group(0))
-                    execution_blueprints[current_group][panel_id] = {"panel_description": None, "steps": {}}
-                    steps = execution_blueprints[current_group][panel_id]["steps"]
-                    panels_in_group.append(panel_id)
+                if line.startswith("execution_blueprint for sub_task"):
+                    # Extract sub_task ID
+                    subtasks_id = int(re.search(r'\d+', line).group(0))
+                    execution_blueprints[current_group][subtasks_id] = {"subtask_description": None, "steps": {}}
+                    steps = execution_blueprints[current_group][subtasks_id]["steps"]
+                    subtasks_in_group.append(subtasks_id)
                     j += 1
 
                     # Skip empty lines
                     j = skip_empty_lines(group_lines, j)
                     if j >= len(group_lines):
-                        raise ValueError(f"Missing content after 'execution_blueprint for Panel {panel_id}'")
+                        raise ValueError(f"Missing content after execution_blueprint for sub_task {subtasks_id}'")
 
-                    # Parse Panel Description
-                    if group_lines[j].strip().startswith("Panel Description:"):
-                        panel_desc = group_lines[j].split("Panel Description:")[1].strip()
-                        execution_blueprints[current_group][panel_id]["panel_description"] = panel_desc
+                    # Parse sub_task Description
+                    if group_lines[j].strip().startswith("sub_task Description:"):
+                        subtasks_desc = group_lines[j].split("sub_task Description:")[1].strip()
+                        execution_blueprints[current_group][subtasks_id]["subtask_description"] = subtasks_desc
                         j += 1
                     else:
-                        raise ValueError(f"Missing Panel Description for Panel {panel_id}")
+                        raise ValueError(f"Missing sub_task Description for sub_task {subtasks_id}")
 
                     # Skip empty lines
                     j = skip_empty_lines(group_lines, j)
                     if j >= len(group_lines):
-                        raise ValueError(f"Missing content after Panel Description for Panel {panel_id}")
+                        raise ValueError(f"Missing content after sub_task Description for sub_task {subtasks_id}")
 
                     # Check for 'execution_blueprint Steps:'
                     if group_lines[j].strip() == "execution_blueprint Steps:":
                         j += 1
                     else:
-                        raise ValueError(f"Missing 'execution_blueprint Steps:' section for Panel {panel_id}")
+                        raise ValueError(f"Missing execution_blueprint Steps: section for sub_task {subtasks_id}")
 
                     # Parse Steps
                     while j < len(group_lines):
@@ -112,16 +112,16 @@ class DAGCompilerNode(BaseNode):
                             break
 
                         line = group_lines[j].strip()
-                        if line.startswith("execution_blueprint for Panel") or line.startswith("Group"):
-                            break  # Move to the next panel or group
+                        if line.startswith("execution_blueprint for sub_task") or line.startswith("Group"):
+                            break  # Move to the next subtask or group
 
                         # Parse Step
                         if line.startswith("Step"):
-                            # Initializing the required parameters for this api
-                            reqd_params_for_this_api = None
+                            # Initializing the required parameters for this tool
+                            reqd_params_for_this_tool = None
                             # Extract step number
                             step_counter = int(re.search(r'\d+', line).group(0))
-                            current_step = {'api': '', 'handles': '', 'input_vars': [], 'output_vars': []}
+                            current_step = {'tool': '', 'handles': '', 'input_vars': [], 'output_vars': []}
                             j += 1
 
                             # Skip empty lines
@@ -135,18 +135,18 @@ class DAGCompilerNode(BaseNode):
                                     break
 
                                 line = group_lines[j].strip()
-                                if line.startswith("Step") or line.startswith("execution_blueprint for Panel") or line.startswith("Group"):
-                                    break  # Next step, panel, or group
+                                if line.startswith("Step") or line.startswith("execution_blueprint for sub_task") or line.startswith("Group"):
+                                    break  # Next step, subtask, or group
 
-                                if line.startswith("- API:"):
-                                    current_step['api'] = line.split("- API:")[1].strip()
-                                    if current_step['api'] in RAPID_REQD_PARAMS_DICT:
-                                        reqd_params_for_this_api = list(RAPID_REQD_PARAMS_DICT[current_step['api']].keys())
-                                    elif current_step['api'] in FUNCTION_APIS_REQD_PARAMS_DICT:
-                                        reqd_params_for_this_api = list(FUNCTION_APIS_REQD_PARAMS_DICT[current_step['api']].keys())
-                                    elif current_step['api'] not in RAPID_PARAMS_DICT or current_step['api'] not in FUNCTION_APIS_PARAMS_DICT:
-                                        raise ValueError(f"Invalid API Name {current_step['api']}, there is no such API name. Please use a valid api name.")
-                                    print(f"current_step['api']: {current_step['api']} reqd_params_for_this_api : {reqd_params_for_this_api}")
+                                if line.startswith("- TOOL:"):
+                                    current_step['tool'] = line.split("- TOOL:")[1].strip()
+                                    if current_step['tool'] in RAPID_REQD_PARAMS_DICT:
+                                        reqd_params_for_this_tool = list(RAPID_REQD_PARAMS_DICT[current_step['tool']].keys())
+                                    elif current_step['tool'] in FUNCTION_APIS_REQD_PARAMS_DICT:
+                                        reqd_params_for_this_tool = list(FUNCTION_APIS_REQD_PARAMS_DICT[current_step['tool']].keys())
+                                    elif current_step['tool'] not in RAPID_PARAMS_DICT or current_step['tool'] not in FUNCTION_APIS_PARAMS_DICT:
+                                        raise ValueError(f"Invalid TOOL Name {current_step['tool']}, there is no such TOOL name. Please use a valid TOOL name.")
+                                    print(f"current_step['tool']: {current_step['tool']} reqd_params_for_this_tool : {reqd_params_for_this_tool}")
                                     j += 1
                                 elif line.startswith("- Handles:"):
                                     current_step['handles'] = line.split("- Handles:")[1].strip()
@@ -159,7 +159,7 @@ class DAGCompilerNode(BaseNode):
                                         if j >= len(group_lines):
                                             break
                                         line = group_lines[j].strip()
-                                        if line.startswith("- Output Variables:") or line.startswith("Step") or line.startswith("execution_blueprint for Panel") or line.startswith("Group"):
+                                        if line.startswith("- Output Variables:") or line.startswith("Step") or line.startswith("execution_blueprint for sub_task") or line.startswith("Group"):
                                             break
                                         if line.startswith("- Name:"):
                                             input_var = {}
@@ -179,27 +179,27 @@ class DAGCompilerNode(BaseNode):
                                                 parameters = [param.strip() for param in param_str.split(",") if param.strip()]
 
                                                 for param_ in parameters:
-                                                    if current_step['api'] in RAPID_PARAMS_DICT and param_ not in RAPID_PARAMS_DICT[current_step['api']]:
-                                                        raise ValueError(f"Given parameter name {param_} is invalid parameter for API {current_step['api']}, there is no such parameter for this API. The valid parameters for this api are {RAPID_PARAMS_DICT[current_step['api']]}.")
-                                                    elif current_step['api'] in FUNCTION_APIS_PARAMS_DICT and param_ not in FUNCTION_APIS_PARAMS_DICT[current_step['api']]:
-                                                        raise ValueError(f"Given parameter name {param_} is invalid parameter for API {current_step['api']}, there is no such parameter for this API. Please use a valid parameter for this API {FUNCTION_APIS_PARAMS_DICT[current_step['api']]}.")
+                                                    if current_step['tool'] in RAPID_PARAMS_DICT and param_ not in RAPID_PARAMS_DICT[current_step['tool']]:
+                                                        raise ValueError(f"Given parameter name {param_} is invalid parameter for TOOL {current_step['tool']}, there is no such parameter for this TOOL. The valid parameters for this tool are {RAPID_PARAMS_DICT[current_step['tool']]}.")
+                                                    elif current_step['tool'] in FUNCTION_APIS_PARAMS_DICT and param_ not in FUNCTION_APIS_PARAMS_DICT[current_step['tool']]:
+                                                        raise ValueError(f"Given parameter name {param_} is invalid parameter for TOOL {current_step['tool']}, there is no such parameter for this TOOL. Please use a valid parameter for this TOOL {FUNCTION_APIS_PARAMS_DICT[current_step['tool']]}.")
                                                     
                                                 
                                                 # Assign the list of parameters to input_var['parameter']
                                                 input_var['parameter'] = parameters
                                                 
-                                                # Iterate through each parameter and remove it from reqd_params_for_this_api if present
+                                                # Iterate through each parameter and remove it from reqd_params_for_this_tool if present
                                                 for param in parameters:
-                                                    if param in reqd_params_for_this_api:
-                                                        reqd_params_for_this_api.remove(param)
+                                                    if param in reqd_params_for_this_tool:
+                                                        reqd_params_for_this_tool.remove(param)
                                                     # else:
                                                     #     # Optionally, handle cases where the parameter is not found
-                                                    #     print(f"Warning: Parameter '{param}' not found in required parameters for this API.")
+                                                    #     print(f"Warning: Parameter '{param}' not found in required parameters for this TOOL.")
                                                 
                                                 # Move to the next line
                                                 j += 1
                                             else:
-                                                raise ValueError(f"Missing 'Parameter' for input variable in Panel {panel_id}, Step {step_counter}")
+                                                raise ValueError(f"Missing 'Parameter' for input variable in sub_task {subtasks_id}, Step {step_counter}")
 
                                             # Parse Type
                                             line = group_lines[j].strip()
@@ -207,7 +207,7 @@ class DAGCompilerNode(BaseNode):
                                                 input_var['type'] = line.split("Type:")[1].strip()
                                                 j += 1
                                             else:
-                                                raise ValueError(f"Missing 'Type' for input variable in Panel {panel_id}, Step {step_counter}")
+                                                raise ValueError(f"Missing 'Type' for input variable in sub_task {subtasks_id}, Step {step_counter}")
 
                                             # Parse Source
                                             line = group_lines[j].strip()
@@ -215,7 +215,7 @@ class DAGCompilerNode(BaseNode):
                                                 input_var['source'] = line.split("Source:")[1].strip()
                                                 j += 1
                                             else:
-                                                raise ValueError(f"Missing 'Source' for input variable in Panel {panel_id}, Step {step_counter}")
+                                                raise ValueError(f"Missing 'Source' for input variable in sub_task {subtasks_id}, Step {step_counter}")
 
                                             # Parse Description
                                             line = group_lines[j].strip()
@@ -223,7 +223,7 @@ class DAGCompilerNode(BaseNode):
                                                 input_var['description'] = line.split("Description:")[1].strip()
                                                 j += 1
                                             else:
-                                                raise ValueError(f"Missing 'Description' for input variable in Panel {panel_id}, Step {step_counter}")
+                                                raise ValueError(f"Missing 'Description' for input variable in sub_task {subtasks_id}, Step {step_counter}")
 
                                             # Parse Value
                                             line = group_lines[j].strip()
@@ -231,31 +231,31 @@ class DAGCompilerNode(BaseNode):
                                                 input_var['value'] = input_var['value'] = line.split("Value:")[1].strip().strip('"')
                                                 # Check for the correct value based on Source
                                                 if input_var['source'] == "LLM_Generated" and input_var['value'] == "None":
-                                                    raise ValueError(f"Value should not be 'None' for LLM_Generated source in Panel {panel_id}, Step {step_counter}")
-                                                elif input_var['source'] == "API_Output" and input_var['value'] != "None":
-                                                    raise ValueError(f"Value should be 'None' for API_Output source in Panel {panel_id}, Step {step_counter}")
+                                                    raise ValueError(f"Value should not be 'None' for LLM_Generated source in sub_task {subtasks_id}, Step {step_counter}")
+                                                elif input_var['source'] == "TOOL_Output" and input_var['value'] != "None":
+                                                    raise ValueError(f"Value should be 'None' for TOOL_Output source in sub_task {subtasks_id}, Step {step_counter}")
                                                 j += 1
                                             else:
-                                                raise ValueError(f"Missing 'Value' for input variable in Panel {panel_id}, Step {step_counter}")
+                                                raise ValueError(f"Missing 'Value' for input variable in sub_task {subtasks_id}, Step {step_counter}")
 
-                                            # Handle dependencies for API_Output
+                                            # Handle dependencies for TOOL_Output
                                             input_var['dependencies'] = []
-                                            if "API_Output" in input_var['source']:
-                                                # match = re.search(r"Panel (\d+), Step (\d+)", input_var['source'])
-                                                match = re.fullmatch(r"API_Output\s*\(Panel\s+(\d+),\s*Step\s+(\d+)\)", input_var['source'])
+                                            if "TOOL_Output" in input_var['source']:
+                                                # match = re.search(r"sub_task (\d+), Step (\d+)", input_var['source'])
+                                                match = re.fullmatch(r"TOOL_Output\s*\(sub_task\s+(\d+),\s*Step\s+(\d+)\)", input_var['source'])
                                                 if match:
-                                                    dependent_panel = int(match.group(1))
+                                                    dependent_subtask = int(match.group(1))
                                                     dependent_step = int(match.group(2))
-                                                    # checking if panel interdependencie are present and using or to propogate it if it ever becomes true
-                                                    panel_interdependencies_found = not(dependent_panel == panel_id) or panel_interdependencies_found
+                                                    # checking if subtask interdependencie are present and using or to propogate it if it ever becomes true
+                                                    subtasks_interdependencies_found = not(dependent_subtask == subtasks_id) or subtasks_interdependencies_found
                                                     input_var['dependencies'].append({
-                                                        "panel": dependent_panel,
+                                                        "sub_task": dependent_subtask,
                                                         "step": dependent_step
                                                     })
-                                                    # Go to the referenced panel and step in execution_blueprints to update "used_by"
-                                                    if dependent_panel in execution_blueprints[current_group]:
-                                                        if dependent_step in execution_blueprints[current_group][dependent_panel]["steps"]:
-                                                            used_step = execution_blueprints[current_group][dependent_panel]["steps"][dependent_step]
+                                                    # Go to the referenced subtask and step in execution_blueprints to update "used_by"
+                                                    if dependent_subtask in execution_blueprints[current_group]:
+                                                        if dependent_step in execution_blueprints[current_group][dependent_subtask]["steps"]:
+                                                            used_step = execution_blueprints[current_group][dependent_subtask]["steps"][dependent_step]
                                                             # Find the relevant output variable in the dependent step
                                                             used_by_check_bool = False
                                                             for output_var in used_step["output_vars"]:
@@ -263,28 +263,28 @@ class DAGCompilerNode(BaseNode):
                                                                     if 'used_by' not in output_var:
                                                                         output_var['used_by'] = []
                                                                     output_var["used_by"].append({
-                                                                        "panel": panel_id,
+                                                                        "sub_task": subtasks_id,
                                                                         "step": step_counter
                                                                     })
                                                                     used_by_check_bool = True
                                                             if not used_by_check_bool:
                                                                 valid_out_var_name_options = [output_var for output_var in used_step["output_vars"]]
-                                                                raise ValueError(f"In Step {dependent_step} Panel {dependent_panel}, dependent input variable ({input_var['name']}) has a different name. If there is dependancy between this and Panel {panel_id}, Step {step_counter}, then they should be same. The valid options for the input variable name for Panel {panel_id}, Step {step_counter} considering the dependency is valid are {valid_out_var_name_options}.")
+                                                                raise ValueError(f"In Step {dependent_step} sub_task {dependent_subtask}, dependent input variable ({input_var['name']}) has a different name. If there is dependancy between this and sub_task {subtasks_id}, Step {step_counter}, then they should be same. The valid options for the input variable name for sub_task {subtasks_id}, Step {step_counter} considering the dependency is valid are {valid_out_var_name_options}.")
                                                         else:
-                                                            raise ValueError(f"Step {dependent_step} not found in Panel {dependent_panel} for the dependency mentioned in Panel {panel_id}, Step {step_counter}. Please check the dependencies in your execution_blueprint carefully.")
+                                                            raise ValueError(f"Step {dependent_step} not found in sub_task {dependent_subtask} for the dependency mentioned in sub_task {subtasks_id}, Step {step_counter}. Please check the dependencies in your execution_blueprint carefully.")
                                                     else:
-                                                        if dependent_panel > panel_id:
-                                                            raise ValueError(f"Current panel (panel no {panel_id}) is referencing a future Panel (panel no {dependent_panel}). Please order the panels such that a panel is not dependent on a future panel.")
+                                                        if dependent_subtask > subtasks_id:
+                                                            raise ValueError(f"Current sub_task (sub_task no {subtasks_id}) is referencing a future sub_task (sub_task no {dependent_subtask}). Please order the sub_tasks such that a sub_task is not dependent on a future sub_task.")
                                                         else:
-                                                            raise ValueError(f"Panel {dependent_panel} not found in Group {current_group}. The interdependencies should be between panels of the same group, if this interdependency is valid then please put them in the same group.")
+                                                            raise ValueError(f"sub_task {dependent_subtask} not found in Group {current_group}. The interdependencies should be between sub_tasks of the same group, if this interdependency is valid then please put them in the same group.")
                                                 else:
-                                                    raise ValueError(f"Invalid source format for dependencies in Panel {panel_id}, Step {step_counter}.")
+                                                    raise ValueError(f"Invalid source format for dependencies in sub_task {subtasks_id}, Step {step_counter}.")
                                             current_step['input_vars'].append(input_var)
                                         else:
                                             j += 1  # Skip any lines that are not input variables
                                     
-                                    if len(reqd_params_for_this_api) != 0:
-                                        raise ValueError(f"You have not used some of the required input parameters for api name: {current_step['api']}, like {reqd_params_for_this_api}.")
+                                    if len(reqd_params_for_this_tool) != 0:
+                                        raise ValueError(f"You have not used some of the required input parameters for tool name: {current_step['tool']}, like {reqd_params_for_this_tool}.")
                                 elif line.startswith("- Output Variables:"):
                                     j += 1
                                     while j < len(group_lines):
@@ -293,7 +293,7 @@ class DAGCompilerNode(BaseNode):
                                         if j >= len(group_lines):
                                             break
                                         line = group_lines[j].strip()
-                                        if line.startswith("Step") or line.startswith("execution_blueprint for Panel") or line.startswith("Group"):
+                                        if line.startswith("Step") or line.startswith("execution_blueprint for sub_task") or line.startswith("Group"):
                                             break
                                         if line.startswith("- Name:"):
                                             output_var = {}
@@ -304,7 +304,7 @@ class DAGCompilerNode(BaseNode):
                                             # Skip empty lines
                                             j = skip_empty_lines(group_lines, j)
                                             if j >= len(group_lines):
-                                                raise ValueError(f"Unexpected end of input while parsing output variable in Panel {panel_id}, Step {step_counter}")
+                                                raise ValueError(f"Unexpected end of input while parsing output variable in sub_task {subtasks_id}, Step {step_counter}")
 
                                             # Description
                                             line = group_lines[j].strip()
@@ -314,7 +314,7 @@ class DAGCompilerNode(BaseNode):
                                                     output_var['used_by'] = []
                                                 j += 1
                                             else:
-                                                raise ValueError(f"Missing 'Description' for output variable in Panel {panel_id}, Step {step_counter}")
+                                                raise ValueError(f"Missing 'Description' for output variable in sub_task {subtasks_id}, Step {step_counter}")
 
                                             current_step['output_vars'].append(output_var)
                                         else:
@@ -330,9 +330,9 @@ class DAGCompilerNode(BaseNode):
                 else:
                     j += 1  # Skip any lines outside of recognized blocks
 
-            # Check for interdependencies. If we are modifying then we cant update panels in the group, so lets allow if there are no interdependencies but still they are in the same group
-            if not(modified_execution_blueprint_bool) and len(panels_in_group) > 1 and not panel_interdependencies_found:
-                raise ValueError(f"Not all panels have interdependencies in Group {current_group}. Please put them in different groups if no interdependencies are there.")
+            # Check for interdependencies. If we are modifying then we cant update sub_task in the group, so lets allow if there are no interdependencies but still they are in the same group
+            if not(modified_execution_blueprint_bool) and len(subtasks_in_group) > 1 and not subtasks_interdependencies_found:
+                raise ValueError(f"Not all sub_tasks have interdependencies in Group {current_group}. Please put them in different groups if no interdependencies are there.")
 
         # Return the chain_of_thought and execution_blueprints
         return chain_of_thought, execution_blueprints
@@ -359,10 +359,10 @@ class DAGCompilerNode(BaseNode):
         chosen_action_text = sections[2].strip()
         if "MODIFY" in chosen_action_text:
             result['chosen_action'] = 'MODIFY'
-        elif "DROP_PANEL" in chosen_action_text:
-            result['chosen_action'] = 'DROP_PANEL'
+        elif "DROP_SUBTASK" in chosen_action_text:
+            result['chosen_action'] = 'DROP_SUBTASK'
         else:
-            raise ValueError("The $$CHOSEN_ACTION$$ section must specify either MODIFY or DROP_PANEL.")
+            raise ValueError("The $$CHOSEN_ACTION$$ section must specify either MODIFY or DROP_SUBTASK.")
 
         # If the action is MODIFY, we should also parse the execution_blueprint section
         if result['chosen_action'] == 'MODIFY':
@@ -382,89 +382,80 @@ class DAGCompilerNode(BaseNode):
     # ALL THE CREATING INPUT FOR LLM FUNCTIONS WILL BE HERE
     
     # create input string
-    def create_first_input_data(self,query, panels_list):
+    def create_first_input_data(self,query, subtask_list):
         """
-        Creates structured input data based on the query, panels, and available APIs.
+        Creates structured input data based on the query, subtask, and available Tools.
         Returns both a data structure and a formatted string.
         """
         # Initialize the formatted string
-        formatted_string = f"**Query:** \"{query}\"\n\n**Interpreter's Panel Requests:**\n"
+        formatted_string = f"**Query:** \"{query}\"\n\n**TaskDecomposers's sub_task Requests:**\n"
 
-        # Initialize a set to keep track of unique APIs
-        unique_apis = {}
+        # Initialize a set to keep track of unique Tools
+        unique_tools = {}
 
-        # Add the panel descriptions along with the relevant API names
-        for panel in panels_list:
-            # print("panellllll : ",panel)
-            formatted_string += f"{panel['instance_id']}. Panel {panel['instance_id']}: {panel['panel_description']}\n"
-            formatted_string += f"Details: {panel['request']['description']}"
-            formatted_string += "\nList of Relevant APIs:\n"
+        # Add the subtask descriptions along with the relevant Tool names
+        for subtask in subtask_list:
+            formatted_string += f"{subtask['instance_id']}. sub_task {subtask['instance_id']}: {subtask['subtask_description']}\n"
+            formatted_string += f"Details: {subtask['request']['description']}"
+            formatted_string += "\nList of Relevant TOOls:\n"
 
-            # Only add API names here and collect unique APIs
-            for api in panel['request']['relevant_apis']:
-                formatted_string += f"   - {api['api_name']}\n"
+            # Only add Tool names here and collect unique Tools
+            for tool in subtask['request']['relevant_tools']:
+                formatted_string += f"   - {tool['tool_name']}\n"
 
-                # Store the unique APIs in the dictionary
-                if api['api_name'] not in unique_apis:
-                    unique_apis[api['api_name']] = {
-                        # "Input": api.get('Input', 'N/A'),
-                        # "Output": api.get('Output', 'N/A'),
-                        "Use": api.get('Use', 'N/A')
+                # Store the unique Tools in the dictionary
+                if tool['tool_name'] not in unique_tools:
+                    unique_tools[tool['tool_name']] = {
+                        # "Input": tool.get('Input', 'N/A'),
+                        # "Output": tool.get('Output', 'N/A'),
+                        "Use": tool.get('Use', 'N/A')
                     }
-            formatted_string += "\n"  # Add a newline after each panel
+            formatted_string += "\n"  # Add a newline after each subtask
 
-        self.unique_apis = unique_apis
+        self.unique_tools = unique_tools
 
-        # Now add the full details of each unique API at the end
-        formatted_string += "**Description of APIs:**\n"
-        api_id = 1
-        for api_name, api_details in unique_apis.items():
-            if api_name in RAPID_APIS_DICT:
+        # Now add the full details of each unique Tools at the end
+        formatted_string += "**Description of Tools:**\n"
+        tool_id = 1
+        for tool_name, tool_details in unique_tools.items():
+            if tool_name in RAPID_APIS_DICT:
                 formatted_string += (
-                    f"{api_id}. {api_name}\n"
-                    f"   - **Use:** {api_details['Use']}\n\n"
-                    f"   - **Documentation:** {RAPID_APIS_DICT[api_name]}\n\n"
-                    f"   - **Required Parameters (If not specified then error will be raised):** {RAPID_REQD_PARAMS_DICT[api_name]}\n\n"
+                    f"{tool_id}. {tool_name}\n"
+                    f"   - **Use:** {tool_details['Use']}\n\n"
+                    f"   - **Documentation:** {RAPID_APIS_DICT[tool_name]}\n\n"
+                    f"   - **Required Parameters (If not specified then error will be raised):** {RAPID_REQD_PARAMS_DICT[tool_name]}\n\n"
                 )
-            elif api_name in FUNCTION_APIS_DOCUMENTATION_DICT:
+            elif tool_name in FUNCTION_APIS_DOCUMENTATION_DICT:
                 formatted_string += (
-                    f"{api_id}. {api_name}\n"
-                    f"   - **Use:** {api_details['Use']}\n\n"
-                    f"   - **Documentation:** {FUNCTION_APIS_DOCUMENTATION_DICT[api_name]}\n\n"
-                    f"   - **Required Parameters (If not specified then error will be raised):** {FUNCTION_APIS_REQD_PARAMS_DICT[api_name]}\n\n"
+                    f"{tool_id}. {tool_name}\n"
+                    f"   - **Use:** {tool_details['Use']}\n\n"
+                    f"   - **Documentation:** {FUNCTION_APIS_DOCUMENTATION_DICT[tool_name]}\n\n"
+                    f"   - **Required Parameters (If not specified then error will be raised):** {FUNCTION_APIS_REQD_PARAMS_DICT[tool_name]}\n\n"
                 )
             else:
-                raise ValueError(f"Invalid API Name {api_name}. It is not there in RAPID_APIS_DICT or FUNCTION_APIS_FUNCTION_DICT. This error is inside create_first_input_data")
-            api_id += 1
+                raise ValueError(f"Invalid TOOL Name {tool_name}. It is not there in RAPID_APIS_DICT or FUNCTION_APIS_FUNCTION_DICT. This error is inside create_first_input_data")
+            tool_id += 1
 
         return formatted_string
     
     def make_input_status_update(self, group_execution_blueprint_dict, group_no, status_update_dict):
         result = []
 
-        # # Add the panel descriptions along with the relevant API names
-        # for panel_no in list(group_execution_blueprint_dict.keys()):
-        #     panel = self.panels_list[panel_no]
-        #     # print("panellllll : ",panel)
-        #     formatted_string += f"{panel['instance_id']}. Panel {panel['instance_id']}: {panel['panel_description']}\n"
-        #     formatted_string += f"Details: {panel['request']['description']}"
-        #     formatted_string += "\nList of Relevant APIs:\n"
-
         # Add Group execution_blueprint header
         result.append(f"Group execution_blueprint:\n")
 
         result.append(f"\nGroup {group_no}:\n")
 
-        # Process each panel's execution_blueprint
-        for panel_no, panel_data in group_execution_blueprint_dict.items():
-            result.append(f"execution_blueprint for Panel {panel_no}:\n")
-            result.append(f"Panel Description: {panel_data['panel_description']}\n")
+        # Process each sub_task's execution_blueprint
+        for subtask_no, subtask_data in group_execution_blueprint_dict.items():
+            result.append(f"execution_blueprint for sub_task {subtask_no}:\n")
+            result.append(f"sub_task Description: {subtask_data['subtask_description']}\n")
             result.append("\nexecution_blueprint Steps:\n")
 
-            # Process each step in the panel
-            for step_no, step_data in panel_data['steps'].items():
+            # Process each step in the sub_task
+            for step_no, step_data in subtask_data['steps'].items():
                 result.append(f"Step {step_no}")
-                result.append(f"- API: {step_data['api']}")
+                result.append(f"- TOOL: {step_data['tool']}")
                 result.append(f"- Handles: {step_data['handles']}")
                 
                 # Input Variables
@@ -485,23 +476,23 @@ class DAGCompilerNode(BaseNode):
 
             result.append("\n")  # Add spacing between execution_blueprints
 
-        # Add Available API Descriptions section
-        if hasattr(self, 'unique_apis'):
-            result.append("Available API Descriptions:\n")
-            api_id = 1
-            for api_name, api_details in self.unique_apis.items():
-                if api_name in RAPID_APIS_DICT:
-                    result.append(f"{api_id}. {api_name}")
-                    result.append(f"   - **Use:** {api_details['Use']}\n")
-                    result.append(f"   - **Documentation:** {RAPID_APIS_DICT[api_name]}\n")
-                    api_id += 1
-                elif api_name in FUNCTION_APIS_DOCUMENTATION_DICT:
-                    result.append(f"{api_id}. {api_name}")
-                    result.append(f"   - **Use:** {api_details['Use']}\n")
-                    result.append(f"   - **Documentation:** {FUNCTION_APIS_DOCUMENTATION_DICT[api_name]}\n")
-                    api_id += 1
+        # Add Available TOOL Descriptions section
+        if hasattr(self, 'unique_tools'):
+            result.append("Available TOOL Descriptions:\n")
+            tool_id = 1
+            for tool_name, tool_details in self.unique_tools.items():
+                if tool_name in RAPID_APIS_DICT:
+                    result.append(f"{tool_id}. {tool_name}")
+                    result.append(f"   - **Use:** {tool_details['Use']}\n")
+                    result.append(f"   - **Documentation:** {RAPID_APIS_DICT[tool_name]}\n")
+                    tool_id += 1
+                elif tool_name in FUNCTION_APIS_DOCUMENTATION_DICT:
+                    result.append(f"{tool_id}. {tool_name}")
+                    result.append(f"   - **Use:** {tool_details['Use']}\n")
+                    result.append(f"   - **Documentation:** {FUNCTION_APIS_DOCUMENTATION_DICT[tool_name]}\n")
+                    tool_id += 1
                 else:
-                    raise ValueError(f"Invalid API Name {api_name}. It is not there in RAPID_APIS_DICT or FUNCTION_APIS_FUNCTION_DICT.")
+                    raise ValueError(f"Invalid TOOL Name {tool_name}. It is not there in RAPID_APIS_DICT or FUNCTION_APIS_FUNCTION_DICT.")
             result.append("\n")  # Add spacing
 
         # Add Status Update section
@@ -516,11 +507,11 @@ class DAGCompilerNode(BaseNode):
         return "\n".join(result)
 
     ########################
-    def setup(self, query, panels_list):
-        self.panels_list = panels_list
-        # Logic to create execution_blueprint and initialize local translator instances
+    def setup(self, query, subtask_list):
+        self.subtask_list = subtask_list
+        # Logic to create execution_blueprint and initialize agent instances
         # We can use self.chat_history to provide context
-        formatted_string = self.create_first_input_data(query, panels_list)
+        formatted_string = self.create_first_input_data(query, subtask_list)
         print("\nformatted_string : \n",formatted_string)
 
         # generating the execution_blueprint from the LLM
@@ -536,19 +527,16 @@ class DAGCompilerNode(BaseNode):
                 _, execution_blueprint_dict = self.parse_dag_compiler_execution_blueprint(llm_response_execution_blueprint)
                 run_success = True
             except Exception as e:
-                error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT and execution_blueprint without any other details before or after. Additionaly inlcude in your CHAIN_OF_THOUGHT about what went wrong in the format and rectify it basded on the given information:\n {str(e)}' 
+                error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT and EXECUTION_BLUEPRINT without any other details before or after. Additionaly inlcude in your CHAIN_OF_THOUGHT about what went wrong in the format and rectify it basded on the given information:\n {str(e)}' 
                 self.chat_history.append({"role": "user", "content": error_message})
                 print("error_message : ",error_message)
             
             counter += 1
         
         if not run_success:
-            raise ValueError("SOmething is wrong with the LLM or the parsing main translator execution_blueprint. An error is not expected here")
+            raise ValueError("SOmething is wrong with the LLM or the parsing dag compiler execution_blueprint. An error is not expected here")
             
-        # print("\llm_response_execution_blueprint:\n")
-        # print(llm_response_execution_blueprint)
-        # print("\nexecution_blueprints:\n")
-        # print(execution_blueprint_dict)
+
         # Write to a JSON file
         with open("execution_blueprint.json", "w") as json_file:
             json.dump(execution_blueprint_dict, json_file, indent=4)
@@ -559,22 +547,22 @@ class DAGCompilerNode(BaseNode):
         return execution_blueprint_dict
 
 
-    async def communicate(self, update, local_translator_id, local_translator_object):
-        await self.queue.put((update, local_translator_id, local_translator_object))
+    async def communicate(self, update, agent_id, agent_object):
+        await self.queue.put((update, agent_id, agent_object))
         
     async def process_queue(self):
         while True:
             # Get the next item from the queue without holding the lock
-            status_update_dict, local_translator_id, local_translator_object = await self.queue.get()
+            status_update_dict, agent_id, agent_object = await self.queue.get()
             print("status_update_dict:", status_update_dict)
             
             # Process the update here
-            print(f"Processing update from Local Translator {local_translator_id}")
+            print(f"Processing update from Agent {agent_id}")
 
             # Prepare the input for the LLM
             status_assistance_llm_input = self.make_input_status_update(
-                self.execution_blueprint[str(local_translator_object.group_id)], 
-                local_translator_object.group_id, 
+                self.execution_blueprint[str(agent_object.group_id)], 
+                agent_object.group_id, 
                 status_update_dict
             )
 
@@ -596,44 +584,44 @@ class DAGCompilerNode(BaseNode):
                     parsed_updated_execution_blueprint = self.parse_status_assistance_output(updated_execution_blueprint)
                     run_success = True
                 except Exception as e:
-                    error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT, CHOSEN_ACTION and/or execution_blueprint without any other details before or after. Additionaly inlcude in your CHAIN_OF_THOUGHT about what went wrong in the format and rectify it basded on the given information:\n {str(e)}' 
+                    error_message = f'The format of the output is incorrect please rectify based on this error message, only output the CHAIN_OF_THOUGHT, CHOSEN_ACTION and/or EXECUTION_BLUEPRINT without any other details before or after. Additionaly inlcude in your CHAIN_OF_THOUGHT about what went wrong in the format and rectify it basded on the given information:\n {str(e)}' 
                     self.chat_history.append({"role": "user", "content": error_message})
                     print("error_message:", error_message)
 
             if not run_success:
                 raise ValueError(
-                    "Something is wrong with the LLM or the parsing status_assistance in main translator. "
+                    "Something is wrong with the LLM or the parsing status_assistance in dag compiler process_queue. "
                     "An error is not expected here."
                 )
             
             print("parsed_updated_execution_blueprint['chosen_action']:", parsed_updated_execution_blueprint['chosen_action'])
 
-            if parsed_updated_execution_blueprint['chosen_action'] == "DROP_PANEL":
+            if parsed_updated_execution_blueprint['chosen_action'] == "DROP_SUBTASK":
                 # Acquire the lock only when modifying shared resources
                 async with self.lock:
 
-                    local_translator_object.drop = True
-                print('Sent Request to Drop Panel')
+                    agent_object.drop = True
+                print('Sent Request to Drop sub_task')
 
             elif parsed_updated_execution_blueprint['chosen_action'] == "MODIFY":
                 # Perform file I/O in a separate thread to avoid blocking the event loop
                 updated_execution_blueprint_dict = await asyncio.to_thread(
                     self.save_and_load_execution_blueprint, 
-                    local_translator_object.group_id, 
+                    agent_object.group_id, 
                     parsed_updated_execution_blueprint['execution_blueprint']
                 )
                 print("updated_execution_blueprint_dict after loading:", updated_execution_blueprint_dict)
                 # Acquire the lock when updating shared resources
                 async with self.lock:
-                    local_translator_object.group_execution_blueprint = updated_execution_blueprint_dict
-                    local_translator_object.modify = True
-                print('Sent Request to Modify Panel')
+                    agent_object.group_execution_blueprint = updated_execution_blueprint_dict
+                    agent_object.modify = True
+                print('Sent Request to Modify sub_task')
 
             else:
                 print("In the else statement")
-                raise ValueError("The chosen_action key must specify either MODIFY or DROP_PANEL.")
+                raise ValueError("The chosen_action key must specify either MODIFY or DROP_SUBTASK.")
             
-            print(f"Finished processing update from Local Translator {local_translator_id}")
+            print(f"Finished processing update from Agent {agent_id}")
             
             # Yield control to other tasks
             await asyncio.sleep(0.1)  # Use sleep(0) to yield control without delay

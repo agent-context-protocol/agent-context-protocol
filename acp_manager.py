@@ -6,28 +6,28 @@ from agent import AgentNode
 from concurrent.futures import ThreadPoolExecutor
 
 class ACPManager:
-    def __init__(self, workflow, dag_compiler, agent_system_prompt):
+    def __init__(self, execution_blueprint, dag_compiler, agent_system_prompt):
         self.dag_compiler = dag_compiler
         self.agent_system_prompt = agent_system_prompt
         self.groups = {}
         self.agents = {}
         self.thread_pool = ThreadPoolExecutor()
         
-        for group_id, group_data in workflow.items():
-            group_translators = []
-            for translator_id, translator_data in group_data.items():
-                translator = AgentNode(
-                    int(translator_id),
-                    translator_data["panel_description"],
+        for group_id, group_data in execution_blueprint.items():
+            group_agents = []
+            for agent_id, agent_data in group_data.items():
+                agent = AgentNode(
+                    int(agent_id),
+                    agent_data["subtask_description"],
                     system_prompt=agent_system_prompt,
                     dag_compiler=self.dag_compiler
                 )
-                translator.group_workflow = group_data
-                translator.group_id = group_id
-                translator.panel_workflow = translator_data["steps"]
-                self.agents[translator_id] = translator
-                group_translators.append(translator)
-            self.groups[group_id] = group_translators
+                agent.group_execution_blueprint = group_data
+                agent.group_id = group_id
+                agent.sub_task_execution_blueprint = agent_data["steps"]
+                self.agents[agent_id] = agent
+                group_agents.append(agent)
+            self.groups[group_id] = group_agents
 
     async def run(self):
         dag_compiler_task = asyncio.create_task(self.dag_compiler.process_queue())
@@ -47,24 +47,24 @@ class ACPManager:
         except asyncio.CancelledError:
             pass
 
-    async def modify_group(self, modified_workflow, group_id):
-        for group_id, group_data in modified_workflow.items():
-            group_translators = []
-            for translator_id, translator_data in group_data.items():
-                translator = AgentNode(
-                    int(translator_id),
-                    translator_data["panel_description"],
+    async def modify_group(self, modified_execution_blueprint, group_id):
+        for group_id, group_data in modified_execution_blueprint.items():
+            group_agents = []
+            for agent_id, agent_data in group_data.items():
+                agent = AgentNode(
+                    int(agent_id),
+                    agent_data["subtask_description"],
                     system_prompt=self.agent_system_prompt,
                     dag_compiler=self.dag_compiler
                 )
-                translator.group_workflow = group_data
-                translator.group_id = group_id
-                translator.panel_workflow = translator_data["steps"]
-                self.agents[translator_id] = translator
-                group_translators.append(translator)
-            self.groups[group_id] = group_translators
+                agent.group_execution_blueprint = group_data
+                agent.group_id = group_id
+                agent.sub_task_execution_blueprint = agent_data["steps"]
+                self.agents[agent_id] = agent
+                group_agents.append(agent)
+            self.groups[group_id] = group_agents
 
-        print('Successfully Modified This Groups Workflow.')
+        print('Successfully Modified This Groups execution_blueprint.')
 
         await asyncio.sleep(0.1)
 
@@ -74,22 +74,22 @@ class ACPManager:
         counter = 0
         while True and counter < 5:
             group_done = True
-            for translator in self.groups[group_id]:
+            for agent in self.groups[group_id]:
                 # try:
-                await translator.build_verify()
-                if translator.drop:
-                    print('Dropping This Workflow...')
+                await agent.build_verify()
+                if agent.drop:
+                    print('Dropping This execution_blueprint...')
                     
-                if translator.modify:
-                    print('Modifying This Workflow...')
-                    print("\ntranslator.group_workflow : ",translator.group_workflow)
+                if agent.modify:
+                    print('Modifying This execution_blueprint...')
+                    print("\nagent.group_execution_blueprint : ",agent.group_execution_blueprint)
                     group_done = False
-                    await self.modify_group(translator.group_workflow, group_id)
+                    await self.modify_group(agent.group_execution_blueprint, group_id)
                     break
                         # return None
-                group_results[translator.panel_no] = translator.get_results()
+                group_results[agent.sub_task_no] = agent.get_results()
                 # except Exception as e:
-                #     print(f"Error in translator {translator.panel_no}: {str(e)}")
+                #     print(f"Error in agent {agent.sub_task_no}: {str(e)}")
 
             counter += 1
             if group_done:
@@ -118,23 +118,20 @@ class ACPOrchestrator:
 
     async def initialise(self, user_query):
         self.task_decomposer.user_query = user_query
-        panels_list = self.task_decomposer.setup()
-        workflow = self.dag_compiler.setup(user_query, panels_list)
-        return workflow
+        subtask_list = self.task_decomposer.setup()
+        execution_blueprint = self.dag_compiler.setup(user_query, subtask_list)
+        return execution_blueprint
 
-    async def run(self, user_query, workflow):
-        # Get initial setup from task_decomposer and send to main translator
-        # self.task_decomposer.user_query = user_query
-        # panels_list = self.task_decomposer.setup()
-        # workflow = self.dag_compiler.setup(user_query, panels_list)
-        
-        # For now, we're loading the workflow from a file
-        with open("workflow.json", "r") as json_file:
-            workflow = json.load(json_file)
+    async def run(self, user_query, execution_blueprint):
+        # Get initial setup from task_decomposer and send to dag compiler
+       
+        # For now, we're loading the execution_blueprint from a file
+        with open("execution_blueprint.json", "r") as json_file:
+            execution_blueprint = json.load(json_file)
 
-        print("Workflow:", workflow)
+        print("execution_blueprint:", execution_blueprint)
 
-        communication_manager = ACPManager(workflow, self.dag_compiler, self.agent_system_prompt)
+        communication_manager = ACPManager(execution_blueprint, self.dag_compiler, self.agent_system_prompt)
         
         # Modify the Manager to yield results as groups complete
         # await communication_manager.run()

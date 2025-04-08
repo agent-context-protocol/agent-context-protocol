@@ -97,7 +97,7 @@ $$CHOSEN_ACTION$$
 - State your decision in uppercase:
 
   - MODIFY
-  - DROP_sub_task
+  - DROP_SUBTASK
 
 $$execution_blueprint$$ (Include only if you chose MODIFY)
 
@@ -617,7 +617,7 @@ Step 5
     - Description: Information on attractions and activities in Budapest
 
 
-#### Example 3: DROP_sub_task
+#### Example 3: DROP_SUBTASK
 
 Input:
 
@@ -654,5 +654,5 @@ $$CHAIN_OF_THOUGHT$$
 
 $$CHOSEN_ACTION$$
 
-DROP_sub_task
+DROP_SUBTASK
 

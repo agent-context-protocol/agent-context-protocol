@@ -7,9 +7,9 @@ import asyncio
 # Load environment variables from .env file
 load_dotenv()
 
-# client = OpenAI()
+client = OpenAI()
 client_async = AsyncAzureOpenAI()
-client = AzureOpenAI()
+# client = AzureOpenAI()
 
 
 class BaseNode:
