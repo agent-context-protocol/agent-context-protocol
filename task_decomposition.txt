@@ -1,0 +1,40 @@
+**Query:** "Write a comprehensive and well-researched report on the rise of Decentralized Finance (DeFi) and how it challenges traditional banking models and regulations.
+
+Strictly keep on 2 sections and not more than that"
+
+**TaskDecomposers's sub_task Requests:**
+1. sub_task 1: The Rise of Decentralized Finance (DeFi)
+Details: This sub task will explore the emergence and growth of Decentralized Finance (DeFi). It will cover the following subsections: 1) Overview of DeFi, highlighting its distinction from traditional finance and its growing importance. 2) Historical Evolution and Milestones, detailing key developments and milestones that shaped DeFi. 3) Core Concepts Underpinning DeFi, including blockchain fundamentals, smart contracts, and tokenization. 4) Key DeFi Platforms and Protocols, showcasing major platforms and their functionalities. 5) Market Trends and Growth Dynamics, examining Total Value Locked (TVL) and adoption indicators. Each subsection should be handled by a step in the sub task's execution_blueprint.
+List of Relevant TOOls:
+   - BrowserTools
+
+2. sub_task 2: Challenges to Traditional Banking Models and Regulations
+Details: This sub task will analyze how DeFi challenges traditional banking models and the regulatory landscape. It will cover the following subsections: 1) Impact on Traditional Banking Models, exploring disintermediation and financial access. 2) Regulatory Challenges, outlining jurisdictional boundaries, compliance, and taxation complexities. 3) Security Risks and Vulnerabilities, identifying smart contract bugs and governance risks. 4) Consumer Protection and Governance Models, discussing user education and DAOs. 5) Global Policy Responses and Coordination, highlighting regional approaches and international collaboration. This sub task depends on Subtask 1 for insights into DeFi's rise. Each subsection should be handled by a step in the sub task's execution_blueprint.
+List of Relevant TOOls:
+   - BrowserTools
+
+**Description of Tools:**
+1. BrowserTools
+   - **Use:** As a web search engine to retrieve and synthesize information from multiple sources into a single, concise response. It can also be utilized for reasoning tasks and coding assistance, including code writing and execution.
+
+   - **Documentation:** Function: browser_tools_function
+
+Description:
+This function interacts with the BrowserTools API to generate a concise answer to a user's query by searching the web and synthesizing information from multiple sources. It can also function as a reasoning agent and assist in writing and executing code (coding agent).
+
+Use Case:
+Use this function as a web search engine to retrieve and compile information into a single, coherent response for queries that require up-to-date or broad information from the internet. It can also be utilized for reasoning tasks and coding assistance, including code writing and execution. For best results, do not ask for too much information in one search; rather, break down the query and perform multiple searches. Please provide the full context in the query itself and avoid vaguely mentioning things about which there is no context.
+
+Parameters:
+- **query** (string, required): The user's question or search term that needs to be answered using web data.
+
+Expected Output:
+- **response_content** (string): A compiled answer based on web search results provided by the API, or the result of code execution if used as a coding agent.
+
+Example Usage:
+1. response = browser_tools_function("What is the capital of India?")
+2. response = browser_tools_function("Write a Python function that calculates the factorial of a number.")
+
+
+   - **Required Parameters (If not specified then error will be raised):** {'query': {'type': 'string'}}
+

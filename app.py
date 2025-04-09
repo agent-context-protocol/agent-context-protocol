@@ -1,7 +1,7 @@
 import streamlit as st
 import asyncio
-from orchestrator import MainOrchestrator
-from available_apis.browser_tools.mdconvert import MarkdownConverter, UnsupportedFormatException, FileConversionException
+from acp_manager import ACP
+from available_tools.browser_tools.mdconvert import MarkdownConverter, UnsupportedFormatException, FileConversionException
 import re
 
 st.set_page_config(layout = "wide") 
@@ -77,7 +77,7 @@ def load_css():
 
 class StreamlitOrchestrator:
     def __init__(self):
-        self.orchestrator = MainOrchestrator()
+        self.orchestrator = ACP()
         self.output = {}
         self.group_placeholders = {}
         self.panels = []
@@ -95,7 +95,7 @@ class StreamlitOrchestrator:
                 panels.append({
                     'group_id' : group_id,
                     'panel_id' : translator_id,
-                    'panel_description' : workflow[group_id][translator_id]['panel_description']}
+                    'subtask_description' : workflow[group_id][translator_id]['subtask_description']}
                 )
 
         # Create a grid layout to hold the panels
@@ -145,7 +145,7 @@ class StreamlitOrchestrator:
                 <div class="fixed-panel">
                     <h3>Group {panel['group_id']}</h3>
                     <h4>Panel {panel['panel_id']}</h4>
-                    <p>{panel['panel_description']}</p>
+                    <p>{panel['subtask_description']}</p>
                 </div>
                 ''', 
                 unsafe_allow_html=True
@@ -161,8 +161,8 @@ class StreamlitOrchestrator:
                 
         #         # Iterate through each panel within the group and display the descriptions
         #         for panel_id, panel_info in group.items():
-        #             panel_description = panel_info["panel_description"]
-        #             st.write(f"**Panel {panel_id}**: {panel_description}")
+        #             subtask_description = panel_info["subtask_description"]
+        #             st.write(f"**Panel {panel_id}**: {subtask_description}")
                     
         #             # Store placeholders for each panel to update later
         #             self.group_placeholders[str(group_id)] = st.empty()
@@ -227,7 +227,7 @@ class StreamlitOrchestrator:
                 <div class="completed-panel">
                     <h3>Group {group_id}</h3>
                     <h4>Panel {panel_id}</h4>
-                    <p>{self.panels[int(panel_id)-1]['panel_description']}</p>
+                    <p>{self.panels[int(panel_id)-1]['subtask_description']}</p>
                     <p>{panel_result['output']}</p>
                 </div>
                 ''', 
@@ -240,7 +240,7 @@ class StreamlitOrchestrator:
         #     # Create an expander for showing the outputs
         #     with st.expander(f"View Results for Group {group_id}"):
         #         for panel_id, panel_result in group_results.items():
-        #             st.markdown(f"**Panel {panel_id}**: {panel_result['panel_description']}")
+        #             st.markdown(f"**Panel {panel_id}**: {panel_result['subtask_description']}")
         #             # st.write("**Output:**")
         #             st.write(panel_result['output'])
         #             st.write("---")
@@ -303,7 +303,7 @@ async def main():
             workflow = await orchestrator.orchestrator.initialise(user_query)
 
             async def update_progress():
-                total_groups = len(orchestrator.orchestrator.main_translator.workflow)
+                total_groups = len(orchestrator.orchestrator.dag_compiler.execution_blueprint)
                 while True:
                     completed_groups = len(orchestrator.output)
                     progress = completed_groups / total_groups

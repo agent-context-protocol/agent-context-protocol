@@ -101,7 +101,7 @@ Input and Output Context
   - If you include any tables/figures in the new section, note the current global counts to assign the correct numbering.
   - Emphasize you will not create extra standalone subsections for figures/tables or for summary segments.
   - Mention that you will follow the structure from {section_details}, especially for the Introduction.
-  - Do not include any real agent constraints, rule following, or mention of failed attempts in the user-facing final text. Similarly do not mention things like step or panel in the final text, as we have to provide a professional report and not explain our internal reasoning.
+  - Do not include any real agent constraints, rule following, or mention of failed attempts in the user-facing final text. Similarly do not mention things like step or sub_task in the final text, as we have to provide a professional report and not explain our internal reasoning.
   Try to be careful about latex syntax, to avoid errors.
 
 - No conclusion paragraphs in the chain-of-thought or the section itself.
@@ -185,7 +185,7 @@ Inside the $$REPORT_SECTION$$ block:
 7. Additional Reminders
 
 - If a step's content is irrelevant, simply skip it or produce an empty $$REPORT_SECTION$$ and $$REFERENCES$$ structure.
-- Do not mention external agents in the final text (e.g., "the agent says..."). Similarly do not mention things like step or panel in the final text, as we have to provide a professional report and not explain our internal reasoning.
+- Do not mention external agents in the final text (e.g., "the agent says..."). Similarly do not mention things like step or sub_task in the final text, as we have to provide a professional report and not explain our internal reasoning.
 - Never insert \end{document}.
 - Keep using the correct table/figure numbering throughout the entire report.
 - Do not include section or sub-section numbers like Section X or Sub-Section X, just write the section or sub-section title
@@ -364,7 +364,7 @@ $$REPORT_SECTION$$
 \tableofcontents
 
 \section{Historical Context of Energy Use}
-As shown in Table 2, historical reliance on fossil fuels formed a baseline for today’s energy production challenges.
+As shown in Table~\ref{tab:fossil_consumption}, historical reliance on fossil fuels formed a baseline for today’s energy production challenges.
 
 \begin{ThreePartTable}
 {\fontsize{6pt}{7pt}\selectfont
@@ -414,11 +414,11 @@ As shown in Table 2, historical reliance on fossil fuels formed a baseline for t
 } % end of \fontsize
 \end{ThreePartTable}
 
-In Figure 3, the gradual decline of coal and the rise of renewable sources are visually represented.
+In Figure~\ref{fig:energy_mix}, the gradual decline of coal and the rise of renewable sources are visually represented.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=1.0\textwidth]{path_to_figure/figure1.png}
+\includegraphics[width=1.0\textwidth]{path_to_figure/figure3.png}
 \caption{\textit{Evolution of the global energy mix, showing a decrease in coal reliance and an increase in wind and solar.}}
 \label{fig:energy_mix}
 \end{figure}

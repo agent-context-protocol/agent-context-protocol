@@ -1,21 +1,33 @@
 # Ignore all PDF files
 *.pdf
 
+# Ignore txt files
+interpreter_task_decomp.txt
+
+# Ignore all csv files
+
 # Ignore specific JSON files
-workflow_updated_*.json
-updated_workflow_group_*.json
-generated_report_*.pdf
+workflow*.json
+updated_workflow*.json
+token.json
+personal_info.json
+framework_metrics.json
+sorted_all_panel_outputs_dict.json
+credentials.json
 
 # Ignore save_viz folder
 save_viz/
+img_search_save/
+save_reports/
+save_viz_test/
 
 # Ignore Python cache folders
 __pycache__/
-available_apis/function_format/__pycache__/
-available_apis/hardcoded_format/__pycache__/
-available_apis/openapi_format/__pycache__/
-available_apis/rapid_apis_format/__pycache__/
-available_apis/browser_tools/__pycache__/
+available_tools/function_format/__pycache__/
+available_tools/hardcoded_format/__pycache__/
+available_tools/openapi_format/__pycache__/
+available_tools/rapid_apis_format/__pycache__/
+available_tools/browser_tools/__pycache__/
 
 # Ignore .cache folder
 .cache/

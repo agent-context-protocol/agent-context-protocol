@@ -12,7 +12,7 @@ import io
 import os
 import subprocess
 
-# def update_interpreter_with_similar_apis(interpreter_message, faiss_index_path='faiss_index.index', model_name='sentence-transformers/all-MiniLM-L6-v2', api_json_path='external_env_details/brief_details.json', k=5):
+# def update_interpreter_with_similar_apis(td_message, faiss_index_path='faiss_index.index', model_name='sentence-transformers/all-MiniLM-L6-v2', tool_json_path='external_env_details/brief_details.json', k=5):
 #     # Load the FAISS index
 #     index = faiss.read_index(faiss_index_path)
 
@@ -21,7 +21,7 @@ import subprocess
 #     model = AutoModel.from_pretrained(model_name)
 
 #     # Generate embedding for the interpreter description
-#     interpreter_description = interpreter_message['panel_description']
+#     interpreter_description = td_message['panel_description']
 #     inputs = tokenizer([interpreter_description], return_tensors='pt', padding=True, truncation=True)
 #     with torch.no_grad():
 #         outputs = model(**inputs)
@@ -31,39 +31,39 @@ import subprocess
 #     distances, indices = index.search(interpreter_embedding, k)
 
 #     # Load the API descriptions
-#     with open(api_json_path, 'r') as file:
-#         api_data = json.load(file)
+#     with open(tool_json_path, 'r') as file:
+#         tool_data = json.load(file)
     
 #     # Prepare the results
 #     similar_apis = []
-#     api_keys = list(api_data.keys())  # Extract API keys from the data
+#     api_keys = list(tool_data.keys())  # Extract API keys from the data
 #     for i, idx in enumerate(indices[0]):
 #         if idx < len(api_keys):  # Ensure index is within bounds
 #             api_key = api_keys[idx]
-#             temp_dict = api_data[api_key]
-#             temp_dict['api_name'] = api_key
+#             temp_dict = tool_data[api_key]
+#             temp_dict['tool_name'] = api_key
 #             similar_apis.append(temp_dict)
 
 #     # Update the interpreter message dictionary
-#     if 'request' not in interpreter_message:
-#         interpreter_message['request'] = {}
-#     interpreter_message['request']['relevant_apis'] = similar_apis
-#     return interpreter_message
+#     if 'request' not in td_message:
+#         td_message['request'] = {}
+#     td_message['request']['relevant_apis'] = similar_apis
+#     return td_message
 
-def update_interpreter_with_similar_apis(interpreter_message, faiss_index_path='faiss_index.index', model_name='sentence-transformers/all-MiniLM-L6-v2', api_json_path='external_env_details/brief_details.json', k=5):
-    # Load the API descriptions
-    with open(api_json_path, 'r') as file:
-        api_data = json.load(file)
-    api_details = []
-    for api_name in interpreter_message['request']['relevant_apis']:
-        api_details.append({
-            'api_name': api_name,
-            # 'Input': api_data[api_name]['Input'],
-            # 'Output': api_data[api_name]['Output'],
-            'Use': api_data[api_name]['Use']
+def update_task_decomposer_with_similar_tools(td_message, faiss_index_path='faiss_index.index', model_name='sentence-transformers/all-MiniLM-L6-v2', tool_json_path='external_env_details/brief_details.json', k=5):
+    # Load the Tool descriptions
+    with open(tool_json_path, 'r') as file:
+        tool_data = json.load(file)
+    tool_details = []
+    for tool_name in td_message['request']['relevant_tools']:
+        tool_details.append({
+            'tool_name': tool_name,
+            # 'Input': tool_data[tool_name]['Input'],
+            # 'Output': tool_data[tool_name]['Output'],
+            'Use': tool_data[tool_name]['Use']
             })
-    interpreter_message['request']['relevant_apis'] = api_details
-    return interpreter_message
+    td_message['request']['relevant_tools'] = tool_details
+    return td_message
 
 def convert_calendar_event(input_str):
     # Split the input string to separate the date-time part and the event description
@@ -176,6 +176,7 @@ def create_pdf_from_latex(latex_code, output_pdf_path, single_run=False):
           result = subprocess.run(
               [
                   "pdflatex",             # Generate PDF via pdflatex (could use -xelatex for XeLaTeX, etc.)
+                #   "lualatex",
                   "-interaction=nonstopmode",    # Do not stop on errors (try to continue compilation)
                   f"-output-directory={output_dir}",  # Directory for output (PDF and aux files)
                   tex_file_path                 # The LaTeX source file to compile
@@ -189,6 +190,7 @@ def create_pdf_from_latex(latex_code, output_pdf_path, single_run=False):
             [
                 "latexmk",
                 "-pdf",  
+                # "-lualatex",
                 "-f",               # Generate PDF via pdflatex (could use -xelatex for XeLaTeX, etc.)
                 "-interaction=nonstopmode",    # Do not stop on errors (try to continue compilation)
                 f"-output-directory={output_dir}",  # Directory for output (PDF and aux files)

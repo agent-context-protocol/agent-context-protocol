@@ -7,6 +7,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 import signal
 from together import Together
+import json
 
 # Load environment variables from .env file
 load_dotenv()
@@ -61,6 +62,12 @@ def timeout_handler(signum, frame):
 
 class BaseNode:
     total_cost = 0
+    # new counters
+    total_generate_calls = 0
+    total_async_generate_calls = 0
+    # A class-level list of events
+    events = []
+
     def __init__(self, node_name, system_prompt = None):
         self.node_name = node_name
         self.chat_history = []
@@ -69,11 +76,14 @@ class BaseNode:
             self.chat_history.append({"role": "system", "content": self.system_prompt})        
 
     async def async_generate(self):
+        # increment class-level function call counter
+        BaseNode.total_async_generate_calls += 1
+        
         max_retries = 5
         timeout = 350
         for attempt in range(1, max_retries + 1):
             try:
-                print(f"node_name: {self.node_name}, Attempt {attempt} of {max_retries}. Cost: {BaseNode.total_cost}")
+                print(f"node_name: {self.node_name}, Attempt {attempt} of {max_retries}. Cost: {BaseNode.total_cost}, Total Calls: {BaseNode.total_async_generate_calls+BaseNode.total_generate_calls}")
                 
                 # Set a timeout of 150 seconds for the chat completion
                 task = asyncio.create_task(client_async.chat.completions.create(
@@ -115,6 +125,9 @@ class BaseNode:
             await asyncio.sleep(2)
 
     def generate(self, o1_bool=False):
+        # increment class-level function call counter
+        BaseNode.total_generate_calls += 1
+
         max_retries = 5
         timeout = 350
         def run_completion():
@@ -144,7 +157,7 @@ class BaseNode:
 
         for attempt in range(1, max_retries + 1):
             try:
-                print(f"node_name: {self.node_name}, Attempt {attempt} of {max_retries}. Cost: {BaseNode.total_cost}")
+                print(f"node_name: {self.node_name}, Attempt {attempt} of {max_retries}. Cost: {BaseNode.total_cost}, Total Calls: {BaseNode.total_async_generate_calls+BaseNode.total_generate_calls}")
                 
                 # Use ThreadPoolExecutor to enforce timeout
                 with ThreadPoolExecutor() as executor:
@@ -178,3 +191,14 @@ class BaseNode:
         # Needs To be Implemented
         # self.generate()
         raise NotImplementedError("Subclasses must implement process method")
+
+
+def save_metrics_to_json(accumulator_count=0, filename="framework_metrics.json"):
+    """Saves the BaseNode class metrics to a JSON file."""
+    data = {
+        "total_cost": BaseNode.total_cost,
+        "total_calls": BaseNode.total_generate_calls+BaseNode.total_async_generate_calls+accumulator_count,
+        "events": BaseNode.events  # list of event dictionaries
+    }
+    with open(filename, "w") as f:
+        json.dump(data, f, indent=4)
