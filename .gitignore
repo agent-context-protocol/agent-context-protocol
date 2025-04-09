@@ -5,6 +5,9 @@
 interpreter_task_decomp.txt
 
 # Ignore all csv files
+*.csv
+
+*.png
 
 # Ignore specific JSON files
 workflow*.json
