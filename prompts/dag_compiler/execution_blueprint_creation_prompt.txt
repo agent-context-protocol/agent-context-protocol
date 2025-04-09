@@ -197,7 +197,7 @@ sub_task Description: [Description of the sub_task's objective]
 
 execution_blueprint Steps:
 
-Step [Step Number]
+Step [Step Number, should be an integer and not of the form subtask_no.step_no]
 
 - TOOL: [TOOL Name]
 - Handles: [Portion of query handled by this TOOL]

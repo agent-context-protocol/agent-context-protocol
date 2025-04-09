@@ -44,7 +44,7 @@ from transformers import AutoTokenizer, AutoModel
 #     interpreter_message['request']['relevant_tools'] = similar_apis
 #     return interpreter_message
 
-def update_interpreter_with_similar_tools(interpreter_message, faiss_index_path='faiss_index.index', model_name='sentence-transformers/all-MiniLM-L6-v2', tool_json_path='external_env_details/brief_details.json', k=5):
+def update_task_decomposer_with_similar_tools(interpreter_message, faiss_index_path='faiss_index.index', model_name='sentence-transformers/all-MiniLM-L6-v2', tool_json_path='external_env_details/brief_details.json', k=5):
     # Load the TOOL descriptions
     with open(tool_json_path, 'r') as file:
         tool_data = json.load(file)

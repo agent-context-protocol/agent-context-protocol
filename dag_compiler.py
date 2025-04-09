@@ -120,7 +120,10 @@ class DAGCompilerNode(BaseNode):
                             # Initializing the required parameters for this tool
                             reqd_params_for_this_tool = None
                             # Extract step number
-                            step_counter = int(re.search(r'\d+', line).group(0))
+                            step_counter_match = re.search(r'(?<!\d\.)\b\d+\b(?!\.\d)', line)
+                            if not step_counter_match:
+                                raise ValueError("Step numbers should be defined as Step step_no and not Step sub_task_no.step_no")
+                            step_counter = int(step_counter_match.group(0)) #int(re.search(r'\d+', line).group(0))
                             current_step = {'tool': '', 'handles': '', 'input_vars': [], 'output_vars': []}
                             j += 1
 
