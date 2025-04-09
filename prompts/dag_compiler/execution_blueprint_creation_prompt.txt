@@ -1,4 +1,4 @@
-Your Current Role is: execution_blueprint_CREATION_REQUEST
+Your Current Role is: EXECUTION_BLUEPRINT_CREATOR
 
 ### Your Task:
 
@@ -174,8 +174,8 @@ TaskDecomposer's sub_task Requests:
 2. sub_task 2: Average Temperatures of Vacation Spots
    - List of Relevant TOOLs:
      - Perplexity
-     - WeatherTOOL.com_Realtime_Weather_TOOL
-     - WeatherTOOL.com_Forecast_Weather_TOOL
+     - WeatherAPI.com_Realtime_Weather_TOOL
+     - WeatherAPI.com_Forecast_Weather_API
 
 Description of TOOLs:
 
@@ -236,14 +236,14 @@ List of Relevant TOOLs:
 2. sub_task 2: Weather Information for Top 5 Cities
 Details: Show real-time weather information for the top 5 cities in the USA. Include temperature, weather conditions, and any relevant weather alerts.
 List of Relevant TOOLs:
-   - WeatherTOOL.com_Realtime_Weather_TOOL
-   - WeatherTOOL.com_Forecast_Weather_TOOL
+   - WeatherAPI.com_Realtime_Weather_TOOL
+   - WeatherAPI.com_Forecast_Weather_API
    - Perplexity
 
 3. sub_task 3: News in Top 5 Cities
 Details: Provide the latest news articles related to the top 5 cities in the USA. Include headlines, brief summaries, and links to full articles.
 List of Relevant TOOLs:
-   - NewsTOOLSearchByKeyWord
+   - NewsAPISearchByKeyWord
    - Perplexity
 
 4. sub_task 4: Reddit Discussions on Top 5 Cities
@@ -311,27 +311,27 @@ sub_task 2: Weather in Top 5 Cities
   -We need to find what is the weather in the top 5 cities in the USA, which we found in the sub_task 1.
 
 - TOOL Selection:
-  - WeatherTOOL.com_Realtime_Weather_TOOL may not always return accurate results with city name queries.
+  - WeatherAPI.com_Realtime_Weather_TOOL may not always return accurate results with city name queries.
   - Therefore, we'll use Perplexity to find the latitude and longitude of each city.
-  - We'll then use WeatherTOOL.com_Realtime_Weather_TOOL with these coordinates to fetch accurate weather data.
+  - We'll then use WeatherAPI.com_Realtime_Weather_TOOL with these coordinates to fetch accurate weather data.
 
 - Input Parameters:
   - Perplexity:
     - For Perplexity we have to consider these required input parameters  ['query']
     - query (string): Queries to find latitude and longitude for each city we got from sub_task 1, Step 1.
-  - WeatherTOOL.com_Realtime_Weather_TOOL:
-    - For WeatherTOOL.com_Realtime_Weather_TOOL we have to consider these required input parameters  {'q': {'type': 'String', 'description': 'Query parameter based on which data is sent back. It could be one of the following: Latitude and Longitude (Decimal degree) e.g: q=48.8567,2.3508, city name e.g.: q=Paris, US zip e.g: q=10001, UK postcode e.g: q=SW1, Canada postal code e.g: q=G2J, metar:<metar_code> e.g: q=metar:EGLL, iata:<3 digit airport code> e.g: q=iata:DXB, auto:ip for IP lookup, IP address (IPv4 and IPv6 supported) e.g: q=100.0.0.1'}}
+  - WeatherAPI.com_Realtime_Weather_TOOL:
+    - For WeatherAPI.com_Realtime_Weather_TOOL we have to consider these required input parameters  {'q': {'type': 'String', 'description': 'Query parameter based on which data is sent back. It could be one of the following: Latitude and Longitude (Decimal degree) e.g: q=48.8567,2.3508, city name e.g.: q=Paris, US zip e.g: q=10001, UK postcode e.g: q=SW1, Canada postal code e.g: q=G2J, metar:<metar_code> e.g: q=metar:EGLL, iata:<3 digit airport code> e.g: q=iata:DXB, auto:ip for IP lookup, IP address (IPv4 and IPv6 supported) e.g: q=100.0.0.1'}}
     - q (string): Latitude and longitude in the format "lat,lon".
 
 - Source of Inputs:
   - Perplexity:
     - query: TOOL_Output, (sub_task 1, Step 1), using top_cities_list
-  - WeatherTOOL.com_Realtime_Weather_TOOL:
+  - WeatherAPI.com_Realtime_Weather_TOOL:
     - q: TOOL_Output (sub_task 2, Step 1), using city_coordinates.
 
 - execution_blueprint Flow:
   - Step 1: Use Perplexity to find the latitude and longitude of each city.
-  - Step 2: Use WeatherTOOL.com_Realtime_Weather_TOOL with these coordinates to fetch real-time weather data.
+  - Step 2: Use WeatherAPI.com_Realtime_Weather_TOOL with these coordinates to fetch real-time weather data.
 
 - Interdependencies:
   - Step 2 depends on Step 1 (city_coordinates) . Dependency is on the current sub_tasks step output.
@@ -352,27 +352,27 @@ sub_task 2: Weather in Top 5 Cities
   -We need to find what is the weather in the top 5 cities in the USA, which we found in the sub_task 1.
 
 - TOOL Selection:
-  - WeatherTOOL.com_Realtime_Weather_TOOL may not always return accurate results with city name queries.
+  - WeatherAPI.com_Realtime_Weather_TOOL may not always return accurate results with city name queries.
   - Therefore, we'll use Perplexity to find the latitude and longitude of each city.
-  - We'll then use WeatherTOOL.com_Realtime_Weather_TOOL with these coordinates to fetch accurate weather data.
+  - We'll then use WeatherAPI.com_Realtime_Weather_TOOL with these coordinates to fetch accurate weather data.
 
 - Input Parameters:
   - Perplexity:
     - For Perplexity we have to consider these required input parameters : ['query']
     - query (string): Queries to find latitude and longitude for each city we got from sub_task 1, Step 1.
-  - WeatherTOOL.com_Realtime_Weather_TOOL:
-    - For WeatherTOOL.com_Realtime_Weather_TOOL we have to consider these required input parameters:  {'q': {'type': 'String', 'description': 'Query parameter based on which data is sent back. It could be one of the following: Latitude and Longitude (Decimal degree) e.g: q=48.8567,2.3508, city name e.g.: q=Paris, US zip e.g: q=10001, UK postcode e.g: q=SW1, Canada postal code e.g: q=G2J, metar:<metar_code> e.g: q=metar:EGLL, iata:<3 digit airport code> e.g: q=iata:DXB, auto:ip for IP lookup, IP address (IPv4 and IPv6 supported) e.g: q=100.0.0.1'}}
+  - WeatherAPI.com_Realtime_Weather_TOOL:
+    - For WeatherAPI.com_Realtime_Weather_TOOL we have to consider these required input parameters:  {'q': {'type': 'String', 'description': 'Query parameter based on which data is sent back. It could be one of the following: Latitude and Longitude (Decimal degree) e.g: q=48.8567,2.3508, city name e.g.: q=Paris, US zip e.g: q=10001, UK postcode e.g: q=SW1, Canada postal code e.g: q=G2J, metar:<metar_code> e.g: q=metar:EGLL, iata:<3 digit airport code> e.g: q=iata:DXB, auto:ip for IP lookup, IP address (IPv4 and IPv6 supported) e.g: q=100.0.0.1'}}
     - q (string): Latitude and longitude in the format "lat,lon".
 
 - Source of Inputs:
   - Perplexity:
     - query: TOOL_Output, (sub_task 1, Step 1), using top_cities_list
-  - WeatherTOOL.com_Realtime_Weather_TOOL:
+  - WeatherAPI.com_Realtime_Weather_TOOL:
     - q: TOOL_Output (sub_task 2, Step 1), using city_coordinates.
 
 - execution_blueprint Flow:
   - Step 1: Use Perplexity to find the latitude and longitude of each city.
-  - Step 2: Use WeatherTOOL.com_Realtime_Weather_TOOL with these coordinates to fetch real-time weather data.
+  - Step 2: Use WeatherAPI.com_Realtime_Weather_TOOL with these coordinates to fetch real-time weather data.
 
 - Interdependencies:
   - Step 2 depends on Step 1 (city_coordinates) . Dependency is on the current sub_tasks step output.
@@ -380,7 +380,7 @@ sub_task 2: Weather in Top 5 Cities
 - Variable Naming:
   - Input variable name for Step 1: top_cities_list (matching the output variable name from sub_task 1, Step 1).
   - Output variable name for Step 1: latitude_data and longitude_data.
-  - Input variable name for Step 2: latitude_data and longitude_data (matching the output variable name from sub_task 2, Step 1). For preparing the q parameter of WeatherTOOL.com_Realtime_Weather_TOOL completely we had to use two input variables.
+  - Input variable name for Step 2: latitude_data and longitude_data (matching the output variable name from sub_task 2, Step 1). For preparing the q parameter of WeatherAPI.com_Realtime_Weather_TOOL completely we had to use two input variables.
   - Out variable name for Step 2: realtime_weather
 
 - Validating if what i have thought till now is correct: Yes it is correct.
@@ -392,12 +392,12 @@ sub_task 3: News in Top 5 Cities
   -We need to find what is the news in the top 5 cities in the USA, which we found in sub_task 1.
 
 - TOOL Selection:
-  - To fetch news articles, we'll use NewsTOOLSearchByKeyWord.
+  - To fetch news articles, we'll use NewsAPISearchByKeyWord.
   - We can input city names directly; Perplexity is not necessary here.
 
 - Input Parameters:
-  - NewsTOOLSearchByKeyWord:
-    - For NewsTOOLSearchByKeyWord there are no required input parameters. But for our purpose we will give the following parameters.
+  - NewsAPISearchByKeyWord:
+    - For NewsAPISearchByKeyWord there are no required input parameters. But for our purpose we will give the following parameters.
       - query (string): City names.
       - language (string): We'll set this to "en".
       - region (string): We'll set this to "US".
@@ -408,7 +408,7 @@ sub_task 3: News in Top 5 Cities
   - region: LLM_Generated, value "US".
 
 - execution_blueprint Flow:
-  - Step 1: Use NewsTOOL to retrieve news articles for each city.
+  - Step 1: Use NewsAPI to retrieve news articles for each city.
 
 - Interdependencies:
   - Depends on sub_task 1, Step 1 for city names. Dependency is on the output from a previous sub_tasks step which is valid.
@@ -567,7 +567,7 @@ Step 1
     - Description: Longitude for each top city
 
 Step 2
-- TOOL: WeatherTOOL.com_Realtime_Weather_TOOL
+- TOOL: WeatherAPI.com_Realtime_Weather_TOOL
 - Handles: Fetches real-time weather data
 - Input Variables:
   - Name: latitude_data
@@ -593,7 +593,7 @@ sub_task Description: Display recent news articles for the top 5 cities.
 execution_blueprint Steps:
 
 Step 1
-- TOOL: NewsTOOLSearchByKeyWord
+- TOOL: NewsAPISearchByKeyWord
 - Handles: Fetches detailed news articles
 - Input Variables:
   - Name: top_cities_list
@@ -679,7 +679,7 @@ List of Relevant TOOLs:
 
 2. sub_task 2: Weather Forecast for New York City
 List of Relevant TOOLs:
-   - WeatherTOOL.com_Forecast_Weather_TOOL
+   - WeatherAPI.com_Forecast_Weather_API
    - Perplexity
 
 Description of TOOLs:
@@ -741,28 +741,28 @@ sub_task 2: Weather Forecast for New York City
 
 - TOOL Selection:
   - To provide the weather forecast for New York City for the specified dates.
-  - Perplexity: To obtain the latitude and longitude of New York City, as using coordinates can provide more accurate results with WeatherTOOL.com_Forecast_Weather_TOOL.
-  - WeatherTOOL.com_Forecast_Weather_TOOL: To fetch the weather forecast using the coordinates and dates.
+  - Perplexity: To obtain the latitude and longitude of New York City, as using coordinates can provide more accurate results with WeatherAPI.com_Forecast_Weather_API.
+  - WeatherAPI.com_Forecast_Weather_API: To fetch the weather forecast using the coordinates and dates.
 
 - Input Parameters:
   - Perplexity:
     - For Perplexity we have to consider these required input parameters: ['query']
     - query (string): A query to obtain the latitude and longitude of New York City.
-  - WeatherTOOL.com_Forecast_Weather_TOOL:
-    - For WeatherTOOL.com_Forecast_Weather_TOOL we have to consider these required input parameters:{'q': {'type': 'String', 'description': 'Query parameter based on which data is sent back. It could be one of the following: Latitude and Longitude (Decimal degree) e.g: q=48.8567,2.3508, city name e.g.: q=Paris, US zip e.g: q=10001, UK postcode e.g: q=SW1, Canada postal code e.g: q=G2J, metar:<metar_code> e.g: q=metar:EGLL, iata:<3 digit airport code> e.g: q=iata:DXB, auto:ip for IP lookup, IP address (IPv4 and IPv6 supported) e.g: q=100.0.0.1'}}
+  - WeatherAPI.com_Forecast_Weather_API:
+    - For WeatherAPI.com_Forecast_Weather_API we have to consider these required input parameters:{'q': {'type': 'String', 'description': 'Query parameter based on which data is sent back. It could be one of the following: Latitude and Longitude (Decimal degree) e.g: q=48.8567,2.3508, city name e.g.: q=Paris, US zip e.g: q=10001, UK postcode e.g: q=SW1, Canada postal code e.g: q=G2J, metar:<metar_code> e.g: q=metar:EGLL, iata:<3 digit airport code> e.g: q=iata:DXB, auto:ip for IP lookup, IP address (IPv4 and IPv6 supported) e.g: q=100.0.0.1'}}
     - q (string): The latitude and longitude in "lat,lon" format.
     - dt (date): Specific dates for which the forecast is required.
 
 - Source of Inputs:
   - Perplexity:
     - query: LLM_Generated, value "What is the latitude and longitude of New York City?", inferred from the user's query.
-  - WeatherTOOL.com_Forecast_Weather_TOOL:
+  - WeatherAPI.com_Forecast_Weather_API:
     - q: TOOL_Output (sub_task 2, Step 1), output nyc_coordinates from Perplexity.
     - dt: LLM_Generated, value ["2024-10-10", "2024-10-11", "2024-10-12"], extracted from the user's query.
 
 - execution_blueprint Flow:
   - Step 1: Use Perplexity to obtain the latitude and longitude of New York City.
-  - Step 2: Use WeatherTOOL.com_Forecast_Weather_TOOL with the coordinates and dates to fetch the weather forecast.
+  - Step 2: Use WeatherAPI.com_Forecast_Weather_API with the coordinates and dates to fetch the weather forecast.
 
 - Interdependencies:
   - Step 2 depends on Step 1 for the coordinates (nyc_coordinates). Dependency is on the current sub_tasks step output which is valid.
@@ -867,7 +867,7 @@ Step 1
     - Description: Longitude and Latitude for New York City
 
 Step 2
-- TOOL: WeatherTOOL.com_Forecast_Weather_TOOL
+- TOOL: WeatherAPI.com_Forecast_Weather_API
 - Handles: Fetches weather forecast for New York City
 - Input Variables:
   - Name: nyc_coordinates
@@ -900,7 +900,7 @@ List of Relevant TOOLs:
 
 2. sub_task 2: Weather Forecast for New York City
 List of Relevant TOOLs:
-   - WeatherTOOL.com_Forecast_Weather_TOOL
+   - WeatherAPI.com_Forecast_Weather_API
    - Perplexity
 
 Description of TOOLs:
@@ -915,13 +915,13 @@ sub_task 1: News in the Netherlands
 
 - TOOL Selection:
   - The user's query is "What is the news in Netherlands?"
-  - We can directly use the NewsTOOLSearchByKeyWord TOOL to fetch news articles related to the Netherlands.
+  - We can directly use the NewsAPISearchByKeyWord TOOL to fetch news articles related to the Netherlands.
   - Perplexity is not necessary here since we can use the country name directly as the search query.
-  - We should avoid using the region parameter in the NewsTOOL if we are unsure about the exact region code or if it might limit the results in unintended ways.
+  - We should avoid using the region parameter in the NewsAPI if we are unsure about the exact region code or if it might limit the results in unintended ways.
 
 - Input Parameters:
-  - NewsTOOLSearchByKeyWord:
-    - For NewsTOOLSearchByKeyWord there are no required input parameters. But for our purpose we will give the following parameters.
+  - NewsAPISearchByKeyWord:
+    - For NewsAPISearchByKeyWord there are no required input parameters. But for our purpose we will give the following parameters.
       - query (string): The keyword or phrase to search for in news articles.
       - language (string): The language of the news articles. This is optional but can be set to "en" for English.
       - region (string): The region or country code. Since we are not sure about the correct region code for the Netherlands in the TOOL, it's best to omit this parameter to ensure we don't miss relevant articles.
@@ -932,7 +932,7 @@ sub_task 1: News in the Netherlands
   - We will not use the region parameter to avoid potential issues with incorrect or restrictive region codes.
 
 - execution_blueprint Flow:
-  - Step 1: Use NewsTOOLSearchByKeyWord to fetch recent news articles about the Netherlands using the keyword and language parameters.
+  - Step 1: Use NewsAPISearchByKeyWord to fetch recent news articles about the Netherlands using the keyword and language parameters.
 
 - Interdependencies:
   - As this is a single-step execution_blueprint, there are no interdependencies with other steps or sub_tasks.
@@ -958,7 +958,7 @@ sub_task 1: News in the Netherlands
 
 $$EXECUTION_BLUEPRINT$$
 
-- TOOL: NewsTOOLSearchByKeyWord
+- TOOL: NewsAPISearchByKeyWord
 - Handles: Fetches news articles for Netherlands
 - Input Variables:
   - Name: vacation_spots_list
@@ -1341,7 +1341,7 @@ List of Relevant TOOLs:
 2. sub_task 2: News Articles on Sci-Fi Book Adaptations
 Details: Find and display news articles about science fiction books that have been or will be adapted into movies or TV series. Include article titles, publication dates, and a brief summary.
 List of Relevant TOOLs:
-   - NewsTOOLSearchByKeyWord
+   - NewsAPISearchByKeyWord
    - Perplexity
 
 Description of TOOLs:
@@ -1411,26 +1411,26 @@ sub_task 2: News Articles on Sci-Fi Book Adaptations
 
 - TOOL Selection:
   - Perplexity: To identify which sci-fi books from the list have been or will be adapted into movies or TV series.
-  - NewsTOOLSearchByKeyWord: To find news articles about these adaptations.
+  - NewsAPISearchByKeyWord: To find news articles about these adaptations.
 
 - Input Parameters:
   - Perplexity:
     - Requires parameter query (string): A query to find adaptations of books from sci_fi_books_list.
-  - NewsTOOLSearchByKeyWord:
-    - For NewsTOOLSearchByKeyWord there are no required input parameters. But for our purpose we will give the following parameters.
+  - NewsAPISearchByKeyWord:
+    - For NewsAPISearchByKeyWord there are no required input parameters. But for our purpose we will give the following parameters.
     - query (string): Keywords related to the identified adaptations.
     - language (string): Set to "en" for English articles.
 
 - Source of Inputs:
   - Perplexity:
     - query: TOOL_Output (sub_task 1, Step 1), using sci_fi_books_list to find adaptation information.
-  - NewsTOOLSearchByKeyWord:
+  - NewsAPISearchByKeyWord:
     - query: TOOL_Output (sub_task 2, Step 1), output adaptation_keywords from Perplexity.
     - language: LLM_Generated, value: "en"
 
 - execution_blueprint Flow:
   - Step 1: Use Perplexity to identify which books have been adapted and generate keywords for searching news articles.
-  - Step 2: Use NewsTOOLSearchByKeyWord to find news articles about these adaptations.
+  - Step 2: Use NewsAPISearchByKeyWord to find news articles about these adaptations.
 
 - Interdependencies:
   - Step 1 depends on sub_task 1, Step 1 for sci_fi_books_list.
@@ -1532,7 +1532,7 @@ Step 1
     - Description: Keywords related to sci-fi book adaptations.
 
 Step 2
-- TOOL: NewsTOOLSearchByKeyWord
+- TOOL: NewsAPISearchByKeyWord
 - Handles: Finds news articles about sci-fi book adaptations.
 - Input Variables:
   - Name: adaptation_keywords
@@ -1558,7 +1558,7 @@ List of Relevant TOOLs:
 2. sub_task 2: Weather Forecast for CTOOLtal City
 Details: Provide the weather forecast for the cTOOLtal city of the country identified in the previous sub_task on October 10, 2024. This will help the user plan their visit based on the weather conditions.
 List of Relevant TOOLs:
-   - WeatherTOOL.com_Forecast_Weather_TOOL
+   - WeatherAPI.com_Forecast_Weather_API
    - Perplexity
 
 3. sub_task 3: Recommended Attractions Based on Weather
@@ -1629,7 +1629,7 @@ sub_task 2: Weather Forecast for CTOOLtal City
     - Perplexity:
         - To find the cTOOLtal city of the identified country.
         - To find the latitude and longitude of the cTOOLtal city.
-    - WeatherTOOL.com_Forecast_Weather_TOOL:
+    - WeatherAPI.com_Forecast_Weather_API:
         - To fetch the weather forecast for the cTOOLtal city on the specified date.
         - Using coordinates (latitude and longitude) can provide more accurate results.
 
@@ -1638,7 +1638,7 @@ sub_task 2: Weather Forecast for CTOOLtal City
         - query (string): Query to find the cTOOLtal city.
     - Perplexity (Step 2):
         - query (string): Query to find the latitude and longitude of the cTOOLtal city.
-    - WeatherTOOL.com_Forecast_Weather_TOOL:
+    - WeatherAPI.com_Forecast_Weather_API:
         - q (string): Location query parameter in the format "lat,lon".
         - dt (date): Forecast date in YYYY-MM-DD format.
 
@@ -1656,7 +1656,7 @@ sub_task 2: Weather Forecast for CTOOLtal City
 - execution_blueprint Flow:
     - Step 1: Use Perplexity to find the cTOOLtal city of the country identified in sub_task 1.
     - Step 2: Use Perplexity to find the latitude and longitude of the cTOOLtal city.
-    - Step 3: Use WeatherTOOL.com_Forecast_Weather_TOOL with the coordinates and date to get the weather forecast.
+    - Step 3: Use WeatherAPI.com_Forecast_Weather_API with the coordinates and date to get the weather forecast.
 
 - Interdependencies:
     - Step 1 depends on sub_task 1, Step 1 for top_tourist_country.
@@ -1808,7 +1808,7 @@ Step 2
     - Description: Coordinates (latitude, longitude) of the cTOOLtal city of the identified country.
 
 Step 3
-- TOOL: WeatherTOOL.com_Forecast_Weather_TOOL
+- TOOL: WeatherAPI.com_Forecast_Weather_API
 - Handles: Fetches the weather forecast for the cTOOLtal city on October 10, 2024.
 - Input Variables:
   - Name: cTOOLtal_city_coordinates

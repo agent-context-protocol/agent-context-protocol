@@ -329,6 +329,9 @@ class AgentNode(BaseNode):
 
         # Join and return the final string
         return "\n".join(result)
+    
+    ###################################################################
+    # ALL THE PARSING FUNCTIONS WILL BE HERE
 
     def parse_agent_request(self, text):
         # Initialize the result dictionary
@@ -390,7 +393,7 @@ class AgentNode(BaseNode):
             else:
                 # Extract method and URL
                 endpoint_match = re.search(
-                    r"tool_ENDPOINT\s+Method:\s*(GET|POST|PUT|PATCH|DELETE|FUNCTION)\s+URL:\s*(\S+)",
+                    r"TOOL_ENDPOINT\s+Method:\s*(GET|POST|PUT|PATCH|DELETE|FUNCTION)\s+URL:\s*(\S+)",
                     agent_request_text
                 )
                 if endpoint_match:
@@ -644,13 +647,6 @@ class AgentNode(BaseNode):
         
     ###################################################################
     async def build_verify(self):
-        """
-        This function goes through each step of the execution_blueprint and prepares inputs based on the execution_blueprint details
-        and the tool descriptions provided.
-        
-        Args:
-            tool_descriptions (dict): Dictionary where the key is the tool name and the value is the tool description.
-        """
         overall_success_bool = False
         overall_counter = 0
         while not overall_success_bool and overall_counter < 5:
@@ -724,6 +720,7 @@ class AgentNode(BaseNode):
                     #########################################################
                     # running the tool i.e., TOOL CALL
                     tool_call_error_counter += 1
+                    run_success=False
                     try:
                         for tool_req_i in range(len(parsed_agent_request['agent_requests'])):
                             if parsed_agent_request['agent_requests'][tool_req_i]['method'] == "FUNCTION":

@@ -346,7 +346,7 @@ class DAGCompilerNode(BaseNode):
         }
 
         # Split the input string into sections using regular expressions
-        sections = re.split(r'\$\$CHAIN_OF_THOUGHT\$\$|\$\$CHOSEN_ACTION\$\$|\$\$execution_blueprint\$\$', updated_execution_blueprint)
+        sections = re.split(r'\$\$CHAIN_OF_THOUGHT\$\$|\$\$CHOSEN_ACTION\$\$|\$\$EXECUTION_BLUEPRINT\$\$', updated_execution_blueprint)
 
         # Check that at least $$CHAIN_OF_THOUGHT$$ and $$CHOSEN_ACTION$$ exist
         if len(sections) < 3:
@@ -367,12 +367,12 @@ class DAGCompilerNode(BaseNode):
         # If the action is MODIFY, we should also parse the execution_blueprint section
         if result['chosen_action'] == 'MODIFY':
             if len(sections) < 4:
-                raise ValueError("The output must contain a $$execution_blueprint$$ section if MODIFY is chosen.")
+                raise ValueError("The output must contain a $$EXECUTION_BLUEPRINT$$ section if MODIFY is chosen.")
             execution_blueprint_text = sections[3].strip()
 
             # Parse the execution_blueprint section by passing it to the existing execution_blueprint parser
             dummy_chain_of_thought = "$$CHAIN_OF_THOUGHT$$\nFiller space"
-            full_execution_blueprint_text = f"{dummy_chain_of_thought}\n$$execution_blueprint$$\n{execution_blueprint_text}"
+            full_execution_blueprint_text = f"{dummy_chain_of_thought}\n$$EXECUTION_BLUEPRINT$$\n{execution_blueprint_text}"
 
             # Call the existing execution_blueprint parser and save the parsed execution_blueprint
             _, result['execution_blueprint'] = self.parse_dag_compiler_execution_blueprint(full_execution_blueprint_text, modified_execution_blueprint_bool = True)
