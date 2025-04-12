@@ -1,0 +1,16 @@
+servers:
+  - name: github
+    path: servers/src/github/dist/index.js 
+    type: node
+    env:
+      GITHUB_PERSONAL_ACCESS_TOKEN: ""
+
+  - name: weather
+    path: modelcontextprotocol/perplexity-ask/dist/index.js
+    type: node
+    env: 
+      PERPLEXITY_API_KEY: "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"
+
+defaults:
+  python_env_path: /Users/db/.venv/bin/python
+  node_command: node
