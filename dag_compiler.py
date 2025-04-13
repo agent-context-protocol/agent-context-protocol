@@ -4,17 +4,17 @@ import json
 import asyncio
 from available_tools.rapid_apis_format.return_dict import RAPIDAPI_TOOLS_DICT, RAPIDAPI_REQD_PARAMS_DICT, RAPIDAPI_PARAMS_DICT
 from available_tools.function_format.return_dict import FUNCTION_TOOLS_DOCUMENTATION_DICT, FUNCTION_TOOLS_REQD_PARAMS_DICT, FUNCTION_TOOLS_PARAMS_DICT
-
 class DAGCompilerNode(BaseNode):
-    def __init__(self, node_name, system_prompt = None):
+    def __init__(self, node_name, system_prompt = None, mcp_tool_manager = None):
         super().__init__(node_name, system_prompt)
         self.get_system_prompts()
         self.clusters = {}
         self.lock = asyncio.Lock()
         self.queue = asyncio.Queue()
         self.execution_blueprint = None
-
+        self.mcp_tool_manager = mcp_tool_manager
         self.unique_tools = {}
+        self.MCP_PARAMS_DICT = self.mcp_tool_manager.return_documentation()
 
     def get_system_prompts(self):
         # execution_blueprint_creation_prompt
@@ -147,7 +147,11 @@ class DAGCompilerNode(BaseNode):
                                         reqd_params_for_this_tool = list(RAPIDAPI_REQD_PARAMS_DICT[current_step['tool']].keys())
                                     elif current_step['tool'] in FUNCTION_TOOLS_REQD_PARAMS_DICT:
                                         reqd_params_for_this_tool = list(FUNCTION_TOOLS_REQD_PARAMS_DICT[current_step['tool']].keys())
-                                    elif current_step['tool'] not in RAPIDAPI_PARAMS_DICT or current_step['tool'] not in FUNCTION_TOOLS_PARAMS_DICT:
+                                    elif current_step['tool'] in self.MCP_PARAMS_DICT.keys():
+                                        print(type(self.MCP_PARAMS_DICT))
+                                        # reqd_params_for_this_tool = self.MCP_PARAMS_DICT[current_step['tool']]['parameters']['required']
+                                        reqd_params_for_this_tool = []
+                                    elif current_step['tool'] not in RAPIDAPI_PARAMS_DICT or current_step['tool'] not in FUNCTION_TOOLS_PARAMS_DICT or current_step['tool'] not in self.MCP_PARAMS_DICT.keys():
                                         raise ValueError(f"Invalid TOOL Name {current_step['tool']}, there is no such TOOL name. Please use a valid TOOL name.")
                                     print(f"current_step['tool']: {current_step['tool']} reqd_params_for_this_tool : {reqd_params_for_this_tool}")
                                     j += 1
@@ -434,6 +438,15 @@ class DAGCompilerNode(BaseNode):
                     f"   - **Use:** {tool_details['Use']}\n\n"
                     f"   - **Documentation:** {FUNCTION_TOOLS_DOCUMENTATION_DICT[tool_name]}\n\n"
                     f"   - **Required Parameters (If not specified then error will be raised):** {FUNCTION_TOOLS_REQD_PARAMS_DICT[tool_name]}\n\n"
+                )
+            elif tool_name in self.MCP_PARAMS_DICT:
+                print(self.MCP_PARAMS_DICT)
+                print(tool_name)
+                formatted_string += (
+                    f"{tool_id}. {tool_name}\n"
+                    f"   - **Use:** {self.MCP_PARAMS_DICT[tool_name]['documentation']}\n\n"
+                    f"   - **Documentation:** {self.MCP_PARAMS_DICT[tool_name]['documentation']}\n\n"
+                    f"   - **Required Parameters (If not specified then error will be raised):** {self.MCP_PARAMS_DICT[tool_name]['parameters']}\n\n"
                 )
             else:
                 raise ValueError(f"Invalid TOOL Name {tool_name}. It is not there in RAPIDAPI_TOOLS_DICT or FUNCTION_APIS_FUNCTION_DICT. This error is inside create_first_input_data")

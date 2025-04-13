@@ -88,8 +88,8 @@ class MCPToolManager:
     def return_documentation(self):
             return {
                 tool: {
-                    "documentation": f"""Description: {client.tools[tool]["description"]}
-                    Input Schema: {client.tools[tool]["inputSchema"]}""",
+                    "documentation": f"""Description: {client.tools[tool]["description"]}""",
+                    "parameters": f"""{client.tools[tool]["inputSchema"]}""",
                     "server": client.name
                 }
                 for tool, client in self.tool_to_server.items()
@@ -98,8 +98,13 @@ class MCPToolManager:
     async def call_tool(self, tool_name: str, tool_args: dict):
         if tool_name not in self.tool_to_server:
             raise ValueError(f"Tool '{tool_name}' not found in any registered server.")
+        
         client = self.tool_to_server[tool_name]
-        return await client.call_tool(tool_name, tool_args)
+        try:
+            output = await client.call_tool(tool_name, tool_args)
+            return True, output
+        except Exception as e:
+            return False, {"error": str(e)}
 
     async def cleanup(self):
         for client in self.server_clients:

@@ -1,23 +1,11 @@
 import json
 from base import BaseNode
 
-def update_task_decomposer_with_tools(task_decomposer_message, tool_json_path='external_env_details/brief_details.json'):
-    # Load the TOOL descriptions
-    with open(tool_json_path, 'r') as file:
-        tool_data = json.load(file)
-    tool_details = []
-    for tool_name in task_decomposer_message['request']['relevant_tools']:
-        tool_details.append({
-            'tool_name': tool_name,
-            'Use': tool_data[tool_name]['Use']
-            })
-    task_decomposer_message['request']['relevant_tools'] = tool_details
-    return task_decomposer_message
-
 class TaskDecompositionNode(BaseNode):
-    def __init__(self, node_name, user_query = None, system_prompt = None):
+    def __init__(self, node_name, user_query = None, system_prompt = None, mcp_tool_manager = None):
         super().__init__(node_name, system_prompt)
         self.user_query = user_query
+        self.mcp_tool_manager = mcp_tool_manager
 
     def create_available_tool_string(self):
         # Load the dictionary from the JSON file
@@ -34,6 +22,12 @@ class TaskDecompositionNode(BaseNode):
                 result_string += f"  {key}: {value}\n"
             result_string += "\n"
 
+        if self.mcp_tool_manager:
+            result_string += "MCP Tools:\n\n"
+            mcp_tool_names = self.mcp_tool_manager.list_all_tools()
+            for tool_name, description in mcp_tool_names.items():
+                result_string += f"  {tool_name}: {description}\n"
+
         return result_string
 
 
@@ -48,6 +42,27 @@ class TaskDecompositionNode(BaseNode):
             output = self.modify_message(output)
             return output
 
+    def update_task_decomposer_with_tools(self, task_decomposer_message, tool_json_path='external_env_details/brief_details.json'):
+        # Load the TOOL descriptions
+        with open(tool_json_path, 'r') as file:
+            tool_data = json.load(file)
+        tool_details = []
+        if self.mcp_tool_manager:
+            mcp_tool_names = self.mcp_tool_manager.list_all_tools()
+            for tool_name, description in mcp_tool_names.items():
+                tool_data[tool_name] = {
+                    "Use": description
+                }
+
+        print(tool_data)
+        for tool_name in task_decomposer_message['request']['relevant_tools']:
+            tool_details.append({
+                'tool_name': tool_name,
+                'Use': tool_data[tool_name]['Use']
+                })
+        task_decomposer_message['request']['relevant_tools'] = tool_details
+        return task_decomposer_message
+
     def modify_message(self, message):
         # Define the JSON-like strings
         json_strings = message.split('---Done---')[1:-1]
@@ -55,6 +70,6 @@ class TaskDecompositionNode(BaseNode):
         for json_string in json_strings:
             sub_task = json.loads(json_string)
             instance_id = sub_task["instance_id"]
-            sub_tasks_list.append(update_task_decomposer_with_tools(sub_task))
+            sub_tasks_list.append(self.update_task_decomposer_with_tools(sub_task))
 
         return sub_tasks_list 

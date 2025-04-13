@@ -4,6 +4,7 @@ from task_decomposer import TaskDecompositionNode
 from dag_compiler import DAGCompilerNode
 from agent import AgentNode
 from concurrent.futures import ThreadPoolExecutor
+from mcp_node import MCPToolManager
 
 class ACPManager:
     def __init__(self, execution_blueprint, dag_compiler, agent_system_prompt):
@@ -101,10 +102,11 @@ class ACPManager:
         self.thread_pool.shutdown(wait=True)
 
 class ACP:
-    def __init__(self):
+    def __init__(self, mcp_tool_manager):
+        self.mcp_tool_manager = mcp_tool_manager
         self.get_system_prompts()
-        self.task_decomposer = TaskDecompositionNode('task_decomposer', system_prompt=self.task_decomposer_system_prompt)
-        self.dag_compiler = DAGCompilerNode('dag_compiler', self.dag_compiler_system_prompt)
+        self.task_decomposer = TaskDecompositionNode('task_decomposer', system_prompt=self.task_decomposer_system_prompt, mcp_tool_manager=self.mcp_tool_manager)
+        self.dag_compiler = DAGCompilerNode('dag_compiler', self.dag_compiler_system_prompt, mcp_tool_manager=self.mcp_tool_manager)
 
     def get_system_prompts(self):
         with open('prompts/task_decomposer_system_prompt.txt', 'r') as file:
@@ -141,7 +143,10 @@ class ACP:
 
 
 async def main():
-    acp = ACP()
+    config_path = "config.yml"
+    manager = MCPToolManager()
+    await manager.load_from_config(config_path)
+    acp = ACP(mcp_tool_manager=manager)
     # await acp.run("what is the weather in seattle, usa", '')
     user_query = "what is the weather in seattle, usa"
     execution_blueprint = await acp.initialise(user_query)

@@ -683,6 +683,10 @@ class AgentNode(BaseNode):
                     tool_documentation = RAPIDAPI_TOOLS_DICT[step['tool']]
                 elif step['tool'] in FUNCTION_TOOLS_DOCUMENTATION_DICT:
                     tool_documentation = FUNCTION_TOOLS_DOCUMENTATION_DICT[step['tool']]
+                elif step['tool'] in self.dag_compiler.MCP_PARAMS_DICT:
+                    tool_documentation = f"""Description: {self.dag_compiler.MCP_PARAMS_DICT[step['tool']]['documentation']}
+                    Input Schema: {self.dag_compiler.MCP_PARAMS_DICT[step['tool']]['parameters']}
+                    """
                 else:
                     raise ValueError("tool Documentation Not Found.")
                 input_data = self.prepare_input_for_tool_running_step(step, tool_documentation)
@@ -722,9 +726,15 @@ class AgentNode(BaseNode):
                     tool_call_error_counter += 1
                     run_success=False
                     try:
+                        print(parsed_agent_request['agent_requests'])
                         for tool_req_i in range(len(parsed_agent_request['agent_requests'])):
+                            # print(tool_req_i)
                             if parsed_agent_request['agent_requests'][tool_req_i]['method'] == "FUNCTION":
-                                tool_call_success_bool, tool_output = self.function_call(step['tool'], parsed_agent_request['agent_requests'][tool_req_i]['body'])
+                                if parsed_agent_request['agent_requests'][tool_req_i]['url'] in self.dag_compiler.MCP_PARAMS_DICT.keys():
+                                    print("tool_req_i in self.dag_compiler.MCP_PARAMS_DICT.keys()")
+                                    tool_call_success_bool, tool_output = await self.dag_compiler.mcp_tool_manager.call_tool(parsed_agent_request['agent_requests'][tool_req_i]['url'],parsed_agent_request['agent_requests'][tool_req_i]['body'])
+                                else:
+                                    tool_call_success_bool, tool_output = self.function_call(step['tool'], parsed_agent_request['agent_requests'][tool_req_i]['body'])
                             else:
                                 tool_call_success_bool, tool_output = self.requests_func(parsed_agent_request['agent_requests'][tool_req_i]['method'], parsed_agent_request['agent_requests'][tool_req_i]['url'], parsed_agent_request['agent_requests'][tool_req_i]['headers'], parsed_agent_request['agent_requests'][tool_req_i]['body'])
 
