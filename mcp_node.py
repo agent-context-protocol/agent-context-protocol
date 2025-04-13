@@ -90,7 +90,8 @@ class MCPToolManager:
                 tool: {
                     "documentation": f"""Description: {client.tools[tool]["description"]}""",
                     "parameters": f"""{client.tools[tool]["inputSchema"]}""",
-                    "server": client.name
+                    "server": client.name,
+                    "parameters_dict": client.tools[tool]["inputSchema"],
                 }
                 for tool, client in self.tool_to_server.items()
             }

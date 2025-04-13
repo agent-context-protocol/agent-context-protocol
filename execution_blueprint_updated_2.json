@@ -1,40 +1,54 @@
 {
     "2": {
-        "subtask_description": "Retrieve weather forecast for the next few days in Seattle, USA.",
+        "subtask_description": "Search GitHub for repositories related to weather data analysis or visualization.",
         "steps": {
             "1": {
-                "tool": "WeatherAPI.com_Forecast_Weather_API",
-                "handles": "Fetches weather forecast for Seattle.",
+                "tool": "search_repositories",
+                "handles": "Searches for GitHub repositories related to weather data analysis or visualization.",
                 "input_vars": [
                     {
-                        "name": "city_name",
+                        "name": "repo_query",
                         "parameter": [
-                            "q"
+                            "query"
                         ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "City name for Seattle.",
-                        "value": "Seattle",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "forecast_days",
-                        "parameter": [
-                            "days"
-                        ],
-                        "type": "number",
-                        "source": "LLM_Generated",
-                        "description": "Number of forecast days required.",
-                        "value": "3",
+                        "description": "Search query for GitHub repositories related to weather data analysis or visualization.",
+                        "value": "weather data analysis visualization",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "weather_forecast",
-                        "description": "Weather forecast for Seattle.",
+                        "name": "weather_repos",
+                        "description": "List of GitHub repositories related to weather data analysis or visualization.",
                         "used_by": [],
-                        "value": "```json\n    {\n      \"Seattle\": {\n        \"day_1\": {\n          \"date\": \"2023-11-01\",\n          \"temperature\": {\n            \"max\": 15,\n            \"min\": 8,\n            \"unit\": \"\u00b0C\"\n          },\n          \"precipitation\": {\n            \"amount\": 5,\n            \"unit\": \"mm\"\n          },\n          \"wind\": {\n            \"speed\": 10,\n            \"unit\": \"km/h\",\n            \"direction\": \"NW\"\n          },\n          \"condition\": \"Partly cloudy\"\n        },\n        \"day_2\": {\n          \"date\": \"2023-11-02\",\n          \"temperature\": {\n            \"max\": 14,\n            \"min\": 7,\n            \"unit\": \"\u00b0C\"\n          },\n          \"precipitation\": {\n            \"amount\": 2,\n            \"unit\": \"mm\"\n          },\n          \"wind\": {\n            \"speed\": 12,\n            \"unit\": \"km/h\",\n            \"direction\": \"N\"\n          },\n          \"condition\": \"Sunny\"\n        },\n        \"day_3\": {\n          \"date\": \"2023-11-03\",\n          \"temperature\": {\n            \"max\": 13,\n            \"min\": 6,\n            \"unit\": \"\u00b0C\"\n          },\n          \"precipitation\": {\n            \"amount\": 0,\n            \"unit\": \"mm\"\n          },\n          \"wind\": {\n            \"speed\": 8,\n            \"unit\": \"km/h\",\n            \"direction\": \"NE\"\n          },\n          \"condition\": \"Clear\"\n        }\n      }\n    }\n    ```"
+                        "value": "```json\n    [\n      {\n        \"name\": \"ladybug\",\n        \"full_name\": \"ladybug-tools/ladybug\",\n        \"html_url\": \"https://github.com/ladybug-tools/ladybug\",\n        \"description\": \"\ud83d\udc1e Core ladybug library for weather data analysis and visualization\"\n      },\n      {\n        \"name\": \"uxarray\",\n        \"full_name\": \"UXARRAY/uxarray\",\n        \"html_url\": \"https://github.com/UXARRAY/uxarray\",\n        \"description\": \"Xarray extension for unstructured climate and global weather data analysis and visualization.\"\n      },\n      {\n        \"name\": \"ncl\",\n        \"full_name\": \"NCAR/ncl\",\n        \"html_url\": \"https://github.com/NCAR/ncl\",\n        \"description\": \"The NCAR Command Language (NCL) is a scripting language for the analysis and visualization of climate and weather data.\"\n      },\n      {\n        \"name\": \"ladybug-web\",\n        \"full_name\": \"ladybug-tools/ladybug-web\",\n        \"html_url\": \"https://github.com/ladybug-tools/ladybug-web\",\n        \"description\": \"Ladybug for web provides weather data visualization and analysis on the web\"\n      },\n      {\n        \"name\": \"Weather_Data_Analysis\",\n        \"full_name\": \"lilyhanhub/Weather_Data_Analysis\",\n        \"html_url\": \"https://github.com/lilyhanhub/Weather_Data_Analysis\",\n        \"description\": \"Data Analytics/Visualization Bootcamp Group Project\"\n      },\n      {\n        \"name\": \"weather-data-analytics\",\n        \"full_name\": \"RaneemLoay/weather-data-analytics\",\n        \"html_url\": \"https://github.com/RaneemLoay/weather-data-analytics\",\n        \"description\": \"Analysis and prediction on a(Rain in Australia) dataset\"\n      },\n      {\n        \"name\": \"data-analysis\",\n        \"full_name\": \"AR10X/data-analysis\",\n        \"html_url\": \"https://github.com/AR10X/data-analysis\",\n        \"description\": \"Weather Forecasting Analysis and Visualization Project\"\n      },\n      {\n        \"name\": \"world_weather_analysis\",\n        \"full_name\": \"Wall-E28/world_weather_analysis\",\n        \"html_url\": \"https://github.com/Wall-E28/world_weather_analysis\",\n        \"description\": \"This project analyzes top vacation cities based on weather data from Open Weather's API and is visualized using Google Map's API.\"\n      },\n      {\n        \"name\": \"Tehran-Weather-Analysis\",\n        \"full_name\": \"MisaghMomeniB/Tehran-Weather-Analysis\",\n        \"html_url\": \"https://github.com/MisaghMomeniB/Tehran-Weather-Analysis\",\n        \"description\": \"A Python-based Data Analysis Tool for Examining and Visualizing Weather Patterns in Tehran.\"\n      },\n      {\n        \"name\": \"weather_data_analysis\",\n        \"full_name\": \"skJack/weather_data_analysis\",\n        \"html_url\": \"https://github.com/skJack/weather_data_analysis\",\n        \"description\": \"analysis of weather data(https://www.aqistudy.cn/historydata/),including data visualization and data crawling\"\n      }\n    ]\n    ```"
+                    }
+                ]
+            },
+            "2": {
+                "tool": "perplexity_ask",
+                "handles": "Refines the search query or gathers additional information about weather-related GitHub repositories.",
+                "input_vars": [
+                    {
+                        "name": "ask_messages",
+                        "parameter": [
+                            "messages"
+                        ],
+                        "type": "array",
+                        "source": "LLM_Generated",
+                        "description": "Array of conversation messages to refine the search query or gather additional information.",
+                        "value": "[{\"role\": \"user\", \"content\": \"Find GitHub repositories related to weather data analysis or visualization.\"}]",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "refined_repo_info",
+                        "description": "Refined information about weather-related GitHub repositories from Perplexity_ask.",
+                        "used_by": [],
+                        "value": "```json\n    [\n      {\n        \"repository\": \"reecebaileyy/Weather-Data-Analysis\",\n        \"project_overview\": \"This project involves analyzing historical weather data using Python and Pandas. It automates data fetching from OpenWeatherMap, cleans and preprocesses the data, performs statistical analysis, and visualizes temperature and precipitation trends.\",\n        \"features\": \"Data collection, cleaning, analysis, and visualization.\",\n        \"tools_used\": \"Python, Pandas, OpenWeatherMap API\",\n        \"link\": \"https://github.com/reecebaileyy/Weather-Data-Analysis\"\n      },\n      {\n        \"repository\": \"dylburger/noaa-ghcn-weather-data\",\n        \"project_overview\": \"This repository focuses on fetching and processing daily weather data from NOAA's Global Historical Climatology Network. It demonstrates how to use Python for processing and ingesting data into a PostgreSQL database.\",\n        \"features\": \"Data ingestion, processing, and database integration.\",\n        \"tools_used\": \"Python, Pandas, PostgreSQL\",\n        \"link\": \"https://github.com/dylburger/noaa-ghcn-weather-data\"\n      },\n      {\n        \"repository\": \"AR10X/data-analysis\",\n        \"project_overview\": \"Aims to analyze and visualize various weather patterns and trends by collecting data from multiple sources. It uses tools like SQL, Excel, Power BI/Tableau, and Python.\",\n        \"features\": \"Data collection, analysis, and visualization across different regions.\",\n        \"tools_used\": \"Python, SQL, Power BI/Tableau\",\n        \"link\": \"https://github.com/AR10X/data-analysis\"\n      },\n      {\n        \"repository\": \"meteostat/meteostat-python\",\n        \"project_overview\": \"Provides a Python library for accessing historical weather and climate data. It offers a simple API for data retrieval and visualization.\",\n        \"features\": \"Accessing open weather and climate data, data visualization.\",\n        \"tools_used\": \"Python, Matplotlib\",\n        \"link\": \"https://github.com/meteostat/meteostat-python\"\n      },\n      {\n        \"repository\": \"ladybug-tools/ladybug\",\n        \"project_overview\": \"A Python library for analyzing, modifying, and visualizing EnergyPlus Weather files (epw).\",\n        \"features\": \"epw file analysis, visualization.\",\n        \"tools_used\": \"Python\",\n        \"link\": \"https://github.com/ladybug-tools/ladybug\"\n      },\n      {\n        \"repository\": \"JovaniPink/world-weather-analysis\",\n        \"project_overview\": \"Collects and analyzes weather data across cities worldwide. It uses APIs for data retrieval and performs statistical analyses.\",\n        \"features\": \"Global weather data collection, statistical analysis.\",\n        \"tools_used\": \"Python, APIs (OpenWeatherMap), Pandas\",\n        \"link\": \"https://github.com/JovaniPink/world-weather-analysis\"\n      }\n    ]\n    ```"
                     }
                 ]
             }

@@ -684,8 +684,7 @@ class AgentNode(BaseNode):
                 elif step['tool'] in FUNCTION_TOOLS_DOCUMENTATION_DICT:
                     tool_documentation = FUNCTION_TOOLS_DOCUMENTATION_DICT[step['tool']]
                 elif step['tool'] in self.dag_compiler.MCP_PARAMS_DICT:
-                    tool_documentation = f"""Description: {self.dag_compiler.MCP_PARAMS_DICT[step['tool']]['documentation']}
-                    Input Schema: {self.dag_compiler.MCP_PARAMS_DICT[step['tool']]['parameters']}
+                    tool_documentation = f"""Tool Name:{step['tool']}\nDescription: {self.dag_compiler.MCP_PARAMS_DICT[step['tool']]['documentation']}\nInput Schema: {self.dag_compiler.MCP_PARAMS_DICT[step['tool']]['parameters']}
                     """
                 else:
                     raise ValueError("tool Documentation Not Found.")

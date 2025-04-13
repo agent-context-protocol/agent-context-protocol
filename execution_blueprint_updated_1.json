@@ -1,29 +1,29 @@
 {
     "1": {
-        "subtask_description": "Retrieve current weather conditions in Seattle, USA.",
+        "subtask_description": "Retrieve the current weather information for Seattle, USA.",
         "steps": {
             "1": {
-                "tool": "WeatherAPI.com_Realtime_Weather_Api",
-                "handles": "Fetches current weather conditions in Seattle.",
+                "tool": "perplexity_ask",
+                "handles": "Retrieves current weather information for Seattle.",
                 "input_vars": [
                     {
-                        "name": "location_query",
+                        "name": "ask_messages",
                         "parameter": [
-                            "q"
+                            "messages"
                         ],
-                        "type": "string",
+                        "type": "array",
                         "source": "LLM_Generated",
-                        "description": "Query parameter for Seattle, USA.",
-                        "value": "Seattle, USA",
+                        "description": "Array of conversation messages to ask about Seattle's current weather.",
+                        "value": "[{\"role\": \"user\", \"content\": \"What is the current weather in Seattle, USA?\"}]",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "current_weather",
-                        "description": "Current weather conditions in Seattle.",
+                        "name": "current_weather_ask",
+                        "description": "Current weather information for Seattle from Perplexity_ask.",
                         "used_by": [],
-                        "value": "```json\n    {\n      \"temperature\": \"15\u00b0C\",\n      \"wind_speed\": \"10 km/h\",\n      \"humidity\": \"80%\",\n      \"condition\": \"Partly cloudy\",\n      \"wind_direction\": \"NW\",\n      \"pressure\": \"1015 hPa\",\n      \"precipitation\": \"0 mm\",\n      \"visibility\": \"10 km\"\n    }\n    ```"
+                        "value": "```json\n    {\n      \"current_weather\": {\n        \"description\": \"Partly sunny\",\n        \"temperature\": \"54\u00b0F (12\u00b0C)\",\n        \"real_feel\": \"57\u00b0F\",\n        \"wind\": {\n          \"speed\": \"2 mph\",\n          \"gusts\": \"5 mph\",\n          \"direction\": \"N\"\n        },\n        \"humidity\": \"56%\",\n        \"visibility\": \"7 miles\",\n        \"cloud_cover\": \"37%\"\n      },\n      \"additional_details\": {\n        \"sunrise\": \"6:27 AM\",\n        \"sunset\": \"7:55 PM\",\n        \"moon_phase\": \"Full Moon (99% illuminated)\",\n        \"forecast\": \"High of 55\u00b0F with partly sunny skies, cooling to 39\u00b0F overnight. The next few days will remain dry with increasing sunshine, warming to the mid-60s by Monday.\"\n      }\n    }\n    ```"
                     }
                 ]
             }

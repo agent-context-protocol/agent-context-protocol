@@ -26,7 +26,7 @@ class TaskDecompositionNode(BaseNode):
             result_string += "MCP Tools:\n\n"
             mcp_tool_names = self.mcp_tool_manager.list_all_tools()
             for tool_name, description in mcp_tool_names.items():
-                result_string += f"  {tool_name}: {description}\n"
+                result_string += f" {tool_name}: {description}\n\n"
 
         return result_string
 

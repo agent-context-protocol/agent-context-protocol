@@ -1,28 +1,52 @@
 {
     "1": {
         "1": {
-            "subtask_description": "Retrieve current weather conditions in Seattle, USA.",
+            "subtask_description": "Retrieve the current weather information for Seattle, USA.",
             "steps": {
                 "1": {
-                    "tool": "WeatherAPI.com_Realtime_Weather_Api",
-                    "handles": "Fetches current weather conditions in Seattle.",
+                    "tool": "perplexity_ask",
+                    "handles": "Retrieves current weather information for Seattle.",
                     "input_vars": [
                         {
-                            "name": "location_query",
+                            "name": "weather_query_messages",
                             "parameter": [
-                                "q"
+                                "messages"
                             ],
-                            "type": "string",
+                            "type": "array",
                             "source": "LLM_Generated",
-                            "description": "Query parameter for Seattle, USA.",
-                            "value": "Seattle, USA",
+                            "description": "Array of messages to query current weather in Seattle.",
+                            "value": "[{\"role\": \"user\", \"content\": \"What is the current weather in Seattle, USA, including temperature, humidity, wind speed, and any weather alerts?\"}]",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "current_weather",
-                            "description": "Current weather conditions in Seattle.",
+                            "name": "current_weather_info",
+                            "description": "Current weather information for Seattle, USA.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "tool": "perplexity_research",
+                    "handles": "Performs deep research to gather comprehensive weather data with citations.",
+                    "input_vars": [
+                        {
+                            "name": "weather_query_messages",
+                            "parameter": [
+                                "messages"
+                            ],
+                            "type": "array",
+                            "source": "LLM_Generated",
+                            "description": "Array of messages to perform deep research on weather in Seattle.",
+                            "value": "[{\"role\": \"user\", \"content\": \"What is the current weather in Seattle, USA, including temperature, humidity, wind speed, and any weather alerts?\"}]",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "comprehensive_weather_data",
+                            "description": "Comprehensive weather data for Seattle, USA, with citations.",
                             "used_by": []
                         }
                     ]
@@ -32,90 +56,28 @@
     },
     "2": {
         "2": {
-            "subtask_description": "Retrieve weather forecast for the next few days in Seattle, USA.",
+            "subtask_description": "Search GitHub for repositories related to weather data analysis or visualization.",
             "steps": {
                 "1": {
-                    "tool": "WeatherAPI.com_Forecast_Weather_API",
-                    "handles": "Fetches weather forecast for Seattle.",
+                    "tool": "search_repositories",
+                    "handles": "Searches for GitHub repositories related to weather data analysis or visualization.",
                     "input_vars": [
                         {
-                            "name": "location_query",
-                            "parameter": [
-                                "q"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query parameter for Seattle, USA.",
-                            "value": "Seattle, USA",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "weather_forecast",
-                            "description": "Weather forecast for Seattle.",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        }
-    },
-    "3": {
-        "3": {
-            "subtask_description": "Retrieve time zone information for Seattle, USA.",
-            "steps": {
-                "1": {
-                    "tool": "WeatherAPI.com_Time_Zone_API",
-                    "handles": "Fetches time zone information for Seattle.",
-                    "input_vars": [
-                        {
-                            "name": "location_query",
-                            "parameter": [
-                                "q"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query parameter for Seattle, USA.",
-                            "value": "Seattle, USA",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "time_zone_info",
-                            "description": "Time zone information for Seattle.",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        }
-    },
-    "4": {
-        "4": {
-            "subtask_description": "Search for recent news articles on Seattle weather.",
-            "steps": {
-                "1": {
-                    "tool": "NewsAPISearchByKeyWord",
-                    "handles": "Searches for recent news articles on Seattle weather.",
-                    "input_vars": [
-                        {
-                            "name": "news_query",
+                            "name": "github_search_query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Search query for Seattle weather.",
-                            "value": "Seattle weather",
+                            "description": "Search query for GitHub repositories related to weather data analysis or visualization.",
+                            "value": "weather data analysis OR weather visualization",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "news_articles",
-                            "description": "Recent news articles on Seattle weather.",
+                            "name": "weather_repositories_list",
+                            "description": "List of GitHub repositories related to weather data analysis or visualization.",
                             "used_by": []
                         }
                     ]

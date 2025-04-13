@@ -75,4 +75,4 @@ json_file = './available_tools/rapid_apis_format/executable-spec-converted.json'
 RAPIDAPI_TOOLS_DICT = create_rapid_apis_dict(json_file)
 RAPIDAPI_REQD_PARAMS_DICT = create_required_params_dict(json_file, True)
 RAPIDAPI_PARAMS_DICT = create_required_params_dict(json_file)
-print("RAPID_PARAMS_DICT:",RAPIDAPI_PARAMS_DICT)
+# print("RAPID_PARAMS_DICT:",RAPIDAPI_PARAMS_DICT)

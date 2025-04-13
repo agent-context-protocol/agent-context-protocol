@@ -148,9 +148,10 @@ class DAGCompilerNode(BaseNode):
                                     elif current_step['tool'] in FUNCTION_TOOLS_REQD_PARAMS_DICT:
                                         reqd_params_for_this_tool = list(FUNCTION_TOOLS_REQD_PARAMS_DICT[current_step['tool']].keys())
                                     elif current_step['tool'] in self.MCP_PARAMS_DICT.keys():
-                                        print(type(self.MCP_PARAMS_DICT))
-                                        # reqd_params_for_this_tool = self.MCP_PARAMS_DICT[current_step['tool']]['parameters']['required']
-                                        reqd_params_for_this_tool = []
+                                        try:
+                                            reqd_params_for_this_tool = self.MCP_PARAMS_DICT[current_step['tool']]['parameters_dict'].get('required', '')
+                                        except:
+                                            reqd_params_for_this_tool = []
                                     elif current_step['tool'] not in RAPIDAPI_PARAMS_DICT or current_step['tool'] not in FUNCTION_TOOLS_PARAMS_DICT or current_step['tool'] not in self.MCP_PARAMS_DICT.keys():
                                         raise ValueError(f"Invalid TOOL Name {current_step['tool']}, there is no such TOOL name. Please use a valid TOOL name.")
                                     print(f"current_step['tool']: {current_step['tool']} reqd_params_for_this_tool : {reqd_params_for_this_tool}")
@@ -442,11 +443,16 @@ class DAGCompilerNode(BaseNode):
             elif tool_name in self.MCP_PARAMS_DICT:
                 print(self.MCP_PARAMS_DICT)
                 print(tool_name)
+                try:
+                    required_params = self.MCP_PARAMS_DICT[tool_name]['parameters_dict'].get('required', '')
+                except:
+                    required_params = ""
                 formatted_string += (
                     f"{tool_id}. {tool_name}\n"
                     f"   - **Use:** {self.MCP_PARAMS_DICT[tool_name]['documentation']}\n\n"
-                    f"   - **Documentation:** {self.MCP_PARAMS_DICT[tool_name]['documentation']}\n\n"
-                    f"   - **Required Parameters (If not specified then error will be raised):** {self.MCP_PARAMS_DICT[tool_name]['parameters']}\n\n"
+                    f"   - **Documentation:** {self.MCP_PARAMS_DICT[tool_name]['parameters']}\n\n"
+                    f"   - **Required Parameters (If not specified then error will be raised):** "
+                    f"{required_params}\n\n"
                 )
             else:
                 raise ValueError(f"Invalid TOOL Name {tool_name}. It is not there in RAPIDAPI_TOOLS_DICT or FUNCTION_APIS_FUNCTION_DICT. This error is inside create_first_input_data")

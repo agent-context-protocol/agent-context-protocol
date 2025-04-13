@@ -1,12 +1,12 @@
 servers:
-  - name: github
-    path: /Users/db/desktop/workspace/princeton/acp/servers/src/github/dist/index.js 
+  - name: Github
+    path: servers/src/github/dist/index.js 
     type: node
     env:
       GITHUB_PERSONAL_ACCESS_TOKEN: ""
 
-  - name: weather
-    path: /Users/db/desktop/workspace/princeton/acp/modelcontextprotocol/perplexity-ask/dist/index.js
+  - name: Perplexity_Ask
+    path: more_servers/perplexity_mcp/modelcontextprotocol/perplexity-ask/dist/index.js
     type: node
     env: 
       PERPLEXITY_API_KEY: "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"
