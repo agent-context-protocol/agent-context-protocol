@@ -72,6 +72,7 @@ Your Current Role is: EXECUTION_BLUEPRINT_CREATOR
 
 - Strict Adherence to TOOL Parameters:
   - Strictly follow the input arguments required by each TOOL and ensure the execution_blueprints adhere to the specific TOOL parameters without altering them.
+  - Always refer to tools using their exact name as defined in the system. Tool names are case-sensitive, so  for example if we have a tool called maps_elevation then use maps_elevation (all lowercase). Do not use variations like Maps_elevation, as this will cause parsing errors.
 
 - Output Format:
   - Always only output the CHAIN_OF_THOUGHT and execution_blueprint without any other details before or after.
@@ -186,6 +187,7 @@ Description of TOOLs:
 $$CHAIN_OF_THOUGHT$$
 
 For each group and sub_task, first provide your chain of thought, explaining your reasoning in determining the TOOLs to use, their parameters, types of the parameters, the flow, any interdependencies, and how groups should be formed. Ensure that each TOOL depends on at most one previous TOOL's output. Variable names should strictly be unique for all the variables in the execution_blueprint (across sub_tasks in a group). Exception: If the input variable for the current step depends on the output from a previous step, the input variable name must be exactly the same as the output variable name (from which we will fill the input variable value) to ensure consistency. The dependency should be such that a sub_tasks step can only be dependent on a previous sub_tasks step output and not on a future sub_tasks step output. It is not necessary to follow the input sub_tasks order as that can be wrong.
+Always refer to tools using their exact name as defined in the system. Tool names are case-sensitive, so  for example if we have a tool called maps_elevation then use maps_elevation (all lowercase). Do not use variations like Maps_elevation, as this will cause parsing errors.
 
 $$EXECUTION_BLUEPRINT$$
 
@@ -498,6 +500,8 @@ Grouping sub_tasks and Interdependencies
 - Ensured that dependencies are on the output from a previous sub_tasks for all such sub_task steps.
 - Input variables that depend on previous outputs have matching names to maintain consistency.
 
+- Kept care of referring to tool names correctly keeping in consideration that they are case-sensitive.
+
 execution_blueprint Efficiency
 
 - Kept the execution_blueprint minimal by:
@@ -786,6 +790,8 @@ Dependency Limitation
 - Ensured that each TOOL depends on at most one previous TOOL's output.
 - All input variables that depend on previous outputs have matching names to maintain consistency.
 
+- Kept care of referring to tool names correctly keeping in consideration that they are case-sensitive.
+
 execution_blueprint Efficiency
 
 - Kept the execution_blueprint minimal by:
@@ -950,6 +956,8 @@ sub_task 1: News in the Netherlands
 
 - Dependency Limitation:
   - The TOOL call does not depend on any previous TOOL outputs.
+
+- Kept care of referring to tool names correctly keeping in consideration that they are case-sensitive.
 
 - execution_blueprint Efficiency:
   - The execution_blueprint is minimal and straightforward, using only one TOOL call.
@@ -1174,6 +1182,8 @@ Dependency Limitation and execution_blueprint Adjustments
 - Ensured that each TOOL input depends on at most one previous TOOL's output.
 - Adjusted variable names to match the output variable names in the updated execution_blueprint provided.
 - Avoided multiple dependencies for any single TOOL input.
+
+- Kept care of referring to tool names correctly keeping in consideration that they are case-sensitive.
 
 execution_blueprint Efficiency
 
@@ -1466,6 +1476,8 @@ Dependency Limitation
 - Ensured that each TOOL depends on at most one previous TOOL's output.
 - Input variables that depend on previous outputs have matching names to maintain consistency.
 
+- Kept care of referring to tool names correctly keeping in consideration that they are case-sensitive.
+
 execution_blueprint Efficiency
 
 - Kept the execution_blueprint minimal by:
@@ -1742,6 +1754,8 @@ Dependency Limitation
 
 - Ensured that each TOOL depends on at most one previous TOOL's output per input variable.
 - Input variables dependent on previous outputs have matching names to maintain consistency.
+
+- Kept care of referring to tool names correctly keeping in consideration that they are case-sensitive.
 
 execution_blueprint Efficiency
 

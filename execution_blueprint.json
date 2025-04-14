@@ -1,83 +1,173 @@
 {
     "1": {
         "1": {
-            "subtask_description": "Retrieve the current weather information for Seattle, USA.",
+            "subtask_description": "Convert the address '1600 Amphitheatre Parkway, Mountain View, CA' into geographic coordinates.",
             "steps": {
                 "1": {
-                    "tool": "perplexity_ask",
-                    "handles": "Retrieves current weather information for Seattle.",
+                    "tool": "maps_geocode",
+                    "handles": "Converts the address into geographic coordinates.",
                     "input_vars": [
                         {
-                            "name": "weather_query_messages",
+                            "name": "address",
                             "parameter": [
-                                "messages"
+                                "address"
                             ],
-                            "type": "array",
+                            "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Array of messages to query current weather in Seattle.",
-                            "value": "[{\"role\": \"user\", \"content\": \"What is the current weather in Seattle, USA, including temperature, humidity, wind speed, and any weather alerts?\"}]",
+                            "description": "The address to geocode.",
+                            "value": "1600 Amphitheatre Parkway, Mountain View, CA",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "current_weather_info",
-                            "description": "Current weather information for Seattle, USA.",
-                            "used_by": []
+                            "name": "latitude",
+                            "description": "Latitude of the address.",
+                            "used_by": [
+                                {
+                                    "sub_task": 2,
+                                    "step": 1
+                                },
+                                {
+                                    "sub_task": 3,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "longitude",
+                            "description": "Longitude of the address.",
+                            "used_by": [
+                                {
+                                    "sub_task": 2,
+                                    "step": 1
+                                },
+                                {
+                                    "sub_task": 3,
+                                    "step": 1
+                                }
+                            ]
                         }
                     ]
-                },
-                "2": {
-                    "tool": "perplexity_research",
-                    "handles": "Performs deep research to gather comprehensive weather data with citations.",
+                }
+            }
+        },
+        "2": {
+            "subtask_description": "Convert the geographic coordinates back into an address to verify the accuracy of the geocoding process.",
+            "steps": {
+                "1": {
+                    "tool": "maps_reverse_geocode",
+                    "handles": "Converts the coordinates back into an address.",
                     "input_vars": [
                         {
-                            "name": "weather_query_messages",
+                            "name": "latitude",
                             "parameter": [
-                                "messages"
+                                "latitude"
                             ],
-                            "type": "array",
-                            "source": "LLM_Generated",
-                            "description": "Array of messages to perform deep research on weather in Seattle.",
-                            "value": "[{\"role\": \"user\", \"content\": \"What is the current weather in Seattle, USA, including temperature, humidity, wind speed, and any weather alerts?\"}]",
-                            "dependencies": []
+                            "type": "number",
+                            "source": "TOOL_Output (sub_task 1, Step 1)",
+                            "description": "Latitude coordinate.",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 1,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "longitude",
+                            "parameter": [
+                                "longitude"
+                            ],
+                            "type": "number",
+                            "source": "TOOL_Output (sub_task 1, Step 1)",
+                            "description": "Longitude coordinate.",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 1,
+                                    "step": 1
+                                }
+                            ]
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "comprehensive_weather_data",
-                            "description": "Comprehensive weather data for Seattle, USA, with citations.",
+                            "name": "reverse_geocoded_address",
+                            "description": "Address obtained from reverse geocoding.",
                             "used_by": []
                         }
                     ]
                 }
             }
-        }
-    },
-    "2": {
-        "2": {
-            "subtask_description": "Search GitHub for repositories related to weather data analysis or visualization.",
+        },
+        "3": {
+            "subtask_description": "Find places of interest around the geocoded location.",
             "steps": {
                 "1": {
-                    "tool": "search_repositories",
-                    "handles": "Searches for GitHub repositories related to weather data analysis or visualization.",
+                    "tool": "maps_search_places",
+                    "handles": "Searches for places of interest around the geocoded location.",
                     "input_vars": [
                         {
-                            "name": "github_search_query",
+                            "name": "query",
                             "parameter": [
                                 "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Search query for GitHub repositories related to weather data analysis or visualization.",
-                            "value": "weather data analysis OR weather visualization",
+                            "description": "Search query for places of interest.",
+                            "value": "places of interest",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "latitude",
+                            "parameter": [
+                                "location.latitude"
+                            ],
+                            "type": "number",
+                            "source": "TOOL_Output (sub_task 1, Step 1)",
+                            "description": "Latitude of the geocoded location.",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 1,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "longitude",
+                            "parameter": [
+                                "location.longitude"
+                            ],
+                            "type": "number",
+                            "source": "TOOL_Output (sub_task 1, Step 1)",
+                            "description": "Longitude of the geocoded location.",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 1,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "radius",
+                            "parameter": [
+                                "radius"
+                            ],
+                            "type": "number",
+                            "source": "LLM_Generated",
+                            "description": "Search radius in meters.",
+                            "value": "5000",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "weather_repositories_list",
-                            "description": "List of GitHub repositories related to weather data analysis or visualization.",
+                            "name": "nearby_places",
+                            "description": "List of nearby places of interest.",
                             "used_by": []
                         }
                     ]

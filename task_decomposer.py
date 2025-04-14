@@ -32,15 +32,23 @@ class TaskDecompositionNode(BaseNode):
 
 
     def setup(self):
-        if self.user_query:
-            self.chat_history.append({"role": "user", "content": f'''User Query: {self.user_query}'''})
-            available_tool_string = self.create_available_tool_string()
-            print("available_tool_string : ",available_tool_string)
-            self.chat_history.append({"role": "user", "content": available_tool_string})
-            output = self.generate()
-            print(output)
-            output = self.modify_message(output)
-            return output
+        try_count = 0
+        while try_count < 5:
+            try_count += 1
+            try:
+                if self.user_query:
+                    self.chat_history.append({"role": "user", "content": f'''User Query: {self.user_query}'''})
+                    available_tool_string = self.create_available_tool_string()
+                    print("available_tool_string : ",available_tool_string)
+                    self.chat_history.append({"role": "user", "content": available_tool_string})
+                    output = self.generate()
+                    print(output)
+                    output = self.modify_message(output)
+                    return output
+            except Exception as e:
+                print(f"Error in Task Decompose, Trying Again. Error Details: {str(e)}")
+        
+        raise ValueError("Task Decomposer Failed")
 
     def update_task_decomposer_with_tools(self, task_decomposer_message, tool_json_path='external_env_details/brief_details.json'):
         # Load the TOOL descriptions

@@ -1,54 +1,176 @@
 {
-    "2": {
-        "subtask_description": "Search GitHub for repositories related to weather data analysis or visualization.",
+    "1": {
+        "subtask_description": "Convert the address '1600 Amphitheatre Parkway, Mountain View, CA' into geographic coordinates.",
         "steps": {
             "1": {
-                "tool": "search_repositories",
-                "handles": "Searches for GitHub repositories related to weather data analysis or visualization.",
+                "tool": "maps_geocode",
+                "handles": "Converts the address into geographic coordinates.",
                 "input_vars": [
                     {
-                        "name": "repo_query",
+                        "name": "address",
+                        "parameter": [
+                            "address"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "The address to geocode.",
+                        "value": "1600 Amphitheatre Parkway, Mountain View, CA",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "latitude",
+                        "description": "Latitude of the address.",
+                        "used_by": [
+                            {
+                                "sub_task": 2,
+                                "step": 1
+                            },
+                            {
+                                "sub_task": 3,
+                                "step": 1
+                            }
+                        ],
+                        "value": "37.4235385"
+                    },
+                    {
+                        "name": "longitude",
+                        "description": "Longitude of the address.",
+                        "used_by": [
+                            {
+                                "sub_task": 2,
+                                "step": 1
+                            },
+                            {
+                                "sub_task": 3,
+                                "step": 1
+                            }
+                        ],
+                        "value": "-122.0855246"
+                    }
+                ]
+            }
+        }
+    },
+    "2": {
+        "subtask_description": "Convert the geographic coordinates back into an address to verify the accuracy of the geocoding process.",
+        "steps": {
+            "1": {
+                "tool": "maps_reverse_geocode",
+                "handles": "Converts the coordinates back into an address.",
+                "input_vars": [
+                    {
+                        "name": "latitude",
+                        "parameter": [
+                            "latitude"
+                        ],
+                        "type": "number",
+                        "source": "TOOL_Output (sub_task 1, Step 1)",
+                        "description": "Latitude coordinate.",
+                        "value": "37.4235385",
+                        "dependencies": [
+                            {
+                                "sub_task": 1,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "longitude",
+                        "parameter": [
+                            "longitude"
+                        ],
+                        "type": "number",
+                        "source": "TOOL_Output (sub_task 1, Step 1)",
+                        "description": "Longitude coordinate.",
+                        "value": "-122.0855246",
+                        "dependencies": [
+                            {
+                                "sub_task": 1,
+                                "step": 1
+                            }
+                        ]
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "reverse_geocoded_address",
+                        "description": "Address obtained from reverse geocoding.",
+                        "used_by": [],
+                        "value": "\"CWF7+CQ, 1600 Amphitheatre Pkwy, Mountain View, CA 94043, USA\""
+                    }
+                ]
+            }
+        }
+    },
+    "3": {
+        "subtask_description": "Find places of interest around the geocoded location.",
+        "steps": {
+            "1": {
+                "tool": "maps_search_places",
+                "handles": "Searches for places of interest around the geocoded location.",
+                "input_vars": [
+                    {
+                        "name": "query",
                         "parameter": [
                             "query"
                         ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Search query for GitHub repositories related to weather data analysis or visualization.",
-                        "value": "weather data analysis visualization",
+                        "description": "Search query for places of interest.",
+                        "value": "places of interest",
                         "dependencies": []
-                    }
-                ],
-                "output_vars": [
+                    },
                     {
-                        "name": "weather_repos",
-                        "description": "List of GitHub repositories related to weather data analysis or visualization.",
-                        "used_by": [],
-                        "value": "```json\n    [\n      {\n        \"name\": \"ladybug\",\n        \"full_name\": \"ladybug-tools/ladybug\",\n        \"html_url\": \"https://github.com/ladybug-tools/ladybug\",\n        \"description\": \"\ud83d\udc1e Core ladybug library for weather data analysis and visualization\"\n      },\n      {\n        \"name\": \"uxarray\",\n        \"full_name\": \"UXARRAY/uxarray\",\n        \"html_url\": \"https://github.com/UXARRAY/uxarray\",\n        \"description\": \"Xarray extension for unstructured climate and global weather data analysis and visualization.\"\n      },\n      {\n        \"name\": \"ncl\",\n        \"full_name\": \"NCAR/ncl\",\n        \"html_url\": \"https://github.com/NCAR/ncl\",\n        \"description\": \"The NCAR Command Language (NCL) is a scripting language for the analysis and visualization of climate and weather data.\"\n      },\n      {\n        \"name\": \"ladybug-web\",\n        \"full_name\": \"ladybug-tools/ladybug-web\",\n        \"html_url\": \"https://github.com/ladybug-tools/ladybug-web\",\n        \"description\": \"Ladybug for web provides weather data visualization and analysis on the web\"\n      },\n      {\n        \"name\": \"Weather_Data_Analysis\",\n        \"full_name\": \"lilyhanhub/Weather_Data_Analysis\",\n        \"html_url\": \"https://github.com/lilyhanhub/Weather_Data_Analysis\",\n        \"description\": \"Data Analytics/Visualization Bootcamp Group Project\"\n      },\n      {\n        \"name\": \"weather-data-analytics\",\n        \"full_name\": \"RaneemLoay/weather-data-analytics\",\n        \"html_url\": \"https://github.com/RaneemLoay/weather-data-analytics\",\n        \"description\": \"Analysis and prediction on a(Rain in Australia) dataset\"\n      },\n      {\n        \"name\": \"data-analysis\",\n        \"full_name\": \"AR10X/data-analysis\",\n        \"html_url\": \"https://github.com/AR10X/data-analysis\",\n        \"description\": \"Weather Forecasting Analysis and Visualization Project\"\n      },\n      {\n        \"name\": \"world_weather_analysis\",\n        \"full_name\": \"Wall-E28/world_weather_analysis\",\n        \"html_url\": \"https://github.com/Wall-E28/world_weather_analysis\",\n        \"description\": \"This project analyzes top vacation cities based on weather data from Open Weather's API and is visualized using Google Map's API.\"\n      },\n      {\n        \"name\": \"Tehran-Weather-Analysis\",\n        \"full_name\": \"MisaghMomeniB/Tehran-Weather-Analysis\",\n        \"html_url\": \"https://github.com/MisaghMomeniB/Tehran-Weather-Analysis\",\n        \"description\": \"A Python-based Data Analysis Tool for Examining and Visualizing Weather Patterns in Tehran.\"\n      },\n      {\n        \"name\": \"weather_data_analysis\",\n        \"full_name\": \"skJack/weather_data_analysis\",\n        \"html_url\": \"https://github.com/skJack/weather_data_analysis\",\n        \"description\": \"analysis of weather data(https://www.aqistudy.cn/historydata/),including data visualization and data crawling\"\n      }\n    ]\n    ```"
-                    }
-                ]
-            },
-            "2": {
-                "tool": "perplexity_ask",
-                "handles": "Refines the search query or gathers additional information about weather-related GitHub repositories.",
-                "input_vars": [
-                    {
-                        "name": "ask_messages",
+                        "name": "latitude",
                         "parameter": [
-                            "messages"
+                            "location.latitude"
                         ],
-                        "type": "array",
+                        "type": "number",
+                        "source": "TOOL_Output (sub_task 1, Step 1)",
+                        "description": "Latitude of the geocoded location.",
+                        "value": "37.4235385",
+                        "dependencies": [
+                            {
+                                "sub_task": 1,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "longitude",
+                        "parameter": [
+                            "location.longitude"
+                        ],
+                        "type": "number",
+                        "source": "TOOL_Output (sub_task 1, Step 1)",
+                        "description": "Longitude of the geocoded location.",
+                        "value": "-122.0855246",
+                        "dependencies": [
+                            {
+                                "sub_task": 1,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "radius",
+                        "parameter": [
+                            "radius"
+                        ],
+                        "type": "number",
                         "source": "LLM_Generated",
-                        "description": "Array of conversation messages to refine the search query or gather additional information.",
-                        "value": "[{\"role\": \"user\", \"content\": \"Find GitHub repositories related to weather data analysis or visualization.\"}]",
+                        "description": "Search radius in meters.",
+                        "value": "5000",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "refined_repo_info",
-                        "description": "Refined information about weather-related GitHub repositories from Perplexity_ask.",
-                        "used_by": [],
-                        "value": "```json\n    [\n      {\n        \"repository\": \"reecebaileyy/Weather-Data-Analysis\",\n        \"project_overview\": \"This project involves analyzing historical weather data using Python and Pandas. It automates data fetching from OpenWeatherMap, cleans and preprocesses the data, performs statistical analysis, and visualizes temperature and precipitation trends.\",\n        \"features\": \"Data collection, cleaning, analysis, and visualization.\",\n        \"tools_used\": \"Python, Pandas, OpenWeatherMap API\",\n        \"link\": \"https://github.com/reecebaileyy/Weather-Data-Analysis\"\n      },\n      {\n        \"repository\": \"dylburger/noaa-ghcn-weather-data\",\n        \"project_overview\": \"This repository focuses on fetching and processing daily weather data from NOAA's Global Historical Climatology Network. It demonstrates how to use Python for processing and ingesting data into a PostgreSQL database.\",\n        \"features\": \"Data ingestion, processing, and database integration.\",\n        \"tools_used\": \"Python, Pandas, PostgreSQL\",\n        \"link\": \"https://github.com/dylburger/noaa-ghcn-weather-data\"\n      },\n      {\n        \"repository\": \"AR10X/data-analysis\",\n        \"project_overview\": \"Aims to analyze and visualize various weather patterns and trends by collecting data from multiple sources. It uses tools like SQL, Excel, Power BI/Tableau, and Python.\",\n        \"features\": \"Data collection, analysis, and visualization across different regions.\",\n        \"tools_used\": \"Python, SQL, Power BI/Tableau\",\n        \"link\": \"https://github.com/AR10X/data-analysis\"\n      },\n      {\n        \"repository\": \"meteostat/meteostat-python\",\n        \"project_overview\": \"Provides a Python library for accessing historical weather and climate data. It offers a simple API for data retrieval and visualization.\",\n        \"features\": \"Accessing open weather and climate data, data visualization.\",\n        \"tools_used\": \"Python, Matplotlib\",\n        \"link\": \"https://github.com/meteostat/meteostat-python\"\n      },\n      {\n        \"repository\": \"ladybug-tools/ladybug\",\n        \"project_overview\": \"A Python library for analyzing, modifying, and visualizing EnergyPlus Weather files (epw).\",\n        \"features\": \"epw file analysis, visualization.\",\n        \"tools_used\": \"Python\",\n        \"link\": \"https://github.com/ladybug-tools/ladybug\"\n      },\n      {\n        \"repository\": \"JovaniPink/world-weather-analysis\",\n        \"project_overview\": \"Collects and analyzes weather data across cities worldwide. It uses APIs for data retrieval and performs statistical analyses.\",\n        \"features\": \"Global weather data collection, statistical analysis.\",\n        \"tools_used\": \"Python, APIs (OpenWeatherMap), Pandas\",\n        \"link\": \"https://github.com/JovaniPink/world-weather-analysis\"\n      }\n    ]\n    ```"
+                        "name": "nearby_places",
+                        "description": "List of nearby places of interest.",
+                        "used_by": []
                     }
                 ]
             }

@@ -1,29 +1,175 @@
 {
     "1": {
-        "subtask_description": "Retrieve the current weather information for Seattle, USA.",
+        "subtask_description": "Convert the address '1600 Amphitheatre Parkway, Mountain View, CA' into geographic coordinates.",
         "steps": {
             "1": {
-                "tool": "perplexity_ask",
-                "handles": "Retrieves current weather information for Seattle.",
+                "tool": "maps_geocode",
+                "handles": "Converts the address into geographic coordinates.",
                 "input_vars": [
                     {
-                        "name": "ask_messages",
+                        "name": "address",
                         "parameter": [
-                            "messages"
+                            "address"
                         ],
-                        "type": "array",
+                        "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Array of conversation messages to ask about Seattle's current weather.",
-                        "value": "[{\"role\": \"user\", \"content\": \"What is the current weather in Seattle, USA?\"}]",
+                        "description": "The address to geocode.",
+                        "value": "1600 Amphitheatre Parkway, Mountain View, CA",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "current_weather_ask",
-                        "description": "Current weather information for Seattle from Perplexity_ask.",
-                        "used_by": [],
-                        "value": "```json\n    {\n      \"current_weather\": {\n        \"description\": \"Partly sunny\",\n        \"temperature\": \"54\u00b0F (12\u00b0C)\",\n        \"real_feel\": \"57\u00b0F\",\n        \"wind\": {\n          \"speed\": \"2 mph\",\n          \"gusts\": \"5 mph\",\n          \"direction\": \"N\"\n        },\n        \"humidity\": \"56%\",\n        \"visibility\": \"7 miles\",\n        \"cloud_cover\": \"37%\"\n      },\n      \"additional_details\": {\n        \"sunrise\": \"6:27 AM\",\n        \"sunset\": \"7:55 PM\",\n        \"moon_phase\": \"Full Moon (99% illuminated)\",\n        \"forecast\": \"High of 55\u00b0F with partly sunny skies, cooling to 39\u00b0F overnight. The next few days will remain dry with increasing sunshine, warming to the mid-60s by Monday.\"\n      }\n    }\n    ```"
+                        "name": "latitude",
+                        "description": "Latitude of the address.",
+                        "used_by": [
+                            {
+                                "sub_task": 2,
+                                "step": 1
+                            },
+                            {
+                                "sub_task": 3,
+                                "step": 1
+                            }
+                        ],
+                        "value": "37.4235385"
+                    },
+                    {
+                        "name": "longitude",
+                        "description": "Longitude of the address.",
+                        "used_by": [
+                            {
+                                "sub_task": 2,
+                                "step": 1
+                            },
+                            {
+                                "sub_task": 3,
+                                "step": 1
+                            }
+                        ],
+                        "value": "-122.0855246"
+                    }
+                ]
+            }
+        }
+    },
+    "2": {
+        "subtask_description": "Convert the geographic coordinates back into an address to verify the accuracy of the geocoding process.",
+        "steps": {
+            "1": {
+                "tool": "maps_reverse_geocode",
+                "handles": "Converts the coordinates back into an address.",
+                "input_vars": [
+                    {
+                        "name": "latitude",
+                        "parameter": [
+                            "latitude"
+                        ],
+                        "type": "number",
+                        "source": "TOOL_Output (sub_task 1, Step 1)",
+                        "description": "Latitude coordinate.",
+                        "value": "37.4235385",
+                        "dependencies": [
+                            {
+                                "sub_task": 1,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "longitude",
+                        "parameter": [
+                            "longitude"
+                        ],
+                        "type": "number",
+                        "source": "TOOL_Output (sub_task 1, Step 1)",
+                        "description": "Longitude coordinate.",
+                        "value": "-122.0855246",
+                        "dependencies": [
+                            {
+                                "sub_task": 1,
+                                "step": 1
+                            }
+                        ]
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "reverse_geocoded_address",
+                        "description": "Address obtained from reverse geocoding.",
+                        "used_by": []
+                    }
+                ]
+            }
+        }
+    },
+    "3": {
+        "subtask_description": "Find places of interest around the geocoded location.",
+        "steps": {
+            "1": {
+                "tool": "maps_search_places",
+                "handles": "Searches for places of interest around the geocoded location.",
+                "input_vars": [
+                    {
+                        "name": "query",
+                        "parameter": [
+                            "query"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Search query for places of interest.",
+                        "value": "places of interest",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "latitude",
+                        "parameter": [
+                            "location.latitude"
+                        ],
+                        "type": "number",
+                        "source": "TOOL_Output (sub_task 1, Step 1)",
+                        "description": "Latitude of the geocoded location.",
+                        "value": "37.4235385",
+                        "dependencies": [
+                            {
+                                "sub_task": 1,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "longitude",
+                        "parameter": [
+                            "location.longitude"
+                        ],
+                        "type": "number",
+                        "source": "TOOL_Output (sub_task 1, Step 1)",
+                        "description": "Longitude of the geocoded location.",
+                        "value": "-122.0855246",
+                        "dependencies": [
+                            {
+                                "sub_task": 1,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "radius",
+                        "parameter": [
+                            "radius"
+                        ],
+                        "type": "number",
+                        "source": "LLM_Generated",
+                        "description": "Search radius in meters.",
+                        "value": "5000",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "nearby_places",
+                        "description": "List of nearby places of interest.",
+                        "used_by": []
                     }
                 ]
             }

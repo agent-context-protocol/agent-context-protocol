@@ -685,7 +685,8 @@ class AgentNode(BaseNode):
                     tool_documentation = FUNCTION_TOOLS_DOCUMENTATION_DICT[step['tool']]
                 elif step['tool'] in self.dag_compiler.MCP_PARAMS_DICT:
                     tool_documentation = f"""Tool Name:{step['tool']}\nDescription: {self.dag_compiler.MCP_PARAMS_DICT[step['tool']]['documentation']}\nInput Schema: {self.dag_compiler.MCP_PARAMS_DICT[step['tool']]['parameters']}
-                    """
+                                             The method for this should always be FUNCTION, keep that in mind, and dont do some HTTP Method.
+                                          """
                 else:
                     raise ValueError("tool Documentation Not Found.")
                 input_data = self.prepare_input_for_tool_running_step(step, tool_documentation)
@@ -708,6 +709,7 @@ class AgentNode(BaseNode):
                     try:
                         agent_request_llm = await self.async_generate()
                         parse_error_bool, parsed_agent_request = self.parse_agent_request(agent_request_llm)
+                        print("agent_request_llm: ",agent_request_llm)
                         if parse_error_bool:
                             # need to call dag compiler module for assistance
                             assistance_request_bool = True
@@ -737,6 +739,7 @@ class AgentNode(BaseNode):
                             else:
                                 tool_call_success_bool, tool_output = self.requests_func(parsed_agent_request['agent_requests'][tool_req_i]['method'], parsed_agent_request['agent_requests'][tool_req_i]['url'], parsed_agent_request['agent_requests'][tool_req_i]['headers'], parsed_agent_request['agent_requests'][tool_req_i]['body'])
 
+                            print("tool_output : ",tool_output)
                             # if tool_output is too big then we will truncate if required and then summarize here itself else it would take a lot of context
                             # Truncating the tool output to 80000 characters
                             if len(str(tool_output)) > 80000:

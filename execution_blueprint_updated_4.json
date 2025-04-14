@@ -1,0 +1,32 @@
+{
+    "4": {
+        "subtask_description": "Offer alternative routes or travel tips for the journey from Starbucks Roastery to Microsoft Redmond office.",
+        "steps": {
+            "1": {
+                "tool": "perplexity_reason",
+                "handles": "Provides alternative routes or travel tips.",
+                "input_vars": [
+                    {
+                        "name": "travel_tips_query",
+                        "parameter": [
+                            "messages"
+                        ],
+                        "type": "array",
+                        "source": "LLM_Generated",
+                        "description": "Query to find alternative routes or travel tips.",
+                        "value": "[{\"role\": \"user\", \"content\": \"Suggest alternative routes or travel tips for traveling from Starbucks Roastery to Microsoft Redmond office.\"}]",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "travel_tips",
+                        "description": "Alternative routes or travel tips for the journey.",
+                        "used_by": [],
+                        "value": "```\n    Traveling from the Starbucks Reserve Roastery in Seattle to Microsoft's Redmond office (Building 92 or 7) offers multiple transportation options. Here are the most efficient routes and tips:\n\n    ### **1. Public Transit**\n    - **Route**:  \n      - From **Starbucks Reserve Roastery (1124 Pike St)**, walk to **Westlake Station** (3 mins).  \n      - Take the **1 LINE** light rail towards **Angle Lake** to **University of Washington Station** (10 mins).  \n      - Transfer to **King County Metro Bus 542** or **545** towards Redmond. Exit at **Redmond Transit Center** (~30 mins).  \n      - From there, take **Line 245 bus** to **156th Ave NE & NE 36th St** (8 mins), a 2-minute walk to Microsoft Building 92.  \n    - **Cost**: ~$5\u20137 total (including transfers).  \n    - **Tip**: Use the **Moovit app** for real-time schedules and connections.\n\n    ### **2. Driving**\n    - **Route**: Take **I-520 E** from Seattle to Redmond (15 miles, ~25\u201340 mins depending on traffic). Exit at **NE 40th St** and follow signs to Microsoft\u2019s campus.  \n    - **Parking**: Microsoft\u2019s Visitor Center (Building 92) offers limited guest parking. Nearby paid lots are available at Redmond Town Center.  \n    - **Tip**: Avoid peak hours (7:30\u20139:30 AM) for lighter traffic.\n\n    ### **3. Biking (Scenic Option)**\n    - **Route**: Follow the **520 Trail** east from Seattle, which connects to the **Sammamish River Trail** and passes through Microsoft\u2019s Redmond campus.  \n      - Distance: ~14 miles one-way (90\u2013120 mins).  \n      - Elevation: Moderate hills on the 520 Trail.  \n    - **Bike Rentals**: Use **Lime** or **Lyft Bikes** in Seattle.  \n    - **Tip**: Microsoft\u2019s campus has bike racks and showers for commuters.\n\n    ### **4. Rideshare/Taxi**\n    - **Cost**: ~$35\u201350 (Uber/Lyft) or $11\u201314 (local taxi).  \n    - **Travel Time**: ~25 mins via I-520 E.  \n    - **Tip**: Split costs with coworkers via carpooling apps like **Waze Carpool**.\n\n    ### **5. Microsoft Shuttle (Employee Access)**\n    - Employees can use the **Connector Shuttle**, which has routes from Seattle to Redmond. Check internal schedules for stops near the Roastery.\n\n    ### **Key Considerations**\n    - **Peak Hours**: Traffic on I-520 is heaviest 7:30\u20139:30 AM and 4\u20136 PM.  \n    - **Transit Passes**: Use an **ORCA Card** for seamless transfers between light rail and buses.  \n    - **Alternative Starbucks**: A standard **Starbucks branch** is 0.6 miles from Microsoft Building 92 if time is limited.\n\n    For real-time updates, cross-reference Google Maps with Moovit.\n    ```"
+                    }
+                ]
+            }
+        }
+    }
+}
