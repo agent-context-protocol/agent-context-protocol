@@ -1,176 +1,51 @@
 {
-    "1": {
-        "subtask_description": "Convert the address '1600 Amphitheatre Parkway, Mountain View, CA' into geographic coordinates.",
-        "steps": {
-            "1": {
-                "tool": "maps_geocode",
-                "handles": "Converts the address into geographic coordinates.",
-                "input_vars": [
-                    {
-                        "name": "address",
-                        "parameter": [
-                            "address"
-                        ],
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "The address to geocode.",
-                        "value": "1600 Amphitheatre Parkway, Mountain View, CA",
-                        "dependencies": []
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "latitude",
-                        "description": "Latitude of the address.",
-                        "used_by": [
-                            {
-                                "sub_task": 2,
-                                "step": 1
-                            },
-                            {
-                                "sub_task": 3,
-                                "step": 1
-                            }
-                        ],
-                        "value": "37.4235385"
-                    },
-                    {
-                        "name": "longitude",
-                        "description": "Longitude of the address.",
-                        "used_by": [
-                            {
-                                "sub_task": 2,
-                                "step": 1
-                            },
-                            {
-                                "sub_task": 3,
-                                "step": 1
-                            }
-                        ],
-                        "value": "-122.0855246"
-                    }
-                ]
-            }
-        }
-    },
     "2": {
-        "subtask_description": "Convert the geographic coordinates back into an address to verify the accuracy of the geocoding process.",
+        "subtask_description": "Calculate travel time from Starbucks Roastery to Microsoft Redmond office.",
         "steps": {
             "1": {
-                "tool": "maps_reverse_geocode",
-                "handles": "Converts the coordinates back into an address.",
+                "tool": "maps_distance_matrix",
+                "handles": "Calculates travel time from Starbucks Roastery to Microsoft Redmond office.",
                 "input_vars": [
                     {
-                        "name": "latitude",
+                        "name": "origins",
                         "parameter": [
-                            "latitude"
+                            "origins"
                         ],
-                        "type": "number",
-                        "source": "TOOL_Output (sub_task 1, Step 1)",
-                        "description": "Latitude coordinate.",
-                        "value": "37.4235385",
-                        "dependencies": [
-                            {
-                                "sub_task": 1,
-                                "step": 1
-                            }
-                        ]
+                        "type": "array",
+                        "source": "LLM_Generated",
+                        "description": "Array of origin addresses.",
+                        "value": "[\"Starbucks Roastery, Seattle, USA\"]",
+                        "dependencies": []
                     },
                     {
-                        "name": "longitude",
+                        "name": "destinations",
                         "parameter": [
-                            "longitude"
+                            "destinations"
                         ],
-                        "type": "number",
-                        "source": "TOOL_Output (sub_task 1, Step 1)",
-                        "description": "Longitude coordinate.",
-                        "value": "-122.0855246",
-                        "dependencies": [
-                            {
-                                "sub_task": 1,
-                                "step": 1
-                            }
-                        ]
-                    }
-                ],
-                "output_vars": [
+                        "type": "array",
+                        "source": "LLM_Generated",
+                        "description": "Array of destination addresses.",
+                        "value": "[\"Microsoft Redmond Office, Redmond, USA\"]",
+                        "dependencies": []
+                    },
                     {
-                        "name": "reverse_geocoded_address",
-                        "description": "Address obtained from reverse geocoding.",
-                        "used_by": [],
-                        "value": "\"CWF7+CQ, 1600 Amphitheatre Pkwy, Mountain View, CA 94043, USA\""
-                    }
-                ]
-            }
-        }
-    },
-    "3": {
-        "subtask_description": "Find places of interest around the geocoded location.",
-        "steps": {
-            "1": {
-                "tool": "maps_search_places",
-                "handles": "Searches for places of interest around the geocoded location.",
-                "input_vars": [
-                    {
-                        "name": "query",
+                        "name": "travel_mode",
                         "parameter": [
-                            "query"
+                            "mode"
                         ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Search query for places of interest.",
-                        "value": "places of interest",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "latitude",
-                        "parameter": [
-                            "location.latitude"
-                        ],
-                        "type": "number",
-                        "source": "TOOL_Output (sub_task 1, Step 1)",
-                        "description": "Latitude of the geocoded location.",
-                        "value": "37.4235385",
-                        "dependencies": [
-                            {
-                                "sub_task": 1,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "longitude",
-                        "parameter": [
-                            "location.longitude"
-                        ],
-                        "type": "number",
-                        "source": "TOOL_Output (sub_task 1, Step 1)",
-                        "description": "Longitude of the geocoded location.",
-                        "value": "-122.0855246",
-                        "dependencies": [
-                            {
-                                "sub_task": 1,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "radius",
-                        "parameter": [
-                            "radius"
-                        ],
-                        "type": "number",
-                        "source": "LLM_Generated",
-                        "description": "Search radius in meters.",
-                        "value": "5000",
+                        "description": "Travel mode for calculating travel time.",
+                        "value": "driving",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "nearby_places",
-                        "description": "List of nearby places of interest.",
-                        "used_by": []
+                        "name": "travel_time",
+                        "description": "Estimated travel time from Starbucks Roastery to Microsoft Redmond office.",
+                        "used_by": [],
+                        "value": "\"21 mins (1283 seconds)\""
                     }
                 ]
             }

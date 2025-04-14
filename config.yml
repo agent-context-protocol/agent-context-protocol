@@ -17,6 +17,12 @@ servers:
     env: 
       GOOGLE_MAPS_API_KEY: "AIzaSyCR5bqaybiUx5sG6F1WDSbWjLmzpcxpQaY"
 
+  - name: FinancialDataset_Ask
+    path: more_servers/financial_mcp_server/mcp-server/server.py
+    type: python
+    env: 
+      FINANCIAL_DATASETS_API_KEY: "2d6f359c-b922-4e6e-b86a-c3427e43b41d"
+
 defaults:
-  python_env_path: /Users/db/.venv/bin/python
+  python_env_path: 
   node_command: node

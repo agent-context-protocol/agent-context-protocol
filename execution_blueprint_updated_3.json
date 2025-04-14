@@ -1,177 +1,51 @@
 {
-    "1": {
-        "subtask_description": "Convert the address '1600 Amphitheatre Parkway, Mountain View, CA' into geographic coordinates.",
-        "steps": {
-            "1": {
-                "tool": "maps_geocode",
-                "handles": "Converts the address into geographic coordinates.",
-                "input_vars": [
-                    {
-                        "name": "address",
-                        "parameter": [
-                            "address"
-                        ],
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "The address to geocode.",
-                        "value": "1600 Amphitheatre Parkway, Mountain View, CA",
-                        "dependencies": []
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "latitude",
-                        "description": "Latitude of the address.",
-                        "used_by": [
-                            {
-                                "sub_task": 2,
-                                "step": 1
-                            },
-                            {
-                                "sub_task": 3,
-                                "step": 1
-                            }
-                        ],
-                        "value": "37.4235385"
-                    },
-                    {
-                        "name": "longitude",
-                        "description": "Longitude of the address.",
-                        "used_by": [
-                            {
-                                "sub_task": 2,
-                                "step": 1
-                            },
-                            {
-                                "sub_task": 3,
-                                "step": 1
-                            }
-                        ],
-                        "value": "-122.0855246"
-                    }
-                ]
-            }
-        }
-    },
-    "2": {
-        "subtask_description": "Convert the geographic coordinates back into an address to verify the accuracy of the geocoding process.",
-        "steps": {
-            "1": {
-                "tool": "maps_reverse_geocode",
-                "handles": "Converts the coordinates back into an address.",
-                "input_vars": [
-                    {
-                        "name": "latitude",
-                        "parameter": [
-                            "latitude"
-                        ],
-                        "type": "number",
-                        "source": "TOOL_Output (sub_task 1, Step 1)",
-                        "description": "Latitude coordinate.",
-                        "value": "37.4235385",
-                        "dependencies": [
-                            {
-                                "sub_task": 1,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "longitude",
-                        "parameter": [
-                            "longitude"
-                        ],
-                        "type": "number",
-                        "source": "TOOL_Output (sub_task 1, Step 1)",
-                        "description": "Longitude coordinate.",
-                        "value": "-122.0855246",
-                        "dependencies": [
-                            {
-                                "sub_task": 1,
-                                "step": 1
-                            }
-                        ]
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "reverse_geocoded_address",
-                        "description": "Address obtained from reverse geocoding.",
-                        "used_by": [],
-                        "value": "\"CWF7+CQ, 1600 Amphitheatre Pkwy, Mountain View, CA 94043, USA\""
-                    }
-                ]
-            }
-        }
-    },
     "3": {
-        "subtask_description": "Find places of interest around the geocoded location.",
+        "subtask_description": "Provide detailed driving directions from Starbucks Roastery to Microsoft Redmond office.",
         "steps": {
             "1": {
-                "tool": "maps_search_places",
-                "handles": "Searches for places of interest around the geocoded location.",
+                "tool": "maps_directions",
+                "handles": "Provides detailed driving directions from Starbucks Roastery to Microsoft Redmond office.",
                 "input_vars": [
                     {
-                        "name": "query",
+                        "name": "origin",
                         "parameter": [
-                            "query"
+                            "origin"
                         ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Search query for places of interest.",
-                        "value": "places of interest",
+                        "description": "Starting point address.",
+                        "value": "Starbucks Roastery, Seattle, USA",
                         "dependencies": []
                     },
                     {
-                        "name": "latitude",
+                        "name": "destination",
                         "parameter": [
-                            "location.latitude"
+                            "destination"
                         ],
-                        "type": "number",
-                        "source": "TOOL_Output (sub_task 1, Step 1)",
-                        "description": "Latitude of the geocoded location.",
-                        "value": "37.4235385",
-                        "dependencies": [
-                            {
-                                "sub_task": 1,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "longitude",
-                        "parameter": [
-                            "location.longitude"
-                        ],
-                        "type": "number",
-                        "source": "TOOL_Output (sub_task 1, Step 1)",
-                        "description": "Longitude of the geocoded location.",
-                        "value": "-122.0855246",
-                        "dependencies": [
-                            {
-                                "sub_task": 1,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "radius",
-                        "parameter": [
-                            "radius"
-                        ],
-                        "type": "number",
+                        "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Search radius in meters.",
-                        "value": "5000",
+                        "description": "Ending point address.",
+                        "value": "Microsoft Redmond Office, Redmond, USA",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "travel_mode",
+                        "parameter": [
+                            "mode"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Travel mode for directions.",
+                        "value": "driving",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "nearby_places",
-                        "description": "List of nearby places of interest.",
+                        "name": "driving_directions",
+                        "description": "Step-by-step driving directions from Starbucks Roastery to Microsoft Redmond office.",
                         "used_by": [],
-                        "value": "```json\n    [\n      {\n        \"name\": \"Baylands Nature Preserve\",\n        \"formatted_address\": \"Palo Alto, CA 94303, United States\",\n        \"location\": {\n          \"lat\": 37.4577446,\n          \"lng\": -122.1065382\n        },\n        \"place_id\": \"ChIJvxDunke6j4ARORduHKhLIiU\",\n        \"rating\": 4.7,\n        \"types\": [\n          \"tourist_attraction\",\n          \"park\",\n          \"point_of_interest\",\n          \"establishment\"\n        ]\n      },\n      {\n        \"name\": \"Computer History Museum\",\n        \"formatted_address\": \"1401 N Shoreline Blvd, Mountain View, CA 94043, United States\",\n        \"location\": {\n          \"lat\": 37.4142744,\n          \"lng\": -122.077409\n        },\n        \"place_id\": \"ChIJm7NJkla3j4AR8vR-HWRxgOo\",\n        \"rating\": 4.7,\n        \"types\": [\n          \"tourist_attraction\",\n          \"museum\",\n          \"point_of_interest\",\n          \"establishment\"\n        ]\n      },\n      {\n        \"name\": \"Pioneer Memorial Park\",\n        \"formatted_address\": \"1146 Church St, Mountain View, CA 94041, United States\",\n        \"location\": {\n          \"lat\": 37.38957449999999,\n          \"lng\": -122.0832656\n        },\n        \"place_id\": \"ChIJ8e4ELDO3j4ARWKnyezbvlhY\",\n        \"rating\": 4.6,\n        \"types\": [\n          \"park\",\n          \"tourist_attraction\",\n          \"point_of_interest\",\n          \"establishment\"\n        ]\n      },\n      {\n        \"name\": \"Libby's Water Tower\",\n        \"formatted_address\": \"490 W California Ave, Sunnyvale, CA 94086, United States\",\n        \"location\": {\n          \"lat\": 37.3811229,\n          \"lng\": -122.0349642\n        },\n        \"place_id\": \"ChIJ21cQyVm2j4ARp4vUDV4mf4g\",\n        \"rating\": 4.3,\n        \"types\": [\n          \"tourist_attraction\",\n          \"point_of_interest\",\n          \"establishment\"\n        ]\n      },\n      {\n        \"name\": \"Baylands Observation Deck and Boardwalk\",\n        \"formatted_address\": \"Embarcadero Rd, Palo Alto, CA 94303, United States\",\n        \"location\": {\n          \"lat\": 37.4605807,\n          \"lng\": -122.1053642\n        },\n        \"place_id\": \"ChIJZe_UX_a7j4AR8JTtQbbZ960\",\n        \"rating\": 4.8,\n        \"types\": [\n          \"tourist_attraction\",\n          \"point_of_interest\",\n          \"establishment\"\n        ]\n      }\n      // Additional places can be added similarly\n    ]\n    ```"
+                        "value": "```json\n    {\n      \"summary\": \"WA-520 E\",\n      \"total_distance\": \"15.8 mi\",\n      \"total_duration\": \"21 mins\",\n      \"steps\": [\n        {\n          \"instructions\": \"Head southeast on Melrose Ave toward Pike St\",\n          \"distance\": \"66 ft\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Turn left after Starbucks Reserve Roastery (on the right) Pass by McMenamins Six Arms (on the left)\",\n          \"distance\": \"249 ft\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Turn left at the 1st cross street onto Bellevue Ave\",\n          \"distance\": \"417 ft\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Turn left at the 1st cross street onto E Pine St\",\n          \"distance\": \"272 ft\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Turn right onto Melrose Ave\",\n          \"distance\": \"0.1 mi\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Slight left to merge onto I-5 N\",\n          \"distance\": \"1.6 mi\",\n          \"duration\": \"2 mins\"\n        },\n        {\n          \"instructions\": \"Take exit 168B for WA-520 toward Bellevue/Kirkland\",\n          \"distance\": \"0.3 mi\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Continue onto WA-520 E Toll road\",\n          \"distance\": \"12.9 mi\",\n          \"duration\": \"13 mins\"\n        },\n        {\n          \"instructions\": \"Turn left onto NE 80th St/NE Union Hill Rd\",\n          \"distance\": \"0.1 mi\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Slight left onto Avondale Way\",\n          \"distance\": \"0.3 mi\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Turn right onto NE 79th St\",\n          \"distance\": \"0.2 mi\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Turn right onto 168th Ave NE\",\n          \"distance\": \"164 ft\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Turn left\",\n          \"distance\": \"69 ft\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Turn right Destination will be on the left\",\n          \"distance\": \"52 ft\",\n          \"duration\": \"1 min\"\n        }\n      ]\n    }\n    ```"
                     }
                 ]
             }

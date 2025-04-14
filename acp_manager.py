@@ -148,7 +148,7 @@ async def main():
     await manager.load_from_config(config_path)
     acp = ACP(mcp_tool_manager=manager)
     # await acp.run("what is the weather in seattle, usa", '')
-    user_query = "what is the weather in seattle, usa?" # Tell time to go from starbucks roastery till Microsoft redmond office?"
+    user_query = "what is the weather in seattle, usa? Tell time to go from starbucks roastery till Microsoft redmond office?"
     # user_query = "Geocode the address '1600 Amphitheatre Parkway, Mountain View, CA"
     execution_blueprint = await acp.initialise(user_query)
     async for group_id, group_results in acp.run(user_query, execution_blueprint):

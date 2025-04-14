@@ -25,7 +25,8 @@ class MCPServerClient:
         args = self.config.get("args", [])
 
         command = (
-            self.defaults.get("python_env_path", "python") if server_type == "python"
+            # self.defaults.get("python_env_path", "python") if server_type == "python"
+            self.defaults.get("python_env_path") or sys.executable if server_type == "python"
             else self.defaults.get("node_command", "node")
         )
 

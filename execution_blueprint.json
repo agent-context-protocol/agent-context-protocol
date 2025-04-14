@@ -1,173 +1,233 @@
 {
     "1": {
         "1": {
-            "subtask_description": "Convert the address '1600 Amphitheatre Parkway, Mountain View, CA' into geographic coordinates.",
+            "subtask_description": "Obtain current weather information for Seattle, USA.",
             "steps": {
                 "1": {
-                    "tool": "maps_geocode",
-                    "handles": "Converts the address into geographic coordinates.",
+                    "tool": "perplexity_research",
+                    "handles": "Performs deep research to obtain comprehensive weather information for Seattle.",
                     "input_vars": [
                         {
-                            "name": "address",
+                            "name": "messages_research",
                             "parameter": [
-                                "address"
+                                "messages"
                             ],
-                            "type": "string",
+                            "type": "array",
                             "source": "LLM_Generated",
-                            "description": "The address to geocode.",
-                            "value": "1600 Amphitheatre Parkway, Mountain View, CA",
+                            "description": "Array of conversation messages to research Seattle's weather.",
+                            "value": "[{\"role\": \"user\", \"content\": \"Research the current weather in Seattle, USA.\"}]",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "latitude",
-                            "description": "Latitude of the address.",
-                            "used_by": [
-                                {
-                                    "sub_task": 2,
-                                    "step": 1
-                                },
-                                {
-                                    "sub_task": 3,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "longitude",
-                            "description": "Longitude of the address.",
-                            "used_by": [
-                                {
-                                    "sub_task": 2,
-                                    "step": 1
-                                },
-                                {
-                                    "sub_task": 3,
-                                    "step": 1
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        },
-        "2": {
-            "subtask_description": "Convert the geographic coordinates back into an address to verify the accuracy of the geocoding process.",
-            "steps": {
-                "1": {
-                    "tool": "maps_reverse_geocode",
-                    "handles": "Converts the coordinates back into an address.",
-                    "input_vars": [
-                        {
-                            "name": "latitude",
-                            "parameter": [
-                                "latitude"
-                            ],
-                            "type": "number",
-                            "source": "TOOL_Output (sub_task 1, Step 1)",
-                            "description": "Latitude coordinate.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "sub_task": 1,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "longitude",
-                            "parameter": [
-                                "longitude"
-                            ],
-                            "type": "number",
-                            "source": "TOOL_Output (sub_task 1, Step 1)",
-                            "description": "Longitude coordinate.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "sub_task": 1,
-                                    "step": 1
-                                }
-                            ]
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "reverse_geocoded_address",
-                            "description": "Address obtained from reverse geocoding.",
+                            "name": "weather_info_research",
+                            "description": "Comprehensive weather information for Seattle obtained from Perplexity_research.",
                             "used_by": []
                         }
                     ]
                 }
             }
-        },
-        "3": {
-            "subtask_description": "Find places of interest around the geocoded location.",
+        }
+    },
+    "2": {
+        "2": {
+            "subtask_description": "Calculate travel time from Starbucks Roastery to Microsoft Redmond office.",
             "steps": {
                 "1": {
-                    "tool": "maps_search_places",
-                    "handles": "Searches for places of interest around the geocoded location.",
+                    "tool": "maps_distance_matrix",
+                    "handles": "Calculates travel time from Starbucks Roastery to Microsoft Redmond office.",
                     "input_vars": [
                         {
-                            "name": "query",
+                            "name": "origins",
                             "parameter": [
-                                "query"
+                                "origins"
                             ],
-                            "type": "string",
+                            "type": "array",
                             "source": "LLM_Generated",
-                            "description": "Search query for places of interest.",
-                            "value": "places of interest",
+                            "description": "Array of origin addresses.",
+                            "value": "[\"Starbucks Roastery, Seattle, USA\"]",
                             "dependencies": []
                         },
                         {
-                            "name": "latitude",
+                            "name": "destinations",
                             "parameter": [
-                                "location.latitude"
+                                "destinations"
                             ],
-                            "type": "number",
-                            "source": "TOOL_Output (sub_task 1, Step 1)",
-                            "description": "Latitude of the geocoded location.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "sub_task": 1,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "longitude",
-                            "parameter": [
-                                "location.longitude"
-                            ],
-                            "type": "number",
-                            "source": "TOOL_Output (sub_task 1, Step 1)",
-                            "description": "Longitude of the geocoded location.",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "sub_task": 1,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "radius",
-                            "parameter": [
-                                "radius"
-                            ],
-                            "type": "number",
+                            "type": "array",
                             "source": "LLM_Generated",
-                            "description": "Search radius in meters.",
-                            "value": "5000",
+                            "description": "Array of destination addresses.",
+                            "value": "[\"Microsoft Redmond Office, Redmond, USA\"]",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "travel_mode",
+                            "parameter": [
+                                "mode"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Travel mode for calculating travel time.",
+                            "value": "driving",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "nearby_places",
-                            "description": "List of nearby places of interest.",
+                            "name": "travel_time",
+                            "description": "Estimated travel time from Starbucks Roastery to Microsoft Redmond office.",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "3": {
+        "3": {
+            "subtask_description": "Provide detailed driving directions from Starbucks Roastery to Microsoft Redmond office.",
+            "steps": {
+                "1": {
+                    "tool": "maps_directions",
+                    "handles": "Provides detailed driving directions from Starbucks Roastery to Microsoft Redmond office.",
+                    "input_vars": [
+                        {
+                            "name": "origin",
+                            "parameter": [
+                                "origin"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Starting point address.",
+                            "value": "Starbucks Roastery, Seattle, USA",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "destination",
+                            "parameter": [
+                                "destination"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Ending point address.",
+                            "value": "Microsoft Redmond Office, Redmond, USA",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "travel_mode",
+                            "parameter": [
+                                "mode"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Travel mode for directions.",
+                            "value": "driving",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "driving_directions",
+                            "description": "Step-by-step driving directions from Starbucks Roastery to Microsoft Redmond office.",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "4": {
+        "4": {
+            "subtask_description": "Explore alternative travel options from Starbucks Roastery to Microsoft Redmond office.",
+            "steps": {
+                "1": {
+                    "tool": "maps_directions",
+                    "handles": "Explores public transport options from Starbucks Roastery to Microsoft Redmond office.",
+                    "input_vars": [
+                        {
+                            "name": "origin_transit",
+                            "parameter": [
+                                "origin"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Starting point address for transit.",
+                            "value": "Starbucks Roastery, Seattle, USA",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "destination_transit",
+                            "parameter": [
+                                "destination"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Ending point address for transit.",
+                            "value": "Microsoft Redmond Office, Redmond, USA",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "travel_mode_transit",
+                            "parameter": [
+                                "mode"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Travel mode for transit options.",
+                            "value": "transit",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "transit_options",
+                            "description": "Public transport options from Starbucks Roastery to Microsoft Redmond office.",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "tool": "maps_directions",
+                    "handles": "Explores biking options from Starbucks Roastery to Microsoft Redmond office.",
+                    "input_vars": [
+                        {
+                            "name": "origin_bike",
+                            "parameter": [
+                                "origin"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Starting point address for biking.",
+                            "value": "Starbucks Roastery, Seattle, USA",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "destination_bike",
+                            "parameter": [
+                                "destination"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Ending point address for biking.",
+                            "value": "Microsoft Redmond Office, Redmond, USA",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "travel_mode_bike",
+                            "parameter": [
+                                "mode"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Travel mode for biking options.",
+                            "value": "bicycling",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "biking_options",
+                            "description": "Biking options from Starbucks Roastery to Microsoft Redmond office.",
                             "used_by": []
                         }
                     ]

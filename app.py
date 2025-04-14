@@ -1,6 +1,8 @@
 import streamlit as st
 import asyncio
-from orchestrator import MainOrchestrator
+from acp_manager import ACP
+from mcp_node import MCPToolManager
+import asyncio
 
 st.set_page_config(layout = "wide") 
 
@@ -69,7 +71,7 @@ def load_css():
             background: #555;
         }
 
-        /* Panel max height with scrollable content */
+        /* SubTask max height with scrollable content */
         .scrollable-panel {
             width: 100%;  /* Take up 100% of the column width */
             max-height: 500px;  /* Set maximum height */
@@ -90,26 +92,32 @@ def load_css():
     """, unsafe_allow_html=True)
 
 
-class StreamlitOrchestrator:
+class StreamlitACP:
     def __init__(self):
-        self.orchestrator = MainOrchestrator()
+        self.mcp_manager = None
+        self.ACP = None
         self.output = {}
         self.group_placeholders = {}
-        self.panels = []
+        self.subtasks = []
 
-    def create_group_sections(self, workflow):
-        panels = []
+    async def async_init(self):
+        self.mcp_manager = MCPToolManager()
+        await self.mcp_manager.load_from_config("config.yml")
+        self.ACP = ACP(mcp_tool_manager=self.mcp_manager)
 
-        for group_id in workflow.keys():
-            for translator_id in workflow[group_id].keys():
-                panels.append({
+    def create_group_sections(self, execution_blueprint):
+        subtasks = []
+
+        for group_id in execution_blueprint.keys():
+            for subtask_id in execution_blueprint[group_id].keys():
+                subtasks.append({
                     'group_id' : group_id,
-                    'panel_id' : translator_id,
-                    'panel_description' : workflow[group_id][translator_id]['panel_description']}
+                    'subtask_id' : subtask_id,
+                    'subtask_description' : execution_blueprint[group_id][subtask_id]['subtask_description']}
                 )
 
         grid = []
-        for i in range(len(panels)//2 + 1):
+        for i in range(len(subtasks)//2 + 1):
             cols = st.columns(2)  # Fixed 2 columns per row
             grid_row = []
             
@@ -119,9 +127,9 @@ class StreamlitOrchestrator:
             grid.append(grid_row)
 
         self.group_placeholders = grid
-        self.panels = panels
+        self.subtasks = subtasks
 
-        # Apply the custom CSS for scrollable panels
+        # Apply the custom CSS for scrollable subtasks
         st.markdown("""
             <style>
             .scrollable-panel {
@@ -142,47 +150,47 @@ class StreamlitOrchestrator:
             </style>
         """, unsafe_allow_html=True)
 
-        # Populate the grid with panels
-        for panel in panels:
-            i = (int(panel['panel_id']) - 1)//2  # Determine the row index
-            j = (int(panel['panel_id']) - 1)%2   # Determine the column index
+        # Populate the grid with subtasks
+        for subtask in subtasks:
+            i = (int(subtask['subtask_id']) - 1)//2  # Determine the row index
+            j = (int(subtask['subtask_id']) - 1)%2   # Determine the column index
             
             # Populate the markdown with scrollable sections
             grid[i][j].markdown(
                 f'''
                 <div class="scrollable-panel">
-                    <h3>Group {panel['group_id']}</h3>
-                    <h4>Panel {panel['panel_id']}</h4>
-                    <p>{panel['panel_description']}</p>
+                    <h3>Group {subtask['group_id']}</h3>
+                    <h4>SubTask {subtask['subtask_id']}</h4>
+                    <p>{subtask['subtask_description']}</p>
                 </div>
                 ''', 
                 unsafe_allow_html=True
             )
 
     def update_group_section(self, group_id, group_results):
-        for panel_id, panel_result in group_results.items():
-            i = (int(panel_id) - 1)//2  # Determine the row index
-            j = (int(panel_id) - 1)%2   # Determine the column index
+        for subtask_id, subtask_result in group_results.items():
+            i = (int(subtask_id) - 1)//2  # Determine the row index
+            j = (int(subtask_id) - 1)%2   # Determine the column index
             
             # Populate the markdown with scrollable content when updating
             self.group_placeholders[i][j].markdown(
                 f'''
                 <div class="scrollable-panel">
                     <h3>Group {group_id}</h3>
-                    <h4>Panel {panel_id}</h4>
-                    <p>{self.panels[int(panel_id)-1]['panel_description']}</p>
-                    <p>{panel_result['output']}</p>
+                    <h4>SubTask {subtask_id}</h4>
+                    <p>{self.subtasks[int(subtask_id)-1]['subtask_description']}</p>
+                    <p>{subtask_result['output']}</p>
                 </div>
                 ''', 
                 unsafe_allow_html=True
             )
 
-    async def run_orchestrator(self, user_query, workflow):
-        # Display the group panels
-        self.create_group_sections(workflow)
+    async def run_acp(self, user_query, execution_blueprint):
+        # Display the group subtasks
+        self.create_group_sections(execution_blueprint)
 
         # Iterate through the groups asynchronously
-        async for group_id, group_results in self.orchestrator.run(user_query, workflow):
+        async for group_id, group_results in self.ACP.run(user_query, execution_blueprint):
             self.output[group_id] = group_results
             # Update the group as completed
             self.update_group_section(group_id, group_results)
@@ -191,8 +199,9 @@ async def main():
     # Load custom CSS
     load_css()
 
-    st.title("Workflow Orchestrator")
-    orchestrator = StreamlitOrchestrator()
+    st.title("Execution Blueprint Executor")
+    acp_app = StreamlitACP()
+    await acp_app.async_init()
 
     # Sidebar for user input
     with st.sidebar:
@@ -202,18 +211,18 @@ async def main():
             user_query = "Example query"
 
     if st.button("Run Workflow"):
-        with st.spinner("Running workflow... please wait"):
-            st.write("Running workflow...")
+        with st.spinner("Running execution_blueprint... please wait"):
+            st.write("Running execution_blueprint...")
             progress_bar = st.progress(0)
             status_text = st.empty()
 
-            # Initialize the workflow
-            workflow = await orchestrator.orchestrator.initialise(user_query)
+            # Initialize the execution_blueprint
+            execution_blueprint = await acp_app.ACP.initialise(user_query)
 
             async def update_progress():
-                total_groups = len(orchestrator.orchestrator.main_translator.workflow)
+                total_groups = len(acp_app.ACP.dag_compiler.execution_blueprint)
                 while True:
-                    completed_groups = len(orchestrator.output)
+                    completed_groups = len(acp_app.output)
                     progress = completed_groups / total_groups
                     progress_bar.progress(progress)
                     status_text.text(f"Completed {completed_groups} out of {total_groups} groups")
@@ -221,13 +230,13 @@ async def main():
                         break
                     await asyncio.sleep(0.1)
 
-            # Run the orchestrator and update progress simultaneously
+            # Run the acp and update progress simultaneously
             await asyncio.gather(
-                orchestrator.run_orchestrator(user_query, workflow),
+                acp_app.run_acp(user_query, execution_blueprint),
                 update_progress()
             )
 
-            st.success("Workflow completed!")
+            st.success("ACP completed!")
 
 if __name__ == "__main__":
     asyncio.run(main())
