@@ -1,29 +1,288 @@
 {
-    "3": {
-        "subtask_description": "Provide historical and visitor information about Red Fort.",
+    "1": {
+        "subtask_description": "Identify the country name mentioned in Slack general channel.",
         "steps": {
             "1": {
-                "tool": "perplexity_research",
-                "handles": "Provides comprehensive insights about Red Fort",
+                "tool": "slack_list_channels",
+                "handles": "Lists public channels to find general channel ID",
                 "input_vars": [
                     {
-                        "name": "red_fort_research_messages",
+                        "name": "channel_listing_limit",
                         "parameter": [
-                            "messages"
+                            "limit"
                         ],
-                        "type": "array",
+                        "type": "number",
                         "source": "LLM_Generated",
-                        "description": "User request message for historical and visitor information on Red Fort",
-                        "value": "[{\"role\":\"user\",\"content\":\"Please provide historical and visitor information about Red Fort, including its significance, architecture, and visitor tips.\"}]",
+                        "description": "Maximum number of channels to return",
+                        "value": "100",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "red_fort_information",
-                        "description": "Historical and visitor information about Red Fort",
+                        "name": "general_channel_id",
+                        "description": "ID of the general channel",
+                        "used_by": [
+                            {
+                                "sub_task": 1,
+                                "step": 2
+                            }
+                        ],
+                        "value": "\"C075CU6FVE0\""
+                    }
+                ]
+            },
+            "2": {
+                "tool": "slack_get_channel_history",
+                "handles": "Gets recent messages from general channel to find mention of a country",
+                "input_vars": [
+                    {
+                        "name": "general_channel_id",
+                        "parameter": [
+                            "channel_id"
+                        ],
+                        "type": "string",
+                        "source": "TOOL_Output (sub_task 1, Step 1)",
+                        "description": "The channel ID for general",
+                        "value": "\"C075CU6FVE0\"",
+                        "dependencies": [
+                            {
+                                "sub_task": 1,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "fetch_limit",
+                        "parameter": [
+                            "limit"
+                        ],
+                        "type": "number",
+                        "source": "LLM_Generated",
+                        "description": "Number of messages to retrieve",
+                        "value": "20",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "identified_country",
+                        "description": "The country name found in the channel messages",
+                        "used_by": [
+                            {
+                                "sub_task": 2,
+                                "step": 1
+                            },
+                            {
+                                "sub_task": 3,
+                                "step": 1
+                            }
+                        ],
+                        "value": "\"Tunisia\""
+                    }
+                ]
+            }
+        }
+    },
+    "2": {
+        "subtask_description": "Retrieve current weather for the identified country.",
+        "steps": {
+            "1": {
+                "tool": "perplexity_ask",
+                "handles": "Identifies a primary city (capital or major city) for the given country",
+                "input_vars": [
+                    {
+                        "name": "identified_country",
+                        "parameter": [
+                            "messages"
+                        ],
+                        "type": "array",
+                        "source": "TOOL_Output (sub_task 1, Step 2)",
+                        "description": "Holds the country name from sub_task 1",
+                        "value": "[\"Tunisia\"]",
+                        "dependencies": [
+                            {
+                                "sub_task": 1,
+                                "step": 2
+                            }
+                        ]
+                    },
+                    {
+                        "name": "city_search_query",
+                        "parameter": [
+                            "messages"
+                        ],
+                        "type": "array",
+                        "source": "LLM_Generated",
+                        "description": "Query for capital or major city",
+                        "value": "[{\"role\":\"user\",\"content\":\"What is a well-known major city or capital in [identified_country]?\"}]",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "target_city",
+                        "description": "City to use for weather lookup",
+                        "used_by": [
+                            {
+                                "sub_task": 2,
+                                "step": 2
+                            }
+                        ],
+                        "value": "\"Tunis\""
+                    }
+                ]
+            },
+            "2": {
+                "tool": "perplexity_ask",
+                "handles": "Retrieves current weather details for the identified city",
+                "input_vars": [
+                    {
+                        "name": "target_city",
+                        "parameter": [
+                            "messages"
+                        ],
+                        "type": "array",
+                        "source": "TOOL_Output (sub_task 2, Step 1)",
+                        "description": "City for which we want the weather",
+                        "value": "[\"Tunis\"]",
+                        "dependencies": [
+                            {
+                                "sub_task": 2,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "weather_query",
+                        "parameter": [
+                            "messages"
+                        ],
+                        "type": "array",
+                        "source": "LLM_Generated",
+                        "description": "Query to get current weather in target_city",
+                        "value": "[{\"role\":\"user\",\"content\":\"What is the current weather in [target_city]?\"}]",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "country_weather",
+                        "description": "Current weather information for the identified city",
                         "used_by": [],
-                        "value": "\"The Red Fort in Delhi stands as an enduring symbol of Mughal grandeur, architectural innovation, and India\u2019s struggle for sovereignty. Constructed in the mid-17th century by Emperor Shah Jahan, this UNESCO World Heritage Site encapsulates over 350 years of history, from its zenith as the Mughal Empire\u2019s political nucleus to its modern role as the focal point of India\u2019s Independence Day celebrations. This report examines the fort\u2019s historical trajectory, architectural brilliance, sociocultural significance, and practical insights for visitors, drawing upon archaeological records, historical accounts, and contemporary tourism resources.\n\n    Historical Evolution of the Red Fort:\n    - Foundation and Mughal Zenith: Emperor Shah Jahan commissioned the Red Fort on 12 May 1639, marking his decision to shift the Mughal capital from Agra to Shahjahanabad (modern-day Old Delhi). Designed by Ustad Ahmad Lahori, the architect of the Taj Mahal, the fort\u2019s construction spanned a decade, concluding on 6 April 1648. The site was strategically chosen along the Yamuna River, whose waters fed the fort\u2019s moats and enhanced its defensive capabilities. Unlike earlier Mughal forts, the Red Fort integrated the pre-existing Salimgarh Fort into its asymmetrical layout, creating a composite defensive structure.\n\n    - Decline and Colonial Subjugation: The fort\u2019s fortunes waned following Aurangzeb\u2019s death in 1707. Weak successors, Maratha incursions, and Nadir Shah\u2019s devastating 1739 invasion precipitated the empire\u2019s fragmentation. By the late 18th century, the Mughals retained only nominal authority, with the Marathas and later the British East India Company controlling Delhi. The 1857 rebellion marked a turning point. After suppressing the uprising, the British exiled Emperor Bahadur Shah II to Rangoon and systematically destroyed 80% of the fort\u2019s inner structures, including harem quarters and gardens.\n\n    Architectural Mastery and Design Philosophy:\n    - Synthesis of Styles: The Red Fort exemplifies Shahjahani architecture, characterized by symmetry, geometric precision, and a fusion of Persian, Timurid, and indigenous Indian elements. Its 254-acre layout follows a rectangular plan oriented along the Yamuna, with key structures arranged on a north-south axis. The fort\u2019s double-walled enclosure incorporates bastions, turrets, and two primary gates: the ceremonial Lahori Gate and the reserved Delhi Gate.\n\n    - Hydraulic Innovation and Aesthetic Detail: A defining feature is the Nahr-i-Behisht (Stream of Paradise), a water channel channeling Yamuna waters through the private apartments. This canal, lined with pietra dura inlay, cooled the chambers and symbolized the Islamic concept of paradise. The Rang Mahal epitomizes this harmony, with its mirrored ceilings, gold-embroidered walls, and central pool fed by the canal.\n\n    Symbolism and Contemporary Relevance:\n    - From Mughal Power to National Identity: The Red Fort\u2019s symbolic resonance evolved dramatically post-independence. On 15 August 1947, Jawaharlal Nehru raised the Indian tricolor above the Lahori Gate, reclaiming the site from its colonial associations. This annual ritual underscores the fort\u2019s transformation into a emblem of republican sovereignty, juxtaposing Mughal and modern Indian identities.\n\n    Visitor Experience and Practical Considerations:\n    - Navigating the Complex: The fort operates daily except Mondays, with extended hours during the summer light shows. Foreign nationals pay \u20b9600, while Indians are charged \u20b935, reflecting differential pricing common at Indian heritage sites. Guided tours are recommended to fully appreciate the fort\u2019s nuances, though audio guides offer a self-paced alternative.\n\n    Preservation Challenges and Future Directions:\n    - Despite its UNESCO status, the Red Fort faces threats from urban pollution, groundwater depletion, and unchecked tourism. Acid rain has eroded sandstone surfaces, while vibrations from nearby traffic risk structural damage. Conservation efforts prioritize restoring water features, replanting historic gardens, and using 3D scanning to document erosion patterns.\n\n    Conclusion: The Red Fort\u2019s layered history\u2014from Shah Jahan\u2019s vision to colonial subversion and postcolonial reclamation\u2014offers a microcosm of India\u2019s architectural and political evolution. Its synthesis of artistic traditions underscores the Mughal Empire\u2019s pluralistic ethos, while its modern ceremonial role highlights the complexities of historical memory in nation-building. For visitors, the fort provides not merely a glimpse into the past, but a living theater where the contours of Indian identity continue to be negotiated. As preservation debates unfold, the Red Fort\u2019s enduring legacy lies in its ability to bridge eras, inviting reflection on power, beauty, and resilience.\""
+                        "value": "\"Current Weather in Tunis (as of April 16, 2025, around 4:00 PM UTC):  \n    - Temperature: 16\u00b0C (feels like 16\u00b0C), highs up to 19\u00b0C today.  \n    - Conditions: A few clouds, thunderstorms and heavy rain reported earlier this afternoon.  \n    - Humidity: Around 85%.  \n    - Wind: Breezy, from the northwest, gusts up to 28 mph.  \n    - Precipitation: Brief showers and heavy thunderstorms this afternoon, more showers possible early evening before clearing.  \n    - Outlook for Tonight: A few showers early, then clearing up. Low expected around 12\u201313\u00b0C (54\u00b0F).  \n    - Summary Table:  \n      | Time    | Temperature | Weather                  | Humidity | Wind        | Precipitation              |  \n      |---------|-------------|--------------------------|----------|-------------|----------------------------|  \n      | 4:00 PM | 16\u00b0C        | Partly cloudy, t-storms  | 85%      | Breezy, NW  | Showers and t-storms       |  \n      | Evening | 12\u201313\u00b0C     | Clearing                 | \u2014        | \u2014           | Isolated showers early     |  \n    Heavy thunderstorms and rain have affected Tunis this afternoon, with breezy conditions continuing. The weather will gradually clear during the evening, leading to a cool and partly cloudy night.  \n    Sources:  \n    - https://www.accuweather.com/en/tn/tunis/321398/weather-forecast/321398  \n    - https://weather.metoffice.gov.uk/forecast/snx1rqvs4  \n    - https://www.accuweather.com/en/tn/tunis/321398/current-weather/321398  \n    - https://www.timeanddate.com/weather/tunisia/tunis/ext  \n    - https://www.theweathernetwork.com/en/city/tn/tunis/tunis/current  \n    - https://www.wunderground.com/forecast/tn/tunis\""
+                    }
+                ]
+            }
+        }
+    },
+    "3": {
+        "subtask_description": "Calculate driving time between the two most populous cities in the identified country.",
+        "steps": {
+            "1": {
+                "tool": "perplexity_ask",
+                "handles": "Finds the two most populous cities in the identified country",
+                "input_vars": [
+                    {
+                        "name": "identified_country",
+                        "parameter": [
+                            "messages"
+                        ],
+                        "type": "array",
+                        "source": "TOOL_Output (sub_task 1, Step 2)",
+                        "description": "The country name from sub_task 1",
+                        "value": "[\"Tunisia\"]",
+                        "dependencies": [
+                            {
+                                "sub_task": 1,
+                                "step": 2
+                            }
+                        ]
+                    },
+                    {
+                        "name": "populous_cities_query",
+                        "parameter": [
+                            "messages"
+                        ],
+                        "type": "array",
+                        "source": "LLM_Generated",
+                        "description": "Query to find the two most populous cities",
+                        "value": "[{\"role\":\"user\",\"content\":\"Which are the two most populous cities in [identified_country]?\"}]",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "populous_cities_list",
+                        "description": "The names of the two most populous cities",
+                        "used_by": [
+                            {
+                                "sub_task": 3,
+                                "step": 2
+                            },
+                            {
+                                "sub_task": 3,
+                                "step": 2
+                            }
+                        ],
+                        "value": "[\"Tunis\", \"Sfax\"]"
+                    }
+                ]
+            },
+            "2": {
+                "tool": "maps_distance_matrix",
+                "handles": "Calculates driving time between the two cities",
+                "input_vars": [
+                    {
+                        "name": "populous_cities_list",
+                        "parameter": [
+                            "origins"
+                        ],
+                        "type": "array",
+                        "source": "TOOL_Output (sub_task 3, Step 1)",
+                        "description": "The two most populous cities in that country",
+                        "value": "[\"Tunis\", \"Sfax\"]",
+                        "dependencies": [
+                            {
+                                "sub_task": 3,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "populous_cities_list",
+                        "parameter": [
+                            "destinations"
+                        ],
+                        "type": "array",
+                        "source": "TOOL_Output (sub_task 3, Step 1)",
+                        "description": "The two most populous cities in that country",
+                        "value": "[\"Tunis\", \"Sfax\"]",
+                        "dependencies": [
+                            {
+                                "sub_task": 3,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "driving_mode",
+                        "parameter": [
+                            "mode"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Travel mode set to driving",
+                        "value": "driving",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "driving_time_between_cities",
+                        "description": "Driving time between the two most populous cities in that country",
+                        "used_by": [],
+                        "value": "```json\n    [\n      {\n        \"from\": \"Tunis, Tunisia\",\n        \"to\": \"Sfax, Tunisia\",\n        \"duration_text\": \"2 hours 59 mins\",\n        \"duration_seconds\": 10760,\n        \"distance_text\": \"267 km\",\n        \"distance_meters\": 267348\n      },\n      {\n        \"from\": \"Sfax, Tunisia\",\n        \"to\": \"Tunis, Tunisia\",\n        \"duration_text\": \"2 hours 59 mins\",\n        \"duration_seconds\": 10744,\n        \"distance_text\": \"268 km\",\n        \"distance_meters\": 267633\n      }\n    ]\n    ```"
                     }
                 ]
             }

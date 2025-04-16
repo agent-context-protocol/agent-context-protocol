@@ -1,33 +1,39 @@
 {
     "1": {
         "1": {
-            "subtask_description": "Find the two most populous cities in India.",
+            "subtask_description": "Retrieve recent S&P 500 index data in a structured format.",
             "steps": {
                 "1": {
                     "tool": "perplexity_research",
-                    "handles": "Identifies the two most populous cities in India",
+                    "handles": "Acquires recent S&P 500 index data (e.g., dates and values for the last few weeks/months)",
                     "input_vars": [
                         {
-                            "name": "query_top_indian_cities",
+                            "name": "sp500_data_request",
                             "parameter": [
                                 "messages"
                             ],
                             "type": "array",
                             "source": "LLM_Generated",
-                            "description": "Array with the user message asking for the 2 most populous cities in India",
-                            "value": "[{\"role\":\"user\",\"content\":\"Which are the two most populous cities in India?\"}]",
+                            "description": "User message asking for structured S&P 500 data over a recent timeframe",
+                            "value": "[{\"role\":\"user\",\"content\":\"Please provide the recent S&P 500 index data (dates and values) over the last month in a structured format.\"}]",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "two_populous_cities",
-                            "description": "The two most populous cities in India",
+                            "name": "sp500_dates",
+                            "description": "Array of date strings for the recent S&P 500 data",
                             "used_by": [
                                 {
                                     "sub_task": 2,
                                     "step": 1
-                                },
+                                }
+                            ]
+                        },
+                        {
+                            "name": "sp500_values",
+                            "description": "Corresponding array of S&P 500 index values",
+                            "used_by": [
                                 {
                                     "sub_task": 2,
                                     "step": 1
@@ -39,60 +45,71 @@
             }
         },
         "2": {
-            "subtask_description": "Calculate driving time between the two cities identified in sub_task 1.",
+            "subtask_description": "Generate a line chart showing the recent S&P 500 trends.",
             "steps": {
                 "1": {
-                    "tool": "maps_distance_matrix",
-                    "handles": "Calculates the driving time between the two cities",
+                    "tool": "generate_chart",
+                    "handles": "Renders a line chart of S&P 500 index vs. date",
                     "input_vars": [
                         {
-                            "name": "two_populous_cities",
+                            "name": "chart_type",
                             "parameter": [
-                                "origins"
-                            ],
-                            "type": "array",
-                            "source": "TOOL_Output (sub_task 1, Step 1)",
-                            "description": "The first city in the array will be used as the origin",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "sub_task": 1,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "two_populous_cities",
-                            "parameter": [
-                                "destinations"
-                            ],
-                            "type": "array",
-                            "source": "TOOL_Output (sub_task 1, Step 1)",
-                            "description": "The second city in the array will be used as the destination",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "sub_task": 1,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "driving_mode",
-                            "parameter": [
-                                "mode"
+                                "type"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Travel mode driving",
-                            "value": "driving",
+                            "description": "The type of chart to generate",
+                            "value": "line",
                             "dependencies": []
+                        },
+                        {
+                            "name": "sp500_dates",
+                            "parameter": [
+                                "labels"
+                            ],
+                            "type": "array",
+                            "source": "TOOL_Output (sub_task 1, Step 1)",
+                            "description": "Labels for the x-axis (dates) from sub_task 1",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 1,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "chart_datasets",
+                            "parameter": [
+                                "datasets"
+                            ],
+                            "type": "array",
+                            "source": "LLM_Generated",
+                            "description": "Dataset configuration for S&P 500 values",
+                            "value": "",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "sp500_values",
+                            "parameter": [
+                                "datasets[0].data"
+                            ],
+                            "type": "array",
+                            "source": "TOOL_Output (sub_task 1, Step 1)",
+                            "description": "Y-axis data points (S&P 500 index values) inserted into the first dataset",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 1,
+                                    "step": 1
+                                }
+                            ]
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "driving_time",
-                            "description": "Driving time between the two most populous cities in India",
+                            "name": "sp500_chart",
+                            "description": "The generated line chart for recent S&P 500 trends",
                             "used_by": []
                         }
                     ]

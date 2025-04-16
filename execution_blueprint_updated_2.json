@@ -1,100 +1,118 @@
 {
     "1": {
-        "subtask_description": "Find the two most populous cities in India.",
+        "subtask_description": "Retrieve recent S&P 500 index data in a structured format.",
         "steps": {
             "1": {
                 "tool": "perplexity_research",
-                "handles": "Identifies the two most populous cities in India",
+                "handles": "Acquires recent S&P 500 index data (e.g., dates and values for the last few weeks/months)",
                 "input_vars": [
                     {
-                        "name": "query_top_indian_cities",
+                        "name": "sp500_data_request",
                         "parameter": [
                             "messages"
                         ],
                         "type": "array",
                         "source": "LLM_Generated",
-                        "description": "Array with the user message asking for the 2 most populous cities in India",
-                        "value": "[{\"role\":\"user\",\"content\":\"Which are the two most populous cities in India?\"}]",
+                        "description": "User message asking for structured S&P 500 data over a recent timeframe",
+                        "value": "[{\"role\":\"user\",\"content\":\"Please provide the recent S&P 500 index data (dates and values) over the last month in a structured format.\"}]",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "two_populous_cities",
-                        "description": "The two most populous cities in India",
+                        "name": "sp500_dates",
+                        "description": "Array of date strings for the recent S&P 500 data",
                         "used_by": [
-                            {
-                                "sub_task": 2,
-                                "step": 1
-                            },
                             {
                                 "sub_task": 2,
                                 "step": 1
                             }
                         ],
-                        "value": "[\"Delhi\", \"Mumbai\"]"
+                        "value": "[\"April 1, 2025\", \"April 9, 2025\", \"April 10, 2025\", \"April 11, 2025\", \"April 14, 2025\", \"April 15, 2025\"]"
+                    },
+                    {
+                        "name": "sp500_values",
+                        "description": "Corresponding array of S&P 500 index values",
+                        "used_by": [
+                            {
+                                "sub_task": 2,
+                                "step": 1
+                            }
+                        ],
+                        "value": "[5566.85, 5456.90, 5268.05, 5363.36, 5405.97, 5396.63]"
                     }
                 ]
             }
         }
     },
     "2": {
-        "subtask_description": "Calculate driving time between the two cities identified in sub_task 1.",
+        "subtask_description": "Generate a line chart showing the recent S&P 500 trends.",
         "steps": {
             "1": {
-                "tool": "maps_distance_matrix",
-                "handles": "Calculates the driving time between the two cities",
+                "tool": "generate_chart",
+                "handles": "Renders a line chart of S&P 500 index vs. date",
                 "input_vars": [
                     {
-                        "name": "two_populous_cities",
+                        "name": "chart_type",
                         "parameter": [
-                            "origins"
-                        ],
-                        "type": "array",
-                        "source": "TOOL_Output (sub_task 1, Step 1)",
-                        "description": "The first city in the array will be used as the origin",
-                        "value": "[\"Delhi\", \"Mumbai\"]",
-                        "dependencies": [
-                            {
-                                "sub_task": 1,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "two_populous_cities",
-                        "parameter": [
-                            "destinations"
-                        ],
-                        "type": "array",
-                        "source": "TOOL_Output (sub_task 1, Step 1)",
-                        "description": "The second city in the array will be used as the destination",
-                        "value": "[\"Delhi\", \"Mumbai\"]",
-                        "dependencies": [
-                            {
-                                "sub_task": 1,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "driving_mode",
-                        "parameter": [
-                            "mode"
+                            "type"
                         ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Travel mode driving",
-                        "value": "driving",
+                        "description": "The type of chart to generate",
+                        "value": "line",
                         "dependencies": []
+                    },
+                    {
+                        "name": "sp500_dates",
+                        "parameter": [
+                            "labels"
+                        ],
+                        "type": "array",
+                        "source": "TOOL_Output (sub_task 1, Step 1)",
+                        "description": "Labels for the x-axis (dates) from sub_task 1",
+                        "value": "[\"April 1, 2025\", \"April 9, 2025\", \"April 10, 2025\", \"April 11, 2025\", \"April 14, 2025\", \"April 15, 2025\"]",
+                        "dependencies": [
+                            {
+                                "sub_task": 1,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "chart_datasets",
+                        "parameter": [
+                            "datasets"
+                        ],
+                        "type": "array",
+                        "source": "LLM_Generated",
+                        "description": "Dataset configuration for S&P 500 values",
+                        "value": "",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "sp500_values",
+                        "parameter": [
+                            "datasets[0].data"
+                        ],
+                        "type": "array",
+                        "source": "TOOL_Output (sub_task 1, Step 1)",
+                        "description": "Y-axis data points (S&P 500 index values) inserted into the first dataset",
+                        "value": "[5566.85, 5456.90, 5268.05, 5363.36, 5405.97, 5396.63]",
+                        "dependencies": [
+                            {
+                                "sub_task": 1,
+                                "step": 1
+                            }
+                        ]
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "driving_time",
-                        "description": "Driving time between the two most populous cities in India",
+                        "name": "sp500_chart",
+                        "description": "The generated line chart for recent S&P 500 trends",
                         "used_by": [],
-                        "value": "{\n      \"origin\": \"Delhi, India\",\n      \"destination\": \"Mumbai, Maharashtra, India\",\n      \"duration_text\": \"23 hours 14 mins\",\n      \"duration_seconds\": 83666,\n      \"distance_text\": \"1,397 km\",\n      \"distance_meters\": 1397304\n    }"
+                        "value": "\"https://quickchart.io/chart?c=%7B%22type%22%3A%22line%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22April%201%2C%202025%22%2C%22April%209%2C%202025%22%2C%22April%2010%2C%202025%22%2C%22April%2011%2C%202025%22%2C%22April%2014%2C%202025%22%2C%22April%2015%2C%202025%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22S%26P%20500%22%2C%22data%22%3A%5B5566.85%2C5456.9%2C5268.05%2C5363.36%2C5405.97%2C5396.63%5D%2C%22backgroundColor%22%3A%22rgba(54%2C%20162%2C%20235%2C%200.2)%22%2C%22borderColor%22%3A%22rgba(54%2C%20162%2C%20235%2C%201)%22%7D%5D%7D%2C%22options%22%3A%7B%7D%7D\""
                     }
                 ]
             }

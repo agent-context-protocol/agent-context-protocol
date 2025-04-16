@@ -25,6 +25,10 @@ servers:
       "SLACK_TEAM_ID": "T074VT6EBN3"
       #"SLACK_CHANNEL_IDS": ""
 
+  - name: QuickChart
+    path: more_servers/node_modules/@gongrzhe/quickchart-mcp-server/build/index.js
+    type: node
+
 # Need to figure out
   # - name: PostgresSQL
   #   path: servers/src/postgres/dist/index.js
