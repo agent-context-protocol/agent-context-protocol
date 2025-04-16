@@ -1,33 +1,81 @@
 {
     "1": {
         "1": {
-            "subtask_description": "Calculate the travel time from Chandni Chowk to Red Fort in multiple modes.",
+            "subtask_description": "Find the two most populous cities in India.",
+            "steps": {
+                "1": {
+                    "tool": "perplexity_research",
+                    "handles": "Identifies the two most populous cities in India",
+                    "input_vars": [
+                        {
+                            "name": "query_top_indian_cities",
+                            "parameter": [
+                                "messages"
+                            ],
+                            "type": "array",
+                            "source": "LLM_Generated",
+                            "description": "Array with the user message asking for the 2 most populous cities in India",
+                            "value": "[{\"role\":\"user\",\"content\":\"Which are the two most populous cities in India?\"}]",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "two_populous_cities",
+                            "description": "The two most populous cities in India",
+                            "used_by": [
+                                {
+                                    "sub_task": 2,
+                                    "step": 1
+                                },
+                                {
+                                    "sub_task": 2,
+                                    "step": 1
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "2": {
+            "subtask_description": "Calculate driving time between the two cities identified in sub_task 1.",
             "steps": {
                 "1": {
                     "tool": "maps_distance_matrix",
-                    "handles": "Calculates travel time driving",
+                    "handles": "Calculates the driving time between the two cities",
                     "input_vars": [
                         {
-                            "name": "chandni_chowk_origin",
+                            "name": "two_populous_cities",
                             "parameter": [
                                 "origins"
                             ],
                             "type": "array",
-                            "source": "LLM_Generated",
-                            "description": "Origin address array",
-                            "value": "[\"Chandni Chowk, Delhi\"]",
-                            "dependencies": []
+                            "source": "TOOL_Output (sub_task 1, Step 1)",
+                            "description": "The first city in the array will be used as the origin",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 1,
+                                    "step": 1
+                                }
+                            ]
                         },
                         {
-                            "name": "red_fort_destination",
+                            "name": "two_populous_cities",
                             "parameter": [
                                 "destinations"
                             ],
                             "type": "array",
-                            "source": "LLM_Generated",
-                            "description": "Destination address array",
-                            "value": "[\"Red Fort, Delhi\"]",
-                            "dependencies": []
+                            "source": "TOOL_Output (sub_task 1, Step 1)",
+                            "description": "The second city in the array will be used as the destination",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 1,
+                                    "step": 1
+                                }
+                            ]
                         },
                         {
                             "name": "driving_mode",
@@ -44,161 +92,7 @@
                     "output_vars": [
                         {
                             "name": "driving_time",
-                            "description": "Calculated driving time from Chandni Chowk to Red Fort",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "2": {
-                    "tool": "maps_distance_matrix",
-                    "handles": "Calculates travel time using public transit",
-                    "input_vars": [
-                        {
-                            "name": "chandni_chowk_origin",
-                            "parameter": [
-                                "origins"
-                            ],
-                            "type": "array",
-                            "source": "LLM_Generated",
-                            "description": "Origin address array",
-                            "value": "[\"Chandni Chowk, Delhi\"]",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "red_fort_destination",
-                            "parameter": [
-                                "destinations"
-                            ],
-                            "type": "array",
-                            "source": "LLM_Generated",
-                            "description": "Destination address array",
-                            "value": "[\"Red Fort, Delhi\"]",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "transit_mode",
-                            "parameter": [
-                                "mode"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Travel mode transit",
-                            "value": "transit",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "transit_time",
-                            "description": "Calculated transit time from Chandni Chowk to Red Fort",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "3": {
-                    "tool": "maps_distance_matrix",
-                    "handles": "Calculates travel time walking",
-                    "input_vars": [
-                        {
-                            "name": "chandni_chowk_origin",
-                            "parameter": [
-                                "origins"
-                            ],
-                            "type": "array",
-                            "source": "LLM_Generated",
-                            "description": "Origin address array",
-                            "value": "[\"Chandni Chowk, Delhi\"]",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "red_fort_destination",
-                            "parameter": [
-                                "destinations"
-                            ],
-                            "type": "array",
-                            "source": "LLM_Generated",
-                            "description": "Destination address array",
-                            "value": "[\"Red Fort, Delhi\"]",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "walking_mode",
-                            "parameter": [
-                                "mode"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Travel mode walking",
-                            "value": "walking",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "walking_time",
-                            "description": "Calculated walking time from Chandni Chowk to Red Fort",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        }
-    },
-    "2": {
-        "2": {
-            "subtask_description": "Suggest restaurants near Red Fort.",
-            "steps": {
-                "1": {
-                    "tool": "maps_search_places",
-                    "handles": "Searches for restaurants near Red Fort",
-                    "input_vars": [
-                        {
-                            "name": "red_fort_restaurants_query",
-                            "parameter": [
-                                "query"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Query to find restaurants near Red Fort",
-                            "value": "restaurants near Red Fort, Delhi",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "restaurants_list",
-                            "description": "List of restaurants near Red Fort",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        }
-    },
-    "3": {
-        "3": {
-            "subtask_description": "Provide historical and visitor information about Red Fort.",
-            "steps": {
-                "1": {
-                    "tool": "perplexity_research",
-                    "handles": "Provides comprehensive insights about Red Fort",
-                    "input_vars": [
-                        {
-                            "name": "red_fort_research_messages",
-                            "parameter": [
-                                "messages"
-                            ],
-                            "type": "array",
-                            "source": "LLM_Generated",
-                            "description": "User request message for historical and visitor information on Red Fort",
-                            "value": "[{\"role\":\"user\",\"content\":\"Please provide historical and visitor information about Red Fort, including its significance, architecture, and visitor tips.\"}]",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "red_fort_information",
-                            "description": "Historical and visitor information about Red Fort",
+                            "description": "Driving time between the two most populous cities in India",
                             "used_by": []
                         }
                     ]

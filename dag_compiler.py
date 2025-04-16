@@ -543,7 +543,7 @@ class DAGCompilerNode(BaseNode):
         counter = 0
         while not run_success and counter < 5:
             try:
-                llm_response_execution_blueprint = self.generate()
+                llm_response_execution_blueprint = self.generate(True)
                 print("llm_response_execution_blueprint : \n",llm_response_execution_blueprint)
                 llm_response_execution_blueprint = llm_response_execution_blueprint.replace("**", "").replace("`", "").replace("#","")
                 _, execution_blueprint_dict = self.parse_dag_compiler_execution_blueprint(llm_response_execution_blueprint)
@@ -600,7 +600,7 @@ class DAGCompilerNode(BaseNode):
                 counter += 1
                 try:
                     # If self.generate() is blocking, run it in a separate thread
-                    updated_execution_blueprint = await asyncio.to_thread(self.generate)
+                    updated_execution_blueprint = await asyncio.to_thread(self.generate, True)
                     print("updated_execution_blueprint:", updated_execution_blueprint)
                     updated_execution_blueprint = updated_execution_blueprint.replace("**", "").replace("`", "").replace("#","")
                     parsed_updated_execution_blueprint = self.parse_status_assistance_output(updated_execution_blueprint)

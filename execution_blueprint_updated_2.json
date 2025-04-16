@@ -1,29 +1,100 @@
 {
-    "2": {
-        "subtask_description": "Suggest restaurants near Red Fort.",
+    "1": {
+        "subtask_description": "Find the two most populous cities in India.",
         "steps": {
             "1": {
-                "tool": "maps_search_places",
-                "handles": "Searches for restaurants near Red Fort",
+                "tool": "perplexity_research",
+                "handles": "Identifies the two most populous cities in India",
                 "input_vars": [
                     {
-                        "name": "red_fort_restaurants_query",
+                        "name": "query_top_indian_cities",
                         "parameter": [
-                            "query"
+                            "messages"
                         ],
-                        "type": "string",
+                        "type": "array",
                         "source": "LLM_Generated",
-                        "description": "Query to find restaurants near Red Fort",
-                        "value": "restaurants near Red Fort, Delhi",
+                        "description": "Array with the user message asking for the 2 most populous cities in India",
+                        "value": "[{\"role\":\"user\",\"content\":\"Which are the two most populous cities in India?\"}]",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "restaurants_list",
-                        "description": "List of restaurants near Red Fort",
+                        "name": "two_populous_cities",
+                        "description": "The two most populous cities in India",
+                        "used_by": [
+                            {
+                                "sub_task": 2,
+                                "step": 1
+                            },
+                            {
+                                "sub_task": 2,
+                                "step": 1
+                            }
+                        ],
+                        "value": "[\"Delhi\", \"Mumbai\"]"
+                    }
+                ]
+            }
+        }
+    },
+    "2": {
+        "subtask_description": "Calculate driving time between the two cities identified in sub_task 1.",
+        "steps": {
+            "1": {
+                "tool": "maps_distance_matrix",
+                "handles": "Calculates the driving time between the two cities",
+                "input_vars": [
+                    {
+                        "name": "two_populous_cities",
+                        "parameter": [
+                            "origins"
+                        ],
+                        "type": "array",
+                        "source": "TOOL_Output (sub_task 1, Step 1)",
+                        "description": "The first city in the array will be used as the origin",
+                        "value": "[\"Delhi\", \"Mumbai\"]",
+                        "dependencies": [
+                            {
+                                "sub_task": 1,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "two_populous_cities",
+                        "parameter": [
+                            "destinations"
+                        ],
+                        "type": "array",
+                        "source": "TOOL_Output (sub_task 1, Step 1)",
+                        "description": "The second city in the array will be used as the destination",
+                        "value": "[\"Delhi\", \"Mumbai\"]",
+                        "dependencies": [
+                            {
+                                "sub_task": 1,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "driving_mode",
+                        "parameter": [
+                            "mode"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Travel mode driving",
+                        "value": "driving",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "driving_time",
+                        "description": "Driving time between the two most populous cities in India",
                         "used_by": [],
-                        "value": "```json\n    [\n      {\n        \"name\": \"Rehmatullah Hotel\",\n        \"address\": \"105-110, Matia Mahal Rd, opposite Gate Number-1, Bazar Matia Mahal, Jama Masjid, Old Delhi, Delhi, 110006, India\",\n        \"rating\": 4.8\n      },\n      {\n        \"name\": \"Caf\u00e9 Red Fort by Aunty's kitchen\",\n        \"address\": \"44, Parda Bagh, Daryaganj, New Delhi, Delhi, 110002, India\",\n        \"rating\": 4.9\n      },\n      {\n        \"name\": \"Haldiram's - Chandni Chowk\",\n        \"address\": \"1454, Chandni Chowk Rd, near Sis Ganj Guru Dwara, Kucha Mahajani, Chandni Chowk, New Delhi, Delhi, 110006, India\",\n        \"rating\": 4\n      },\n      {\n        \"name\": \"Lakhori\",\n        \"address\": \"2293, Gali Anar, Dharam Pura, Old Delhi, Delhi, 110006, India\",\n        \"rating\": 4.1\n      },\n      {\n        \"name\": \"Karim's Hotel Pvt. Ltd.\",\n        \"address\": \"16, Gali Kababian, Jama Masjid, Old Delhi, Delhi, 110006, India\",\n        \"rating\": 3.8\n      },\n      {\n        \"name\": \"Kake Di Hatti\",\n        \"address\": \"Church Mission Rd, Cloth Market, Katra Ghel, Khari Baoli, Chandni Chowk, New Delhi, Delhi, 110006, India\",\n        \"rating\": 4.1\n      },\n      {\n        \"name\": \"Changezi Chicken\",\n        \"address\": \"3614, Netaji Subhash Marg, Kucha Alam, Khabas Pura, Daryaganj, New Delhi, Delhi, 110002, India\",\n        \"rating\": 4\n      },\n      {\n        \"name\": \"Old Famous Jalebi Wala\",\n        \"address\": \"1795, Dariba Corner, opp. Bank of Maharashtra, Dariba Kalan, Chandni Chowk, New Delhi, Delhi 110006, India\",\n        \"rating\": 4\n      },\n      {\n        \"name\": \"Natraj Dahi Bhalla\",\n        \"address\": \"1396, Main Road, beside Central Bank, Kucha Mahajani, Chandni Chowk, New Delhi, Delhi 110006, India\",\n        \"rating\": 3.7\n      },\n      {\n        \"name\": \"Cafe Delhi Heights\",\n        \"address\": \"Visitor Center, RR Barracks, Lal Qila, Red Fort, Delhi, 110006, India\",\n        \"rating\": 3.8\n      },\n      {\n        \"name\": \"Mughlai Invitation Restaurant & Caterers\",\n        \"address\": \"Hotel AL-Haram, GALI GAJAT CINEMA WALI, 3917, Jama Masjid, Delhi, 110006, India\",\n        \"rating\": 4.8\n      },\n      {\n        \"name\": \"Al Gulzar Restaurant\",\n        \"address\": \"Meena Bazar, Jama Masjid, Chandni Chowk, New Delhi, Delhi, 110006, India\",\n        \"rating\": 4.2\n      },\n      {\n        \"name\": \"Shabrati Nahari Centre\",\n        \"address\": \"722, Gali Haveli Azam Khan, Bazar Chitli Qabar, Jama Masjid, Old Delhi, New Delhi, Delhi, 110006, India\",\n        \"rating\": 4.3\n      },\n      {\n        \"name\": \"Restaurant\",\n        \"address\": \"Gate No. 1, Metro Station, Urdu Bazar Rd, behind Kasturba Hospital Marg, opp. Jama Masjid, Jama Masjid, Old Delhi, Delhi, 110006, India\",\n        \"rating\": 4.8\n      },\n      {\n        \"name\": \"Chor Bizarre\",\n        \"address\": \"Hotel Broadway, 4/15A, Asaf Ali Rd, Chatta lal Miya, Chandni Mahal, Chandni Chowk, Delhi, New Delhi, Delhi 110002, India\",\n        \"rating\": 4.3\n      },\n      {\n        \"name\": \"Pind Balluchi Regal Building, Connaught Place, Delhi\",\n        \"address\": \"13, Regal Building, near Regal Cinema, Hanuman Road Area, Connaught Place, New Delhi, Delhi 110001, India\",\n        \"rating\": 4.2\n      },\n      {\n        \"name\": \"PT. Gaya Prashad Shiv Charan\",\n        \"address\": \"34, Paranthe Wali Gali, Chandni Chowk, New Delhi, Delhi, 110006, India\",\n        \"rating\": 3.8\n      },\n      {\n        \"name\": \"Bikanervala | Chandni Chowk\",\n        \"address\": \"382, Kucha Seth Rd, Gachi Ram, Fatehpuri, Chandni Chowk, Delhi, 110006, India\",\n        \"rating\": 4\n      },\n      {\n        \"name\": \"Pt. Babu Ram Paranthe Wala\",\n        \"address\": \"1984 -1985 , Gali Parnthewali, Chandni Chowk, New Delhi, Delhi 110006, India\",\n        \"rating\": 3.5\n      },\n      {\n        \"name\": \"Bhaja Govindam\",\n        \"address\": \"Delite Theater Building, Asaf Ali Rd, opp. MCD Park, Chatta lal Miya, Chandni Mahal, Chandni Chowk, New Delhi, Delhi, 110057, India\",\n        \"rating\": 4.3\n      }\n    ]\n    ```"
+                        "value": "{\n      \"origin\": \"Delhi, India\",\n      \"destination\": \"Mumbai, Maharashtra, India\",\n      \"duration_text\": \"23 hours 14 mins\",\n      \"duration_seconds\": 83666,\n      \"distance_text\": \"1,397 km\",\n      \"distance_meters\": 1397304\n    }"
                     }
                 ]
             }

@@ -11,6 +11,15 @@ client = OpenAI()
 client_async = AsyncOpenAI()
 # client = AzureOpenAI()
 
+"""
+Model Options:
+gpt-4o-2024-08-06
+o1-2024-12-17
+gpt-4.1-2025-04-14
+"""
+
+model_name = "gpt-4.1-2025-04-14"
+
 
 class BaseNode:
     def __init__(self, node_name, system_prompt = None):
@@ -20,13 +29,19 @@ class BaseNode:
         if self.system_prompt:
             self.chat_history.append({"role": "system", "content": self.system_prompt})        
 
-    async def async_generate(self):
+    async def async_generate(self, o1_bool=False):
         try:
-            task = asyncio.create_task(client_async.chat.completions.create(
-                model="gpt-4o-2024-08-06",
-                messages=self.chat_history,
-                temperature=0
-            ))
+            if "o1" in model_name or o1_bool:
+                task = asyncio.create_task(client_async.chat.completions.create(
+                    model="o1-2024-12-17",
+                    messages=self.chat_history,
+                ))
+            else:
+                task = asyncio.create_task(client_async.chat.completions.create(
+                    model=model_name,
+                    messages=self.chat_history,
+                    temperature=0
+                ))
 
             completion = await task
 
@@ -37,12 +52,18 @@ class BaseNode:
             print(f"Error in generate: {str(e)}")
             raise
 
-    def generate(self):
-        completion = client.chat.completions.create(
-            model="gpt-4o-2024-08-06",
-            messages=self.chat_history,
-            temperature = 0
-        )
+    def generate(self, o1_bool=False):
+        if "o1" in model_name or o1_bool:
+            completion = client.chat.completions.create(
+                model="o1-2024-12-17",
+                messages=self.chat_history,
+            )
+        else:
+            completion = client.chat.completions.create(
+                model=model_name,
+                messages=self.chat_history,
+                temperature = 0
+            )
         output = completion.choices[0].message.content
         self.chat_history.append({"role": "assistant", "content": output})
         return output
