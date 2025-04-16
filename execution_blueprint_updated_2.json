@@ -1,51 +1,29 @@
 {
     "2": {
-        "subtask_description": "Calculate travel time from Starbucks Roastery to Microsoft Redmond office.",
+        "subtask_description": "Suggest restaurants near Red Fort.",
         "steps": {
             "1": {
-                "tool": "maps_distance_matrix",
-                "handles": "Calculates travel time from Starbucks Roastery to Microsoft Redmond office.",
+                "tool": "maps_search_places",
+                "handles": "Searches for restaurants near Red Fort",
                 "input_vars": [
                     {
-                        "name": "origins",
+                        "name": "red_fort_restaurants_query",
                         "parameter": [
-                            "origins"
-                        ],
-                        "type": "array",
-                        "source": "LLM_Generated",
-                        "description": "Array of origin addresses.",
-                        "value": "[\"Starbucks Roastery, Seattle, USA\"]",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "destinations",
-                        "parameter": [
-                            "destinations"
-                        ],
-                        "type": "array",
-                        "source": "LLM_Generated",
-                        "description": "Array of destination addresses.",
-                        "value": "[\"Microsoft Redmond Office, Redmond, USA\"]",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "travel_mode",
-                        "parameter": [
-                            "mode"
+                            "query"
                         ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Travel mode for calculating travel time.",
-                        "value": "driving",
+                        "description": "Query to find restaurants near Red Fort",
+                        "value": "restaurants near Red Fort, Delhi",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "travel_time",
-                        "description": "Estimated travel time from Starbucks Roastery to Microsoft Redmond office.",
+                        "name": "restaurants_list",
+                        "description": "List of restaurants near Red Fort",
                         "used_by": [],
-                        "value": "\"21 mins (1283 seconds)\""
+                        "value": "```json\n    [\n      {\n        \"name\": \"Rehmatullah Hotel\",\n        \"address\": \"105-110, Matia Mahal Rd, opposite Gate Number-1, Bazar Matia Mahal, Jama Masjid, Old Delhi, Delhi, 110006, India\",\n        \"rating\": 4.8\n      },\n      {\n        \"name\": \"Caf\u00e9 Red Fort by Aunty's kitchen\",\n        \"address\": \"44, Parda Bagh, Daryaganj, New Delhi, Delhi, 110002, India\",\n        \"rating\": 4.9\n      },\n      {\n        \"name\": \"Haldiram's - Chandni Chowk\",\n        \"address\": \"1454, Chandni Chowk Rd, near Sis Ganj Guru Dwara, Kucha Mahajani, Chandni Chowk, New Delhi, Delhi, 110006, India\",\n        \"rating\": 4\n      },\n      {\n        \"name\": \"Lakhori\",\n        \"address\": \"2293, Gali Anar, Dharam Pura, Old Delhi, Delhi, 110006, India\",\n        \"rating\": 4.1\n      },\n      {\n        \"name\": \"Karim's Hotel Pvt. Ltd.\",\n        \"address\": \"16, Gali Kababian, Jama Masjid, Old Delhi, Delhi, 110006, India\",\n        \"rating\": 3.8\n      },\n      {\n        \"name\": \"Kake Di Hatti\",\n        \"address\": \"Church Mission Rd, Cloth Market, Katra Ghel, Khari Baoli, Chandni Chowk, New Delhi, Delhi, 110006, India\",\n        \"rating\": 4.1\n      },\n      {\n        \"name\": \"Changezi Chicken\",\n        \"address\": \"3614, Netaji Subhash Marg, Kucha Alam, Khabas Pura, Daryaganj, New Delhi, Delhi, 110002, India\",\n        \"rating\": 4\n      },\n      {\n        \"name\": \"Old Famous Jalebi Wala\",\n        \"address\": \"1795, Dariba Corner, opp. Bank of Maharashtra, Dariba Kalan, Chandni Chowk, New Delhi, Delhi 110006, India\",\n        \"rating\": 4\n      },\n      {\n        \"name\": \"Natraj Dahi Bhalla\",\n        \"address\": \"1396, Main Road, beside Central Bank, Kucha Mahajani, Chandni Chowk, New Delhi, Delhi 110006, India\",\n        \"rating\": 3.7\n      },\n      {\n        \"name\": \"Cafe Delhi Heights\",\n        \"address\": \"Visitor Center, RR Barracks, Lal Qila, Red Fort, Delhi, 110006, India\",\n        \"rating\": 3.8\n      },\n      {\n        \"name\": \"Mughlai Invitation Restaurant & Caterers\",\n        \"address\": \"Hotel AL-Haram, GALI GAJAT CINEMA WALI, 3917, Jama Masjid, Delhi, 110006, India\",\n        \"rating\": 4.8\n      },\n      {\n        \"name\": \"Al Gulzar Restaurant\",\n        \"address\": \"Meena Bazar, Jama Masjid, Chandni Chowk, New Delhi, Delhi, 110006, India\",\n        \"rating\": 4.2\n      },\n      {\n        \"name\": \"Shabrati Nahari Centre\",\n        \"address\": \"722, Gali Haveli Azam Khan, Bazar Chitli Qabar, Jama Masjid, Old Delhi, New Delhi, Delhi, 110006, India\",\n        \"rating\": 4.3\n      },\n      {\n        \"name\": \"Restaurant\",\n        \"address\": \"Gate No. 1, Metro Station, Urdu Bazar Rd, behind Kasturba Hospital Marg, opp. Jama Masjid, Jama Masjid, Old Delhi, Delhi, 110006, India\",\n        \"rating\": 4.8\n      },\n      {\n        \"name\": \"Chor Bizarre\",\n        \"address\": \"Hotel Broadway, 4/15A, Asaf Ali Rd, Chatta lal Miya, Chandni Mahal, Chandni Chowk, Delhi, New Delhi, Delhi 110002, India\",\n        \"rating\": 4.3\n      },\n      {\n        \"name\": \"Pind Balluchi Regal Building, Connaught Place, Delhi\",\n        \"address\": \"13, Regal Building, near Regal Cinema, Hanuman Road Area, Connaught Place, New Delhi, Delhi 110001, India\",\n        \"rating\": 4.2\n      },\n      {\n        \"name\": \"PT. Gaya Prashad Shiv Charan\",\n        \"address\": \"34, Paranthe Wali Gali, Chandni Chowk, New Delhi, Delhi, 110006, India\",\n        \"rating\": 3.8\n      },\n      {\n        \"name\": \"Bikanervala | Chandni Chowk\",\n        \"address\": \"382, Kucha Seth Rd, Gachi Ram, Fatehpuri, Chandni Chowk, Delhi, 110006, India\",\n        \"rating\": 4\n      },\n      {\n        \"name\": \"Pt. Babu Ram Paranthe Wala\",\n        \"address\": \"1984 -1985 , Gali Parnthewali, Chandni Chowk, New Delhi, Delhi 110006, India\",\n        \"rating\": 3.5\n      },\n      {\n        \"name\": \"Bhaja Govindam\",\n        \"address\": \"Delite Theater Building, Asaf Ali Rd, opp. MCD Park, Chatta lal Miya, Chandni Mahal, Chandni Chowk, New Delhi, Delhi, 110057, India\",\n        \"rating\": 4.3\n      }\n    ]\n    ```"
                     }
                 ]
             }

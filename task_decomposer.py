@@ -62,7 +62,7 @@ class TaskDecompositionNode(BaseNode):
                     "Use": description
                 }
 
-        print(tool_data)
+        # print(tool_data)
         for tool_name in task_decomposer_message['request']['relevant_tools']:
             tool_details.append({
                 'tool_name': tool_name,

@@ -224,7 +224,7 @@ Step [Step Number, should be an integer and not of the form subtask_no.step_no]
 
 ### Example Outputs:
 
-#### Example 1:
+#### Example:
 
 Query: "What top 5 cities in usa? what is weather and news there? What does reddit say about them? What are some good restaurants there?"
 
@@ -233,32 +233,32 @@ TaskDecomposer's sub_task Requests:
 Details: Display a list of the top 5 cities in the USA. Provide a brief overview of each city, including key attractions and general information.
 List of Relevant TOOLs:
    - TripadvisorSearchLocation
-   - Perplexity
+   - perplexity_ask
 
 2. sub_task 2: Weather Information for Top 5 Cities
 Details: Show real-time weather information for the top 5 cities in the USA. Include temperature, weather conditions, and any relevant weather alerts.
 List of Relevant TOOLs:
    - WeatherAPI.com_Realtime_Weather_TOOL
    - WeatherAPI.com_Forecast_Weather_API
-   - Perplexity
+   - perplexity_ask
 
 3. sub_task 3: News in Top 5 Cities
 Details: Provide the latest news articles related to the top 5 cities in the USA. Include headlines, brief summaries, and links to full articles.
 List of Relevant TOOLs:
    - NewsAPISearchByKeyWord
-   - Perplexity
+   - perplexity_ask
 
 4. sub_task 4: Reddit Discussions on Top 5 Cities
 Details: Retrieve top Reddit posts discussing the top 5 cities in the USA. Include post titles, brief descriptions, and links to the discussions.
 List of Relevant TOOLs:
    - RedditTopPostsBySubreddit
-   - Perplexity
+   - perplexity_ask
 
 5. sub_task 5: Top Restaurants in Top 5 Cities
 Details: List the top-rated restaurants in the top 5 cities in the USA. Include restaurant names, ratings, reviews, and links to more details.
 List of Relevant TOOLs:
    - TripadvisorSearchRestaurants
-   - Perplexity
+   - perplexity_ask
 
 
 Description of TOOLs:
@@ -270,245 +270,157 @@ Your Output:
 $$CHAIN_OF_THOUGHT$$
 
 sub_task 1: Top 5 Cities in USA Overview
-
-- Understanding sub_task Details: 
-  -We need to find what are the top 5 cities in the USA, the country.
-
-- TOOL Selection:
-  - We need to identify the top 5 cities in the USA. Perplexity is suitable for retrieving this information by synthesizing data from multiple sources.
-  - To get specific location details like geoId for each city, we'll use TripadvisorSearchLocation.
-    - Note: TripadvisorSearchLocation is only reliable for obtaining geoId and not longitude or latitude, and that too for well-known cities.
-
-- Input Parameters:
-  - Perplexity:
-    - For Perplexity we have to consider these required input parameters  ['query']
-    - query (string): Requires a search query. We'll use "What are the top 5 cities in the USA?".
-  - TripadvisorSearchLocation:
-    - For TripadvisorSearchLocation we have to consider these required input parameters  {'query': {'type': 'string', 'description': 'Search query for location (e.g., city name)'}}
-    - query (string): Requires city names. We'll input the list of cities obtained from Perplexity.
-
-- Source of Inputs:
-  - Perplexity:
-    - query: LLM_Generated based on the user's query.
-  - TripadvisorSearchLocation:
-    - query: TOOL_Output (sub_task 1, Step 1), using top_cities_list from Perplexity's output.
-
-- execution_blueprint Flow:
-  - Step 1: Use Perplexity to get the list of the top 5 cities.
-  - Step 2: Use TripadvisorSearchLocation to obtain geoId details for each city.
-    - Acknowledging that this TOOL is only reliable for well-known cities.
-
-- Variable Naming:
-  - Input variable name for Step 1: query_top_cities
-  - Output variable name for Step 1: top_cities_list.
-  - Input variable name for Step 2: top_cities_list (matches the output variable name).
-  - Output variable name for Step 2: city_geoID_details
-
-- Validating if what i have thought till now is correct: Yes it is correct.
-
+-	Understanding sub_task Details:
+-We need to find what are the top 5 cities in the USA, the country.
+-	TOOL Selection:
+-	We need to identify the top 5 cities in the USA. perplexity_ask is suitable for retrieving this information by synthesizing data from multiple sources.
+-	To get specific location details like geoId for each city, we’ll use TripadvisorSearchLocation.
+-	Note: TripadvisorSearchLocation is only reliable for obtaining geoId and not longitude or latitude, and that too for well-known cities.
+-	Input Parameters:
+-	perplexity_ask:
+-	For perplexity_ask we have to consider these required input parameters  [‘messages’]
+-	messages (array of objects with role and content): We will pass a single user message with the content "What are the top 5 cities in the USA?".
+-	TripadvisorSearchLocation:
+-	For TripadvisorSearchLocation we have to consider these required input parameters  {‘query’: {‘type’: ‘string’, ‘description’: ‘Search query for location (e.g., city name)’}}
+-	query (string): Requires city names. We’ll input the list of cities obtained from perplexity_ask.
+-	Source of Inputs:
+-	perplexity_ask:
+-	messages: LLM_Generated based on the user’s query.
+-	TripadvisorSearchLocation:
+-	query: TOOL_Output (sub_task 1, Step 1), using top_cities_list from perplexity_ask’s output.
+-	execution_blueprint Flow:
+-	Step 1: Use perplexity_ask to get the list of the top 5 cities.
+-	Step 2: Use TripadvisorSearchLocation to obtain geoId details for each city.
+-	Acknowledging that this TOOL is only reliable for well-known cities.
+-	Variable Naming:
+-	Input variable name for Step 1: query_top_cities
+-	Output variable name for Step 1: top_cities_list.
+-	Input variable name for Step 2: top_cities_list (matches the output variable name).
+-	Output variable name for Step 2: city_geoID_details
+-	Validating if what i have thought till now is correct: Yes it is correct.
 
 sub_task 2: Weather in Top 5 Cities
-
-- Understanding sub_task Details: 
-  -We need to find what is the weather in the top 5 cities in the USA, which we found in the sub_task 1.
-
-- TOOL Selection:
-  - WeatherAPI.com_Realtime_Weather_TOOL may not always return accurate results with city name queries.
-  - Therefore, we'll use Perplexity to find the latitude and longitude of each city.
-  - We'll then use WeatherAPI.com_Realtime_Weather_TOOL with these coordinates to fetch accurate weather data.
-
-- Input Parameters:
-  - Perplexity:
-    - For Perplexity we have to consider these required input parameters  ['query']
-    - query (string): Queries to find latitude and longitude for each city we got from sub_task 1, Step 1.
-  - WeatherAPI.com_Realtime_Weather_TOOL:
-    - For WeatherAPI.com_Realtime_Weather_TOOL we have to consider these required input parameters  {'q': {'type': 'String', 'description': 'Query parameter based on which data is sent back. It could be one of the following: Latitude and Longitude (Decimal degree) e.g: q=48.8567,2.3508, city name e.g.: q=Paris, US zip e.g: q=10001, UK postcode e.g: q=SW1, Canada postal code e.g: q=G2J, metar:<metar_code> e.g: q=metar:EGLL, iata:<3 digit airport code> e.g: q=iata:DXB, auto:ip for IP lookup, IP address (IPv4 and IPv6 supported) e.g: q=100.0.0.1'}}
-    - q (string): Latitude and longitude in the format "lat,lon".
-
-- Source of Inputs:
-  - Perplexity:
-    - query: TOOL_Output, (sub_task 1, Step 1), using top_cities_list
-  - WeatherAPI.com_Realtime_Weather_TOOL:
-    - q: TOOL_Output (sub_task 2, Step 1), using city_coordinates.
-
-- execution_blueprint Flow:
-  - Step 1: Use Perplexity to find the latitude and longitude of each city.
-  - Step 2: Use WeatherAPI.com_Realtime_Weather_TOOL with these coordinates to fetch real-time weather data.
-
-- Interdependencies:
-  - Step 2 depends on Step 1 (city_coordinates) . Dependency is on the current sub_tasks step output.
-
-- Variable Naming:
-  - Input variable name for Step 1: top_cities_list (matching the output variable name from sub_task 1, Step 1).
-  - Output variable name for Step 1: latitude_data and longitude_data.
-  - Input variable name for Step 2: latitude and longitude (matching the output variable name from sub_task 2, Step 1).
-  - Out variable name for Step 2: realtime_weather
-
-- Validating if what i have thought till now is correct: No, i named the input varialble names wrongly for step 2, it should match the output variable names of step 1 since they are dependent on it.
-
-Rectifying the mistake:
-
-sub_task 2: Weather in Top 5 Cities
-
-- Understanding sub_task Details: 
-  -We need to find what is the weather in the top 5 cities in the USA, which we found in the sub_task 1.
-
-- TOOL Selection:
-  - WeatherAPI.com_Realtime_Weather_TOOL may not always return accurate results with city name queries.
-  - Therefore, we'll use Perplexity to find the latitude and longitude of each city.
-  - We'll then use WeatherAPI.com_Realtime_Weather_TOOL with these coordinates to fetch accurate weather data.
-
-- Input Parameters:
-  - Perplexity:
-    - For Perplexity we have to consider these required input parameters : ['query']
-    - query (string): Queries to find latitude and longitude for each city we got from sub_task 1, Step 1.
-  - WeatherAPI.com_Realtime_Weather_TOOL:
-    - For WeatherAPI.com_Realtime_Weather_TOOL we have to consider these required input parameters:  {'q': {'type': 'String', 'description': 'Query parameter based on which data is sent back. It could be one of the following: Latitude and Longitude (Decimal degree) e.g: q=48.8567,2.3508, city name e.g.: q=Paris, US zip e.g: q=10001, UK postcode e.g: q=SW1, Canada postal code e.g: q=G2J, metar:<metar_code> e.g: q=metar:EGLL, iata:<3 digit airport code> e.g: q=iata:DXB, auto:ip for IP lookup, IP address (IPv4 and IPv6 supported) e.g: q=100.0.0.1'}}
-    - q (string): Latitude and longitude in the format "lat,lon".
-
-- Source of Inputs:
-  - Perplexity:
-    - query: TOOL_Output, (sub_task 1, Step 1), using top_cities_list
-  - WeatherAPI.com_Realtime_Weather_TOOL:
-    - q: TOOL_Output (sub_task 2, Step 1), using city_coordinates.
-
-- execution_blueprint Flow:
-  - Step 1: Use Perplexity to find the latitude and longitude of each city.
-  - Step 2: Use WeatherAPI.com_Realtime_Weather_TOOL with these coordinates to fetch real-time weather data.
-
-- Interdependencies:
-  - Step 2 depends on Step 1 (city_coordinates) . Dependency is on the current sub_tasks step output.
-
-- Variable Naming:
-  - Input variable name for Step 1: top_cities_list (matching the output variable name from sub_task 1, Step 1).
-  - Output variable name for Step 1: latitude_data and longitude_data.
-  - Input variable name for Step 2: latitude_data and longitude_data (matching the output variable name from sub_task 2, Step 1). For preparing the q parameter of WeatherAPI.com_Realtime_Weather_TOOL completely we had to use two input variables.
-  - Out variable name for Step 2: realtime_weather
-
-- Validating if what i have thought till now is correct: Yes it is correct.
-
+-	Understanding sub_task Details:
+-We need to find what is the weather in the top 5 cities in the USA, which we found in the sub_task 1.
+-	TOOL Selection:
+-	WeatherAPI.com_Realtime_Weather_TOOL may not always return accurate results with city name queries.
+-	Therefore, we’ll use perplexity_ask to find the latitude and longitude of each city.
+-	We’ll then use WeatherAPI.com_Realtime_Weather_TOOL with these coordinates to fetch accurate weather data.
+-	Input Parameters:
+-	perplexity_ask:
+-	For perplexity_ask we have to consider these required input parameters : [‘messages’]
+-	messages (array of objects with role and content): Queries to find latitude and longitude for each city we got from sub_task 1, Step 1.
+-	WeatherAPI.com_Realtime_Weather_TOOL:
+-	For WeatherAPI.com_Realtime_Weather_TOOL we have to consider these required input parameters  {‘q’: {‘type’: ‘String’,‘description’: ‘Query parameter based on which data is sent back. It could be one of the following: Latitude and Longitude (Decimal degree) e.g: q=48.8567,2.3508, city name e.g.: q=Paris, US zip e.g: q=10001, UK postcode e.g: q=SW1, Canada postal code e.g: q=G2J, metar:<metar_code> e.g: q=metar:EGLL, iata:<3 digit airport code> e.g: q=iata:DXB, auto:ip for IP lookup, IP address (IPv4 and IPv6 supported) e.g: q=100.0.0.1’}}
+-	q (string): Latitude and longitude in the format "lat,lon".
+-	Source of Inputs:
+-	perplexity_ask:
+-	messages: TOOL_Output, (sub_task 1, Step 1), using top_cities_list
+-	WeatherAPI.com_Realtime_Weather_TOOL:
+-	q: TOOL_Output (sub_task 2, Step 1), using city_coordinates.
+-	execution_blueprint Flow:
+-	Step 1: Use perplexity_ask to find the latitude and longitude of each city.
+-	Step 2: Use WeatherAPI.com_Realtime_Weather_TOOL with these coordinates to fetch real-time weather data.
+-	Interdependencies:
+-	Step 2 depends on Step 1 (city_coordinates) . Dependency is on the current sub_tasks step output.
+-	Variable Naming:
+-	Input variable name for Step 1: top_cities_list (matching the output variable name from sub_task 1, Step 1).
+-	Output variable name for Step 1: latitude_data and longitude_data.
+-	Input variable name for Step 2: latitude_data and longitude_data (matching the output variable name from sub_task 2, Step 1). For preparing the q parameter of WeatherAPI.com_Realtime_Weather_TOOL completely we had to use two input variables.
+-	Out variable name for Step 2: realtime_weather
+-	Validating if what i have thought till now is correct: Yes it is correct.
 
 sub_task 3: News in Top 5 Cities
-
-- Understanding sub_task Details: 
-  -We need to find what is the news in the top 5 cities in the USA, which we found in sub_task 1.
-
-- TOOL Selection:
-  - To fetch news articles, we'll use NewsAPISearchByKeyWord.
-  - We can input city names directly; Perplexity is not necessary here.
-
-- Input Parameters:
-  - NewsAPISearchByKeyWord:
-    - For NewsAPISearchByKeyWord there are no required input parameters. But for our purpose we will give the following parameters.
-      - query (string): City names.
-      - language (string): We'll set this to "en".
-      - region (string): We'll set this to "US".
-
-- Source of Inputs:
-  - query: TOOL_Output (sub_task 1, Step 1), using top_cities_list.
-  - language: LLM_Generated, value "en".
-  - region: LLM_Generated, value "US".
-
-- execution_blueprint Flow:
-  - Step 1: Use NewsAPI to retrieve news articles for each city.
-
-- Interdependencies:
-  - Depends on sub_task 1, Step 1 for city names. Dependency is on the output from a previous sub_tasks step which is valid.
-
-- Variable Naming:
-  - Input variable name for Step 1: top_cities_list, matching the output from sub_task 1, Step 1.
-  - Output variable name for Step 1: news_articles
-
-- Validating if what i have thought till now is correct: Yes it is correct.
-
+-	Understanding sub_task Details:
+-We need to find what is the news in the top 5 cities in the USA, which we found in the sub_task 1.
+-	TOOL Selection:
+-	To fetch news articles, we’ll use NewsAPISearchByKeyWord.
+-	We can input city names directly; perplexity_ask is not necessary here.
+-	Input Parameters:
+-	NewsAPISearchByKeyWord:
+-	For NewsAPISearchByKeyWord there are no required input parameters. But for our purpose we will give the following parameters.
+-	query (string): City names.
+-	language (string): We’ll set this to "en".
+-	region (string): We’ll set this to "US".
+-	Source of Inputs:
+-	query: TOOL_Output (sub_task 1, Step 1), using top_cities_list.
+-	language: LLM_Generated, value "en".
+-	region: LLM_Generated, value "US".
+-	execution_blueprint Flow:
+-	Step 1: Use NewsAPI to retrieve news articles for each city.
+-	Interdependencies:
+-	Depends on sub_task 1, Step 1 for city names. Dependency is on the output from a previous sub_tasks step which is valid.
+-	Variable Naming:
+-	Input variable name for Step 1: top_cities_list, matching the output from sub_task 1, Step 1.
+-	Output variable name for Step 1: news_articles
+-	Validating if what i have thought till now is correct: Yes it is correct.
 
 sub_task 4: Reddit Discussions on Top 5 Cities
-
-- Understanding sub_task Details: 
-  -We need to find what is the top reddit discussions in the top 5 cities in the USA, which we found in the sub_task 1.
-
-- TOOL Selection:
-  - To find relevant subreddits, we'll use Perplexity.
-  - To get top Reddit posts, we'll use RedditTopPostsBySubreddit.
-
-- Input Parameters:
-  - Perplexity:
-    - For Perplexity we have to consider these required input parameters : ['query']
-    - query (string): Queries to find subreddits for each city.
-  - RedditTopPostsBySubreddit:
-    - For RedditTopPostsBySubreddit we have to consider these required input parameters: {'subreddit': {'type': 'String', 'description': "The subreddit name for which to fetch top posts. Only the subreddit name should be provided, 'r/' prefix is invalid."}, 'time': {'type': 'String', 'description': 'The time period for which to fetch top posts.'}}
-    - subreddit (string): Subreddit names.
-    - time (string): We'll set this to "day".
-
-- Source of Inputs:
-  - Perplexity:
-    - query: TOOL_Output (sub_task 1, Step 1)., using city names from top_cities_list
-  - RedditTopPostsBySubreddit:
-    - subreddit: TOOL_Output (sub_task 4, Step 1), using subreddits.
-    - time: LLM_Generated, value "day".
-
-- execution_blueprint Flow:
-  - Step 1: Use Perplexity to find subreddits related to each city.
-  - Step 2: Use Reddit TOOL to fetch top posts from these subreddits.
-
-- Interdependencies:
-  - Step 2 depends on Step 1 (subreddits).
-  - Perplexity in Step 1 uses city names from sub_task 1, Step 1. Dependency is on the output from a previous sub_tasks step which is valid.
-
-- Variable Naming:
-  - Input variable name for Step 1: top_cities_list
-  - Output variable name for Step 1: subreddits.
-  - Input variable name for Step 2: subreddits.
-  - Output variable name for Step 2: reddit_posts
-
-- Validating if what i have thought till now is correct: Yes it is correct.
-
+-	Understanding sub_task Details:
+-We need to find what is the top reddit discussions in the top 5 cities in the USA, which we found in the sub_task 1.
+-	TOOL Selection:
+-	To find relevant subreddits, we’ll use perplexity_ask.
+-	To get top Reddit posts, we’ll use RedditTopPostsBySubreddit.
+-	Input Parameters:
+-	perplexity_ask:
+-	For perplexity_ask we have to consider these required input parameters : [‘messages’]
+-	messages (array of objects with role and content): Queries to find subreddits for each city.
+-	RedditTopPostsBySubreddit:
+-	For RedditTopPostsBySubreddit we have to consider these required input parameters: {‘subreddit’: {‘type’: ‘String’, ‘description’: "The subreddit name for which to fetch top posts. Only the subreddit name should be provided, ‘r/’ prefix is invalid."}, ‘time’: {‘type’: ‘String’, ‘description’: ‘The time period for which to fetch top posts.’}}
+-	subreddit (string): Subreddit names.
+-	time (string): We’ll set this to "day".
+-	Source of Inputs:
+-	perplexity_ask:
+-	messages: TOOL_Output (sub_task 1, Step 1), using city names from top_cities_list
+-	RedditTopPostsBySubreddit:
+-	subreddit: TOOL_Output (sub_task 4, Step 1), using subreddits.
+-	time: LLM_Generated, value "day".
+-	execution_blueprint Flow:
+-	Step 1: Use perplexity_ask to find subreddits related to each city.
+-	Step 2: Use Reddit TOOL to fetch top posts from these subreddits.
+-	Interdependencies:
+-	Step 2 depends on Step 1 (subreddits).
+-	perplexity_ask in Step 1 uses city names from sub_task 1, Step 1. Dependency is on the output from a previous sub_tasks step which is valid.
+-	Variable Naming:
+-	Input variable name for Step 1: top_cities_list
+-	Output variable name for Step 1: subreddits.
+-	Input variable name for Step 2: subreddits.
+-	Output variable name for Step 2: reddit_posts
+-	Validating if what i have thought till now is correct: Yes it is correct.
 
 sub_task 5: Top Restaurants in Top 5 Cities
-
-- Understanding sub_task Details: 
-  -We need to find what are the top restaurants in the top 5 cities in the USA, which we found in the sub_task 1.
-
-- TOOL Selection:
-  - We'll use TripadvisorSearchRestaurants to find top restaurants using geoId.
-
-- Input Parameters:
-  - TripadvisorSearchRestaurants:
-    - For TripadvisorSearchRestaurants we have to consider these required input parameters: {'locationId': {'type': 'string', 'description': 'location geoId of a place.'}}
-    - locationId (string): geoId of each city.
-
-- Source of Inputs:
-  - locationId: TOOL_Output (sub_task 1, Step 2), using city_geoID_details.
-
-- execution_blueprint Flow:
-  - Step 1: Use the Tripadvisor TOOL to get top restaurants for each city.
-
-- Interdependencies:
-  - Depends on sub_task 1, Step 2 for geoId. Dependency is on the output from a previous sub_tasks step which is valid.
-
-- Variable Naming:
-  - Input variable name for Step 1: city_geoID_details, matching the output from sub_task 1, Step 2.
-  - Output variable name for Step 1: top_restaurants
-
-- Validating if what i have thought till now is correct: Yes it is correct.
-
+-	Understanding sub_task Details:
+-We need to find what are the top restaurants in the top 5 cities in the USA, which we found in the sub_task 1.
+-	TOOL Selection:
+-	We’ll use TripadvisorSearchRestaurants to find top restaurants using geoId.
+-	Input Parameters:
+-	TripadvisorSearchRestaurants:
+-	For TripadvisorSearchRestaurants we have to consider these required input parameters: {‘locationId’: {‘type’: ‘string’, ‘description’: ‘location geoId of a place.’}}
+-	locationId (string): geoId of each city.
+-	Source of Inputs:
+-	locationId: TOOL_Output (sub_task 1, Step 2), using city_geoID_details.
+-	execution_blueprint Flow:
+-	Step 1: Use the Tripadvisor TOOL to get top restaurants for each city.
+-	Interdependencies:
+-	Depends on sub_task 1, Step 2 for geoId. Dependency is on the output from a previous sub_tasks step which is valid.
+-	Variable Naming:
+-	Input variable name for Step 1: city_geoID_details, matching the output from sub_task 1, Step 2.
+-	Output variable name for Step 1: top_restaurants
+-	Validating if what i have thought till now is correct: Yes it is correct.
 
 Grouping sub_tasks and Interdependencies
-
-- All sub_tasks depend on outputs from sub_task 1. Therefore, we will place all sub_tasks in Group 1.
-- Ensured that each TOOL depends on at most one previous TOOL's output.
-- Ensured that dependencies are on the output from a previous sub_tasks for all such sub_task steps.
-- Input variables that depend on previous outputs have matching names to maintain consistency.
-
-- Kept care of referring to tool names correctly keeping in consideration that they are case-sensitive.
+-	All sub_tasks depend on outputs from sub_task 1. Therefore, we will place all sub_tasks in Group 1.
+-	Ensured that each TOOL depends on at most one previous TOOL’s output.
+-	Ensured that dependencies are on the output from a previous sub_tasks for all such sub_task steps.
+-	Input variables that depend on previous outputs have matching names to maintain consistency.
+-	Kept care of referring to tool names correctly keeping in consideration that they are case-sensitive.
 
 execution_blueprint Efficiency
-
-- Kept the execution_blueprint minimal by:
-  - Avoiding unnecessary TOOLs (e.g., not using Perplexity where not essential).
-  - Avoided calling the same TOOL for same purpose multiple times by keeping such sub_tasks in the same group and sharing the TOOL output with other sub_tasks.
-  - Using city names directly when possible.
-  - Limiting each sub_task to essential steps only.
+-	Kept the execution_blueprint minimal by:
+-	Avoiding unnecessary TOOLs (e.g., not using perplexity_ask where not essential).
+-	Avoided calling the same TOOL for the same purpose multiple times by keeping such sub_tasks in the same group and sharing the TOOL output with other sub_tasks.
+-	Using city names directly when possible.
+-	Limiting each sub_task to essential steps only.
 
 $$EXECUTION_BLUEPRINT$$
 
@@ -521,32 +433,32 @@ sub_task Description: Identify and provide an overview of the top 5 cities in th
 execution_blueprint Steps:
 
 Step 1
-- TOOL: Perplexity
-- Handles: Retrieves the top 5 cities in the USA
-- Input Variables:
-  - Name: query_top_cities
-    - Parameter: query
-    - Type: string
-    - Source: LLM_Generated
-    - Description: Query to find the top 5 cities in the USA
-    - Value: "What are the top 5 cities in the USA?"
-- Output Variables:
-  - Name: top_cities_list
-    - Description: List of the top 5 cities in the USA
+-	TOOL: perplexity_ask
+-	Handles: Retrieves the top 5 cities in the USA
+-	Input Variables:
+  -	Name: query_top_cities
+    -	Parameter: messages
+    -	Type: array
+    -	Source: LLM_Generated
+    -	Description: Single user message with query about top 5 cities in the USA
+    -	Value: [{"role":"user","content":"What are the top 5 cities in the USA?"}]
+-	Output Variables:
+  -	Name: top_cities_list
+    -	Description: List of the top 5 cities in the USA
 
 Step 2
-- TOOL: TripadvisorSearchLocation
-- Handles: Fetches geoID about each city
-- Input Variables:
-  - Name: top_cities_list
-    - Parameter: query
-    - Type: string
-    - Source: TOOL_Output (sub_task 1, Step 1)
-    - Description: List of top cities from Perplexity
-    - Value: None
-- Output Variables:
-  - Name: city_geoID_details
-    - Description: GeoID for each city
+-	TOOL: TripadvisorSearchLocation
+-	Handles: Fetches geoID about each city
+-	Input Variables:
+  -	Name: top_cities_list
+    -	Parameter: query
+    -	Type: string
+    -	Source: TOOL_Output (sub_task 1, Step 1)
+    -	Description: List of top cities from perplexity_ask
+    -	Value: None
+-	Output Variables:
+  -	Name: city_geoID_details
+    -	Description: GeoID for each city
 
 execution_blueprint for sub_task 2:
 
@@ -554,41 +466,41 @@ sub_task Description: Provide real-time weather information for the top 5 cities
 
 execution_blueprint Steps:
 
-Step 1  
-- TOOL: Perplexity  
-- Handles: Fetches latitude and longitude for each top city in USA
-- Input Variables:
-  - Name: top_cities_list
-    - Parameter: query
-    - Type: string
-    - Source: TOOL_Output (sub_task 1, Step 1)  
-    - Description: List of top cities in USA
-    - Value: None
-- Output Variables:
-  - Name: latitude_data
-    - Description: Latitude for each top city
-  - Name: longitude_data
-    - Description: Longitude for each top city
+Step 1
+-	TOOL: perplexity_ask
+-	Handles: Fetches latitude and longitude for each top city in USA
+-	Input Variables:
+  -	Name: top_cities_list
+    -	Parameter: messages
+    -	Type: array
+    -	Source: TOOL_Output (sub_task 1, Step 1)
+    -	Description: The user message(s) to find lat/long for top cities
+    -	Value: None
+-	Output Variables:
+  -	Name: latitude_data
+    -	Description: Latitude for each top city
+  -	Name: longitude_data
+    -	Description: Longitude for each top city
 
 Step 2
-- TOOL: WeatherAPI.com_Realtime_Weather_TOOL
-- Handles: Fetches real-time weather data
-- Input Variables:
-  - Name: latitude_data
-    - Parameter: q
-    - Type: string
-    - Source: TOOL_Output (sub_task 2, Step 1)
-    - Description: Latitude of the top cities
-    - Value: None
-  - Name: longitude_data
-    - Parameter: q
-    - Type: string
-    - Source: TOOL_Output (sub_task 2, Step 1)
-    - Description: Longitutdes of the top cities
-    - Value: None
-- Output Variables:
-  - Name: realtime_weather
-    - Description: Real-time weather data for each city
+-	TOOL: WeatherAPI.com_Realtime_Weather_TOOL
+-	Handles: Fetches real-time weather data
+-	Input Variables:
+  -	Name: latitude_data
+    -	Parameter: q
+    -	Type: string
+    -	Source: TOOL_Output (sub_task 2, Step 1)
+    -	Description: Latitude of the top cities
+    -	Value: None
+  -	Name: longitude_data
+    -	Parameter: q
+    -	Type: string
+    -	Source: TOOL_Output (sub_task 2, Step 1)
+    -	Description: Longitudes of the top cities
+    -	Value: None
+-	Output Variables:
+  -	Name: realtime_weather
+    -	Description: Real-time weather data for each city
 
 execution_blueprint for sub_task 3:
 
@@ -597,18 +509,18 @@ sub_task Description: Display recent news articles for the top 5 cities.
 execution_blueprint Steps:
 
 Step 1
-- TOOL: NewsAPISearchByKeyWord
-- Handles: Fetches detailed news articles
-- Input Variables:
-  - Name: top_cities_list
-    - Parameter: query
-    - Type: string
-    - Source: TOOL_Output (sub_task 1, Step 1)
-    - Description: City names which can used as query keyword for searching news
-    - Value: None
-- Output Variables:
-  - Name: news_articles
-    - Description: Detailed news articles for each city
+-	TOOL: NewsAPISearchByKeyWord
+-	Handles: Fetches detailed news articles
+-	Input Variables:
+  -	Name: top_cities_list
+    -	Parameter: query
+    -	Type: string
+    -	Source: TOOL_Output (sub_task 1, Step 1)
+    -	Description: City names which can used as query keyword for searching news
+    -	Value: None
+-	Output Variables:
+  -	Name: news_articles
+    -	Description: Detailed news articles for each city
 
 execution_blueprint for sub_task 4:
 
@@ -617,38 +529,38 @@ sub_task Description: Display top Reddit discussions for the top 5 cities.
 execution_blueprint Steps:
 
 Step 1
-- TOOL: Perplexity
-- Handles: Identifies relevant subreddits for each city
-- Input Variables:
-  - Name: top_cities_list
-    - Parameter: query
-    - Type: string
-    - Source: TOOL_Output (sub_task 1, Step 1)
-    - Description: List of top cities
-    - Value: None
-- Output Variables:
-  - Name: subreddits
-    - Description: Relevant subreddits for each city
+-	TOOL: perplexity_ask
+-	Handles: Identifies relevant subreddits for each city
+-	Input Variables:
+  -	Name: top_cities_list
+    -	Parameter: messages
+    -	Type: array
+    -	Source: TOOL_Output (sub_task 1, Step 1)
+    -	Description: The user message(s) to find relevant subreddits for top cities
+    -	Value: None
+-	Output Variables:
+  -	Name: subreddits
+    -	Description: Relevant subreddits for each city
 
 Step 2
-- TOOL: RedditTopPostsBySubreddit
-- Handles: Fetches top posts from relevant subreddits
-- Input Variables:
-  - Name: subreddits
-    - Parameter: subreddit
-    - Type: string
-    - Source: TOOL_Output (sub_task 4, Step 1)
-    - Description: Subreddits identified by Perplexity
-    - Value: None
-  - Name: time_period
-    - Parameter: time
-    - Type: string
-    - Source: LLM_Generated
-    - Description: Time period for top posts
-    - Value: "day"
-- Output Variables:
-  - Name: reddit_posts
-    - Description: Top Reddit posts for each city
+-	TOOL: RedditTopPostsBySubreddit
+-	Handles: Fetches top posts from relevant subreddits
+-	Input Variables:
+  -	Name: subreddits
+    -	Parameter: subreddit
+    -	Type: string
+    -	Source: TOOL_Output (sub_task 4, Step 1)
+    -	Description: Subreddits identified by perplexity_ask
+    -	Value: None
+  -	Name: time_period
+    -	Parameter: time
+    -	Type: string
+    -	Source: LLM_Generated
+    -	Description: Time period for top posts
+    -	Value: "day"
+-	Output Variables:
+  -	Name: reddit_posts
+    -	Description: Top Reddit posts for each city
 
 execution_blueprint for sub_task 5:
 
@@ -657,37 +569,35 @@ sub_task Description: Display top restaurants in the top 5 cities.
 execution_blueprint Steps:
 
 Step 1
-- TOOL: TripadvisorSearchRestaurants
-- Handles: Searches for top restaurants in each city
-- Input Variables:
-  - Name: city_geoID_details
-    - Parameter: locationId
-    - Type: string
-    - Source: TOOL_Output (sub_task 1, Step 2)
-    - Description: geoId of each city
-    - Value: None
-- Output Variables:
-  - Name: top_restaurants
-    - Description: List of top restaurants in each city
+-	TOOL: TripadvisorSearchRestaurants
+-	Handles: Searches for top restaurants in each city
+-	Input Variables:
+  -	Name: city_geoID_details
+    -	Parameter: locationId
+    -	Type: string
+    -	Source: TOOL_Output (sub_task 1, Step 2)
+    -	Description: geoId of each city
+    -	Value: None
+-	Output Variables:
+  -	Name: top_restaurants
+    -	Description: List of top restaurants in each city
 
-#### Example 2:
+#### Example:
 
-Query: "what are the hotel options in new york city from 10th october 2024 to 12th october 2024.  Also what will the weather be like then?"
+Query: "what are the hotel options in new york city from 10th october 2024 to 12th october 2024. Also what will the weather be like then?"
 
-TaskDecomposer's sub_task Requests:
-1. sub_task 1: Hotel Options in New York City
+TaskDecomposer’s sub_task Requests:
+1.	sub_task 1: Hotel Options in New York City
 List of Relevant TOOLs:
-   - TripadvisorSearchLocation
-   - TripadvisorSearchHotels
-   - Perplexity
-
-2. sub_task 2: Weather Forecast for New York City
+-	TripadvisorSearchLocation
+-	TripadvisorSearchHotels
+-	perplexity_ask
+2.	sub_task 2: Weather Forecast for New York City
 List of Relevant TOOLs:
-   - WeatherAPI.com_Forecast_Weather_API
-   - Perplexity
+-	WeatherAPI.com_Forecast_Weather_API
+-	perplexity_ask
 
 Description of TOOLs:
-
 [Will be given to you]
 
 Your Output:
@@ -695,110 +605,92 @@ Your Output:
 $$CHAIN_OF_THOUGHT$$
 
 sub_task 1: Hotel Options in New York City
-
-- Understanding sub_task Details: 
-  -We need to find hotel options in New York City from 10th october 2024 to 12th october 2024.
-
-- TOOL Selection:
-  - To find hotel options in New York City for the specified dates.
-  - TripadvisorSearchLocation: To obtain the geoId for New York City.
-    - Note: TripadvisorSearchLocation is reliable for obtaining geoId for well-known locations, and not longitude or latitude.
-  - TripadvisorSearchHotels: To retrieve hotel options using the geoId and the specified dates.
-  - Perplexity: Not necessary here since we can obtain all required data using Tripadvisor TOOLs, keeping the execution_blueprint minimal.
-
-- Input Parameters:
-  - TripadvisorSearchLocation:
-    - For TripadvisorSearchLocation we have to consider these required input parameters:  {'query': {'type': 'string', 'description': 'Search query for location (e.g., city name)'}}
-    - query (string): The location name to search for.
-  - TripadvisorSearchHotels:
-    - For TripadvisorSearchHotels we have to consider these required input parameters: {'geoId': {'type': 'string', 'description': 'Geo ID of the location retrieved from the Search Location TOOL.'}, 'checkIn': {'type': 'string', 'description': 'Check-in date. Format: YYYY-MM-DD'}, 'checkOut': {'type': 'string', 'description': 'Check-out date. Format: YYYY-MM-DD'}}
-    - geoId (string): The geoId obtained from TripadvisorSearchLocation.
-    - checkIn (string): The check-in date in YYYY-MM-DD format.
-    - checkOut (string): The check-out date in YYYY-MM-DD format.
-
-- Source of Inputs:
-  - TripadvisorSearchLocation:
-    - query: LLM_Generated, value "New York City", extracted from the user's query.
-  - TripadvisorSearchHotels:
-    - geoId: TOOL_Output (sub_task 1, Step 1), output location_geoId from TripadvisorSearchLocation.
-    - checkIn: LLM_Generated, value "2024-10-10", extracted from the user's query.
-    - checkOut: LLM_Generated, value "2024-10-12", extracted from the user's query.
-
-- execution_blueprint Flow:
-  - Step 1: Use TripadvisorSearchLocation to get the geoId for New York City.
-  - Step 2: Use TripadvisorSearchHotels with the geoId and dates to retrieve hotel options.
-
-- Interdependencies:
-  - Step 2 depends on Step 1 for the geoId (location_geoId). Dependency is on the current sub_tasks step output which is valid.
-  - The input variable location_geoId in Step 2 must match the output variable name from Step 1.
-
-- Variable Naming:
-  - Input variable name for Step 1: location_query
-  - Output variable name for Step 1: location_geoId.
-  - Input variable name for Step 2: location_geoId (matching the output variable name), check_in_date, check_out_date.
-  - Output variable name for Step 2: hotel_options.
+-	Understanding sub_task Details:
+-We need to find hotel options in New York City from 10th october 2024 to 12th october 2024.
+-	TOOL Selection:
+-	To find hotel options in New York City for the specified dates.
+-	TripadvisorSearchLocation: To obtain the geoId for New York City.
+-	Note: TripadvisorSearchLocation is reliable for obtaining geoId for well-known locations, and not longitude or latitude.
+-	TripadvisorSearchHotels: To retrieve hotel options using the geoId and the specified dates.
+-	perplexity_ask: Not necessary here since we can obtain all required data using Tripadvisor TOOLs, keeping the execution_blueprint minimal.
+-	Input Parameters:
+-	TripadvisorSearchLocation:
+-	For TripadvisorSearchLocation we have to consider these required input parameters: {‘query’: {‘type’: ‘string’, ‘description’: ‘Search query for location (e.g., city name)’}}
+-	query (string): The location name to search for.
+-	TripadvisorSearchHotels:
+-	For TripadvisorSearchHotels we have to consider these required input parameters: {‘geoId’: {‘type’: ‘string’, ‘description’: ‘Geo ID of the location retrieved from the Search Location TOOL.’}, ‘checkIn’: {‘type’: ‘string’, ‘description’: ‘Check-in date. Format: YYYY-MM-DD’}, ‘checkOut’: {‘type’: ‘string’, ‘description’: ‘Check-out date. Format: YYYY-MM-DD’}}
+-	geoId (string): The geoId obtained from TripadvisorSearchLocation.
+-	checkIn (string): The check-in date in YYYY-MM-DD format.
+-	checkOut (string): The check-out date in YYYY-MM-DD format.
+-	Source of Inputs:
+-	TripadvisorSearchLocation:
+-	query: LLM_Generated, value "New York City", extracted from the user’s query.
+-	TripadvisorSearchHotels:
+-	geoId: TOOL_Output (sub_task 1, Step 1), output location_geoId from TripadvisorSearchLocation.
+-	checkIn: LLM_Generated, value "2024-10-10", extracted from the user’s query.
+-	checkOut: LLM_Generated, value "2024-10-12", extracted from the user’s query.
+-	execution_blueprint Flow:
+-	Step 1: Use TripadvisorSearchLocation to get the geoId for New York City.
+-	Step 2: Use TripadvisorSearchHotels with the geoId and dates to retrieve hotel options.
+-	Interdependencies:
+-	Step 2 depends on Step 1 for the geoId (location_geoId). Dependency is on the current sub_tasks step output which is valid.
+-	The input variable location_geoId in Step 2 must match the output variable name from Step 1.
+-	Variable Naming:
+-	Input variable name for Step 1: location_query
+-	Output variable name for Step 1: location_geoId.
+-	Input variable name for Step 2: location_geoId (matching the output variable name), check_in_date, check_out_date.
+-	Output variable name for Step 2: hotel_options.
 
 sub_task 2: Weather Forecast for New York City
-
-- Understanding sub_task Details: 
-  -We need to get the weather details in New York City from 10th october 2024 to 12th october 2024.
-
-- TOOL Selection:
-  - To provide the weather forecast for New York City for the specified dates.
-  - Perplexity: To obtain the latitude and longitude of New York City, as using coordinates can provide more accurate results with WeatherAPI.com_Forecast_Weather_API.
-  - WeatherAPI.com_Forecast_Weather_API: To fetch the weather forecast using the coordinates and dates.
-
-- Input Parameters:
-  - Perplexity:
-    - For Perplexity we have to consider these required input parameters: ['query']
-    - query (string): A query to obtain the latitude and longitude of New York City.
-  - WeatherAPI.com_Forecast_Weather_API:
-    - For WeatherAPI.com_Forecast_Weather_API we have to consider these required input parameters:{'q': {'type': 'String', 'description': 'Query parameter based on which data is sent back. It could be one of the following: Latitude and Longitude (Decimal degree) e.g: q=48.8567,2.3508, city name e.g.: q=Paris, US zip e.g: q=10001, UK postcode e.g: q=SW1, Canada postal code e.g: q=G2J, metar:<metar_code> e.g: q=metar:EGLL, iata:<3 digit airport code> e.g: q=iata:DXB, auto:ip for IP lookup, IP address (IPv4 and IPv6 supported) e.g: q=100.0.0.1'}}
-    - q (string): The latitude and longitude in "lat,lon" format.
-    - dt (date): Specific dates for which the forecast is required.
-
-- Source of Inputs:
-  - Perplexity:
-    - query: LLM_Generated, value "What is the latitude and longitude of New York City?", inferred from the user's query.
-  - WeatherAPI.com_Forecast_Weather_API:
-    - q: TOOL_Output (sub_task 2, Step 1), output nyc_coordinates from Perplexity.
-    - dt: LLM_Generated, value ["2024-10-10", "2024-10-11", "2024-10-12"], extracted from the user's query.
-
-- execution_blueprint Flow:
-  - Step 1: Use Perplexity to obtain the latitude and longitude of New York City.
-  - Step 2: Use WeatherAPI.com_Forecast_Weather_API with the coordinates and dates to fetch the weather forecast.
-
-- Interdependencies:
-  - Step 2 depends on Step 1 for the coordinates (nyc_coordinates). Dependency is on the current sub_tasks step output which is valid.
-  - The input variable nyc_coordinates in Step 2 must match the output variable name from Step 1.
-
-- Variable Naming:
-  - Input variable name for Step 1: query_nyc_coordinates
-  - Output variable for Step 1: nyc_coordinates.
-  - Input variable name for Step 2: nyc_coordinates (matching the output variable name), forecast_dates.
-  - Output variable name for Step 2: weather_forecast
+-	Understanding sub_task Details:
+-We need to get the weather details in New York City from 10th october 2024 to 12th october 2024.
+-	TOOL Selection:
+-	To provide the weather forecast for New York City for the specified dates.
+-	perplexity_ask: To obtain the latitude and longitude of New York City, as using coordinates can provide more accurate results with WeatherAPI.com_Forecast_Weather_API.
+-	WeatherAPI.com_Forecast_Weather_API: To fetch the weather forecast using the coordinates and dates.
+-	Input Parameters:
+-	perplexity_ask:
+-	For perplexity_ask we have to consider these required input parameters: [‘messages’]
+-	messages (array of objects with role and content): A query to obtain the latitude and longitude of New York City.
+-	WeatherAPI.com_Forecast_Weather_API:
+-	For WeatherAPI.com_Forecast_Weather_API we have to consider these required input parameters:{‘q’: {‘type’: ‘String’, ‘description’: ‘Query parameter based on which data is sent back. It could be one of the following: Latitude and Longitude (Decimal degree) e.g: q=48.8567,2.3508, city name e.g.: q=Paris, US zip e.g: q=10001, UK postcode e.g: q=SW1, Canada postal code e.g: q=G2J, metar:<metar_code> e.g: q=metar:EGLL, iata:<3 digit airport code> e.g: q=iata:DXB, auto:ip for IP lookup, IP address (IPv4 and IPv6 supported) e.g: q=100.0.0.1’}}
+-	q (string): The latitude and longitude in "lat,lon" format.
+-	dt (date): Specific dates for which the forecast is required.
+-	Source of Inputs:
+-	perplexity_ask:
+-	messages: LLM_Generated, value "What is the latitude and longitude of New York City?", inferred from the user’s query.
+-	WeatherAPI.com_Forecast_Weather_API:
+-	q: TOOL_Output (sub_task 2, Step 1), output nyc_coordinates from perplexity_ask.
+-	dt: LLM_Generated, value ["2024-10-10", "2024-10-11", "2024-10-12"], extracted from the user’s query.
+-	execution_blueprint Flow:
+-	Step 1: Use perplexity_ask to obtain the latitude and longitude of New York City.
+-	Step 2: Use WeatherAPI.com_Forecast_Weather_API with the coordinates and dates to fetch the weather forecast.
+-	Interdependencies:
+-	Step 2 depends on Step 1 for the coordinates (nyc_coordinates). Dependency is on the current sub_tasks step output which is valid.
+-	The input variable nyc_coordinates in Step 2 must match the output variable name from Step 1.
+-	Variable Naming:
+-	Input variable name for Step 1: query_nyc_coordinates
+-	Output variable for Step 1: nyc_coordinates.
+-	Input variable name for Step 2: nyc_coordinates (matching the output variable name), forecast_dates.
+-	Output variable name for Step 2: weather_forecast
 
 Grouping sub_tasks and Interdependencies
-
-- sub_task 1 and sub_task 2 do not have interdependencies between them.
-- Therefore, they should be placed in different groups:
-  - sub_task 1 is in Group 1.
-  - sub_task 2 is in Group 2.
+-	sub_task 1 and sub_task 2 do not have interdependencies between them.
+-	Therefore, they should be placed in different groups:
+-	sub_task 1 is in Group 1.
+-	sub_task 2 is in Group 2.
 
 Dependency Limitation
-
-- Ensured that each TOOL depends on at most one previous TOOL's output.
-- All input variables that depend on previous outputs have matching names to maintain consistency.
-
-- Kept care of referring to tool names correctly keeping in consideration that they are case-sensitive.
+-	Ensured that each TOOL depends on at most one previous TOOL’s output.
+-	All input variables that depend on previous outputs have matching names to maintain consistency.
+-	Kept care of referring to tool names correctly keeping in consideration that they are case-sensitive.
 
 execution_blueprint Efficiency
-
-- Kept the execution_blueprint minimal by:
-  - Using only necessary TOOLs.
-  - Avoided calling the same TOOL for same purpose multiple times by keeping such sub_tasks in the same group and sharing the TOOL output with other sub_tasks.
-  - Avoiding unnecessary steps like additional Perplexity calls.
-  - Extracting dates directly from the user's query without additional processing.
+-	Kept the execution_blueprint minimal by:
+-	Using only necessary TOOLs.
+-	Avoided calling the same TOOL for same purpose multiple times by keeping such sub_tasks in the same group and sharing the TOOL output with other sub_tasks.
+-	Avoiding unnecessary steps like additional perplexity_ask calls.
+-	Extracting dates directly from the user’s query without additional processing.
 
 $$EXECUTION_BLUEPRINT$$
 
@@ -811,44 +703,44 @@ sub_task Description: Retrieve hotel options in New York City for specified date
 execution_blueprint Steps:
 
 Step 1
-- TOOL: TripadvisorSearchLocation
-- Handles: Retrieves geoId for New York City
-- Input Variables:
-  - Name: location_query
-    - Parameter: query
-    - Type: string
-    - Source: LLM_Generated
-    - Description: Search query for New York City
-    - Value: "New York City"
-- Output Variables:
-  - Name: location_geoId
-    - Description: Geo ID for New York City
+	-	TOOL: TripadvisorSearchLocation
+	-	Handles: Retrieves geoId for New York City
+	-	Input Variables:
+    -	Name: location_query
+      -	Parameter: query
+      -	Type: string
+      -	Source: LLM_Generated
+      -	Description: Search query for New York City
+      -	Value: "New York City"
+	-	Output Variables:
+    -	Name: location_geoId
+      -	Description: Geo ID for New York City
 
 Step 2
-- TOOL: TripadvisorSearchHotels
-- Handles: Retrieves hotel options using geoId
-- Input Variables:
-  - Name: location_geoId
-    - Parameter: geoId
-    - Type: string
-    - Source: TOOL_Output (sub_task 1, Step 1)
-    - Description: Geo ID for New York City
-    - Value: None
-  - Name: check_in_date
-    - Parameter: checkIn
-    - Type: string
-    - Source: LLM_Generated
-    - Description: Check-in date
-    - Value: "2024-10-10"
-  - Name: check_out_date
-    - Parameter: checkOut
-    - Type: string
-    - Source: LLM_Generated
-    - Description: Check-out date
-    - Value: "2024-10-12"
-- Output Variables:
-  - Name: hotel_options
-    - Description: List of available hotels in New York City
+	-	TOOL: TripadvisorSearchHotels
+	-	Handles: Retrieves hotel options using geoId
+	-	Input Variables:
+    -	Name: location_geoId
+      -	Parameter: geoId
+      -	Type: string
+      -	Source: TOOL_Output (sub_task 1, Step 1)
+      -	Description: Geo ID for New York City
+      -	Value: None
+    -	Name: check_in_date
+      -	Parameter: checkIn
+      -	Type: string
+      -	Source: LLM_Generated
+      -	Description: Check-in date
+      -	Value: "2024-10-10"
+    -	Name: check_out_date
+      -	Parameter: checkOut
+      -	Type: string
+      -	Source: LLM_Generated
+      -	Description: Check-out date
+      -	Value: "2024-10-12"
+	-	Output Variables:
+    -	Name: hotel_options
+      -	Description: List of available hotels in New York City
 
 Group 2:
 
@@ -858,159 +750,63 @@ sub_task Description: Provide weather forecast for New York City for specified d
 
 execution_blueprint Steps:
 
-Step 1  
-- TOOL: Perplexity  
-- Handles: Fetches latitude and longitude for New York City
-- Input Variables:
-  - Name: query_nyc_coordinates
-    - Parameter: query
-    - Type: string
-    - Source: LLM_Generated 
-    - Description: query to for getting latitude and longitude coordinates for New York City
-    - Value: "What is the latitude and longitude coordinates for New York City"
-- Output Variables:
-  - Name: nyc_coordinates
-    - Description: Longitude and Latitude for New York City
+Step 1
+	-	TOOL: perplexity_ask
+	-	Handles: Fetches latitude and longitude for New York City
+	-	Input Variables:
+    -	Name: query_nyc_coordinates
+      -	Parameter: messages
+      -	Type: array
+      -	Source: LLM_Generated
+      -	Description: Array of user messages to get lat and long for New York City
+      -	Value: [{"role":"user","content":"What is the latitude and longitude coordinates for New York City"}]
+	-	Output Variables:
+    -	Name: nyc_coordinates
+      -	Description: Longitude and Latitude for New York City
 
 Step 2
-- TOOL: WeatherAPI.com_Forecast_Weather_API
-- Handles: Fetches weather forecast for New York City
-- Input Variables:
-  - Name: nyc_coordinates
-    - Parameter: q
-    - Type: string
-    - Source: TOOL_Output (sub_task 2, Step 1)
-    - Description: Longitude and Latitude for New York City
-    - Value: None
-  - Name: forecast_dates
-    - Parameter: dt
-    - Type: date
-    - Source: LLM_Generated
-    - Description: Forecast dates on which we have to check the weather
-    - Value: "[2024-10-10, 2024-10-11, 2024-10-12]"
-- Output Variables:
-  - Name: weather_forecast
-    - Description: Weather forecast for New York City on specified dates
+	-	TOOL: WeatherAPI.com_Forecast_Weather_API
+	-	Handles: Fetches weather forecast for New York City
+	-	Input Variables:
+    -	Name: nyc_coordinates
+      -	Parameter: q
+      -	Type: string
+      -	Source: TOOL_Output (sub_task 2, Step 1)
+      -	Description: Longitude and Latitude for New York City
+      -	Value: None
+    -	Name: forecast_dates
+      -	Parameter: dt
+      -	Type: date
+      -	Source: LLM_Generated
+      -	Description: Forecast dates on which we have to check the weather
+      -	Value: "[2024-10-10, 2024-10-11, 2024-10-12]"
+	-	Output Variables:
+    -	Name: weather_forecast
+      -	Description: Weather forecast for New York City on specified dates
 
 
-#### Example 3:
-
-Query: "What is the news in Netherlands?"
-
-TaskDecomposer's sub_task Requests:
-1. sub_task 1: Hotel Options in New York City
-List of Relevant TOOLs:
-   - TripadvisorSearchLocation
-   - TripadvisorSearchHotels
-   - Perplexity
-
-2. sub_task 2: Weather Forecast for New York City
-List of Relevant TOOLs:
-   - WeatherAPI.com_Forecast_Weather_API
-   - Perplexity
-
-Description of TOOLs:
-
-[Will be given to you]
-
-Your Output:
-
-$$CHAIN_OF_THOUGHT$$
-
-sub_task 1: News in the Netherlands
-
-- TOOL Selection:
-  - The user's query is "What is the news in Netherlands?"
-  - We can directly use the NewsAPISearchByKeyWord TOOL to fetch news articles related to the Netherlands.
-  - Perplexity is not necessary here since we can use the country name directly as the search query.
-  - We should avoid using the region parameter in the NewsAPI if we are unsure about the exact region code or if it might limit the results in unintended ways.
-
-- Input Parameters:
-  - NewsAPISearchByKeyWord:
-    - For NewsAPISearchByKeyWord there are no required input parameters. But for our purpose we will give the following parameters.
-      - query (string): The keyword or phrase to search for in news articles.
-      - language (string): The language of the news articles. This is optional but can be set to "en" for English.
-      - region (string): The region or country code. Since we are not sure about the correct region code for the Netherlands in the TOOL, it's best to omit this parameter to ensure we don't miss relevant articles.
-
-- Source of Inputs:
-  - query: LLM_Generated, value "Netherlands", directly extracted from the user's query.
-  - language: LLM_Generated, value "en", assuming the user wants news articles in English.
-  - We will not use the region parameter to avoid potential issues with incorrect or restrictive region codes.
-
-- execution_blueprint Flow:
-  - Step 1: Use NewsAPISearchByKeyWord to fetch recent news articles about the Netherlands using the keyword and language parameters.
-
-- Interdependencies:
-  - As this is a single-step execution_blueprint, there are no interdependencies with other steps or sub_tasks.
-
-- Variable Naming:
-  - Input Variables:
-    - news_query (for the query parameter)
-    - news_language (for the language parameter)
-  - Output Variables:
-    - news_articles
-
-- Grouping sub_tasks and Interdependencies:
-  - Since there's only one sub_task, it will be placed in Group 1.
-  - There are no dependencies on other sub_tasks.
-
-- Dependency Limitation:
-  - The TOOL call does not depend on any previous TOOL outputs.
-
-- Kept care of referring to tool names correctly keeping in consideration that they are case-sensitive.
-
-- execution_blueprint Efficiency:
-  - The execution_blueprint is minimal and straightforward, using only one TOOL call.
-  - By avoiding unnecessary parameters like region, we reduce the risk of errors and ensure we retrieve the most comprehensive set of news articles.
-
-
-$$EXECUTION_BLUEPRINT$$
-
-- TOOL: NewsAPISearchByKeyWord
-- Handles: Fetches news articles for Netherlands
-- Input Variables:
-  - Name: vacation_spots_list
-    - Parameter: query
-    - Type: string
-    - Source: LLM_Generated
-    - Description: query should be Netherlands
-    - Value: "Netherlands"
-  - Name: language
-    - Parameter: language
-    - Type: string
-    - Source: LLM_Generated
-    - Description: Language for news articles
-    - Value: en
-- Output Variables:
-  - Name: news_articles
-    - Description: News articles for Netherlands
-
-
-#### Example 4:
+#### Example:
 
 Query: "Identify upcoming music festivals worldwide over the next three months (currently it is October 2024) and their exact dates, find affordable flights to these destinations from New York, and check recent Reddit threads for attendee experiences or tips."
 
-TaskDecomposer's sub_task Requests:
-1. sub_task 1: Upcoming Music Festivals Worldwide
+TaskDecomposer’s sub_task Requests:
+	1.	sub_task 1: Upcoming Music Festivals Worldwide
 Details: Display a list of upcoming music festivals worldwide over the next three months, including their exact dates and locations. The sub_task should provide a brief description of each festival and any notable artists or events associated with them.
 List of Relevant TOOLs:
-   - Perplexity
-
-2. sub_task 2: Affordable Flights to Music Festival Destinations
+	-	perplexity_research
+	2.	sub_task 2: Affordable Flights to Music Festival Destinations
 Details: Find and display affordable flights from New York to the destinations of the identified music festivals. Include details such as airlines, prices, and travel dates. Ensure the flights align with the festival dates.
 List of Relevant TOOLs:
-   - SkyScrapperFlightSearch
-   - SkyScrapperSearchAirport
-   - Perplexity
-
-3. sub_task 3: Reddit Threads on Music Festival Experiences
+	-	SkyScrapperFlightSearch
+	-	SkyScrapperSearchAirport
+	-	perplexity_research
+	3.	sub_task 3: Reddit Threads on Music Festival Experiences
 Details: Retrieve and display recent Reddit threads discussing attendee experiences or tips for the identified music festivals. Include the top posts with user comments and ratings.
 List of Relevant TOOLs:
-   - RedditTopPostsBySubreddit
-   - Perplexity
+	-	RedditTopPostsBySubreddit
+	-	perplexity_research
 
 Description of TOOLs:
-
 [Will be given to you]
 
 Your Output:
@@ -1018,179 +814,151 @@ Your Output:
 $$CHAIN_OF_THOUGHT$$
 
 sub_task 1: Upcoming Music Festivals Worldwide
-
-- Understanding sub_task Details:
-  - The sub_task aims to display a list of upcoming music festivals worldwide over the next three months (October 2024 to December 2024), including their exact dates, locations, descriptions, and notable artists.
-
-- TOOL Selection:
-  - Perplexity: To retrieve and synthesize up-to-date information on upcoming music festivals worldwide, including all required details.
-
-- Input Parameters:
-  - Perplexity requires the parameter query (string): The user's question or search term.
-
-- Source of Inputs:
-  - query_music_festivals: LLM_Generated, value: "List upcoming music festivals worldwide from October 2024 to December 2024 with exact dates, locations, descriptions, and notable artists."
-
-- execution_blueprint Flow:
-  - Step 1: Use Perplexity to obtain information on upcoming music festivals over the next three months.
-
-- Interdependencies:
-  - Since this is the first sub_task and a single-step execution_blueprint, there are no interdependencies with other sub_tasks or steps.
-
-- Variable Naming:
-  - Input Variable:
-    - query_music_festivals (for parameter query)
-  - Output Variable:
-    - music_festivals_list
-
-- Validation:
-  - Perplexity requires only the query parameter.
-  - Variable names are unique and match those in the updated execution_blueprint.
-  - The execution_blueprint is minimal and efficient.
+	-	Understanding sub_task Details:
+	-	The sub_task aims to display a list of upcoming music festivals worldwide over the next three months (October 2024 to December 2024), including their exact dates, locations, descriptions, and notable artists.
+	-	TOOL Selection:
+	-	perplexity_research: To retrieve and synthesize up-to-date information on upcoming music festivals worldwide, including all required details.
+	-	Input Parameters:
+	-	perplexity_research requires the parameter messages (array of objects with role and content).
+	-	We will pass a single user message with the content "List upcoming music festivals worldwide from October 2024 to December 2024 with exact dates, locations, descriptions, and notable artists."
+	-	Source of Inputs:
+	-	query_music_festivals: LLM_Generated, value: "List upcoming music festivals worldwide from October 2024 to December 2024 with exact dates, locations, descriptions, and notable artists."
+	-	execution_blueprint Flow:
+	-	Step 1: Use perplexity_research to obtain information on upcoming music festivals over the next three months.
+	-	Interdependencies:
+	-	Since this is the first sub_task and a single-step execution_blueprint, there are no interdependencies with other sub_tasks or steps.
+	-	Variable Naming:
+	-	Input Variable:
+	-	query_music_festivals (for parameter messages)
+	-	Output Variable:
+	-	music_festivals_list
+	-	Validation:
+	-	perplexity_research requires only the messages parameter.
+	-	Variable names are unique and match those in the updated execution_blueprint.
+	-	The execution_blueprint is minimal and efficient.
 
 sub_task 2: Affordable Flights to Music Festival Destinations
-
-- Understanding sub_task Details:
-  - The sub_task aims to find and display affordable flights from New York to the destinations of the identified music festivals.
-  - Include details such as airlines, prices, and travel dates, ensuring the flights align with the festival dates.
-
-- TOOL Selection:
-  - Perplexity: To extract festival locations and dates from the music_festivals_list obtained in sub_task 1.
-  - SkyScrapperSearchAirport: To find airport details (skyIds and entityIds) for New York and festival destinations.
-  - SkyScrapperFlightSearch: To search for flights using the airport details and dates.
-
-- Input Parameters:
-  - Perplexity (Step 1):
-    - Requires parameter query (string): We'll input music_festivals_list to extract locations and dates.
-  - SkyScrapperSearchAirport (Step 2 and Step 3):
-    - Requires parameter query (string): Name of the location where the airport is situated.
-  - SkyScrapperFlightSearch (Step 4):
-    - Requires parameters:
-      - originSkyId (string)
-      - destinationSkyId (string)
-      - originEntityId (string)
-      - destinationEntityId (string)
-      - date (string): Departure or travel date in YYYY-MM-DD format.
-
-- Source of Inputs:
-  - Step 1:
-    - music_festivals_list: TOOL_Output (sub_task 1, Step 1)
-  - Step 2:
-    - origin_location_query: LLM_Generated, value: "New York"
-  - Step 3:
-    - festival_locations_dates: TOOL_Output (sub_task 2, Step 1)
-  - Step 4:
-    - nyc_airport_details: TOOL_Output (sub_task 2, Step 2)
-    - festival_airport_details: TOOL_Output (sub_task 2, Step 3)
-    - festival_locations_dates: TOOL_Output (sub_task 2, Step 1)
-
-- execution_blueprint Flow:
-  - Step 1: Use Perplexity to extract festival locations and dates from music_festivals_list.
-  - Step 2: Use SkyScrapperSearchAirport to get airport details for New York.
-  - Step 3: Use SkyScrapperSearchAirport to get airport details for each festival destination.
-  - Step 4: Use SkyScrapperFlightSearch to find affordable flights using the airport details and festival dates.
-
-- Interdependencies:
-  - Step 2 depends on LLM_Generated input.
-  - Step 3 depends on Step 1 (festival_locations_dates).
-  - Step 4 depends on Step 2 (nyc_airport_details), Step 3 (festival_airport_details), and Step 1 (festival_locations_dates).
-  - Each TOOL depends on at most one previous TOOL's output per input variable.
-  - Input variable names that depend on previous outputs match the output variable names to ensure consistency.
-
-- Variable Naming:
-  - Input Variables:
-    - Step 1:
-      - music_festivals_list (from sub_task 1, Step 1)
-    - Step 2:
-      - origin_location_query (LLM_Generated)
-    - Step 3:
-      - festival_locations_dates (from sub_task 2, Step 1)
-    - Step 4:
-      - nyc_airport_details (from sub_task 2, Step 2)
-      - festival_airport_details (from sub_task 2, Step 3)
-      - festival_locations_dates (from sub_task 2, Step 1)
-  - Output Variable:
-    - festival_locations_dates
-    - flight_options
-
-- Validation:
-  - Each TOOL depends on at most one previous TOOL's output per input variable.
-  - Variable names are unique and match those in the updated execution_blueprint.
-  - The execution_blueprint complies with dependency limitations.
+	-	Understanding sub_task Details:
+	-	The sub_task aims to find and display affordable flights from New York to the destinations of the identified music festivals.
+	-	Include details such as airlines, prices, and travel dates, ensuring the flights align with the festival dates.
+	-	TOOL Selection:
+	-	perplexity_research: To extract festival locations and dates from the music_festivals_list obtained in sub_task 1.
+	-	SkyScrapperSearchAirport: To find airport details (skyIds and entityIds) for New York and festival destinations.
+	-	SkyScrapperFlightSearch: To search for flights using the airport details and dates.
+	-	Input Parameters:
+	-	perplexity_research (Step 1):
+	-	Requires parameter messages (array of objects with role and content): We’ll pass music_festivals_list to extract locations and dates.
+	-	SkyScrapperSearchAirport (Step 2 and Step 3):
+	-	Requires parameter query (string): Name of the location where the airport is situated.
+	-	SkyScrapperFlightSearch (Step 4):
+	-	Requires parameters:
+	-	originSkyId (string)
+	-	destinationSkyId (string)
+	-	originEntityId (string)
+	-	destinationEntityId (string)
+	-	date (string): Departure or travel date in YYYY-MM-DD format.
+	-	Source of Inputs:
+	-	Step 1:
+	-	music_festivals_list: TOOL_Output (sub_task 1, Step 1)
+	-	Step 2:
+	-	origin_location_query: LLM_Generated, value: "New York"
+	-	Step 3:
+	-	festival_locations_dates: TOOL_Output (sub_task 2, Step 1)
+	-	Step 4:
+	-	nyc_airport_details: TOOL_Output (sub_task 2, Step 2)
+	-	festival_airport_details: TOOL_Output (sub_task 2, Step 3)
+	-	festival_locations_dates: TOOL_Output (sub_task 2, Step 1)
+	-	execution_blueprint Flow:
+	-	Step 1: Use perplexity_research to extract festival locations and dates from music_festivals_list.
+	-	Step 2: Use SkyScrapperSearchAirport to get airport details for New York.
+	-	Step 3: Use SkyScrapperSearchAirport to get airport details for each festival destination.
+	-	Step 4: Use SkyScrapperFlightSearch to find affordable flights using the airport details and festival dates.
+	-	Interdependencies:
+	-	Step 2 depends on LLM_Generated input.
+	-	Step 3 depends on Step 1 (festival_locations_dates).
+	-	Step 4 depends on Step 2 (nyc_airport_details), Step 3 (festival_airport_details), and Step 1 (festival_locations_dates).
+	-	Each TOOL depends on at most one previous TOOL’s output per input variable.
+	-	Input variable names that depend on previous outputs match the output variable names to ensure consistency.
+	-	Variable Naming:
+	-	Input Variables:
+	-	Step 1:
+	-	music_festivals_list (from sub_task 1, Step 1)
+	-	Step 2:
+	-	origin_location_query (LLM_Generated)
+	-	Step 3:
+	-	festival_locations_dates (from sub_task 2, Step 1)
+	-	Step 4:
+	-	nyc_airport_details (from sub_task 2, Step 2)
+	-	festival_airport_details (from sub_task 2, Step 3)
+	-	festival_locations_dates (from sub_task 2, Step 1)
+	-	Output Variable:
+	-	festival_locations_dates
+	-	flight_options
+	-	Validation:
+	-	Each TOOL depends on at most one previous TOOL’s output per input variable.
+	-	Variable names are unique and match those in the updated execution_blueprint.
+	-	The execution_blueprint complies with dependency limitations.
 
 sub_task 3: Reddit Threads on Music Festival Experiences
+	-	Understanding sub_task Details:
+	-	Retrieve and display recent Reddit threads discussing attendee experiences or tips for the identified music festivals.
+	-	Include top posts with user comments and ratings.
+	-	TOOL Selection:
+	-	perplexity_research: To identify relevant subreddits or search terms for each music festival.
+	-	RedditTopPostsBySubreddit: To fetch top Reddit posts from relevant subreddits.
+	-	Input Parameters:
+	-	perplexity_research (Step 1):
+	-	Requires parameter messages (array of objects with role and content): We’ll pass music_festivals_list to find relevant subreddits.
+	-	RedditTopPostsBySubreddit (Step 2):
+	-	Requires parameters:
+	-	subreddit (string): The subreddit name.
+	-	time (string): The time period for which to fetch top posts.
+	-	Source of Inputs:
+	-	Step 1:
+	-	festival_locations_dates: TOOL_Output (sub_task 1, Step 1)
+	-	Step 2:
+	-	festival_subreddits: TOOL_Output (sub_task 3, Step 1)
+	-	time_period: LLM_Generated, value: "month"
+	-	execution_blueprint Flow:
+	-	Step 1: Use perplexity_research to identify relevant subreddits or search terms for each music festival.
+	-	Step 2: Use RedditTopPostsBySubreddit to retrieve top posts from the identified subreddits.
+	-	Interdependencies:
+	-	Step 1 depends on sub_task 1, Step 1 (music_festivals_list).
+	-	Step 2 depends on Step 1 (festival_subreddits).
+	-	Input variable names that depend on previous outputs match the output variable names to ensure consistency.
+	-	Variable Naming:
+	-	Input Variables:
+	-	Step 1:
+	-	music_festivals_list (from sub_task 1, Step 1)
+	-	Step 2:
+	-	festival_subreddits (from sub_task 3, Step 1)
+	-	time_period (LLM_Generated)
+	-	Output Variable:
+	-	festival_subreddits
+	-	reddit_posts
+	-	Validation:
+	-	Each TOOL depends on at most one previous TOOL’s output per input variable.
+	-	Variable names are unique and match those in the updated execution_blueprint.
+	-	The execution_blueprint is minimal and efficient.
 
-- Understanding sub_task Details:
-  - Retrieve and display recent Reddit threads discussing attendee experiences or tips for the identified music festivals.
-  - Include top posts with user comments and ratings.
-
-- TOOL Selection:
-  - Perplexity: To identify relevant subreddits or search terms for each music festival.
-  - RedditTopPostsBySubreddit: To fetch top Reddit posts from relevant subreddits.
-
-- Input Parameters:
-  - Perplexity (Step 1):
-    - Requires parameter query (string): We'll input music_festivals_list to find relevant subreddits.
-  - RedditTopPostsBySubreddit (Step 2):
-    - Requires parameters:
-      - subreddit (string): The subreddit name.
-      - time (string): The time period for which to fetch top posts.
-
-- Source of Inputs:
-  - Step 1:
-    - festival_locations_dates: TOOL_Output (sub_task 1, Step 1)
-  - Step 2:
-    - festival_subreddits: TOOL_Output (sub_task 3, Step 1)
-    - time_period: LLM_Generated, value: "month"
-
-- execution_blueprint Flow:
-  - Step 1: Use Perplexity to identify relevant subreddits or search terms for each music festival.
-  - Step 2: Use RedditTopPostsBySubreddit to retrieve top posts from the identified subreddits.
-
-- Interdependencies:
-  - Step 1 depends on sub_task 1, Step 1 (music_festivals_list).
-  - Step 2 depends on Step 1 (festival_subreddits).
-  - Input variable names that depend on previous outputs match the output variable names to ensure consistency.
-
-- Variable Naming:
-  - Input Variables:
-    - Step 1:
-      - music_festivals_list (from sub_task 1, Step 1)
-    - Step 2:
-      - festival_subreddits (from sub_task 3, Step 1)
-      - time_period (LLM_Generated)
-  - Output Variable:
-    - festival_subreddits
-    - reddit_posts
-
-- Validation:
-  - Each TOOL depends on at most one previous TOOL's output per input variable.
-  - Variable names are unique and match those in the updated execution_blueprint.
-  - The execution_blueprint is minimal and efficient.
-
----
 
 Grouping sub_tasks and Interdependencies
-
-- sub_tasks 1, 2, and 3 are interdependent:
-  - sub_task 2 depends on sub_task 1 for music_festivals_list.
-  - sub_task 3 depends on sub_task 1 for music_festivals_list.
-- Therefore, all sub_tasks are placed in Group 1.
+	-	sub_tasks 1, 2, and 3 are interdependent:
+	-	sub_task 2 depends on sub_task 1 for music_festivals_list.
+	-	sub_task 3 depends on sub_task 1 for music_festivals_list.
+	-	Therefore, all sub_tasks are placed in Group 1.
 
 Dependency Limitation and execution_blueprint Adjustments
-
-- Ensured that each TOOL input depends on at most one previous TOOL's output.
-- Adjusted variable names to match the output variable names in the updated execution_blueprint provided.
-- Avoided multiple dependencies for any single TOOL input.
-
-- Kept care of referring to tool names correctly keeping in consideration that they are case-sensitive.
+	-	Ensured that each TOOL input depends on at most one previous TOOL’s output.
+	-	Adjusted variable names to match the output variable names in the updated execution_blueprint provided.
+	-	Avoided multiple dependencies for any single TOOL input.
+	-	Kept care of referring to tool names correctly keeping in consideration that they are case-sensitive.
 
 execution_blueprint Efficiency
-
-- Kept the execution_blueprint minimal by:
-  - Using only necessary TOOLs.
-  - Ensuring data flows efficiently between steps.
-  - Matching variable names to maintain consistency and avoid errors.
+	-	Kept the execution_blueprint minimal by:
+	-	Using only necessary TOOLs.
+	-	Ensuring data flows efficiently between steps.
+	-	Matching variable names to maintain consistency and avoid errors.
 
 $$EXECUTION_BLUEPRINT$$
 
@@ -1203,19 +971,18 @@ sub_task Description: Identify upcoming music festivals worldwide over the next 
 execution_blueprint Steps:
 
 Step 1
-
-- TOOL: Perplexity
-- Handles: Retrieves upcoming music festivals with exact dates, locations, descriptions, and notable artists.
-- Input Variables:
-  - Name: query_music_festivals
-    - Parameter: query
-    - Type: string
-    - Source: LLM_Generated
-    - Description: Query to find upcoming music festivals worldwide from October 2024 to December 2024.
-    - Value: "List upcoming music festivals worldwide from October 2024 to December 2024 with exact dates, locations, descriptions, and notable artists."
-- Output Variables:
-  - Name: music_festivals_list
-    - Description: List of upcoming music festivals with dates, locations, descriptions, and notable artists.
+	-	TOOL: perplexity_research
+	-	Handles: Retrieves upcoming music festivals with exact dates, locations, descriptions, and notable artists.
+	-	Input Variables:
+    -	Name: query_music_festivals
+      -	Parameter: messages
+      -	Type: array
+      -	Source: LLM_Generated
+      -	Description: Array with single user message for listing upcoming music festivals
+      -	Value: [{"role":"user","content":"List upcoming music festivals worldwide from October 2024 to December 2024 with exact dates, locations, descriptions, and notable artists."}]
+	-	Output Variables:
+    -	Name: music_festivals_list
+      -	Description: List of upcoming music festivals with dates, locations, descriptions, and notable artists.
 
 execution_blueprint for sub_task 2:
 
@@ -1224,76 +991,72 @@ sub_task Description: Find affordable flights from New York to music festival de
 execution_blueprint Steps:
 
 Step 1
-
-- TOOL: Perplexity
-- Handles: Extracts festival locations and dates from music_festivals_list.
-- Input Variables:
-  - Name: music_festivals_list
-    - Parameter: query
-    - Type: string
-    - Source: TOOL_Output (sub_task 1, Step 1)
-    - Description: List of music festivals to extract locations and dates.
-    - Value: None
-- Output Variables:
-  - Name: festival_locations_dates
-    - Description: Extracted locations and dates of the festivals.
+	-	TOOL: perplexity_research
+	-	Handles: Extracts festival locations and dates from music_festivals_list.
+	-	Input Variables:
+    -	Name: music_festivals_list
+      -	Parameter: messages
+      -	Type: array
+      -	Source: TOOL_Output (sub_task 1, Step 1)
+      -	Description: Array of user messages containing festival list
+      -	Value: None
+	-	Output Variables:
+    -	Name: festival_locations_dates
+      -	Description: Extracted locations and dates of the festivals.
 
 Step 2
-
-- TOOL: SkyScrapperSearchAirport
-- Handles: Retrieves airport details for New York.
-- Input Variables:
-  - Name: origin_location_query
-    - Parameter: query
-    - Type: string
-    - Source: LLM_Generated
-    - Description: Location name for airport search.
-    - Value: "New York"
-- Output Variables:
-  - Name: nyc_airport_details
-    - Description: Airport details for New York (originSkyId, originEntityId).
+	-	TOOL: SkyScrapperSearchAirport
+	-	Handles: Retrieves airport details for New York.
+	-	Input Variables:
+    -	Name: origin_location_query
+      -	Parameter: query
+      -	Type: string
+      -	Source: LLM_Generated
+      -	Description: Location name for airport search
+      -	Value: "New York"
+	-	Output Variables:
+    -	Name: nyc_airport_details
+      -	Description: Airport details for New York (originSkyId, originEntityId).
 
 Step 3
-
-- TOOL: SkyScrapperSearchAirport
-- Handles: Retrieves airport details for festival destinations.
-- Input Variables:
-  - Name: festival_locations_dates
-    - Parameter: query
-    - Type: string
-    - Source: TOOL_Output (sub_task 2, Step 1)
-    - Description: Festival locations for airport search.
-    - Value: None
-- Output Variables:
-  - Name: festival_airport_details
-    - Description: Airport details for festival destinations (destinationSkyId, destinationEntityId).
+	-	TOOL: SkyScrapperSearchAirport
+	-	Handles: Retrieves airport details for festival destinations.
+	-	Input Variables:
+    -	Name: festival_locations_dates
+      -	Parameter: query
+      -	Type: string
+      -	Source: TOOL_Output (sub_task 2, Step 1)
+      -	Description: Festival locations for airport search
+      -	Value: None
+	-	Output Variables:
+    -	Name: festival_airport_details
+      -	Description: Airport details for festival destinations (destinationSkyId, destinationEntityId).
 
 Step 4
-
-- TOOL: SkyScrapperFlightSearch
-- Handles: Finds affordable flights using airport details and festival dates.
-- Input Variables:
-  - Name: nyc_airport_details
-    - Parameter: originSkyId, originEntityId
-    - Type: string
-    - Source: TOOL_Output (sub_task 2, Step 2)
-    - Description: Airport details of New York for flight search.
-    - Value: None
-  - Name: festival_airport_details
-    - Parameter: destinationSkyId, destinationEntityId
-    - Type: string
-    - Source: TOOL_Output (sub_task 2, Step 3)
-    - Description: Airport details of festival destinations for flight search.
-    - Value: None
-  - Name: festival_locations_dates
-    - Parameter: date
-    - Type: string
-    - Source: TOOL_Output (sub_task 2, Step 1)
-    - Description: Dates of the music festivals.
-    - Value: None
-- Output Variables:
-  - Name: flight_options
-    - Description: Affordable flight options to festival destinations.
+	-	TOOL: SkyScrapperFlightSearch
+	-	Handles: Finds affordable flights using airport details and festival dates.
+	-	Input Variables:
+    -	Name: nyc_airport_details
+      -	Parameter: originSkyId, originEntityId
+      -	Type: string
+      -	Source: TOOL_Output (sub_task 2, Step 2)
+      -	Description: Airport details of New York for flight search
+      -	Value: None
+    -	Name: festival_airport_details
+      -	Parameter: destinationSkyId, destinationEntityId
+      -	Type: string
+      -	Source: TOOL_Output (sub_task 2, Step 3)
+      -	Description: Airport details of festival destinations for flight search
+      -	Value: None
+    -	Name: festival_locations_dates
+      -	Parameter: date
+      -	Type: string
+      -	Source: TOOL_Output (sub_task 2, Step 1)
+      -	Description: Dates of the music festivals
+      -	Value: None
+	-	Output Variables:
+    -	Name: flight_options
+      -	Description: Affordable flight options to festival destinations.
 
 execution_blueprint for sub_task 3:
 
@@ -1302,188 +1065,161 @@ sub_task Description: Retrieve Reddit threads on music festival experiences.
 execution_blueprint Steps:
 
 Step 1
-
-- TOOL: Perplexity
-- Handles: Identifies relevant subreddits or search terms for each festival.
-- Input Variables:
-  - Name: music_festivals_list
-    - Parameter: query
-    - Type: string
-    - Source: TOOL_Output (sub_task 1, Step 1)
-    - Description: Names of music festivals to find relevant subreddits.
-    - Value: None
-- Output Variables:
-  - Name: festival_subreddits
-    - Description: Relevant subreddits or search terms for each festival.
+	-	TOOL: perplexity_research
+	-	Handles: Identifies relevant subreddits or search terms for each festival.
+	-	Input Variables:
+    -	Name: music_festivals_list
+      -	Parameter: messages
+      -	Type: array
+      -	Source: TOOL_Output (sub_task 1, Step 1)
+      -	Description: Array of user messages containing festival list
+      -	Value: None
+	-	Output Variables:
+    -	Name: festival_subreddits
+      -	Description: Relevant subreddits or search terms for each festival.
 
 Step 2
+	-	TOOL: RedditTopPostsBySubreddit
+	-	Handles: Fetches top posts from relevant subreddits.
+	-	Input Variables:
+    -	Name: festival_subreddits
+      -	Parameter: subreddit
+      -	Type: string
+      -	Source: TOOL_Output (sub_task 3, Step 1)
+      -	Description: Subreddits identified by perplexity_research
+      -	Value: None
+    -	Name: time_period
+      -	Parameter: time
+      -	Type: string
+      -	Source: LLM_Generated
+      -	Description: Time period for top posts
+      -	Value: "month"
+	-	Output Variables:
+    -	Name: reddit_posts
+      -	Description: Top Reddit posts for each festival.
 
-- TOOL: RedditTopPostsBySubreddit
-- Handles: Fetches top posts from relevant subreddits.
-- Input Variables:
-  - Name: festival_subreddits
-    - Parameter: subreddit
-    - Type: string
-    - Source: TOOL_Output (sub_task 3, Step 1)
-    - Description: Subreddits identified by Perplexity.
-    - Value: None
-  - Name: time_period
-    - Parameter: time
-    - Type: string
-    - Source: LLM_Generated
-    - Description: Time period for top posts.
-    - Value: "month"
-- Output Variables:
-  - Name: reddit_posts
-    - Description: Top Reddit posts for each festival.
-
-#### Example 5:
+#### Example:
 
 Query: "what are some 3 popular sci-fi books also provide their rating on Goodreads ratings, and find news articles about any that have been or will be adapted into movies or TV series."
 
-TaskDecomposer's sub_task Requests:
-1. sub_task 1: Popular Sci-Fi Books with Goodreads Ratings
+TaskDecomposer’s sub_task Requests:
+	1.	sub_task 1: Popular Sci-Fi Books with Goodreads Ratings
 Details: Display a list of popular science fiction books along with their ratings from Goodreads. Include details such as the book title, author, and average rating.
 List of Relevant TOOLs:
-   - Goodreads_Search_Book_By_Keyword
-   - Perplexity
-
-2. sub_task 2: News Articles on Sci-Fi Book Adaptations
+	-	Goodreads_Search_Book_By_Keyword
+	-	perplexity_ask
+	2.	sub_task 2: News Articles on Sci-Fi Book Adaptations
 Details: Find and display news articles about science fiction books that have been or will be adapted into movies or TV series. Include article titles, publication dates, and a brief summary.
 List of Relevant TOOLs:
-   - NewsAPISearchByKeyWord
-   - Perplexity
+	-	NewsAPISearchByKeyWord
+	-	perplexity_ask
 
 Description of TOOLs:
-
 [Will be given to you]
 
 Your Output:
 
 $$CHAIN_OF_THOUGHT$$
 
-$$CHAIN_OF_THOUGHT$$
-
 sub_task 1: Popular Sci-Fi Books with Goodreads Ratings
-
-- Understanding sub_task Details:
-  - The sub_task aims to display a list of 3 popular science fiction books along with their ratings from Goodreads.
-  - Details to include: book title, author, average rating.
-
-- TOOL Selection:
-  - Perplexity: To retrieve a list of 3 popular sci-fi books.
-    - Reasoning: The Goodreads_Search_Book_By_Keyword TOOL requires specific keywords or book titles to search effectively.
-    - We cannot use general terms like "popular sci-fi books" as the keyword parameter in the Goodreads TOOL; it won't yield meaningful results.
-    - Therefore, we first need to obtain specific book titles using Perplexity.
-  - Goodreads_Search_Book_By_Keyword: To get the Goodreads ratings and details for the specific books obtained from Perplexity.
-
-- Input Parameters:
-  - Perplexity:
-    - Requires parameter query (string): A query to find 3 popular sci-fi books.
-  - Goodreads_Search_Book_By_Keyword:
-    - keyword (string): The specific book titles obtained from Perplexity.
-
-- Source of Inputs:
-  - Perplexity:
-    - query: LLM_Generated, value: "List 3 popular science fiction books."
-  - Goodreads_Search_Book_By_Keyword:
-    - For Goodreads_Search_Book_By_Keyword we have to consider these required input parameters: {'keyword': {'type': 'String', 'description': 'Search term or keyword to look up books.'}}
-    - keyword: TOOL_Output (sub_task 1, Step 1), output sci_fi_books_list from Perplexity.
-
-- execution_blueprint Flow:
-  - Step 1: Use Perplexity to obtain a list of 3 popular sci-fi books.
-  - Step 2: Use Goodreads_Search_Book_By_Keyword to retrieve ratings and details for each book obtained in Step 1.
-
-- Interdependencies:
-  - Step 2 depends on Step 1 for the sci_fi_books_list.
-  - The input variable sci_fi_books_list in Step 2 must match the output variable name from Step 1.
-
-- Variable Naming:
-  - Input Variable for Step 1:
-    - Name: query_sci_fi_books (for parameter query)
-  - Output Variable for Step 1:
-    - Name: sci_fi_books_list
-  - Input Variable for Step 2:
-    - Name: sci_fi_books_list (matching the output from Step 1)
-  - Output Variable for Step 2:
-    - Name: goodreads_ratings
-
-- Validation:
-  - The Goodreads_Search_Book_By_Keyword TOOL requires specific book titles or keywords.
-  - Using general terms like "popular sci-fi books" as the keyword may not return accurate results from goodreads TOOL directly.
-  - Therefore, obtaining specific book titles from Perplexity is necessary for effective use of the Goodreads TOOL.
+	-	Understanding sub_task Details:
+	-	The sub_task aims to display a list of 3 popular science fiction books along with their ratings from Goodreads.
+	-	Details to include: book title, author, average rating.
+	-	TOOL Selection:
+	-	perplexity_ask: To retrieve a list of 3 popular sci-fi books.
+	-	Reasoning: The Goodreads_Search_Book_By_Keyword TOOL requires specific keywords or book titles to search effectively.
+	-	We cannot use general terms like "popular sci-fi books" as the keyword parameter in the Goodreads TOOL; it won’t yield meaningful results.
+	-	Therefore, we first need to obtain specific book titles using perplexity_ask.
+	-	Goodreads_Search_Book_By_Keyword: To get the Goodreads ratings and details for the specific books obtained from perplexity_ask.
+	-	Input Parameters:
+	-	perplexity_ask:
+	-	Requires parameter messages (array of objects with role and content): A query to find 3 popular sci-fi books.
+	-	Goodreads_Search_Book_By_Keyword:
+	-	keyword (string): The specific book titles obtained from perplexity_ask.
+	-	Source of Inputs:
+	-	perplexity_ask:
+	-	messages: LLM_Generated, value: "List 3 popular science fiction books."
+	-	Goodreads_Search_Book_By_Keyword:
+	-	For Goodreads_Search_Book_By_Keyword we have to consider these required input parameters: {‘keyword’: {‘type’: ‘String’, ‘description’: ‘Search term or keyword to look up books.’}}
+	-	keyword: TOOL_Output (sub_task 1, Step 1), output sci_fi_books_list from perplexity_ask.
+	-	execution_blueprint Flow:
+	-	Step 1: Use perplexity_ask to obtain a list of 3 popular sci-fi books.
+	-	Step 2: Use Goodreads_Search_Book_By_Keyword to retrieve ratings and details for each book obtained in Step 1.
+	-	Interdependencies:
+	-	Step 2 depends on Step 1 for the sci_fi_books_list.
+	-	The input variable sci_fi_books_list in Step 2 must match the output variable name from Step 1.
+	-	Variable Naming:
+	-	Input Variable for Step 1:
+	-	Name: query_sci_fi_books (for parameter messages)
+	-	Output Variable for Step 1:
+	-	Name: sci_fi_books_list
+	-	Input Variable for Step 2:
+	-	Name: sci_fi_books_list (matching the output from Step 1)
+	-	Output Variable for Step 2:
+	-	Name: goodreads_ratings
+	-	Validation:
+	-	The Goodreads_Search_Book_By_Keyword TOOL requires specific book titles or keywords.
+	-	Using general terms like "popular sci-fi books" as the keyword may not return accurate results from the goodreads TOOL directly.
+	-	Therefore, obtaining specific book titles from perplexity_ask is necessary for effective use of the Goodreads TOOL.
 
 sub_task 2: News Articles on Sci-Fi Book Adaptations
-
-- Understanding sub_task Details:
-  - The sub_task aims to find and display news articles about sci-fi books that have been or will be adapted into movies or TV series.
-  - Include article titles, publication dates, and brief summaries.
-
-- TOOL Selection:
-  - Perplexity: To identify which sci-fi books from the list have been or will be adapted into movies or TV series.
-  - NewsAPISearchByKeyWord: To find news articles about these adaptations.
-
-- Input Parameters:
-  - Perplexity:
-    - Requires parameter query (string): A query to find adaptations of books from sci_fi_books_list.
-  - NewsAPISearchByKeyWord:
-    - For NewsAPISearchByKeyWord there are no required input parameters. But for our purpose we will give the following parameters.
-    - query (string): Keywords related to the identified adaptations.
-    - language (string): Set to "en" for English articles.
-
-- Source of Inputs:
-  - Perplexity:
-    - query: TOOL_Output (sub_task 1, Step 1), using sci_fi_books_list to find adaptation information.
-  - NewsAPISearchByKeyWord:
-    - query: TOOL_Output (sub_task 2, Step 1), output adaptation_keywords from Perplexity.
-    - language: LLM_Generated, value: "en"
-
-- execution_blueprint Flow:
-  - Step 1: Use Perplexity to identify which books have been adapted and generate keywords for searching news articles.
-  - Step 2: Use NewsAPISearchByKeyWord to find news articles about these adaptations.
-
-- Interdependencies:
-  - Step 1 depends on sub_task 1, Step 1 for sci_fi_books_list.
-  - Step 2 depends on Step 1 for adaptation_keywords.
-
-- Variable Naming:
-  - Input Variable for Step 1:
-    - Name: sci_fi_books_list (from sub_task 1, Step 1)
-  - Output Variable for Step 1:
-    - Name: adaptation_keywords
-  - Input Variables for Step 2:
-    - Name: adaptation_keywords (matching the output from Step 1)
-    - Name: news_language
-  - Output Variable for Step 2:
-    - Name: news_articles
-
-- Validation:
-  - Using specific adaptation keywords improves the relevance of news articles retrieved.
-  - Setting the language parameter to "en" ensures articles are in English.
-
-- Potential Issues in the execution_blueprint:
-  - In sub_task 2, Step 1, the Value field for sci_fi_books_list is set to None, which is appropriate since it depends on the output from sub_task 1, Step 1.
-  - The variable names are consistent with the dependencies and follow the guidelines.
+	-	Understanding sub_task Details:
+	-	The sub_task aims to find and display news articles about sci-fi books that have been or will be adapted into movies or TV series.
+	-	Include article titles, publication dates, and brief summaries.
+	-	TOOL Selection:
+	-	perplexity_ask: To identify which sci-fi books from the list have been or will be adapted into movies or TV series.
+	-	NewsAPISearchByKeyWord: To find news articles about these adaptations.
+	-	Input Parameters:
+	-	perplexity_ask:
+	-	Requires parameter messages (array of objects with role and content): A query to find adaptations of books from sci_fi_books_list.
+	-	NewsAPISearchByKeyWord:
+	-	For NewsAPISearchByKeyWord there are no required input parameters. But for our purpose we will give the following parameters.
+	-	query (string): Keywords related to the identified adaptations.
+	-	language (string): Set to "en" for English articles.
+	-	Source of Inputs:
+	-	perplexity_ask:
+	-	messages: TOOL_Output (sub_task 1, Step 1), using sci_fi_books_list to find adaptation information.
+	-	NewsAPISearchByKeyWord:
+	-	query: TOOL_Output (sub_task 2, Step 1), output adaptation_keywords from perplexity_ask.
+	-	language: LLM_Generated, value: "en"
+	-	execution_blueprint Flow:
+	-	Step 1: Use perplexity_ask to identify which books have been adapted and generate keywords for searching news articles.
+	-	Step 2: Use NewsAPISearchByKeyWord to find news articles about these adaptations.
+	-	Interdependencies:
+	-	Step 1 depends on sub_task 1, Step 1 for sci_fi_books_list.
+	-	Step 2 depends on Step 1 for adaptation_keywords.
+	-	Variable Naming:
+	-	Input Variable for Step 1:
+	-	Name: sci_fi_books_list (from sub_task 1, Step 1)
+	-	Output Variable for Step 1:
+	-	Name: adaptation_keywords
+	-	Input Variables for Step 2:
+	-	Name: adaptation_keywords (matching the output from Step 1)
+	-	Name: news_language
+	-	Output Variable for Step 2:
+	-	Name: news_articles
+	-	Validation:
+	-	Using specific adaptation keywords improves the relevance of news articles retrieved.
+	-	Setting the language parameter to "en" ensures articles are in English.
+	-	Potential Issues in the execution_blueprint:
+	-	In sub_task 2, Step 1, the Value field for sci_fi_books_list is set to None, which is appropriate since it depends on the output from sub_task 1, Step 1.
+	-	The variable names are consistent with the dependencies and follow the guidelines.
 
 Grouping sub_tasks and Interdependencies
-
-- Both sub_tasks are interdependent:
-  - sub_task 2 depends on sub_task 1 for sci_fi_books_list.
-- Therefore, both sub_tasks should be placed in Group 1.
+	-	Both sub_tasks are interdependent:
+	-	sub_task 2 depends on sub_task 1 for sci_fi_books_list.
+	-	Therefore, both sub_tasks should be placed in Group 1.
 
 Dependency Limitation
-
-- Ensured that each TOOL depends on at most one previous TOOL's output.
-- Input variables that depend on previous outputs have matching names to maintain consistency.
-
-- Kept care of referring to tool names correctly keeping in consideration that they are case-sensitive.
+	-	Ensured that each TOOL depends on at most one previous TOOL’s output.
+	-	Input variables that depend on previous outputs have matching names to maintain consistency.
+	-	Kept care of referring to tool names correctly keeping in consideration that they are case-sensitive.
 
 execution_blueprint Efficiency
-
-- Kept the execution_blueprint minimal by:
-  - Using only necessary TOOLs.
-  - Avoiding unnecessary TOOL calls.
-  - Ensuring data flows efficiently between steps.
+	-	Kept the execution_blueprint minimal by:
+	-	Using only necessary TOOLs.
+	-	Avoiding unnecessary TOOL calls.
+	-	Ensuring data flows efficiently between steps.
 
 $$EXECUTION_BLUEPRINT$$
 
@@ -1496,32 +1232,32 @@ sub_task Description: Display a list of 3 popular science fiction books along wi
 execution_blueprint Steps:
 
 Step 1
-- TOOL: Perplexity
-- Handles: Look for 3 popular science fiction books
-- Input Variables:
-  - Name: query_sci_books
-    - Parameter: query
-    - Type: string
-    - Source: LLM_Generated
-    - Description: List of 3 popular sci-fi books
-    - Value: None
-- Output Variables:
-  - Name: sci_fi_books_list
-    - Description: Keywords related to sci-fi book adaptations.
+	-	TOOL: perplexity_ask
+	-	Handles: Look for 3 popular science fiction books
+	-	Input Variables:
+    -	Name: query_sci_books
+      -	Parameter: messages
+      -	Type: array
+      -	Source: LLM_Generated
+      -	Description: Array with user message about listing 3 popular sci-fi books
+      -	Value: [{"role":"user","content":"List 3 popular science fiction books."}]
+	-	Output Variables:
+    -	Name: sci_fi_books_list
+      -	Description: Keywords related to sci-fi book adaptations
 
 Step 2
-- TOOL: Goodreads_Search_Book_By_Keyword
-- Handles: Retrieves popular sci-fi books ratings on goodreads.
-- Input Variables:
-  - Name: sci_fi_books_list
-    - Parameter: keyword
-    - Type: string
-    - Source: TOOL_Output (sub_task 1, Step 1)
-    - Description: popular sci-fi books to search on goodreads.
-    - Value: None
-- Output Variables:
-  - Name: goodreads_ratings
-    - Description: Ratings and more information about popular sci-fi books retrieved from Perplexity in step 1.
+	-	TOOL: Goodreads_Search_Book_By_Keyword
+	-	Handles: Retrieves popular sci-fi books ratings on goodreads.
+	-	Input Variables:
+    -	Name: sci_fi_books_list
+      -	Parameter: keyword
+      -	Type: string
+      -	Source: TOOL_Output (sub_task 1, Step 1)
+      -	Description: popular sci-fi books to search on goodreads
+      -	Value: None
+	-	Output Variables:
+    -	Name: goodreads_ratings
+      -	Description: Ratings and more information about popular sci-fi books retrieved from perplexity_ask in step 1
 
 execution_blueprint for sub_task 2:
 
@@ -1530,57 +1266,60 @@ sub_task Description: Find news articles about sci-fi books adapted into movies 
 execution_blueprint Steps:
 
 Step 1
-- TOOL: Perplexity
-- Handles: Identifies sci-fi books adapted into movies or TV series.
-- Input Variables:
-  - Name: sci_fi_books_list
-    - Parameter: query
-    - Type: string
-    - Source: TOOL_Output (sub_task 1, Step 1)
-    - Description: List of sci-fi books to find adaptations.
-    - Value: None
-- Output Variables:
-  - Name: adaptation_keywords
-    - Description: Keywords related to sci-fi book adaptations.
+	-	TOOL: perplexity_ask
+	-	Handles: Identifies sci-fi books adapted into movies or TV series
+	-	Input Variables:
+    -	Name: sci_fi_books_list
+      -	Parameter: messages
+      -	Type: array
+      -	Source: TOOL_Output (sub_task 1, Step 1)
+      -	Description: Array with user message referencing the sci-fi books to find adaptations
+      -	Value: None
+	-	Output Variables:
+    -	Name: adaptation_keywords
+      -	Description: Keywords related to sci-fi book adaptations
 
 Step 2
-- TOOL: NewsAPISearchByKeyWord
-- Handles: Finds news articles about sci-fi book adaptations.
-- Input Variables:
-  - Name: adaptation_keywords
-    - Parameter: query
-    - Type: string
-    - Source: TOOL_Output (sub_task 2, Step 1)
-    - Description: Keywords for searching news articles on adaptations.
-    - Value: None
-- Output Variables:
-  - Name: news_articles
-    - Description: News articles about sci-fi book adaptations.
+	-	TOOL: NewsAPISearchByKeyWord
+	-	Handles: Finds news articles about sci-fi book adaptations
+	-	Input Variables:
+    -	Name: adaptation_keywords
+      -	Parameter: query
+      -	Type: string
+      -	Source: TOOL_Output (sub_task 2, Step 1)
+      -	Description: Keywords for searching news articles on adaptations
+      -	Value: None
+    -	Name: news_language
+      -	Parameter: language
+      -	Type: string
+      -	Source: LLM_Generated
+      -	Description: Language for news articles
+      -	Value: "en"
+	-	Output Variables:
+    -	Name: news_articles
+      -	Description: News articles about sci-fi book adaptations
 
-#### Example 6:
+#### Example
 
-Query: "Which country had the most amount tourist attractions in 2024 in the world? Provide the weather forecast for its cTOOLtal on October 10, 2024, and recommend the best attractions to visit based on that weather."
+Query: "Which country had the most amount tourist attractions in 2024 in the world? Provide the weather forecast for its capital on October 10, 2024, and recommend the best attractions to visit based on that weather."
 
-TaskDecomposer's sub_task Requests:
-1. sub_task 1: Top Tourist Attractions in 2024
+TaskDecomposer’s sub_task Requests:
+	1.	sub_task 1: Top Tourist Attractions in 2024
 Details: Identify the country with the most tourist attractions in 2024 and provide a list of these attractions. This will help the user understand which country was most popular for tourism in that year.
 List of Relevant TOOLs:
-   - Perplexity
-
-2. sub_task 2: Weather Forecast for CTOOLtal City
-Details: Provide the weather forecast for the cTOOLtal city of the country identified in the previous sub_task on October 10, 2024. This will help the user plan their visit based on the weather conditions.
+	-	perplexity_ask
+	2.	sub_task 2: Weather Forecast for capital City
+Details: Provide the weather forecast for the capital city of the country identified in the previous sub_task on October 10, 2024. This will help the user plan their visit based on the weather conditions.
 List of Relevant TOOLs:
-   - WeatherAPI.com_Forecast_Weather_API
-   - Perplexity
-
-3. sub_task 3: Recommended Attractions Based on Weather
-Details: Recommend the best tourist attractions to visit in the cTOOLtal city based on the weather forecast for October 10, 2024. This will provide the user with tailored suggestions that align with the expected weather conditions.
+	-	WeatherAPI.com_Forecast_Weather_API
+	-	perplexity_ask
+	3.	sub_task 3: Recommended Attractions Based on Weather
+Details: Recommend the best tourist attractions to visit in the capital city based on the weather forecast for October 10, 2024. This will provide the user with tailored suggestions that align with the expected weather conditions.
 List of Relevant TOOLs:
-   - TripadvisorSearchLocation
-   - Perplexity
+	-	TripadvisorSearchLocation
+	-	perplexity_ask
 
 Description of TOOLs:
-
 [Will be given to you]
 
 Your Output:
@@ -1588,180 +1327,152 @@ Your Output:
 $$CHAIN_OF_THOUGHT$$
 
 sub_task 1: Top Tourist Attractions in 2024
+	-	Understanding sub_task Details:
+	-	The goal is to identify the country with the most tourist attractions in 2024 and provide a list of these attractions.
+	-	TOOL Selection:
+	-	perplexity_ask: Suitable for retrieving up-to-date information on global tourism statistics and listing attractions within a country.
+	-	Input Parameters:
+	-	perplexity_ask requires the parameter:
+	-	messages (array of objects with role and content)
+	-	Source of Inputs:
+	-	Step 1:
+	-	query_tourist_country: LLM_Generated, value: "Which country had the most tourist attractions in 2024?"
+	-	Step 2:
+	-	top_tourist_country: TOOL_Output (sub_task 1, Step 1), output from perplexity_ask.
+	-	query_attractions_list: LLM_Generated, value: "List of tourist attractions in [top_tourist_country] in 2024."
+	-	execution_blueprint Flow:
+	-	Step 1: Use perplexity_ask to identify the country with the most tourist attractions in 2024.
+	-	Step 2: Use perplexity_ask to obtain a list of tourist attractions in the identified country.
+	-	Interdependencies:
+	-	Step 2 depends on Step 1 for the top_tourist_country.
+	-	Input variable top_tourist_country in Step 2 must match the output variable name from Step 1.
+	-	Variable Naming:
+	-	Step 1:
+	-	Input Variable:
+	-	Name: query_tourist_country
+	-	Output Variable:
+	-	Name: top_tourist_country
+	-	Step 2:
+	-	Input Variables:
+	-	Name: top_tourist_country (matches output from Step 1)
+	-	Name: query_attractions_list
+	-	Output Variable:
+	-	Name: attractions_list
+	-	Validation:
+	-	perplexity_ask can handle both identifying the country and listing its attractions.
+	-	Variable names are unique and consistent across steps.
+	-	Ensured that each TOOL depends on at most one previous TOOL’s output.
 
-- Understanding sub_task Details:
-  - The goal is to identify the country with the most tourist attractions in 2024 and provide a list of these attractions.
-  
-- TOOL Selection:
-  - Perplexity: Suitable for retrieving up-to-date information on global tourism statistics and listing attractions within a country.
-  
-- Input Parameters:
-  - Perplexity requires the parameter:
-    - query (string): The search query or question.
-
-- Source of Inputs:
-  - Step 1:
-    - query_tourist_country: LLM_Generated, value: "Which country had the most tourist attractions in 2024?"
-  - Step 2:
-    - top_tourist_country: TOOL_Output (sub_task 1, Step 1), output from Perplexity.
-    - query_attractions_list: LLM_Generated, value: "List of tourist attractions in [top_tourist_country] in 2024."
-
-- execution_blueprint Flow:
-  - Step 1: Use Perplexity to identify the country with the most tourist attractions in 2024.
-  - Step 2: Use Perplexity to obtain a list of tourist attractions in the identified country.
-
-- Interdependencies:
-  - Step 2 depends on Step 1 for the top_tourist_country.
-  - Input variable top_tourist_country in Step 2 must match the output variable name from Step 1.
-
-- Variable Naming:
-  - Step 1:
-    - Input Variable:
-      - Name: query_tourist_country
-    - Output Variable:
-      - Name: top_tourist_country
-  - Step 2:
-    - Input Variables:
-      - Name: top_tourist_country (matches output from Step 1)
-      - Name: query_attractions_list
-    - Output Variable:
-      - Name: attractions_list
-
-- Validation:
-  - Perplexity can handle both identifying the country and listing its attractions.
-  - Variable names are unique and consistent across steps.
-  - Ensured that each TOOL depends on at most one previous TOOL's output.
-
-sub_task 2: Weather Forecast for CTOOLtal City
-
-- Understanding sub_task Details:
-    - Provide the weather forecast for the cTOOLtal city of the country identified in sub_task 1 on October 10, 2024.
-
-- TOOL Selection:
-    - Perplexity:
-        - To find the cTOOLtal city of the identified country.
-        - To find the latitude and longitude of the cTOOLtal city.
-    - WeatherAPI.com_Forecast_Weather_API:
-        - To fetch the weather forecast for the cTOOLtal city on the specified date.
-        - Using coordinates (latitude and longitude) can provide more accurate results.
-
-- Input Parameters:
-    - Perplexity (Step 1):
-        - query (string): Query to find the cTOOLtal city.
-    - Perplexity (Step 2):
-        - query (string): Query to find the latitude and longitude of the cTOOLtal city.
-    - WeatherAPI.com_Forecast_Weather_API:
-        - q (string): Location query parameter in the format "lat,lon".
-        - dt (date): Forecast date in YYYY-MM-DD format.
-
-- Source of Inputs:
-    - Step 1:
-        - top_tourist_country: TOOL_Output (sub_task 1, Step 1)
-        - query_cTOOLtal_city: LLM_Generated, value: "What is the cTOOLtal city of [top_tourist_country]?"
-    - Step 2:
-        - cTOOLtal_city: TOOL_Output (sub_task 2, Step 1)
-        - query_cTOOLtal_coordinates: LLM_Generated, value: "What are the latitude and longitude of [cTOOLtal_city]?"
-    - Step 3:
-        - cTOOLtal_city_coordinates: TOOL_Output (sub_task 2, Step 2)
-        - forecast_date: LLM_Generated, value: "2024-10-10"
-
-- execution_blueprint Flow:
-    - Step 1: Use Perplexity to find the cTOOLtal city of the country identified in sub_task 1.
-    - Step 2: Use Perplexity to find the latitude and longitude of the cTOOLtal city.
-    - Step 3: Use WeatherAPI.com_Forecast_Weather_API with the coordinates and date to get the weather forecast.
-
-- Interdependencies:
-    - Step 1 depends on sub_task 1, Step 1 for top_tourist_country.
-    - Step 2 depends on Step 1 for cTOOLtal_city.
-    - Step 3 depends on Step 2 for cTOOLtal_city_coordinates.
-    - Input variables that depend on previous outputs have matching names to ensure consistency.
-
-- Variable Naming:
-    - Step 1:
-        - Input Variable:
-            - Name: query_cTOOLtal_city
-        - Output Variable:
-            - Name: cTOOLtal_city
-    - Step 2:
-        - Input Variable:
-            - Name: query_cTOOLtal_coordinates
-        - Output Variable:
-            - Name: cTOOLtal_city_coordinates
-    - Step 3:
-        - Input Variables:
-            - Name: cTOOLtal_city_coordinates (from Step 2)
-            - Name: forecast_date
-        - Output Variable:
-            - Name: weather_forecast
-
-- Validation:
-    - Variable names are unique and consistent.
-    - Each TOOL depends on at most one previous TOOL's output per input variable.
-    - The dependency chain is logical and follows the sequence of steps.
+sub_task 2: Weather Forecast for capital City
+	-	Understanding sub_task Details:
+	-	Provide the weather forecast for the capital city of the country identified in sub_task 1 on October 10, 2024.
+	-	TOOL Selection:
+	-	perplexity_ask:
+	-	To find the capital city of the identified country.
+	-	To find the latitude and longitude of the capital city.
+	-	WeatherAPI.com_Forecast_Weather_API:
+	-	To fetch the weather forecast for the capital city on the specified date.
+	-	Using coordinates (latitude and longitude) can provide more accurate results.
+	-	Input Parameters:
+	-	perplexity_ask (Step 1):
+	-	messages (array of objects with role and content): Query to find the capital city.
+	-	perplexity_ask (Step 2):
+	-	messages (array of objects with role and content): Query to find the latitude and longitude of the capital city.
+	-	WeatherAPI.com_Forecast_Weather_API:
+	-	q (string): Location query parameter in the format "lat,lon".
+	-	dt (date): Forecast date in YYYY-MM-DD format.
+	-	Source of Inputs:
+	-	Step 1:
+	-	top_tourist_country: TOOL_Output (sub_task 1, Step 1)
+	-	query_capital_city: LLM_Generated, value: "What is the capital city of [top_tourist_country]?"
+	-	Step 2:
+	-	capital_city: TOOL_Output (sub_task 2, Step 1)
+	-	query_capital_coordinates: LLM_Generated, value: "What are the latitude and longitude of [capital_city]?"
+	-	Step 3:
+	-	capital_city_coordinates: TOOL_Output (sub_task 2, Step 2)
+	-	forecast_date: LLM_Generated, value: "2024-10-10"
+	-	execution_blueprint Flow:
+	-	Step 1: Use perplexity_ask to find the capital city of the country identified in sub_task 1.
+	-	Step 2: Use perplexity_ask to find the latitude and longitude of the capital city.
+	-	Step 3: Use WeatherAPI.com_Forecast_Weather_API with the coordinates and date to get the weather forecast.
+	-	Interdependencies:
+	-	Step 1 depends on sub_task 1, Step 1 for top_tourist_country.
+	-	Step 2 depends on Step 1 for capital_city.
+	-	Step 3 depends on Step 2 for capital_city_coordinates.
+	-	Input variables that depend on previous outputs have matching names to ensure consistency.
+	-	Variable Naming:
+	-	Step 1:
+	-	Input Variable:
+	-	Name: query_capital_city
+	-	Output Variable:
+	-	Name: capital_city
+	-	Step 2:
+	-	Input Variable:
+	-	Name: query_capital_coordinates
+	-	Output Variable:
+	-	Name: capital_city_coordinates
+	-	Step 3:
+	-	Input Variables:
+	-	Name: capital_city_coordinates (from Step 2)
+	-	Name: forecast_date
+	-	Output Variable:
+	-	Name: weather_forecast
+	-	Validation:
+	-	Variable names are unique and consistent.
+	-	Each TOOL depends on at most one previous TOOL’s output per input variable.
+	-	The dependency chain is logical and follows the sequence of steps.
 
 sub_task 3: Recommended Attractions Based on Weather
-
-- Understanding sub_task Details:
-    - Recommend the best tourist attractions to visit in the cTOOLtal city based on the weather forecast for October 10, 2024.
-
-- TOOL Selection:
-    - Perplexity:
-        - To recommend attractions in the cTOOLtal city considering the weather conditions.
-    - TripadvisorSearchLocation:
-        - Considered but not used for this sub_task because it only provides GeoID retrieval and does not offer attraction lists for cities.
-        - Important Note: TripadvisorSearchLocation is only used for GeoID retrieval and does not provide attraction lists for cities; therefore, we do not use it for sub_task 3.
-
-- Input Parameters:
-    - Perplexity:
-        - query (string): Query to get recommended attractions based on the weather.
-
-- Source of Inputs:
-    - Step 1:
-        - cTOOLtal_city: TOOL_Output (sub_task 2, Step 1)
-        - weather_forecast: TOOL_Output (sub_task 2, Step 3)
-        - query_recommendations: LLM_Generated, value: "Based on the weather forecast of [weather_forecast] on 2024-10-10, recommend the best attractions to visit in [cTOOLtal_city]."
-
-- execution_blueprint Flow:
-    - Step 1: Use Perplexity to get tailored attraction recommendations in the cTOOLtal city based on the weather forecast.
-
-- Interdependencies:
-    - Step 1 depends on:
-        - cTOOLtal_city from sub_task 2, Step 1
-        - weather_forecast from sub_task 2, Step 3
-    - Input variables cTOOLtal_city and weather_forecast match the output variable names from previous steps.
-
-- Variable Naming:
-    - Step 1:
-        - Input Variables:
-            - Name: cTOOLtal_city (from sub_task 2, Step 1)
-            - Name: weather_forecast (from sub_task 2, Step 3)
-            - Name: query_recommendations
-        - Output Variable:
-            - Name: recommended_attractions
-
-- Validation:
-    - Variable names are unique and consistent.
-    - Dependencies are correctly mapped to outputs from previous steps.
-    - Avoided using TripadvisorSearchLocation since it does not provide attraction lists, ensuring execution_blueprint efficiency.
+	-	Understanding sub_task Details:
+	-	Recommend the best tourist attractions to visit in the capital city based on the weather forecast for October 10, 2024.
+	-	TOOL Selection:
+	-	perplexity_ask:
+	-	To recommend attractions in the capital city considering the weather conditions.
+	-	TripadvisorSearchLocation:
+	-	Considered but not used for this sub_task because it only provides GeoID retrieval and does not offer attraction lists for cities.
+	-	Important Note: TripadvisorSearchLocation is only used for GeoID retrieval and does not provide attraction lists for cities; therefore, we do not use it for sub_task 3.
+	-	Input Parameters:
+	-	perplexity_ask:
+	-	messages (array of objects with role and content): Query to get recommended attractions based on the weather.
+	-	Source of Inputs:
+	-	Step 1:
+	-	capital_city: TOOL_Output (sub_task 2, Step 1)
+	-	weather_forecast: TOOL_Output (sub_task 2, Step 3)
+	-	query_recommendations: LLM_Generated, value: "Based on the weather forecast of [weather_forecast] on 2024-10-10, recommend the best attractions to visit in [capital_city]."
+	-	execution_blueprint Flow:
+	-	Step 1: Use perplexity_ask to get tailored attraction recommendations in the capital city based on the weather forecast.
+	-	Interdependencies:
+	-	Step 1 depends on:
+	-	capital_city from sub_task 2, Step 1
+	-	weather_forecast from sub_task 2, Step 3
+	-	Input variables capital_city and weather_forecast match the output variable names from previous steps.
+	-	Variable Naming:
+	-	Step 1:
+	-	Input Variables:
+	-	Name: capital_city (from sub_task 2, Step 1)
+	-	Name: weather_forecast (from sub_task 2, Step 3)
+	-	Name: query_recommendations
+	-	Output Variable:
+	-	Name: recommended_attractions
+	-	Validation:
+	-	Variable names are unique and consistent.
+	-	Dependencies are correctly mapped to outputs from previous steps.
+	-	Avoided using TripadvisorSearchLocation since it does not provide attraction lists, ensuring execution_blueprint efficiency.
 
 Grouping sub_tasks and Interdependencies
-
-- All sub_tasks are interdependent and are placed in Group 1.
-    - sub_task 1 provides top_tourist_country for sub_task 2.
-    - sub_task 2 provides cTOOLtal_city and weather_forecast for sub_task 3.
+	-	All sub_tasks are interdependent and are placed in Group 1.
+	-	sub_task 1 provides top_tourist_country for sub_task 2.
+	-	sub_task 2 provides capital_city and weather_forecast for sub_task 3.
 
 Dependency Limitation
-
-- Ensured that each TOOL depends on at most one previous TOOL's output per input variable.
-- Input variables dependent on previous outputs have matching names to maintain consistency.
-
-- Kept care of referring to tool names correctly keeping in consideration that they are case-sensitive.
+	-	Ensured that each TOOL depends on at most one previous TOOL’s output per input variable.
+	-	Input variables dependent on previous outputs have matching names to maintain consistency.
+	-	Kept care of referring to tool names correctly keeping in consideration that they are case-sensitive.
 
 execution_blueprint Efficiency
-
-- Included the coordinate-finding step in sub_task 2 to enhance accuracy in weather forecasting.
-- Used Perplexity efficiently to handle multiple information retrieval tasks.
-- Avoided unnecessary TOOLs, keeping the execution_blueprint minimal and straightforward.
+	-	Included the coordinate-finding step in sub_task 2 to enhance accuracy in weather forecasting.
+	-	Used perplexity_ask efficiently to handle multiple information retrieval tasks.
+	-	Avoided unnecessary TOOLs, keeping the execution_blueprint minimal and straightforward.
 
 $$EXECUTION_BLUEPRINT$$
 
@@ -1774,95 +1485,352 @@ sub_task Description: Identify the country with the most tourist attractions in 
 execution_blueprint Steps:
 
 Step 1
-- TOOL: Perplexity
-- Handles: Identifies the country with the most tourist attractions in 2024.
-- Input Variables:
-  - Name: query_tourist_country
-    - Parameter: query
-    - Type: string
-    - Source: LLM_Generated
-    - Description: Query to find the country with the most tourist attractions in 2024.
-    - Value: "Which country had the most tourist attractions in 2024?"
-- Output Variables:
-  - Name: top_tourist_country
-    - Description: Country with the most tourist attractions in 2024.
+	-	TOOL: perplexity_ask
+	-	Handles: Identifies the country with the most tourist attractions in 2024
+	-	Input Variables:
+    -	Name: query_tourist_country
+      -	Parameter: messages
+      -	Type: array
+      -	Source: LLM_Generated
+      -	Description: Array with user message about which country had the most tourist attractions
+      -	Value: [{"role":"user","content":"Which country had the most tourist attractions in 2024?"}]
+	-	Output Variables:
+    -	Name: top_tourist_country
+	-	Description: Country with the most tourist attractions in 2024
+
+Step 2
+	-	TOOL: perplexity_ask
+	-	Handles: Lists tourist attractions in the identified country
+	-	Input Variables:
+    -	Name: top_tourist_country
+      -	Parameter: messages
+      -	Type: array
+      -	Source: TOOL_Output (sub_task 1, Step 1)
+      -	Description: Array with user message referencing the identified country
+      -	Value: None
+    -	Name: query_attractions_list
+      -	Parameter: messages
+      -	Type: array
+      -	Source: LLM_Generated
+      -	Description: Additional user message about listing attractions
+      -	Value: [{"role":"user","content":"List of tourist attractions in [top_tourist_country] in 2024."}]
+	-	Output Variables:
+    -	Name: attractions_list
+      -	Description: List of tourist attractions in the identified country
 
 execution_blueprint for sub_task 2:
 
-sub_task Description: Provide the weather forecast for the cTOOLtal city on October 10, 2024.
+sub_task Description: Provide the weather forecast for the capital city on October 10, 2024.
 
 execution_blueprint Steps:
 
 Step 1
-- TOOL: Perplexity
-- Handles: Finds the cTOOLtal city of the identified country.
-- Input Variables:
-  - Name: top_tourist_country
-    - Parameter: query
-    - Type: string
-    - Source: TOOL_Output (sub_task 1, Step 1)
-    - Description: Country name to find its cTOOLtal city.
-    - Value: None
-- Output Variables:
-  - Name: cTOOLtal_city
-    - Description: CTOOLtal city of the identified country.
+	-	TOOL: perplexity_ask
+	-	Handles: Finds the capital city of the identified country
+	-	Input Variables:
+    -	Name: top_tourist_country
+      -	Parameter: messages
+      -	Type: array
+      -	Source: TOOL_Output (sub_task 1, Step 1)
+      -	Description: Array with user message referencing the identified country
+      -	Value: None
+    -	Name: query_capital_city
+      -	Parameter: messages
+      -	Type: array
+      -	Source: LLM_Generated
+      -	Description: Additional user message about capital city
+      -	Value: [{"role":"user","content":"What is the capital city of [top_tourist_country]?"}]
+	-	Output Variables:
+    -	Name: capital_city
+      -	Description: Capital city of the identified country
 
 Step 2
-- TOOL: Perplexity
-- Handles: Finds the latitude, longitude of cTOOLtal city of the identified country.
-- Input Variables:
-  - Name: cTOOLtal_city
-    - Parameter: query
-    - Type: string
-    - Source: TOOL_Output (sub_task 2, Step 1)
-    - Description: CTOOLtal city name of whom we have to get latitude, longitude.
-    - Value: None
-- Output Variables:
-  - Name: cTOOLtal_city_coordinates
-    - Description: Coordinates (latitude, longitude) of the cTOOLtal city of the identified country.
+	-	TOOL: perplexity_ask
+	-	Handles: Finds the latitude and longitude of the capital city
+	-	Input Variables:
+    -	Name: capital_city
+      -	Parameter: messages
+      -	Type: array
+      -	Source: TOOL_Output (sub_task 2, Step 1)
+      -	Description: Array with user message referencing the capital city
+      -	Value: None
+    -	Name: query_capital_coordinates
+      -	Parameter: messages
+      -	Type: array
+      -	Source: LLM_Generated
+      -	Description: Additional user message about lat/long
+      -	Value: [{"role":"user","content":"What are the latitude and longitude of [capital_city]?"}]
+	-	Output Variables:
+    -	Name: capital_city_coordinates
+      -	Description: Coordinates (latitude, longitude) of the capital city
 
 Step 3
-- TOOL: WeatherAPI.com_Forecast_Weather_API
-- Handles: Fetches the weather forecast for the cTOOLtal city on October 10, 2024.
-- Input Variables:
-  - Name: cTOOLtal_city_coordinates
-    - Parameter: q
-    - Type: string
-    - Source: TOOL_Output (sub_task 2, Step 2)
-    - Description: CTOOLtal city latitude, longitude for weather forecast.
-    - Value: None
-  - Name: forecast_date
-    - Parameter: dt
-    - Type: date
-    - Source: LLM_Generated
-    - Description: Date for the weather forecast.
-    - Value: "2024-10-10"
-- Output Variables:
-  - Name: weather_forecast
-    - Description: Weather forecast for the cTOOLtal city on October 10, 2024.
+	-	TOOL: WeatherAPI.com_Forecast_Weather_API
+	-	Handles: Fetches the weather forecast for the capital city on October 10, 2024
+	-	Input Variables:
+    -	Name: capital_city_coordinates
+      -	Parameter: q
+      -	Type: string
+      -	Source: TOOL_Output (sub_task 2, Step 2)
+      -	Description: Capital city latitude, longitude for weather forecast
+      -	Value: None
+    -	Name: forecast_date
+      -	Parameter: dt
+      -	Type: date
+      -	Source: LLM_Generated
+      -	Description: Date for the weather forecast
+      -	Value: "2024-10-10"
+	-	Output Variables:
+    -	Name: weather_forecast
+      -	Description: Weather forecast for the capital city on October 10, 2024
 
 execution_blueprint for sub_task 3:
 
-sub_task Description: Recommend the best tourist attractions to visit in the cTOOLtal city based on the weather forecast.
+sub_task Description: Recommend the best tourist attractions to visit in the capital city based on the weather forecast.
 
 execution_blueprint Steps:
 
 Step 1
-- TOOL: Perplexity
-- Handles: Recommends attractions based on the weather forecast.
-- Input Variables:
-  - Name: cTOOLtal_city
-    - Parameter: query
-    - Type: string
-    - Source: TOOL_Output (sub_task 2, Step 1)
-    - Description: CTOOLtal city of the identified country.
-    - Value: None
-  - Name: weather_forecast
-    - Parameter: query
-    - Type: string
-    - Source: TOOL_Output (sub_task 2, Step 3)
-    - Description: Weather forecast to tailor recommendations.
-    - Value: None
-- Output Variables:
-  - Name: recommended_attractions
-    - Description: Recommended attractions based on the weather forecast.
+	-	TOOL: perplexity_ask
+	-	Handles: Recommends attractions based on the weather forecast
+	-	Input Variables:
+    -	Name: capital_city
+      -	Parameter: messages
+      -	Type: array
+      -	Source: TOOL_Output (sub_task 2, Step 1)
+      -	Description: Array with user message referencing the capital city
+      -	Value: None
+    -	Name: weather_forecast
+      -	Parameter: messages
+      -	Type: array
+      -	Source: TOOL_Output (sub_task 2, Step 3)
+      -	Description: Array with user message referencing the weather forecast
+      -	Value: None
+    -	Name: query_recommendations
+      -	Parameter: messages
+      -	Type: array
+      -	Source: LLM_Generated
+      -	Description: Additional user message about recommended attractions
+      -	Value: [{"role":"user","content":"Based on the weather forecast of [weather_forecast] on 2024-10-10, recommend the best attractions to visit in [capital_city]."}]
+	-	Output Variables:
+    -	Name: recommended_attractions
+      -	Description: Recommended attractions based on the weather forecast
+
+
+#### Example:
+
+Query: "how much time would it take for me to reach world trade center from fort green Brooklyn, and also suggest some restaurants"
+
+TaskDecomposer’s sub_task Requests:
+1. sub_task 1: Calculate Travel Time
+Details: Calculate the travel time from Fort Greene, Brooklyn to the World Trade Center using Google Maps. Provide options for different modes of transportation such as driving, public transit, and walking.
+List of Relevant TOOls:
+   - maps_distance_matrix
+   - maps_directions
+
+2. sub_task 2: Suggest Restaurants
+Details: Suggest a list of restaurants near the World Trade Center. Include a variety of cuisines and price ranges. Use Google Maps to find and provide details about these restaurants.
+List of Relevant TOOls:
+   - maps_search_places
+
+3. sub_task 3: Provide Additional Insights
+Details: Use Perplexity to provide additional insights or recommendations about the World Trade Center area. This could include historical information, nearby attractions, or tips for visitors.
+List of Relevant TOOls:
+   - perplexity_research
+
+Description of TOOLs:
+[Will be given to you]
+
+Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+sub_task 1: Calculate Travel Time
+	-	Understanding sub_task Details:
+	-	We need to calculate the travel time from Fort Greene, Brooklyn, NY to the World Trade Center, New York, NY. The user wants options for different modes of transportation (driving, public transit, walking). We will use maps_distance_matrix with each mode to get the travel time. We also note that if detailed route directions are required for transit, we can use maps_directions with full addresses (origin: "Fort Greene, Brooklyn, NY", destination: "World Trade Center, New York, NY", mode: "transit").
+	-	For the sake of completeness, we will provide travel time for driving, transit, and walking.
+	-	TOOL Selection:
+	-	maps_distance_matrix: Will calculate travel time for different modes (driving, transit, walking).
+	-	We could also use maps_directions to provide a transit route if needed, but the main sub_task emphasis is on travel time, so maps_distance_matrix is sufficient for direct travel durations.
+	-	Input Parameters:
+	-	For maps_distance_matrix:
+	-	origins (array of strings): ["Fort Greene, Brooklyn, NY"]
+	-	destinations (array of strings): ["World Trade Center, New York, NY"]
+	-	mode (string): "driving" or "transit" or "walking"
+	-	Source of Inputs:
+	-	LLM_Generated: The addresses "Fort Greene, Brooklyn, NY" and "World Trade Center, New York, NY" come from the user query.
+	-	We will produce multiple steps with each mode for clarity.
+	-	execution_blueprint Flow:
+	-	Step 1: Use maps_distance_matrix with mode=driving
+	-	Step 2: Use maps_distance_matrix with mode=transit
+	-	Step 3: Use maps_distance_matrix with mode=walking
+	-	Interdependencies:
+	-	No direct interdependency between these steps as each step simply calculates a different mode’s travel time. All inputs are LLM_Generated addresses from the user query.
+	-	Variable Naming:
+	-	Input variable names for each step: origins, destinations, mode.
+	-	Output variable names for each step: driving_time, transit_time, walking_time respectively.
+
+sub_task 2: Suggest Restaurants
+	-	Understanding sub_task Details:
+	-	We need to find restaurants near the World Trade Center. We’ll use maps_search_places with a simple query "restaurants near World Trade Center, New York, NY".
+	-	The sub_task specifically says to include a variety of cuisines and price ranges, so we rely on the search results from the Google Places data.
+	-	TOOL Selection:
+	-	maps_search_places: We provide the query "restaurants near World Trade Center, New York, NY".
+	-	Input Parameters:
+	-	For maps_search_places:
+	-	query (string): "restaurants near World Trade Center, New York, NY"
+	-	Source of Inputs:
+	-	LLM_Generated: The query for "restaurants near World Trade Center, New York, NY" is derived from the user request.
+	-	execution_blueprint Flow:
+	-	Step 1: Use maps_search_places to retrieve a list of restaurants near the World Trade Center.
+	-	Interdependencies:
+	-	No direct interdependency with sub_task 1. This sub_task only needs the user query for searching places near the WTC.
+	-	Variable Naming:
+	-	Input variable name: wtc_restaurants_query
+	-	Output variable name: restaurants_list
+
+sub_task 3: Provide Additional Insights
+	-	Understanding sub_task Details:
+	-	The user wants historical information or tips about the World Trade Center area. We’ll use perplexity_research to get more in-depth coverage with potential citations or references.
+	-	TOOL Selection:
+	-	perplexity_research: Will provide a detailed research-based response about the WTC area, including historical insights or tips.
+	-	Input Parameters:
+	-	perplexity_research:
+	-	messages (array of objects with role and content): We will pass a user message asking for additional insights or recommendations about the World Trade Center area.
+	-	Source of Inputs:
+	-	LLM_Generated: "Please provide any additional insights or recommendations about the World Trade Center area, including historical info or visitor tips."
+	-	execution_blueprint Flow:
+	-	Step 1: Use perplexity_research with the user message to retrieve additional insights on the World Trade Center area.
+	-	Interdependencies:
+	-	None with previous sub_tasks. This sub_task does not need the outputs from sub_task 1 or 2 to generate general insights.
+	-	Variable Naming:
+	-	Input variable name: wtc_research_messages
+	-	Output variable name: wtc_additional_insights
+
+$$EXECUTION_BLUEPRINT$$
+
+Group 1:
+
+execution_blueprint for sub_task 1:
+
+sub_task Description: Calculate the travel time from Fort Greene, Brooklyn to World Trade Center in multiple modes.
+
+execution_blueprint Steps:
+
+Step 1
+	-	TOOL: maps_distance_matrix
+	-	Handles: Calculates travel time driving
+	-	Input Variables:
+    -	Name: fort_greene_origin
+      -	Parameter: origins
+      -	Type: array
+      -	Source: LLM_Generated
+      -	Description: Origin address array
+      -	Value: ["Fort Greene, Brooklyn, NY"]
+    -	Name: wtc_destination
+      -	Parameter: destinations
+      -	Type: array
+      -	Source: LLM_Generated
+      -	Description: Destination address array
+      -	Value: ["World Trade Center, New York, NY"]
+    -	Name: driving_mode
+      -	Parameter: mode
+      -	Type: string
+      -	Source: LLM_Generated
+      -	Description: Travel mode driving
+      -	Value: "driving"
+	-	Output Variables:
+    -	Name: driving_time
+      -	Description: Calculated driving time from Fort Greene, Brooklyn to World Trade Center
+
+Step 2
+	-	TOOL: maps_distance_matrix
+	-	Handles: Calculates travel time using public transit
+	-	Input Variables:
+    -	Name: fort_greene_origin
+      -	Parameter: origins
+      -	Type: array
+      -	Source: LLM_Generated
+      -	Description: Origin address array
+      -	Value: ["Fort Greene, Brooklyn, NY"]
+    -	Name: wtc_destination
+      -	Parameter: destinations
+      -	Type: array
+      -	Source: LLM_Generated
+      -	Description: Destination address array
+      -	Value: ["World Trade Center, New York, NY"]
+    -	Name: transit_mode
+      -	Parameter: mode
+      -	Type: string
+      -	Source: LLM_Generated
+      -	Description: Travel mode transit
+      -	Value: "transit"
+	-	Output Variables:
+    -	Name: transit_time
+      -	Description: Calculated transit time from Fort Greene, Brooklyn to World Trade Center
+
+Step 3
+	-	TOOL: maps_distance_matrix
+	-	Handles: Calculates travel time walking
+	-	Input Variables:
+    -	Name: fort_greene_origin
+      -	Parameter: origins
+      -	Type: array
+      -	Source: LLM_Generated
+      -	Description: Origin address array
+      -	Value: ["Fort Greene, Brooklyn, NY"]
+    -	Name: wtc_destination
+      -	Parameter: destinations
+      -	Type: array
+      -	Source: LLM_Generated
+      -	Description: Destination address array
+      -	Value: ["World Trade Center, New York, NY"]
+    -	Name: walking_mode
+      -	Parameter: mode
+      -	Type: string
+      -	Source: LLM_Generated
+      -	Description: Travel mode walking
+      -	Value: "walking"
+	-	Output Variables:
+    -	Name: walking_time
+      -	Description: Calculated walking time from Fort Greene, Brooklyn to World Trade Center
+
+execution_blueprint for sub_task 2:
+
+sub_task Description: Suggest restaurants near the World Trade Center.
+
+execution_blueprint Steps:
+
+Step 1
+	-	TOOL: maps_search_places
+	-	Handles: Searches for restaurants near World Trade Center
+	-	Input Variables:
+    -	Name: wtc_restaurants_query
+      -	Parameter: query
+      -	Type: string
+      -	Source: LLM_Generated
+      -	Description: Query to find restaurants near WTC
+      -	Value: "restaurants near World Trade Center, New York, NY"
+	-	Output Variables:
+    -	Name: restaurants_list
+      -	Description: List of restaurants near World Trade Center
+
+execution_blueprint for sub_task 3:
+
+sub_task Description: Provide additional insights about the World Trade Center area.
+
+execution_blueprint Steps:
+
+Step 1
+	-	TOOL: perplexity_research
+	-	Handles: Provides comprehensive insights about the WTC area
+	-	Input Variables:
+    -	Name: wtc_research_messages
+      -	Parameter: messages
+      -	Type: array
+      -	Source: LLM_Generated
+      -	Description: User request message for additional insights on the WTC area
+      -	Value: [{"role":"user","content":"Please provide any historical information, nearby attractions, or visitor tips for the World Trade Center area."}]
+	-	Output Variables:
+    -	Name: wtc_additional_insights
+      -	Description: Additional insights, historical context, and tips for visiting the WTC area

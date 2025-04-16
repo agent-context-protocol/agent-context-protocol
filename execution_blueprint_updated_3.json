@@ -1,51 +1,29 @@
 {
     "3": {
-        "subtask_description": "Provide detailed driving directions from Starbucks Roastery to Microsoft Redmond office.",
+        "subtask_description": "Provide historical and visitor information about Red Fort.",
         "steps": {
             "1": {
-                "tool": "maps_directions",
-                "handles": "Provides detailed driving directions from Starbucks Roastery to Microsoft Redmond office.",
+                "tool": "perplexity_research",
+                "handles": "Provides comprehensive insights about Red Fort",
                 "input_vars": [
                     {
-                        "name": "origin",
+                        "name": "red_fort_research_messages",
                         "parameter": [
-                            "origin"
+                            "messages"
                         ],
-                        "type": "string",
+                        "type": "array",
                         "source": "LLM_Generated",
-                        "description": "Starting point address.",
-                        "value": "Starbucks Roastery, Seattle, USA",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "destination",
-                        "parameter": [
-                            "destination"
-                        ],
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Ending point address.",
-                        "value": "Microsoft Redmond Office, Redmond, USA",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "travel_mode",
-                        "parameter": [
-                            "mode"
-                        ],
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Travel mode for directions.",
-                        "value": "driving",
+                        "description": "User request message for historical and visitor information on Red Fort",
+                        "value": "[{\"role\":\"user\",\"content\":\"Please provide historical and visitor information about Red Fort, including its significance, architecture, and visitor tips.\"}]",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "driving_directions",
-                        "description": "Step-by-step driving directions from Starbucks Roastery to Microsoft Redmond office.",
+                        "name": "red_fort_information",
+                        "description": "Historical and visitor information about Red Fort",
                         "used_by": [],
-                        "value": "```json\n    {\n      \"summary\": \"WA-520 E\",\n      \"total_distance\": \"15.8 mi\",\n      \"total_duration\": \"21 mins\",\n      \"steps\": [\n        {\n          \"instructions\": \"Head southeast on Melrose Ave toward Pike St\",\n          \"distance\": \"66 ft\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Turn left after Starbucks Reserve Roastery (on the right) Pass by McMenamins Six Arms (on the left)\",\n          \"distance\": \"249 ft\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Turn left at the 1st cross street onto Bellevue Ave\",\n          \"distance\": \"417 ft\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Turn left at the 1st cross street onto E Pine St\",\n          \"distance\": \"272 ft\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Turn right onto Melrose Ave\",\n          \"distance\": \"0.1 mi\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Slight left to merge onto I-5 N\",\n          \"distance\": \"1.6 mi\",\n          \"duration\": \"2 mins\"\n        },\n        {\n          \"instructions\": \"Take exit 168B for WA-520 toward Bellevue/Kirkland\",\n          \"distance\": \"0.3 mi\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Continue onto WA-520 E Toll road\",\n          \"distance\": \"12.9 mi\",\n          \"duration\": \"13 mins\"\n        },\n        {\n          \"instructions\": \"Turn left onto NE 80th St/NE Union Hill Rd\",\n          \"distance\": \"0.1 mi\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Slight left onto Avondale Way\",\n          \"distance\": \"0.3 mi\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Turn right onto NE 79th St\",\n          \"distance\": \"0.2 mi\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Turn right onto 168th Ave NE\",\n          \"distance\": \"164 ft\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Turn left\",\n          \"distance\": \"69 ft\",\n          \"duration\": \"1 min\"\n        },\n        {\n          \"instructions\": \"Turn right Destination will be on the left\",\n          \"distance\": \"52 ft\",\n          \"duration\": \"1 min\"\n        }\n      ]\n    }\n    ```"
+                        "value": "\"The Red Fort in Delhi stands as an enduring symbol of Mughal grandeur, architectural innovation, and India\u2019s struggle for sovereignty. Constructed in the mid-17th century by Emperor Shah Jahan, this UNESCO World Heritage Site encapsulates over 350 years of history, from its zenith as the Mughal Empire\u2019s political nucleus to its modern role as the focal point of India\u2019s Independence Day celebrations. This report examines the fort\u2019s historical trajectory, architectural brilliance, sociocultural significance, and practical insights for visitors, drawing upon archaeological records, historical accounts, and contemporary tourism resources.\n\n    Historical Evolution of the Red Fort:\n    - Foundation and Mughal Zenith: Emperor Shah Jahan commissioned the Red Fort on 12 May 1639, marking his decision to shift the Mughal capital from Agra to Shahjahanabad (modern-day Old Delhi). Designed by Ustad Ahmad Lahori, the architect of the Taj Mahal, the fort\u2019s construction spanned a decade, concluding on 6 April 1648. The site was strategically chosen along the Yamuna River, whose waters fed the fort\u2019s moats and enhanced its defensive capabilities. Unlike earlier Mughal forts, the Red Fort integrated the pre-existing Salimgarh Fort into its asymmetrical layout, creating a composite defensive structure.\n\n    - Decline and Colonial Subjugation: The fort\u2019s fortunes waned following Aurangzeb\u2019s death in 1707. Weak successors, Maratha incursions, and Nadir Shah\u2019s devastating 1739 invasion precipitated the empire\u2019s fragmentation. By the late 18th century, the Mughals retained only nominal authority, with the Marathas and later the British East India Company controlling Delhi. The 1857 rebellion marked a turning point. After suppressing the uprising, the British exiled Emperor Bahadur Shah II to Rangoon and systematically destroyed 80% of the fort\u2019s inner structures, including harem quarters and gardens.\n\n    Architectural Mastery and Design Philosophy:\n    - Synthesis of Styles: The Red Fort exemplifies Shahjahani architecture, characterized by symmetry, geometric precision, and a fusion of Persian, Timurid, and indigenous Indian elements. Its 254-acre layout follows a rectangular plan oriented along the Yamuna, with key structures arranged on a north-south axis. The fort\u2019s double-walled enclosure incorporates bastions, turrets, and two primary gates: the ceremonial Lahori Gate and the reserved Delhi Gate.\n\n    - Hydraulic Innovation and Aesthetic Detail: A defining feature is the Nahr-i-Behisht (Stream of Paradise), a water channel channeling Yamuna waters through the private apartments. This canal, lined with pietra dura inlay, cooled the chambers and symbolized the Islamic concept of paradise. The Rang Mahal epitomizes this harmony, with its mirrored ceilings, gold-embroidered walls, and central pool fed by the canal.\n\n    Symbolism and Contemporary Relevance:\n    - From Mughal Power to National Identity: The Red Fort\u2019s symbolic resonance evolved dramatically post-independence. On 15 August 1947, Jawaharlal Nehru raised the Indian tricolor above the Lahori Gate, reclaiming the site from its colonial associations. This annual ritual underscores the fort\u2019s transformation into a emblem of republican sovereignty, juxtaposing Mughal and modern Indian identities.\n\n    Visitor Experience and Practical Considerations:\n    - Navigating the Complex: The fort operates daily except Mondays, with extended hours during the summer light shows. Foreign nationals pay \u20b9600, while Indians are charged \u20b935, reflecting differential pricing common at Indian heritage sites. Guided tours are recommended to fully appreciate the fort\u2019s nuances, though audio guides offer a self-paced alternative.\n\n    Preservation Challenges and Future Directions:\n    - Despite its UNESCO status, the Red Fort faces threats from urban pollution, groundwater depletion, and unchecked tourism. Acid rain has eroded sandstone surfaces, while vibrations from nearby traffic risk structural damage. Conservation efforts prioritize restoring water features, replanting historic gardens, and using 3D scanning to document erosion patterns.\n\n    Conclusion: The Red Fort\u2019s layered history\u2014from Shah Jahan\u2019s vision to colonial subversion and postcolonial reclamation\u2014offers a microcosm of India\u2019s architectural and political evolution. Its synthesis of artistic traditions underscores the Mughal Empire\u2019s pluralistic ethos, while its modern ceremonial role highlights the complexities of historical memory in nation-building. For visitors, the fort provides not merely a glimpse into the past, but a living theater where the contours of Indian identity continue to be negotiated. As preservation debates unfold, the Red Fort\u2019s enduring legacy lies in its ability to bridge eras, inviting reflection on power, beauty, and resilience.\""
                     }
                 ]
             }

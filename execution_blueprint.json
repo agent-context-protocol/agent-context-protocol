@@ -1,28 +1,142 @@
 {
     "1": {
         "1": {
-            "subtask_description": "Obtain current weather information for Seattle, USA.",
+            "subtask_description": "Calculate the travel time from Chandni Chowk to Red Fort in multiple modes.",
             "steps": {
                 "1": {
-                    "tool": "perplexity_research",
-                    "handles": "Performs deep research to obtain comprehensive weather information for Seattle.",
+                    "tool": "maps_distance_matrix",
+                    "handles": "Calculates travel time driving",
                     "input_vars": [
                         {
-                            "name": "messages_research",
+                            "name": "chandni_chowk_origin",
                             "parameter": [
-                                "messages"
+                                "origins"
                             ],
                             "type": "array",
                             "source": "LLM_Generated",
-                            "description": "Array of conversation messages to research Seattle's weather.",
-                            "value": "[{\"role\": \"user\", \"content\": \"Research the current weather in Seattle, USA.\"}]",
+                            "description": "Origin address array",
+                            "value": "[\"Chandni Chowk, Delhi\"]",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "red_fort_destination",
+                            "parameter": [
+                                "destinations"
+                            ],
+                            "type": "array",
+                            "source": "LLM_Generated",
+                            "description": "Destination address array",
+                            "value": "[\"Red Fort, Delhi\"]",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "driving_mode",
+                            "parameter": [
+                                "mode"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Travel mode driving",
+                            "value": "driving",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "weather_info_research",
-                            "description": "Comprehensive weather information for Seattle obtained from Perplexity_research.",
+                            "name": "driving_time",
+                            "description": "Calculated driving time from Chandni Chowk to Red Fort",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "tool": "maps_distance_matrix",
+                    "handles": "Calculates travel time using public transit",
+                    "input_vars": [
+                        {
+                            "name": "chandni_chowk_origin",
+                            "parameter": [
+                                "origins"
+                            ],
+                            "type": "array",
+                            "source": "LLM_Generated",
+                            "description": "Origin address array",
+                            "value": "[\"Chandni Chowk, Delhi\"]",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "red_fort_destination",
+                            "parameter": [
+                                "destinations"
+                            ],
+                            "type": "array",
+                            "source": "LLM_Generated",
+                            "description": "Destination address array",
+                            "value": "[\"Red Fort, Delhi\"]",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "transit_mode",
+                            "parameter": [
+                                "mode"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Travel mode transit",
+                            "value": "transit",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "transit_time",
+                            "description": "Calculated transit time from Chandni Chowk to Red Fort",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "tool": "maps_distance_matrix",
+                    "handles": "Calculates travel time walking",
+                    "input_vars": [
+                        {
+                            "name": "chandni_chowk_origin",
+                            "parameter": [
+                                "origins"
+                            ],
+                            "type": "array",
+                            "source": "LLM_Generated",
+                            "description": "Origin address array",
+                            "value": "[\"Chandni Chowk, Delhi\"]",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "red_fort_destination",
+                            "parameter": [
+                                "destinations"
+                            ],
+                            "type": "array",
+                            "source": "LLM_Generated",
+                            "description": "Destination address array",
+                            "value": "[\"Red Fort, Delhi\"]",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "walking_mode",
+                            "parameter": [
+                                "mode"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Travel mode walking",
+                            "value": "walking",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "walking_time",
+                            "description": "Calculated walking time from Chandni Chowk to Red Fort",
                             "used_by": []
                         }
                     ]
@@ -32,50 +146,28 @@
     },
     "2": {
         "2": {
-            "subtask_description": "Calculate travel time from Starbucks Roastery to Microsoft Redmond office.",
+            "subtask_description": "Suggest restaurants near Red Fort.",
             "steps": {
                 "1": {
-                    "tool": "maps_distance_matrix",
-                    "handles": "Calculates travel time from Starbucks Roastery to Microsoft Redmond office.",
+                    "tool": "maps_search_places",
+                    "handles": "Searches for restaurants near Red Fort",
                     "input_vars": [
                         {
-                            "name": "origins",
+                            "name": "red_fort_restaurants_query",
                             "parameter": [
-                                "origins"
-                            ],
-                            "type": "array",
-                            "source": "LLM_Generated",
-                            "description": "Array of origin addresses.",
-                            "value": "[\"Starbucks Roastery, Seattle, USA\"]",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "destinations",
-                            "parameter": [
-                                "destinations"
-                            ],
-                            "type": "array",
-                            "source": "LLM_Generated",
-                            "description": "Array of destination addresses.",
-                            "value": "[\"Microsoft Redmond Office, Redmond, USA\"]",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "travel_mode",
-                            "parameter": [
-                                "mode"
+                                "query"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Travel mode for calculating travel time.",
-                            "value": "driving",
+                            "description": "Query to find restaurants near Red Fort",
+                            "value": "restaurants near Red Fort, Delhi",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "travel_time",
-                            "description": "Estimated travel time from Starbucks Roastery to Microsoft Redmond office.",
+                            "name": "restaurants_list",
+                            "description": "List of restaurants near Red Fort",
                             "used_by": []
                         }
                     ]
@@ -85,149 +177,28 @@
     },
     "3": {
         "3": {
-            "subtask_description": "Provide detailed driving directions from Starbucks Roastery to Microsoft Redmond office.",
+            "subtask_description": "Provide historical and visitor information about Red Fort.",
             "steps": {
                 "1": {
-                    "tool": "maps_directions",
-                    "handles": "Provides detailed driving directions from Starbucks Roastery to Microsoft Redmond office.",
+                    "tool": "perplexity_research",
+                    "handles": "Provides comprehensive insights about Red Fort",
                     "input_vars": [
                         {
-                            "name": "origin",
+                            "name": "red_fort_research_messages",
                             "parameter": [
-                                "origin"
+                                "messages"
                             ],
-                            "type": "string",
+                            "type": "array",
                             "source": "LLM_Generated",
-                            "description": "Starting point address.",
-                            "value": "Starbucks Roastery, Seattle, USA",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "destination",
-                            "parameter": [
-                                "destination"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Ending point address.",
-                            "value": "Microsoft Redmond Office, Redmond, USA",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "travel_mode",
-                            "parameter": [
-                                "mode"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Travel mode for directions.",
-                            "value": "driving",
+                            "description": "User request message for historical and visitor information on Red Fort",
+                            "value": "[{\"role\":\"user\",\"content\":\"Please provide historical and visitor information about Red Fort, including its significance, architecture, and visitor tips.\"}]",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "driving_directions",
-                            "description": "Step-by-step driving directions from Starbucks Roastery to Microsoft Redmond office.",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        }
-    },
-    "4": {
-        "4": {
-            "subtask_description": "Explore alternative travel options from Starbucks Roastery to Microsoft Redmond office.",
-            "steps": {
-                "1": {
-                    "tool": "maps_directions",
-                    "handles": "Explores public transport options from Starbucks Roastery to Microsoft Redmond office.",
-                    "input_vars": [
-                        {
-                            "name": "origin_transit",
-                            "parameter": [
-                                "origin"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Starting point address for transit.",
-                            "value": "Starbucks Roastery, Seattle, USA",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "destination_transit",
-                            "parameter": [
-                                "destination"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Ending point address for transit.",
-                            "value": "Microsoft Redmond Office, Redmond, USA",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "travel_mode_transit",
-                            "parameter": [
-                                "mode"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Travel mode for transit options.",
-                            "value": "transit",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "transit_options",
-                            "description": "Public transport options from Starbucks Roastery to Microsoft Redmond office.",
-                            "used_by": []
-                        }
-                    ]
-                },
-                "2": {
-                    "tool": "maps_directions",
-                    "handles": "Explores biking options from Starbucks Roastery to Microsoft Redmond office.",
-                    "input_vars": [
-                        {
-                            "name": "origin_bike",
-                            "parameter": [
-                                "origin"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Starting point address for biking.",
-                            "value": "Starbucks Roastery, Seattle, USA",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "destination_bike",
-                            "parameter": [
-                                "destination"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Ending point address for biking.",
-                            "value": "Microsoft Redmond Office, Redmond, USA",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "travel_mode_bike",
-                            "parameter": [
-                                "mode"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Travel mode for biking options.",
-                            "value": "bicycling",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "biking_options",
-                            "description": "Biking options from Starbucks Roastery to Microsoft Redmond office.",
+                            "name": "red_fort_information",
+                            "description": "Historical and visitor information about Red Fort",
                             "used_by": []
                         }
                     ]
