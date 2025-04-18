@@ -1,6 +1,7 @@
 from base import BaseNode
 import re
 import json
+import traceback 
 import asyncio
 from available_tools.rapid_apis_format.return_dict import RAPIDAPI_TOOLS_DICT, RAPIDAPI_REQD_PARAMS_DICT, RAPIDAPI_PARAMS_DICT
 from available_tools.function_format.return_dict import FUNCTION_TOOLS_DOCUMENTATION_DICT, FUNCTION_TOOLS_REQD_PARAMS_DICT, FUNCTION_TOOLS_PARAMS_DICT
@@ -513,6 +514,16 @@ class DAGCompilerNode(BaseNode):
                     result.append(f"   - **Use:** {tool_details['Use']}\n")
                     result.append(f"   - **Documentation:** {FUNCTION_TOOLS_DOCUMENTATION_DICT[tool_name]}\n")
                     tool_id += 1
+                elif tool_name in self.MCP_PARAMS_DICT:
+                    print(self.MCP_PARAMS_DICT)
+                    print(tool_name)
+                    formatted_string = (
+                        f"{tool_id}. {tool_name}\n"
+                        f"   - **Use:** {self.MCP_PARAMS_DICT[tool_name]['documentation']}\n\n"
+                        f"   - **Documentation:** {self.MCP_PARAMS_DICT[tool_name]['parameters']}\n\n"
+                    )
+                    result.append(formatted_string)
+                    tool_id += 1
                 else:
                     raise ValueError(f"Invalid TOOL Name {tool_name}. It is not there in RAPIDAPI_TOOLS_DICT or FUNCTION_APIS_FUNCTION_DICT.")
             result.append("\n")  # Add spacing
@@ -558,7 +569,6 @@ class DAGCompilerNode(BaseNode):
         if not run_success:
             raise ValueError("SOmething is wrong with the LLM or the parsing dag compiler execution_blueprint. An error is not expected here")
             
-
         # Write to a JSON file
         with open("execution_blueprint.json", "w") as json_file:
             json.dump(execution_blueprint_dict, json_file, indent=4)
@@ -580,13 +590,20 @@ class DAGCompilerNode(BaseNode):
             
             # Process the update here
             print(f"Processing update from Agent {agent_id}")
+            
+            try:
+                # Prepare the input for the LLM
+                status_assistance_llm_input = self.make_input_status_update(
+                    self.execution_blueprint[str(agent_object.group_id)], 
+                    agent_object.group_id, 
+                    status_update_dict
+                )
+            except Exception as e:
+                print("ERROR in make_input_status_update:")
+                traceback.print_exc()  
+                # optionally re-raise or handle differently
+                continue
 
-            # Prepare the input for the LLM
-            status_assistance_llm_input = self.make_input_status_update(
-                self.execution_blueprint[str(agent_object.group_id)], 
-                agent_object.group_id, 
-                status_update_dict
-            )
 
             print("status_assistance_llm_input:", status_assistance_llm_input)
 
@@ -656,5 +673,5 @@ class DAGCompilerNode(BaseNode):
         # Load the execution_blueprint back from the file
         with open(filename, "r") as json_file:
             updated_execution_blueprint_dict = json.load(json_file)
-        self.execution_blueprint[str(group_id)] = updated_execution_blueprint_dict
+        self.execution_blueprint[str(group_id)] = updated_execution_blueprint_dict[str(group_id)]
         return updated_execution_blueprint_dict

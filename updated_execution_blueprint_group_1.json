@@ -1,28 +1,28 @@
 {
     "1": {
         "1": {
-            "subtask_description": "Identify the top 5 most populous cities in India in order of their population.",
+            "subtask_description": "Identify the 5 most populous cities in India with approximate population figures.",
             "steps": {
                 "1": {
-                    "tool": "perplexity_research",
-                    "handles": "Finding the 5 most populous cities in India",
+                    "tool": "perplexity_ask",
+                    "handles": "Retrieves the top 5 most populous cities in India with approximate populations",
                     "input_vars": [
                         {
-                            "name": "get_top_5_indian_cities",
+                            "name": "query_populous_cities",
                             "parameter": [
                                 "messages"
                             ],
                             "type": "array",
                             "source": "LLM_Generated",
-                            "description": "Query asking for India\u2019s 5 most populous cities with ranking",
-                            "value": "[{\"role\":\"user\",\"content\":\"Please list the 5 most populous cities in India by population ranking.\"}]",
+                            "description": "Single user message querying for the 5 most populous cities in India",
+                            "value": "[{\"role\":\"user\",\"content\":\"List the 5 most populous cities in India with approximate population figures.\"}]",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "top_5_indian_cities",
-                            "description": "The list of the 5 most populous Indian cities in population order",
+                            "name": "populous_cities_list",
+                            "description": "List of the 5 most populous Indian cities along with approximate population",
                             "used_by": [
                                 {
                                     "sub_task": 2,
@@ -39,20 +39,20 @@
             }
         },
         "2": {
-            "subtask_description": "Provide distances between each pair of the 5 most populous cities.",
+            "subtask_description": "Compute the distances among the 5 identified cities.",
             "steps": {
                 "1": {
                     "tool": "maps_distance_matrix",
-                    "handles": "Generating a distance matrix among the 5 cities",
+                    "handles": "Generates a distance matrix among the identified cities",
                     "input_vars": [
                         {
-                            "name": "top_5_indian_cities",
+                            "name": "populous_cities_list",
                             "parameter": [
                                 "origins"
                             ],
                             "type": "array",
                             "source": "TOOL_Output (sub_task 1, Step 1)",
-                            "description": "The same 5 Indian cities for origins",
+                            "description": "The 5 populous Indian cities used as origins",
                             "value": "None",
                             "dependencies": [
                                 {
@@ -62,13 +62,13 @@
                             ]
                         },
                         {
-                            "name": "top_5_indian_cities",
+                            "name": "populous_cities_list",
                             "parameter": [
                                 "destinations"
                             ],
                             "type": "array",
                             "source": "TOOL_Output (sub_task 1, Step 1)",
-                            "description": "The same 5 Indian cities for destinations",
+                            "description": "The 5 populous Indian cities used as destinations",
                             "value": "None",
                             "dependencies": [
                                 {
@@ -84,15 +84,15 @@
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Travel mode for distance calculations",
+                            "description": "Travel mode for distance calculation",
                             "value": "driving",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "cities_distance_matrix",
-                            "description": "Distance matrix among the 5 most populous Indian cities",
+                            "name": "distance_matrix",
+                            "description": "Matrix of distances for each city pair",
                             "used_by": []
                         }
                     ]

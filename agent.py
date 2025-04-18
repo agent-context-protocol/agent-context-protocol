@@ -733,13 +733,15 @@ class AgentNode(BaseNode):
                             if parsed_agent_request['agent_requests'][tool_req_i]['method'] == "FUNCTION":
                                 if parsed_agent_request['agent_requests'][tool_req_i]['url'] in self.dag_compiler.MCP_PARAMS_DICT.keys():
                                     print("tool_req_i in self.dag_compiler.MCP_PARAMS_DICT.keys()")
-                                    tool_call_success_bool, tool_output = await self.dag_compiler.mcp_tool_manager.call_tool(parsed_agent_request['agent_requests'][tool_req_i]['url'],parsed_agent_request['agent_requests'][tool_req_i]['body'])
+                                    _, mcp_output = await self.dag_compiler.mcp_tool_manager.call_tool(parsed_agent_request['agent_requests'][tool_req_i]['url'],parsed_agent_request['agent_requests'][tool_req_i]['body'])
+                                    tool_call_success_bool, tool_output = not(mcp_output.isError), mcp_output
                                 else:
                                     tool_call_success_bool, tool_output = self.function_call(step['tool'], parsed_agent_request['agent_requests'][tool_req_i]['body'])
                             else:
                                 tool_call_success_bool, tool_output = self.requests_func(parsed_agent_request['agent_requests'][tool_req_i]['method'], parsed_agent_request['agent_requests'][tool_req_i]['url'], parsed_agent_request['agent_requests'][tool_req_i]['headers'], parsed_agent_request['agent_requests'][tool_req_i]['body'])
 
                             print("tool_output : ",tool_output)
+                            print("tool_call_success_bool : ",tool_call_success_bool)
                             # if tool_output is too big then we will truncate if required and then summarize here itself else it would take a lot of context
                             # Truncating the tool output to 80000 characters
                             if len(str(tool_output)) > 80000:
@@ -759,19 +761,19 @@ class AgentNode(BaseNode):
                                 tool_output = llm_output_tool_output_summarize
                                 print("after summarize num of tokens : ",self.num_tokens_from_string(f"{tool_output}"))
 
-                            # if its tool call failed then we can retry as it is possible that llm made a wrong agent request
-                            if not tool_call_success_bool:
-                                # error handling part here
-                                raise ValueError(f"tool_output : {tool_output}")
-                            # apart from tool call failure errors we should just call the dag compiler for assistance
+
+                            # If tool call failure, then we should retry
                             if not tool_call_success_bool:
                                 assistance_request_bool = True
                                 assistance_error_dict = tool_output
-                                break
+                                raise ValueError(f"tool_output : {tool_output}")
                             
                             tool_outputs_list.append(tool_output)
 
                         run_success = True
+                        # Resetting in case it was updated
+                        assistance_request_bool = False
+                        assistance_error_dict = None
                     except Exception as e:
                         error_message = f'There was an error while running the tool, please rectify based on this error message, only output the CHAIN_OF_THOUGHT and AGENT_REQUEST without any other details before or after. Carefully review the tool call and its documentation to identify and then rectify it.:\n {str(e)}' 
                         self.chat_history.append({"role": "user", "content": error_message})

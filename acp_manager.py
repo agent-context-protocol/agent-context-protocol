@@ -80,12 +80,14 @@ class ACPManager:
                 await agent.build_verify()
                 if agent.drop:
                     print('Dropping This execution_blueprint...')
+                    agent.drop = False
                     
                 if agent.modify:
                     print('Modifying This execution_blueprint...')
                     print("\nagent.group_execution_blueprint : ",agent.group_execution_blueprint)
                     group_done = False
                     await self.modify_group(agent.group_execution_blueprint, group_id)
+                    agent.modify = False
                     break
                         # return None
                 group_results[agent.sub_task_no] = agent.get_results()
