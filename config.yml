@@ -9,7 +9,7 @@ servers:
     path: more_servers/perplexity_mcp/modelcontextprotocol/perplexity-ask/dist/index.js
     type: node
     env: 
-      PERPLEXITY_API_KEY: "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"
+      PERPLEXITY_API_KEY: "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"
 
   - name: GoogleMaps
     path: servers/src/google-maps/dist/index.js

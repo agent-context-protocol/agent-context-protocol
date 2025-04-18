@@ -1,33 +1,79 @@
 {
     "1": {
         "1": {
-            "subtask_description": "Identify the top 5 most populous cities in India in order of their population.",
+            "subtask_description": "Retrieve the last message from the group Slack channel and store its content and sender user ID.",
             "steps": {
                 "1": {
-                    "tool": "perplexity_research",
-                    "handles": "Finding the 5 most populous cities in India",
+                    "tool": "slack_list_channels",
+                    "handles": "Listing public Slack channels to identify the group channel",
                     "input_vars": [
                         {
-                            "name": "get_top_5_indian_cities",
+                            "name": "channel_list_limit",
                             "parameter": [
-                                "messages"
+                                "limit"
                             ],
-                            "type": "array",
+                            "type": "number",
                             "source": "LLM_Generated",
-                            "description": "Query asking for India\u2019s 5 most populous cities with ranking",
-                            "value": "[{\"role\":\"user\",\"content\":\"Please list the 5 most populous cities in India by population ranking.\"}]",
+                            "description": "Maximum number of channels to return",
+                            "value": "100",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "top_5_indian_cities",
-                            "description": "The list of the 5 most populous Indian cities in population order",
+                            "name": "group_channel_id",
+                            "description": "ID of the target Slack channel",
                             "used_by": [
                                 {
-                                    "sub_task": 2,
+                                    "sub_task": 1,
+                                    "step": 2
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "2": {
+                    "tool": "slack_get_channel_history",
+                    "handles": "Fetching the most recent message from the identified channel",
+                    "input_vars": [
+                        {
+                            "name": "group_channel_id",
+                            "parameter": [
+                                "channel_id"
+                            ],
+                            "type": "string",
+                            "source": "TOOL_Output (sub_task 1, Step 1)",
+                            "description": "Slack channel ID for which to retrieve history",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 1,
                                     "step": 1
-                                },
+                                }
+                            ]
+                        },
+                        {
+                            "name": "history_limit",
+                            "parameter": [
+                                "limit"
+                            ],
+                            "type": "number",
+                            "source": "LLM_Generated",
+                            "description": "Number of messages to retrieve",
+                            "value": "1",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "last_message_content",
+                            "description": "The most recent message text from the channel",
+                            "used_by": []
+                        },
+                        {
+                            "name": "last_message_user_id",
+                            "description": "The user ID of the sender of the most recent message",
+                            "used_by": [
                                 {
                                     "sub_task": 2,
                                     "step": 1
@@ -39,60 +85,33 @@
             }
         },
         "2": {
-            "subtask_description": "Provide distances between each pair of the 5 most populous cities.",
+            "subtask_description": "Identify the user who posted the last message and display both the last message and the user info.",
             "steps": {
                 "1": {
-                    "tool": "maps_distance_matrix",
-                    "handles": "Generating a distance matrix among the 5 cities",
+                    "tool": "slack_get_user_profile",
+                    "handles": "Retrieving the user's profile with the last message user ID",
                     "input_vars": [
                         {
-                            "name": "top_5_indian_cities",
+                            "name": "last_message_user_id",
                             "parameter": [
-                                "origins"
-                            ],
-                            "type": "array",
-                            "source": "TOOL_Output (sub_task 1, Step 1)",
-                            "description": "The same 5 Indian cities for origins",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "sub_task": 1,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "top_5_indian_cities",
-                            "parameter": [
-                                "destinations"
-                            ],
-                            "type": "array",
-                            "source": "TOOL_Output (sub_task 1, Step 1)",
-                            "description": "The same 5 Indian cities for destinations",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "sub_task": 1,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "travel_mode",
-                            "parameter": [
-                                "mode"
+                                "user_id"
                             ],
                             "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Travel mode for distance calculations",
-                            "value": "driving",
-                            "dependencies": []
+                            "source": "TOOL_Output (sub_task 1, Step 2)",
+                            "description": "ID of the user who posted the last message",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 1,
+                                    "step": 2
+                                }
+                            ]
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "cities_distance_matrix",
-                            "description": "Distance matrix among the 5 most populous Indian cities",
+                            "name": "last_message_user_profile",
+                            "description": "Profile details of the user who posted the last message",
                             "used_by": []
                         }
                     ]

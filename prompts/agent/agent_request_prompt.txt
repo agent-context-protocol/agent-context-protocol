@@ -209,7 +209,7 @@ ERROR_EXPLANATION
 
 ### Some More Example:
 
-#### Example 1:
+#### Example:
 
 # Input:
 
@@ -353,99 +353,7 @@ HEADERS
   "X-RTOOLdTOOL-Key": YOUR_TOOL_KEY
 }
 
-
-#### Example 2:
-
-# Input:
-
-Step Details:
-
-- TOOL: Stack_Exchange_Questions
-- Handles: Retrieves specific C++ questions from Stack Exchange
-- Input Variables:
-  - Name: tagged
-    - Parameter: tagged
-    - Type: string
-    - Source: LLM_Generated
-    - Description: Filter questions by the C++ tag
-    - Value: "c++"
-- Output Variables:
-  - Name: cpp_questions_list
-    - Description: List of C++ questions from Stack Exchange
-
-TOOL Documentation:
-
-[You will be given the TOOL documentation]
-
-# Your Output:
-
-$$CHAIN_OF_THOUGHT$$
-
-Input Variables:
-
-- Name: tagged
-  - Parameter: tagged
-  - Type: string
-  - Source: LLM_Generated
-  - Description: Filter questions by the C++ tag
-  - Value: "c++"
-
-Verification of Input Variables:
-
-- The parameter tagged is optional and used to filter questions by a specific tag.
-- The type is correct (string), and the value "c++" is appropriate for filtering C++ questions.
-- The parameter name tagged matches the TOOL documentation.
-
-Determining Single vs. Multiple Agent Requests:
-
-- Since there are not multiple things we will just do one Agent Request
-
-HTTP Method & Endpoint URL:
-
-- The TOOL method is GET, as specified in the TOOL documentation for listing questions.
-- The base URL is https://TOOL.stackexchange.com/2.2.
-- The endpoint is /questions.
-- We need to construct the full URL with required and optional query parameters.
-
-Required Query Parameters:
-
-- site (string, required): The site to query. Default is stackoverflow, but we need to include it explicitly. We will add the site=stackoverflow parameter ourselves instead of raising error 601 MISSING_REQUIRED_PARAMETERS.
-
-Optional Query Parameters:
-
-- tagged (string, optional): We'll use this to filter questions tagged with "c++".
-- pagesize (integer, optional): To limit the number of results, we'll set pagesize=15.
-- page (integer, optional): We'll set page=1 to retrieve the first page of results.
-
-Headers:
-
-- The TOOL does not require any special headers for this request.
-
-Dependencies:
-
-- There are no dependencies on previous TOOL outputs.
-
-Encoding Parameters:
-
-- The tag "c++" contains a + character, which needs to be URL-encoded as %2B.
-
-Final Decision:
-
-- Construct the GET request URL by including all required and optional parameters.
-- The final URL will be: https://TOOL.stackexchange.com/2.2/questions?site=stackoverflow&tagged=c%2B%2B&pagesize=15&page=1
-
-$$AGENT_REQUEST$$
-
-TOOL_ENDPOINT
-
-Method: GET  
-URL: https://TOOL.stackexchange.com/2.2/questions?site=stackoverflow&tagged=c%2B%2B&pagesize=15&page=1
-
-HEADERS
-
-BODY
-
-#### Example 3:
+#### Example:
 
 # Input:
 
@@ -513,7 +421,7 @@ ERROR_EXPLANATION
 
 The latitude of the location we want weather of is missing. We cannot get the weather from WeatherTOOL.com_Realtime_Weather_TOOL without both longitude and latitude of the location
 
-#### Example 4:
+#### Example:
 
 # Input:
 
@@ -545,72 +453,121 @@ TOOL Documentation:
 # Your Output:
 
 $$CHAIN_OF_THOUGHT$$
-
-Input Variables:
-
-- Name: vacation_spots_list
-  - Parameter: query
-  - Type: string
-  - Source: TOOL_Output (sub_task 1, Step 1)
-  - Description: List of vacation spots from sub_task 1
-  - Value: ["The Dolomites, Italy", "Santorini, Greece", "Prague, Czech Republic", "Cinque Terre, Italy", "Barcelona, Spain", "London, UK", "Rome, Italy", "Amsterdam, Netherlands", "Munich, Germany", "Dublin, Ireland"]
-
-Verification of Input Variables:
-
-- The query parameter is required and expects a string representing the user's question or search term.
-- The vacation_spots_list is a list of vacation spot names.
-- Since the query parameter accepts a single string, and the TOOL recommends not to ask too much information in one search, we should execute separate Agent Requests for each vacation spot.
-
-Determining Single vs. Multiple Agent Requests:
-
-- The TOOL documentation advises to break down queries and not ask for too much information in one search.
-- Therefore, we will execute individual Agent Requests for each vacation spot to ensure accurate and concise responses.
-- We are keeping the number of Agent Requests below 5 by getting latitude and longitude data of multiple cities at once.
-
-Method & Function Name:
-
-- The method is FUNCTION, and the function name is perplexity_TOOL_response.
-
-Headers:
-
-- No headers are required for this function call.
-
-Request Body:
-
-- For each vacation spot, we will construct a query asking for the latitude and longitude of that specific place.
-- The preplexity_ai_key is provided as "YOUR_TOOL_KEY".
-
-Final Decision:
-
-- Create ten separate Agent Requests, one for each vacation spot.
-- Each request will have its own query parameter formatted as "What are the latitude and longitude of [vacation spot]?"
+	-	vacation_spots_list contains ten distinct place names delivered from the earlier step.
+	-	Per the documentation and guidance, asking about many locations in one query can degrade accuracy.
+	-	We must keep total agent requests ≤ 5. Splitting the ten places into five queries with two locations each balances accuracy and the request‑limit constraint.
+	-	Method is FUNCTION because we are calling a function‑style tool; URL is the function name perplexity_ask.
+	-	No authentication header or API key is needed.
+	-	Each BODY will supply one user‑role message asking for the lat‑lon of the two places.
+	-	HEADERS remains empty for function calls.
+	-	All parameter names and types match the tool schema.
 
 $$AGENT_REQUEST$$
 
 TOOL_ENDPOINT
 
-Method: FUNCTION  
-URL: perplexity_TOOL_response
+Method: FUNCTION
+URL: perplexity_ask
 
 HEADERS
 
+{}
+
 BODY
+
 {
-  "query": "What are the latitude and longitude for the following places: "The Dolomites, Italy", "Santorini, Greece", "Prague, Czech Republic", "Cinque Terre, Italy", "Barcelona, Spain"",
-  "preplexity_ai_key": "YOUR_TOOL_KEY"
+“messages”: [
+{
+“role”: “user”,
+“content”: “What are the latitude and longitude coordinates for The Dolomites, Italy and Santorini, Greece?”
+}
+]
 }
 
 $$AGENT_REQUEST$$
 
 TOOL_ENDPOINT
 
-Method: FUNCTION  
-URL: perplexity_TOOL_response
+Method: FUNCTION
+URL: perplexity_ask
 
 HEADERS
 
+{}
+
 BODY
+
 {
-  "query": "What are the latitude and longitude for the following places: "London, UK", "Rome, Italy", "Amsterdam, Netherlands", "Munich, Germany", "Dublin, Ireland"",
-  "preplexity_ai_key": "YOUR_TOOL_KEY"
+“messages”: [
+{
+“role”: “user”,
+“content”: “What are the latitude and longitude coordinates for Prague, Czech Republic and Cinque Terre, Italy?”
+}
+]
+}
+
+$$AGENT_REQUEST$$
+
+TOOL_ENDPOINT
+
+Method: FUNCTION
+URL: perplexity_ask
+
+HEADERS
+
+{}
+
+BODY
+
+{
+“messages”: [
+{
+“role”: “user”,
+“content”: “What are the latitude and longitude coordinates for Barcelona, Spain and London, UK?”
+}
+]
+}
+
+$$AGENT_REQUEST$$
+
+TOOL_ENDPOINT
+
+Method: FUNCTION
+URL: perplexity_ask
+
+HEADERS
+
+{}
+
+BODY
+
+{
+“messages”: [
+{
+“role”: “user”,
+“content”: “What are the latitude and longitude coordinates for Rome, Italy and Amsterdam, Netherlands?”
+}
+]
+}
+
+$$AGENT_REQUEST$$
+
+TOOL_ENDPOINT
+
+Method: FUNCTION
+URL: perplexity_ask
+
+HEADERS
+
+{}
+
+BODY
+
+{
+“messages”: [
+{
+“role”: “user”,
+“content”: “What are the latitude and longitude coordinates for Munich, Germany and Dublin, Ireland?”
+}
+]
 }

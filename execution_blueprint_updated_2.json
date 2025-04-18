@@ -1,118 +1,180 @@
 {
     "1": {
-        "subtask_description": "Retrieve recent S&P 500 index data in a structured format.",
+        "subtask_description": "Identify five most populous cities in India and provide a concise summary.",
         "steps": {
             "1": {
-                "tool": "perplexity_research",
-                "handles": "Acquires recent S&P 500 index data (e.g., dates and values for the last few weeks/months)",
+                "tool": "perplexity_ask",
+                "handles": "Retrieves an initial list of five most populous Indian cities",
                 "input_vars": [
                     {
-                        "name": "sp500_data_request",
+                        "name": "query_populous_cities_initial",
                         "parameter": [
                             "messages"
                         ],
                         "type": "array",
                         "source": "LLM_Generated",
-                        "description": "User message asking for structured S&P 500 data over a recent timeframe",
-                        "value": "[{\"role\":\"user\",\"content\":\"Please provide the recent S&P 500 index data (dates and values) over the last month in a structured format.\"}]",
+                        "description": "The user request about the top five most populous cities in India",
+                        "value": "[{\"role\":\"user\",\"content\":\"List the 5 most populous cities of India.\"}]",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "sp500_dates",
-                        "description": "Array of date strings for the recent S&P 500 data",
+                        "name": "initial_city_list",
+                        "description": "Initial list of five populous cities in India",
                         "used_by": [
                             {
-                                "sub_task": 2,
-                                "step": 1
+                                "sub_task": 1,
+                                "step": 2
                             }
                         ],
-                        "value": "[\"April 1, 2025\", \"April 9, 2025\", \"April 10, 2025\", \"April 11, 2025\", \"April 14, 2025\", \"April 15, 2025\"]"
-                    },
+                        "value": "```json\n    [\n      {\n        \"city\": \"Delhi\",\n        \"state\": null,\n        \"population\": 33807403\n      },\n      {\n        \"city\": \"Mumbai\",\n        \"state\": \"Maharashtra\",\n        \"population\": 21673570\n      },\n      {\n        \"city\": \"Kolkata\",\n        \"state\": \"West Bengal\",\n        \"population\": 15570786\n      },\n      {\n        \"city\": \"Bangalore\",\n        \"state\": \"Karnataka\",\n        \"population\": 14008262\n      },\n      {\n        \"city\": \"Chennai\",\n        \"state\": \"Tamil Nadu\",\n        \"population\": 12053697\n      }\n    ]\n    ```"
+                    }
+                ]
+            },
+            "2": {
+                "tool": "perplexity_research",
+                "handles": "Confirms or refines the list of five cities",
+                "input_vars": [
                     {
-                        "name": "sp500_values",
-                        "description": "Corresponding array of S&P 500 index values",
+                        "name": "initial_city_list",
+                        "parameter": [
+                            "messages"
+                        ],
+                        "type": "array",
+                        "source": "TOOL_Output (sub_task 1, Step 1)",
+                        "description": "Array with user message referencing the initial list of cities for confirmation",
+                        "value": "```json\n    [\n      {\n        \"city\": \"Delhi\",\n        \"state\": null,\n        \"population\": 33807403\n      },\n      {\n        \"city\": \"Mumbai\",\n        \"state\": \"Maharashtra\",\n        \"population\": 21673570\n      },\n      {\n        \"city\": \"Kolkata\",\n        \"state\": \"West Bengal\",\n        \"population\": 15570786\n      },\n      {\n        \"city\": \"Bangalore\",\n        \"state\": \"Karnataka\",\n        \"population\": 14008262\n      },\n      {\n        \"city\": \"Chennai\",\n        \"state\": \"Tamil Nadu\",\n        \"population\": 12053697\n      }\n    ]\n    ```",
+                        "dependencies": [
+                            {
+                                "sub_task": 1,
+                                "step": 1
+                            }
+                        ]
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "top_five_cities",
+                        "description": "Final verified list of five most populous cities in India",
                         "used_by": [
                             {
                                 "sub_task": 2,
                                 "step": 1
+                            },
+                            {
+                                "sub_task": 2,
+                                "step": 2
+                            },
+                            {
+                                "sub_task": 2,
+                                "step": 2
                             }
                         ],
-                        "value": "[5566.85, 5456.90, 5268.05, 5363.36, 5405.97, 5396.63]"
+                        "value": "```json\n    [\n      {\n        \"city\": \"Delhi\",\n        \"state\": null,\n        \"population\": 33800000\n      },\n      {\n        \"city\": \"Mumbai\",\n        \"state\": \"Maharashtra\",\n        \"population\": 21700000\n      },\n      {\n        \"city\": \"Kolkata\",\n        \"state\": \"West Bengal\",\n        \"population\": 15600000\n      },\n      {\n        \"city\": \"Bangalore\",\n        \"state\": \"Karnataka\",\n        \"population\": 14000000\n      },\n      {\n        \"city\": \"Chennai\",\n        \"state\": \"Tamil Nadu\",\n        \"population\": 12050000\n      }\n    ]\n    ```"
                     }
                 ]
             }
         }
     },
     "2": {
-        "subtask_description": "Generate a line chart showing the recent S&P 500 trends.",
+        "subtask_description": "Provide pairwise distances between the five identified cities.",
         "steps": {
             "1": {
-                "tool": "generate_chart",
-                "handles": "Renders a line chart of S&P 500 index vs. date",
+                "tool": "perplexity_ask",
+                "handles": "Retrieves approximate distances among the five cities",
                 "input_vars": [
                     {
-                        "name": "chart_type",
+                        "name": "top_five_cities",
                         "parameter": [
-                            "type"
-                        ],
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "The type of chart to generate",
-                        "value": "line",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "sp500_dates",
-                        "parameter": [
-                            "labels"
+                            "messages"
                         ],
                         "type": "array",
-                        "source": "TOOL_Output (sub_task 1, Step 1)",
-                        "description": "Labels for the x-axis (dates) from sub_task 1",
-                        "value": "[\"April 1, 2025\", \"April 9, 2025\", \"April 10, 2025\", \"April 11, 2025\", \"April 14, 2025\", \"April 15, 2025\"]",
+                        "source": "TOOL_Output (sub_task 1, Step 2)",
+                        "description": "The final verified list of five most populous cities in India",
+                        "value": "```json\n    [\n      {\n        \"city\": \"Delhi\",\n        \"state\": null,\n        \"population\": 33800000\n      },\n      {\n        \"city\": \"Mumbai\",\n        \"state\": \"Maharashtra\",\n        \"population\": 21700000\n      },\n      {\n        \"city\": \"Kolkata\",\n        \"state\": \"West Bengal\",\n        \"population\": 15600000\n      },\n      {\n        \"city\": \"Bangalore\",\n        \"state\": \"Karnataka\",\n        \"population\": 14000000\n      },\n      {\n        \"city\": \"Chennai\",\n        \"state\": \"Tamil Nadu\",\n        \"population\": 12050000\n      }\n    ]\n    ```",
                         "dependencies": [
                             {
                                 "sub_task": 1,
-                                "step": 1
+                                "step": 2
                             }
                         ]
                     },
                     {
-                        "name": "chart_datasets",
+                        "name": "query_approx_distances",
                         "parameter": [
-                            "datasets"
+                            "messages"
                         ],
                         "type": "array",
                         "source": "LLM_Generated",
-                        "description": "Dataset configuration for S&P 500 values",
-                        "value": "",
+                        "description": "Additional user message requesting approximate distances",
+                        "value": "[{\"role\":\"user\",\"content\":\"What are the approximate distances among these 5 cities in India?\"}]",
                         "dependencies": []
-                    },
-                    {
-                        "name": "sp500_values",
-                        "parameter": [
-                            "datasets[0].data"
-                        ],
-                        "type": "array",
-                        "source": "TOOL_Output (sub_task 1, Step 1)",
-                        "description": "Y-axis data points (S&P 500 index values) inserted into the first dataset",
-                        "value": "[5566.85, 5456.90, 5268.05, 5363.36, 5405.97, 5396.63]",
-                        "dependencies": [
-                            {
-                                "sub_task": 1,
-                                "step": 1
-                            }
-                        ]
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "sp500_chart",
-                        "description": "The generated line chart for recent S&P 500 trends",
+                        "name": "approximate_distance_info",
+                        "description": "Summary or approximate distances among the five cities",
                         "used_by": [],
-                        "value": "\"https://quickchart.io/chart?c=%7B%22type%22%3A%22line%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22April%201%2C%202025%22%2C%22April%209%2C%202025%22%2C%22April%2010%2C%202025%22%2C%22April%2011%2C%202025%22%2C%22April%2014%2C%202025%22%2C%22April%2015%2C%202025%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22S%26P%20500%22%2C%22data%22%3A%5B5566.85%2C5456.9%2C5268.05%2C5363.36%2C5405.97%2C5396.63%5D%2C%22backgroundColor%22%3A%22rgba(54%2C%20162%2C%20235%2C%200.2)%22%2C%22borderColor%22%3A%22rgba(54%2C%20162%2C%20235%2C%201)%22%7D%5D%7D%2C%22options%22%3A%7B%7D%7D\""
+                        "value": "\"Here are the approximate distances among Delhi, Mumbai, Kolkata, Bangalore, and Chennai, India\u2019s major metropolises (all distances in kilometers):\n\n| City Pair             | Approx. Road Distance (km) |\n|-----------------------|----------------------------|\n| Delhi \u2013 Mumbai        | 1,419                      |\n| Delhi \u2013 Kolkata       | 1,453                      |\n| Delhi \u2013 Chennai       | 2,191                      |\n| Delhi \u2013 Bangalore     | 2,096                      |\n| Mumbai \u2013 Kolkata      | 1,670                      |\n| Mumbai \u2013 Chennai      | 1,290                      |\n| Mumbai \u2013 Bangalore    | 1,019                      |\n| Kolkata \u2013 Chennai     | 1,684                      |\n| Kolkata \u2013 Bangalore   | 1,300                      |\n| Bangalore \u2013 Chennai   | 350                        |\n\n- These distances are based on major National Highway routes, especially the Golden Quadrilateral network.\n- Straight-line distances are generally shorter than road distances.\n- The Golden Quadrilateral highway system connects Delhi, Mumbai, Kolkata, and Chennai in a four-sided network, with Bangalore also well connected.\n- Actual travel times may vary depending on the mode of transport and chosen route.\n\nSources: [distancecalculator.globefeed.com](https://distancecalculator.globefeed.com/India_Distance_Calculator.asp), [Wikipedia: Golden Quadrilateral](https://en.wikipedia.org/wiki/Golden_Quadrilateral), and others as cited in the TOOL response.\""
+                    }
+                ]
+            },
+            "2": {
+                "tool": "maps_distance_matrix",
+                "handles": "Calculates the pairwise driving distances among the five cities",
+                "input_vars": [
+                    {
+                        "name": "top_five_cities",
+                        "parameter": [
+                            "origins"
+                        ],
+                        "type": "array",
+                        "source": "TOOL_Output (sub_task 1, Step 2)",
+                        "description": "Final verified list of five cities used as origins",
+                        "value": "```json\n    [\n      {\n        \"city\": \"Delhi\",\n        \"state\": null,\n        \"population\": 33800000\n      },\n      {\n        \"city\": \"Mumbai\",\n        \"state\": \"Maharashtra\",\n        \"population\": 21700000\n      },\n      {\n        \"city\": \"Kolkata\",\n        \"state\": \"West Bengal\",\n        \"population\": 15600000\n      },\n      {\n        \"city\": \"Bangalore\",\n        \"state\": \"Karnataka\",\n        \"population\": 14000000\n      },\n      {\n        \"city\": \"Chennai\",\n        \"state\": \"Tamil Nadu\",\n        \"population\": 12050000\n      }\n    ]\n    ```",
+                        "dependencies": [
+                            {
+                                "sub_task": 1,
+                                "step": 2
+                            }
+                        ]
+                    },
+                    {
+                        "name": "top_five_cities",
+                        "parameter": [
+                            "destinations"
+                        ],
+                        "type": "array",
+                        "source": "TOOL_Output (sub_task 1, Step 2)",
+                        "description": "Final verified list of five cities used as destinations",
+                        "value": "```json\n    [\n      {\n        \"city\": \"Delhi\",\n        \"state\": null,\n        \"population\": 33800000\n      },\n      {\n        \"city\": \"Mumbai\",\n        \"state\": \"Maharashtra\",\n        \"population\": 21700000\n      },\n      {\n        \"city\": \"Kolkata\",\n        \"state\": \"West Bengal\",\n        \"population\": 15600000\n      },\n      {\n        \"city\": \"Bangalore\",\n        \"state\": \"Karnataka\",\n        \"population\": 14000000\n      },\n      {\n        \"city\": \"Chennai\",\n        \"state\": \"Tamil Nadu\",\n        \"population\": 12050000\n      }\n    ]\n    ```",
+                        "dependencies": [
+                            {
+                                "sub_task": 1,
+                                "step": 2
+                            }
+                        ]
+                    },
+                    {
+                        "name": "driving_mode",
+                        "parameter": [
+                            "mode"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Travel mode is set to driving",
+                        "value": "driving",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "distances_table",
+                        "description": "Pairwise driving distances between the five cities",
+                        "used_by": [],
+                        "value": "```json\n    [\n      {\n        \"origin\": \"Delhi, India\",\n        \"to\": [\n          {\n            \"destination\": \"Delhi, India\",\n            \"distance\": \"1 m\",\n            \"distance_meters\": 0,\n            \"duration\": \"1 min\",\n            \"duration_seconds\": 0\n          },\n          {\n            \"destination\": \"Mumbai, Maharashtra, India\",\n            \"distance\": \"1,368 km\",\n            \"distance_meters\": 1367618,\n            \"duration\": \"23 hours 32 mins\",\n            \"duration_seconds\": 84740\n          },\n          {\n            \"destination\": \"Kolkata, West Bengal, India\",\n            \"distance\": \"1,494 km\",\n            \"distance_meters\": 1494370,\n            \"duration\": \"1 day 1 hour\",\n            \"duration_seconds\": 91586\n          },\n          {\n            \"destination\": \"Bengaluru, Karnataka, India\",\n            \"distance\": \"2,139 km\",\n            \"distance_meters\": 2139473,\n            \"duration\": \"1 day 11 hours\",\n            \"duration_seconds\": 127050\n          },\n          {\n            \"destination\": \"Chennai, Tamil Nadu, India\",\n            \"distance\": \"2,361 km\",\n            \"distance_meters\": 2361121,\n            \"duration\": \"1 day 13 hours\",\n            \"duration_seconds\": 134832\n          }\n        ]\n      },\n      {\n        \"origin\": \"Mumbai, Maharashtra, India\",\n        \"to\": [\n          {\n            \"destination\": \"Delhi, India\",\n            \"distance\": \"1,401 km\",\n            \"distance_meters\": 1401298,\n            \"duration\": \"23 hours 18 mins\",\n            \"duration_seconds\": 83896\n          },\n          {\n            \"destination\": \"Mumbai, Maharashtra, India\",\n            \"distance\": \"1 m\",\n            \"distance_meters\": 0,\n            \"duration\": \"1 min\",\n            \"duration_seconds\": 0\n          },\n          {\n            \"destination\": \"Kolkata, West Bengal, India\",\n            \"distance\": \"1,887 km\",\n            \"distance_meters\": 1887233,\n            \"duration\": \"1 day 9 hours\",\n            \"duration_seconds\": 118021\n          },\n          {\n            \"destination\": \"Bengaluru, Karnataka, India\",\n            \"distance\": \"989 km\",\n            \"distance_meters\": 989343,\n            \"duration\": \"17 hours 53 mins\",\n            \"duration_seconds\": 64380\n          },\n          {\n            \"destination\": \"Chennai, Tamil Nadu, India\",\n            \"distance\": \"1,346 km\",\n            \"distance_meters\": 1346490,\n            \"duration\": \"23 hours 40 mins\",\n            \"duration_seconds\": 85173\n          }\n        ]\n      },\n      {\n        \"origin\": \"Kolkata, West Bengal, India\",\n        \"to\": [\n          {\n            \"destination\": \"Delhi, India\",\n            \"distance\": \"1,491 km\",\n            \"distance_meters\": 1490615,\n            \"duration\": \"1 day 2 hours\",\n            \"duration_seconds\": 93729\n          },\n          {\n            \"destination\": \"Mumbai, Maharashtra, India\",\n            \"distance\": \"1,880 km\",\n            \"distance_meters\": 1880188,\n            \"duration\": \"1 day 9 hours\",\n            \"duration_seconds\": 117825\n          },\n          {\n            \"destination\": \"Kolkata, West Bengal, India\",\n            \"distance\": \"1 m\",\n            \"distance_meters\": 0,\n            \"duration\": \"1 min\",\n            \"duration_seconds\": 0\n          },\n          {\n            \"destination\": \"Bengaluru, Karnataka, India\",\n            \"distance\": \"1,874 km\",\n            \"distance_meters\": 1874046,\n            \"duration\": \"1 day 9 hours\",\n            \"duration_seconds\": 117467\n          },\n          {\n            \"destination\": \"Chennai, Tamil Nadu, India\",\n            \"distance\": \"1,670 km\",\n            \"distance_meters\": 1669574,\n            \"duration\": \"1 day 5 hours\",\n            \"duration_seconds\": 106021\n          }\n        ]\n      },\n      {\n        \"origin\": \"Bengaluru, Karnataka, India\",\n        \"to\": [\n          {\n            \"destination\": \"Delhi, India\",\n            \"distance\": \"2,142 km\",\n            \"distance_meters\": 2142013,\n            \"duration\": \"1 day 11 hours\",\n            \"duration_seconds\": 126105\n          },\n          {\n            \"destination\": \"Mumbai, Maharashtra, India\",\n            \"distance\": \"982 km\",\n            \"distance_meters\": 982462,\n            \"duration\": \"17 hours 15 mins\",\n            \"duration_seconds\": 62098\n          },\n          {\n            \"destination\": \"Kolkata, West Bengal, India\",\n            \"distance\": \"1,875 km\",\n            \"distance_meters\": 1874722,\n            \"duration\": \"1 day 9 hours\",\n            \"duration_seconds\": 117717\n          },\n          {\n            \"destination\": \"Bengaluru, Karnataka, India\",\n            \"distance\": \"1 m\",\n            \"distance_meters\": 0,\n            \"duration\": \"1 min\",\n            \"duration_seconds\": 0\n          },\n          {\n            \"destination\": \"Chennai, Tamil Nadu, India\",\n            \"distance\": \"325 km\",\n            \"distance_meters\": 324741,\n            \"duration\": \"6 hours 53 mins\",\n            \"duration_seconds\": 24779\n          }\n        ]\n      },\n      {\n        \"origin\": \"Chennai, Tamil Nadu, India\",\n        \"to\": [\n          {\n            \"destination\": \"Delhi, India\",\n            \"distance\": \"2,354 km\",\n            \"distance_meters\": 2354225,\n            \"duration\": \"1 day 13 hours\",\n            \"duration_seconds\": 134867\n          },\n          {\n            \"destination\": \"Mumbai, Maharashtra, India\",\n            \"distance\": \"1,308 km\",\n            \"distance_meters\": 1307574,\n            \"duration\": \"23 hours 6 mins\",\n            \"duration_seconds\": 83134\n          },\n          {\n            \"destination\": \"Kolkata, West Bengal, India\",\n            \"distance\": \"1,668 km\",\n            \"distance_meters\": 1668455,\n            \"duration\": \"1 day 5 hours\",\n            \"duration_seconds\": 105958\n          },\n          {\n            \"destination\": \"Bengaluru, Karnataka, India\",\n            \"distance\": \"324 km\",\n            \"distance_meters\": 324331,\n            \"duration\": \"7 hours 0 mins\",\n            \"duration_seconds\": 25205\n          },\n          {\n            \"destination\": \"Chennai, Tamil Nadu, India\",\n            \"distance\": \"1 m\",\n            \"distance_meters\": 0,\n            \"duration\": \"1 min\",\n            \"duration_seconds\": 0\n          }\n        ]\n      }\n    ]\n    ```"
                     }
                 ]
             }

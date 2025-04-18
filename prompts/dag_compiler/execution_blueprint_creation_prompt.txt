@@ -142,7 +142,7 @@ Your Current Role is: EXECUTION_BLUEPRINT_CREATOR
   - Since we have to run all the sub_tasks quickly in a time-sensitive manner, you should try to make the execution_blueprint minimal, simple, and straightforward.
   - Ensure that if a common TOOL output is required by two or more sub_tasks then it would be best if they are in the same group. It would be inefficient to call the same TOOL for the same purpose multiple times in different groups.
 
-- Do not use ** or ` or # in your output strictly.
+- Do not use  or ` or # in your output strictly.
 
 
 
@@ -182,7 +182,7 @@ Description of TOOLs:
 
 [Description of TOOLs]
 
-### Your Output Format (Strictly follow this, first CHAIN_OF_THOUGHT and then execution_blueprint. Do not use ** or ` or # in your output strictly.):
+### Your Output Format (Strictly follow this, first CHAIN_OF_THOUGHT and then execution_blueprint. Do not use  or ` or # in your output strictly.):
 
 $$CHAIN_OF_THOUGHT$$
 
@@ -1834,3 +1834,167 @@ Step 1
 	-	Output Variables:
     -	Name: wtc_additional_insights
       -	Description: Additional insights, historical context, and tips for visiting the WTC area
+
+#### Example:
+
+Query: "what is the last message in the group slack channel and by whom"
+
+TaskDecomposers's sub_task Requests:
+1. sub_task 1: Get Last Message from Slack Channel
+Details: Use slack_list_channels to find or confirm the group Slack channel. Then use slack_get_channel_history to fetch the most recent message from that channel. Extract both the message content and the user ID of the sender. Store the message content and user ID for use in the next sub_task.
+List of Relevant TOOls:
+   - slack_list_channels
+   - slack_get_channel_history
+
+2. sub_task 2: Identify user who posted last message
+Details: Using the user ID obtained from sub_task #1, retrieve the user's profile information with slack_get_user_profile to determine who posted the last message in the channel. Display the final result: the last message and by whom.
+List of Relevant TOOls:
+   - slack_get_user_profile
+
+Description of Tools:
+[Will be given to you]
+
+Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+sub_task 1: Get Last Message from Slack Channel  
+• Understanding sub_task Details:  
+  - We need to first list the public channels via slack_list_channels to confirm/locate the group Slack channel.  
+  - Next, we use slack_get_channel_history to fetch the most recent message. The slack_get_channel_history TOOL requires a channel_id as a required parameter (which we will get from slack_list_channels output).  
+  - We will output both the message content and the user ID of the sender for use in sub_task 2.  
+
+• TOOL Selection:  
+  - slack_list_channels (Step 1): to list and identify the group Slack channel (or confirm the channel’s existence).  
+  - slack_get_channel_history (Step 2): to retrieve the recent messages from that channel, focusing on the most recent one.  
+
+• Input Parameters (sub_task 1):  
+  - slack_list_channels:  
+    - limit (number): optional, defaults to 100.  
+    - cursor (string): optional, used for pagination.  
+  - slack_get_channel_history:  
+    - channel_id (string): required.  
+    - limit (number): optional, defaults to 10.  
+
+• Source of Inputs:  
+  - For sub_task 1, Step 1:  
+    - We can rely on LLM_Generated inputs for limit if needed, or just use the defaults.  
+  - For sub_task 1, Step 2:  
+    - The channel_id is extracted from slack_list_channels’ output.  
+
+• execution_blueprint Flow (sub_task 1):  
+  1) Use slack_list_channels to retrieve list of channels (potentially to confirm channel ID).  
+  2) Use slack_get_channel_history with the identified channel_id to fetch the most recent message.  
+
+• Interdependencies:  
+  - Step 2 depends on Step 1 for the channel_id.  
+
+• Variable Naming:  
+  - Step 1 (slack_list_channels):  
+    - Output: group_channel_id (ID of the relevant Slack channel).  
+  - Step 2 (slack_get_channel_history):  
+    - Input: channel_id = group_channel_id.  
+    - Outputs: last_message_content, last_message_user_id.  
+
+sub_task 2: Identify user who posted last message  
+• Understanding sub_task Details:  
+  - We have a user ID from sub_task 1. We need to retrieve that user’s profile using slack_get_user_profile.  
+  - Final display includes the last message content (from sub_task 1) and the user name or user info from sub_task 2.  
+
+• TOOL Selection:  
+  - slack_get_user_profile: to fetch detailed profile information given a user_id.  
+
+• Input Parameters (sub_task 2):  
+  - slack_get_user_profile:  
+    - user_id (string): required.  
+
+• Source of Inputs:  
+  - user_id for slack_get_user_profile is last_message_user_id from sub_task 1, Step 2.  
+
+• execution_blueprint Flow (sub_task 2):  
+  1) Use slack_get_user_profile with the user_id from sub_task 1 to get the user’s profile details.  
+
+• Interdependencies:  
+  - sub_task 2, Step 1 depends on sub_task 1, Step 2 for the user ID.  
+
+• Variable Naming:  
+  - sub_task 2, Step 1 (slack_get_user_profile):  
+    - Input variable name: last_message_user_id (matching sub_task 1, Step 2 output).  
+    - Output variable name: last_message_user_profile.  
+
+• Grouping sub_tasks:  
+  - Both sub_task 1 and sub_task 2 are interdependent: sub_task 2 depends on sub_task 1’s output.  
+  - Place them together in Group 1.  
+
+• Dependency Limitation Checks:  
+  - Each TOOL in each step depends on at most one previous step’s output.  
+  - Input and output variable names match correctly for consistent referencing.  
+
+• Minimal Execution Blueprint:  
+  - Kept the steps minimal and straightforward: sub_task 1 uses exactly two Slack tools (slack_list_channels and slack_get_channel_history), sub_task 2 uses slack_get_user_profile.  
+
+$$EXECUTION_BLUEPRINT$$
+
+Group 1:
+
+execution_blueprint for sub_task 1:
+
+sub_task Description: Retrieve the last message from the group Slack channel and store its content and sender user ID.
+
+execution_blueprint Steps:
+
+Step 1
+- TOOL: slack_list_channels
+- Handles: Listing public Slack channels to identify the group channel
+- Input Variables:
+  - Name: channel_list_limit
+    - Parameter: limit
+    - Type: number
+    - Source: LLM_Generated
+    - Description: Maximum number of channels to return
+    - Value: 100
+- Output Variables:
+  - Name: group_channel_id
+    - Description: ID of the target Slack channel
+
+Step 2
+- TOOL: slack_get_channel_history
+- Handles: Fetching the most recent message from the identified channel
+- Input Variables:
+  - Name: group_channel_id
+    - Parameter: channel_id
+    - Type: string
+    - Source: TOOL_Output (sub_task 1, Step 1)
+    - Description: Slack channel ID for which to retrieve history
+    - Value: None
+  - Name: history_limit
+    - Parameter: limit
+    - Type: number
+    - Source: LLM_Generated
+    - Description: Number of messages to retrieve
+    - Value: 1
+- Output Variables:
+  - Name: last_message_content
+    - Description: The most recent message text from the channel
+  - Name: last_message_user_id
+    - Description: The user ID of the sender of the most recent message
+
+execution_blueprint for sub_task 2:
+
+sub_task Description: Identify the user who posted the last message and display both the last message and the user info.
+
+execution_blueprint Steps:
+
+Step 1
+- TOOL: slack_get_user_profile
+- Handles: Retrieving the user's profile with the last message user ID
+- Input Variables:
+  - Name: last_message_user_id
+    - Parameter: user_id
+    - Type: string
+    - Source: TOOL_Output (sub_task 1, Step 2)
+    - Description: ID of the user who posted the last message
+    - Value: None
+- Output Variables:
+  - Name: last_message_user_profile
+    - Description: Profile details of the user who posted the last message

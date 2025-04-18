@@ -1,116 +1,119 @@
 {
     "1": {
-        "subtask_description": "Retrieve recent S&P 500 index data in a structured format.",
+        "subtask_description": "Retrieve the last message from the group Slack channel and store its content and sender user ID.",
         "steps": {
             "1": {
-                "tool": "perplexity_research",
-                "handles": "Acquires recent S&P 500 index data (e.g., dates and values for the last few weeks/months)",
+                "tool": "slack_list_channels",
+                "handles": "Listing public Slack channels to identify the group channel",
                 "input_vars": [
                     {
-                        "name": "sp500_data_request",
+                        "name": "channel_list_limit",
                         "parameter": [
-                            "messages"
+                            "limit"
                         ],
-                        "type": "array",
+                        "type": "number",
                         "source": "LLM_Generated",
-                        "description": "User message asking for structured S&P 500 data over a recent timeframe",
-                        "value": "[{\"role\":\"user\",\"content\":\"Please provide the recent S&P 500 index data (dates and values) over the last month in a structured format.\"}]",
+                        "description": "Maximum number of channels to return",
+                        "value": "100",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "sp500_dates",
-                        "description": "Array of date strings for the recent S&P 500 data",
+                        "name": "group_channel_id",
+                        "description": "ID of the target Slack channel",
                         "used_by": [
                             {
-                                "sub_task": 2,
-                                "step": 1
+                                "sub_task": 1,
+                                "step": 2
                             }
                         ],
-                        "value": "[\"April 1, 2025\", \"April 9, 2025\", \"April 10, 2025\", \"April 11, 2025\", \"April 14, 2025\", \"April 15, 2025\"]"
+                        "value": "\"C075CU6FVE0\""
+                    }
+                ]
+            },
+            "2": {
+                "tool": "slack_get_channel_history",
+                "handles": "Fetching the most recent message from the identified channel",
+                "input_vars": [
+                    {
+                        "name": "group_channel_id",
+                        "parameter": [
+                            "channel_id"
+                        ],
+                        "type": "string",
+                        "source": "TOOL_Output (sub_task 1, Step 1)",
+                        "description": "Slack channel ID for which to retrieve history",
+                        "value": "\"C075CU6FVE0\"",
+                        "dependencies": [
+                            {
+                                "sub_task": 1,
+                                "step": 1
+                            }
+                        ]
                     },
                     {
-                        "name": "sp500_values",
-                        "description": "Corresponding array of S&P 500 index values",
+                        "name": "history_limit",
+                        "parameter": [
+                            "limit"
+                        ],
+                        "type": "number",
+                        "source": "LLM_Generated",
+                        "description": "Number of messages to retrieve",
+                        "value": "1",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "last_message_content",
+                        "description": "The most recent message text from the channel",
+                        "used_by": [],
+                        "value": "\"Tunisia\""
+                    },
+                    {
+                        "name": "last_message_user_id",
+                        "description": "The user ID of the sender of the most recent message",
                         "used_by": [
                             {
                                 "sub_task": 2,
                                 "step": 1
                             }
                         ],
-                        "value": "[5566.85, 5456.90, 5268.05, 5363.36, 5405.97, 5396.63]"
+                        "value": "\"U075AE6E7NW\""
                     }
                 ]
             }
         }
     },
     "2": {
-        "subtask_description": "Generate a line chart showing the recent S&P 500 trends.",
+        "subtask_description": "Identify the user who posted the last message and display both the last message and the user info.",
         "steps": {
             "1": {
-                "tool": "generate_chart",
-                "handles": "Renders a line chart of S&P 500 index vs. date",
+                "tool": "slack_get_user_profile",
+                "handles": "Retrieving the user's profile with the last message user ID",
                 "input_vars": [
                     {
-                        "name": "chart_type",
+                        "name": "last_message_user_id",
                         "parameter": [
-                            "type"
+                            "user_id"
                         ],
                         "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "The type of chart to generate",
-                        "value": "line",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "sp500_dates",
-                        "parameter": [
-                            "labels"
-                        ],
-                        "type": "array",
-                        "source": "TOOL_Output (sub_task 1, Step 1)",
-                        "description": "Labels for the x-axis (dates) from sub_task 1",
-                        "value": "[\"April 1, 2025\", \"April 9, 2025\", \"April 10, 2025\", \"April 11, 2025\", \"April 14, 2025\", \"April 15, 2025\"]",
+                        "source": "TOOL_Output (sub_task 1, Step 2)",
+                        "description": "ID of the user who posted the last message",
+                        "value": "\"U075AE6E7NW\"",
                         "dependencies": [
                             {
                                 "sub_task": 1,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "chart_datasets",
-                        "parameter": [
-                            "datasets"
-                        ],
-                        "type": "array",
-                        "source": "LLM_Generated",
-                        "description": "Dataset configuration for S&P 500 values",
-                        "value": "",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "sp500_values",
-                        "parameter": [
-                            "datasets[0].data"
-                        ],
-                        "type": "array",
-                        "source": "TOOL_Output (sub_task 1, Step 1)",
-                        "description": "Y-axis data points (S&P 500 index values) inserted into the first dataset",
-                        "value": "[5566.85, 5456.90, 5268.05, 5363.36, 5405.97, 5396.63]",
-                        "dependencies": [
-                            {
-                                "sub_task": 1,
-                                "step": 1
+                                "step": 2
                             }
                         ]
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "sp500_chart",
-                        "description": "The generated line chart for recent S&P 500 trends",
+                        "name": "last_message_user_profile",
+                        "description": "Profile details of the user who posted the last message",
                         "used_by": []
                     }
                 ]
