@@ -21,7 +21,7 @@ servers:
     path: servers/src/slack/dist/index.js
     type: node
     env: 
-      "SLACK_BOT_TOKEN": "xoxe.xoxp-1-Mi0yLTg3OTY1MTU2OTc5ODQtODc5NjUxNTcxNzE4NC04NzY1NDU0MzIyNTk4LTg3NjU0NTQzMjMzNjYtZWFlNjg0NDc5MDc3ZjczZWRiMWVkZjk1YmMwNmM4YjRmYzQ0MzJiOTNmYWMyY2FiZTM5Mjc4MzY2NDgzYTliOA"
+      "SLACK_BOT_TOKEN": "xoxb-7165924487751-8758498069556-FF1CADJaojawQGZ5r2i7WgTn"
       "SLACK_TEAM_ID": "T08PEF5LHUY"
       #"SLACK_CHANNEL_IDS": ""
 
