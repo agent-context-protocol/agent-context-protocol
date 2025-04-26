@@ -3,10 +3,17 @@ import asyncio
 from acp_manager import ACP
 from mcp_node import MCPToolManager
 import asyncio
+import json
+from openai import OpenAI, AsyncOpenAI
+import streamlit.components.v1 as components
+import json
+from pathlib import Path
+from collections import defaultdict
 
 st.set_page_config(layout = "wide") 
-
-
+client = OpenAI()
+client_async = AsyncOpenAI()
+model_name = "gpt-4o-2024-08-06"
 # Load custom CSS for minimal styling (removing extra background colors and padding)
 def load_css():
     st.markdown("""
@@ -97,7 +104,7 @@ class StreamlitACP:
         self.mcp_manager = None
         self.ACP = None
         self.output = {}
-        self.group_placeholders = {}
+        self.group_containers = {}
         self.subtasks = []
 
     async def async_init(self):
@@ -106,85 +113,101 @@ class StreamlitACP:
         self.ACP = ACP(mcp_tool_manager=self.mcp_manager)
 
     def create_group_sections(self, execution_blueprint):
-        subtasks = []
+        """
+        For each group, create a full‐width container and render the stub panel.
+        """
+        for gid, gdata in execution_blueprint.items():
+            container = st.container()
+            self.group_containers[gid] = container
 
-        for group_id in execution_blueprint.keys():
-            for subtask_id in execution_blueprint[group_id].keys():
-                subtasks.append({
-                    'group_id' : group_id,
-                    'subtask_id' : subtask_id,
-                    'subtask_description' : execution_blueprint[group_id][subtask_id]['subtask_description']}
-                )
+            # with container:
+            #     subtasks_html = "".join(
+            #         f"<p><b>SubTask {s_id}:</b> {s['subtask_description']}</p>"
+            #         for s_id, s in gdata.items()
+            #     )
+            #     st.markdown(f"""
+            #         <div class="scrollable-panel">
+            #             <h3>Group {gid}</h3>
+            #             {subtasks_html}
+            #         </div>
+            #     """, unsafe_allow_html=True)
 
-        grid = []
-        for i in range(len(subtasks)//2 + 1):
-            cols = st.columns(2)  # Fixed 2 columns per row
-            grid_row = []
-            
-            for j in range(2):
-                container = cols[j].empty()  # Create an empty container for each column
-                grid_row.append(container)
-            grid.append(grid_row)
+    def update_group_section(self, group_id, user_query):
+        # gid, container = next(
+        #     (g, c) for g, c in self.group_placeholders if g == group_id
+        # )
 
-        self.group_placeholders = grid
-        self.subtasks = subtasks
+        # Load system prompt
+        with open(f"prompts/dashboard_prompt.txt", "r") as f:
+            system_prompt = f.read()
+        with open(f"execution_blueprint_updated_{group_id}.json", "r") as f:
+            data = json.load(f)
 
-        # Apply the custom CSS for scrollable subtasks
-        st.markdown("""
-            <style>
-            .scrollable-panel {
-                width: 100%;
-                max-height: 300px; /* Set max height */
-                padding: 20px;
-                border: 2px solid white;
-                border-radius: 10px;
-                background-color: black;
-                color: white;
-                box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
-                overflow-y: auto;  /* Enable vertical scrolling */
-            }
+        queries   = []                       # each sub-task’s natural-language query
+        variables = defaultdict(list)        # input + output vars keyed by sub-task
+        outputs   = defaultdict(list)        # output-only vars keyed by sub-task
 
-            .scrollable-panel h3, .scrollable-panel h4, .scrollable-panel p {
-                color: white;
-            }
-            </style>
-        """, unsafe_allow_html=True)
-
-        # Populate the grid with subtasks
-        for subtask in subtasks:
-            i = (int(subtask['subtask_id']) - 1)//2  # Determine the row index
-            j = (int(subtask['subtask_id']) - 1)%2   # Determine the column index
-            
-            # Populate the markdown with scrollable sections
-            grid[i][j].markdown(
-                f'''
-                <div class="scrollable-panel">
-                    <h3>Group {subtask['group_id']}</h3>
-                    <h4>SubTask {subtask['subtask_id']}</h4>
-                    <p>{subtask['subtask_description']}</p>
-                </div>
-                ''', 
-                unsafe_allow_html=True
+        for sub_id, sub in data.items():
+            queries.append(
+                {"subtask_id": sub_id,
+                "query": sub.get("subtask_description", "").strip()}
             )
+            for step_id, step in sub.get("steps", {}).items():
 
-    def update_group_section(self, group_id, group_results):
-        for subtask_id, subtask_result in group_results.items():
-            i = (int(subtask_id) - 1)//2  # Determine the row index
-            j = (int(subtask_id) - 1)%2   # Determine the column index
-            
-            # Populate the markdown with scrollable content when updating
-            self.group_placeholders[i][j].markdown(
-                f'''
-                <div class="scrollable-panel">
-                    <h3>Group {group_id}</h3>
-                    <h4>SubTask {subtask_id}</h4>
-                    <p>{self.subtasks[int(subtask_id)-1]['subtask_description']}</p>
-                    <p>{subtask_result['output']}</p>
-                </div>
-                ''', 
-                unsafe_allow_html=True
-            )
+                # input variables
+                for v in step.get("input_vars", []):
+                    variables[sub_id].append(
+                        {"step_id": step_id,
+                        "name": v["name"],
+                        "value": v.get("value"),
+                        "description": v.get("description"),
+                        "kind": "input"}
+                    ) 
 
+                # output variables
+                for v in step.get("output_vars", []):
+                    rec = {"step_id": step_id,
+                        "name": v["name"],
+                        "value": v.get("value"),
+                        "description": v.get("description"),
+                        "kind": "output"}
+                    variables[sub_id].append(rec)
+                    outputs[sub_id].append(rec)
+        input_data = f"Query: {user_query}\n"
+        for sid, outlist in outputs.items():
+            input_data+=f"Sub-task {sid}:\n"
+            for v in outlist:
+                input_data+=f" {v}\n"
+        input_data = json.dumps(data, indent=2)
+        # Prepare execution blueprint content
+        # Prepare the prompt for the LLM
+        completion = client.chat.completions.create(
+                        model=model_name,
+                        messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": input_data}
+            ],
+                        temperature = 0
+                    ) 
+        
+        raw_html_snippet = completion.choices[0].message.content.split("### FORMATTED_OUTPUT")[-1].strip()
+        full_doc = f"""
+        <!DOCTYPE html>
+        <html lang="en">
+          <head>
+            <meta charset="UTF-8"/>
+          </head>
+          <body style="margin:0; padding:1rem;">
+            {raw_html_snippet}
+          </body>
+        </html>
+        """
+        # print(dashboard_html)
+        # Render the LLM-generated dashboard
+        container = self.group_containers[group_id]
+        with container:
+            # st.subheader(f"Group {group_id} — Completed")
+            components.html(full_doc, height=600, scrolling=True)
     async def run_acp(self, user_query, execution_blueprint):
         # Display the group subtasks
         self.create_group_sections(execution_blueprint)
@@ -193,7 +216,7 @@ class StreamlitACP:
         async for group_id, group_results in self.ACP.run(user_query, execution_blueprint):
             self.output[group_id] = group_results
             # Update the group as completed
-            self.update_group_section(group_id, group_results)
+            self.update_group_section(group_id, user_query)
 
 async def main():
     # Load custom CSS

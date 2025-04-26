@@ -261,6 +261,7 @@ class AgentNode(BaseNode):
             for output_var in step_data['output_vars']:
                 result.append(f"  - Name: {output_var['name']}")
                 result.append(f"    - Description: {output_var['description']}")
+                result.append(f"    - Value: {output_var.get('value', 'None')}")
         
         # Add Current tool Step
         result.append(f"\nCurrent tool Step: sub_task {self.sub_task_no}, Step {step_no}")
@@ -325,7 +326,7 @@ class AgentNode(BaseNode):
             for output_var in step_data['output_vars']:
                 result.append(f"  - Name: {output_var['name']}")
                 result.append(f"    - Description: {output_var['description']}")
-                result.append(f"    - Value: {output_var['value']}")
+                result.append(f"    - Value: {output_var.get('value', 'None')}")
 
         # Join and return the final string
         return "\n".join(result)
@@ -734,6 +735,7 @@ class AgentNode(BaseNode):
                                 if parsed_agent_request['agent_requests'][tool_req_i]['url'] in self.dag_compiler.MCP_PARAMS_DICT.keys():
                                     print("tool_req_i in self.dag_compiler.MCP_PARAMS_DICT.keys()")
                                     _, mcp_output = await self.dag_compiler.mcp_tool_manager.call_tool(parsed_agent_request['agent_requests'][tool_req_i]['url'],parsed_agent_request['agent_requests'][tool_req_i]['body'])
+                                    print(mcp_output)
                                     tool_call_success_bool, tool_output = not(mcp_output.isError), mcp_output
                                 else:
                                     tool_call_success_bool, tool_output = self.function_call(step['tool'], parsed_agent_request['agent_requests'][tool_req_i]['body'])
@@ -829,7 +831,7 @@ class AgentNode(BaseNode):
                     
                 #########################################################
                 # Saving the updated execution_blueprint with tool output values
-                with open(f"execution_blueprint_updated_{self.sub_task_no}.json", "w") as json_file:
+                with open(f"execution_blueprint_updated_{self.group_id}.json", "w") as json_file:
                     json.dump(self.group_execution_blueprint, json_file, indent=4)
 
                 #########################################################
@@ -917,21 +919,28 @@ class AgentNode(BaseNode):
             raise ValueError(f"Overall the execution_blueprint failed for {self.sub_task_no}")
 
     # Compile SUB TASK ouptut   
-    def get_results(self):
-        if self.drop:
-            return {
-            'sub_task_description' : self.sub_task_description,
-            'output' : 'This sub_task Was Dropped'
-        }
+    # def get_results(self):
+    #     if self.drop:
+    #         return {
+    #         'sub_task_description' : self.sub_task_description,
+    #         'output' : 'This sub_task Was Dropped'
+    #     }
 
-        final_execution_blueprint_with_values = self.make_final_execution_blueprint_with_output_values(self.group_execution_blueprint, self.dag_compiler.subtask_list)
-        self.chat_history.append({"role": "user", "content": self.user_readable_output_prompt})
-        self.chat_history.append({"role": "user", "content": final_execution_blueprint_with_values})
-        output = self.generate()
-        print("output.split('$$FORMATTED_OUTPUT$$')[-1] : ", output.split('$$FORMATTED_OUTPUT$$')[-1])
+    #     final_execution_blueprint_with_values = self.make_final_execution_blueprint_with_output_values(self.group_execution_blueprint, self.dag_compiler.subtask_list)
+    #     self.chat_history.append({"role": "user", "content": self.user_readable_output_prompt})
+    #     self.chat_history.append({"role": "user", "content": final_execution_blueprint_with_values})
+    #     output = self.generate()
+    #     print("output.split('$$FORMATTED_OUTPUT$$')[-1] : ", output.split('$$FORMATTED_OUTPUT$$')[-1])
+    #     return {
+    #         'sub_task_description' : self.sub_task_description,
+    #         'output' : output.split('$$FORMATTED_OUTPUT$$')[-1]
+    #     }
+
+    def get_results(self):
+        # final_execution_blueprint_with_values = self.make_final_execution_blueprint_with_output_values(self.group_execution_blueprint, self.dag_compiler.subtask_list)
         return {
             'sub_task_description' : self.sub_task_description,
-            'output' : output.split('$$FORMATTED_OUTPUT$$')[-1]
+            'output' : "Done"
         }
 
             

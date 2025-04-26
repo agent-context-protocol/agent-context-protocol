@@ -9,7 +9,7 @@ servers:
     path: more_servers/perplexity_mcp/modelcontextprotocol/perplexity-ask/dist/index.js
     type: node
     env: 
-      PERPLEXITY_API_KEY: "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"
+      PERPLEXITY_API_KEY: "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"
 
   - name: GoogleMaps
     path: servers/src/google-maps/dist/index.js
@@ -21,13 +21,23 @@ servers:
     path: servers/src/slack/dist/index.js
     type: node
     env: 
-      "SLACK_BOT_TOKEN": "xoxb-7165924487751-8758498069556-FF1CADJaojawQGZ5r2i7WgTn"
-      "SLACK_TEAM_ID": "T074VT6EBN3"
+      "SLACK_BOT_TOKEN": "xoxe.xoxp-1-Mi0yLTg3OTY1MTU2OTc5ODQtODc5NjUxNTcxNzE4NC04NzY1NDU0MzIyNTk4LTg3NjU0NTQzMjMzNjYtZWFlNjg0NDc5MDc3ZjczZWRiMWVkZjk1YmMwNmM4YjRmYzQ0MzJiOTNmYWMyY2FiZTM5Mjc4MzY2NDgzYTliOA"
+      "SLACK_TEAM_ID": "T08PEF5LHUY"
       #"SLACK_CHANNEL_IDS": ""
 
   - name: QuickChart
     path: more_servers/node_modules/@gongrzhe/quickchart-mcp-server/build/index.js
+    type: node 
+
+  - name: Youtube-API
+    path: /Users/db/Desktop/workspace/acp/youtube-video-summarizer-mcp/dist/index.js
     type: node
+
+  - name: everart
+    path: servers/src/everart/dist/index.js
+    type: node
+    env: 
+      "EVERART_API_KEY": "everart-ZwWgd60GM5-WedRL2UQdRLZtThmE6UN2cVEU-PqkmNA"
 
 # Need to figure out
   # - name: PostgresSQL
