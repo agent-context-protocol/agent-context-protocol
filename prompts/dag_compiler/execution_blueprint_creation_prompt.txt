@@ -13,9 +13,32 @@ Your Current Role is: EXECUTION_BLUEPRINT_CREATOR
 
    - Input Parameters:
      - What are the input parameters of the TOOLs being used? What is the type of data each input parameter expects?
+     - For Slack post messages be careful that all the required input is being provided to it i.e., slack needs to be provided the context from previous steps output variable (Through TOOL_Output) if it needs to include that in its message.
 
    - Source of Inputs:
      - What would be the source for these parameters (LLM_Generated or TOOL_Output)? Use LLM_Generated only if we are inferring something from the query or the TOOL description. Do not use your own knowledge; rather, use Perplexity to retrieve information.
+     - Never substitute a literal variable name for the data itself: if a parameter input variable should be derived from a previous step’s TOOL_Output, do not replace it with an LLM_Generated placeholder that merely echoes the variable name. Information must be passed between steps by supplying the actual TOOL_Output, not by referencing the variable symbol.
+       Do not do shennanigans like this where Source is LLM_Generated, but in the value the variable names are being referred to
+       ```
+          - Name: dataset_label
+          - Parameter: datasets
+          - Type: array
+          - Source: LLM_Generated
+          - Description: We provide an array with one dataset object, whose data references the three distances
+          - Value: [
+            {
+              "label": "Driving Distance (miles)",
+              "data": [
+                {"source":"TOOL_Output (sub_task 1, Step 1)","value_field":"distance_leg1"},
+                {"source":"TOOL_Output (sub_task 1, Step 2)","value_field":"distance_leg2"},
+                {"source":"TOOL_Output (sub_task 1, Step 3)","value_field":"distance_leg3"}
+              ]
+            }
+          ]
+          - Output Variables:
+            - Name: chart_url
+              - Description: URL or data link for the generated bar chart
+        ```
 
    - execution_blueprint Flow:
      - What should be the flow for each of the sub_tasks? Since we have to run all the sub_tasks quickly in a time-sensitive manner, we should try to make the execution_blueprint minimal, simple, and straightforward. 
@@ -142,9 +165,9 @@ Your Current Role is: EXECUTION_BLUEPRINT_CREATOR
   - Since we have to run all the sub_tasks quickly in a time-sensitive manner, you should try to make the execution_blueprint minimal, simple, and straightforward.
   - Ensure that if a common TOOL output is required by two or more sub_tasks then it would be best if they are in the same group. It would be inefficient to call the same TOOL for the same purpose multiple times in different groups.
 
+- Never substitute a literal variable name for the data itself: if a parameter input variable should be derived from a previous step’s TOOL_Output, do not replace it with an LLM_Generated placeholder that merely echoes the variable name. Information must be passed between steps by supplying the actual TOOL_Output, not by referencing the variable symbol.
+- For Slack post messages be careful that all the required input is being provided to it i.e., slack needs to be provided the context from previous steps output variable (Through TOOL_Output) if it needs to include that in its message.
 - Do not use  or ` or # in your output strictly.
-
-
 
 ### Your Input:
 
@@ -417,10 +440,12 @@ Grouping sub_tasks and Interdependencies
 
 execution_blueprint Efficiency
 -	Kept the execution_blueprint minimal by:
--	Avoiding unnecessary TOOLs (e.g., not using perplexity_ask where not essential).
+-	Avoiding unnecessary TOOLs (e.g., not using perplexity_ask where not essential, and ensuring that perplexity_research).
 -	Avoided calling the same TOOL for the same purpose multiple times by keeping such sub_tasks in the same group and sharing the TOOL output with other sub_tasks.
 -	Using city names directly when possible.
 -	Limiting each sub_task to essential steps only.
+
+- Never substitute a literal variable name for the data itself: if a parameter input variable should be derived from a previous step’s TOOL_Output, do not replace it with an LLM_Generated placeholder that merely echoes the variable name. Information must be passed between steps by supplying the actual TOOL_Output, not by referencing the variable symbol.
 
 $$EXECUTION_BLUEPRINT$$
 
@@ -581,208 +606,6 @@ Step 1
 -	Output Variables:
   -	Name: top_restaurants
     -	Description: List of top restaurants in each city
-
-#### Example:
-
-Query: "what are the hotel options in new york city from 10th october 2024 to 12th october 2024. Also what will the weather be like then?"
-
-TaskDecomposer’s sub_task Requests:
-1.	sub_task 1: Hotel Options in New York City
-List of Relevant TOOLs:
--	TripadvisorSearchLocation
--	TripadvisorSearchHotels
--	perplexity_ask
-2.	sub_task 2: Weather Forecast for New York City
-List of Relevant TOOLs:
--	WeatherAPI.com_Forecast_Weather_API
--	perplexity_ask
-
-Description of TOOLs:
-[Will be given to you]
-
-Your Output:
-
-$$CHAIN_OF_THOUGHT$$
-
-sub_task 1: Hotel Options in New York City
--	Understanding sub_task Details:
--We need to find hotel options in New York City from 10th october 2024 to 12th october 2024.
--	TOOL Selection:
--	To find hotel options in New York City for the specified dates.
--	TripadvisorSearchLocation: To obtain the geoId for New York City.
--	Note: TripadvisorSearchLocation is reliable for obtaining geoId for well-known locations, and not longitude or latitude.
--	TripadvisorSearchHotels: To retrieve hotel options using the geoId and the specified dates.
--	perplexity_ask: Not necessary here since we can obtain all required data using Tripadvisor TOOLs, keeping the execution_blueprint minimal.
--	Input Parameters:
--	TripadvisorSearchLocation:
--	For TripadvisorSearchLocation we have to consider these required input parameters: {‘query’: {‘type’: ‘string’, ‘description’: ‘Search query for location (e.g., city name)’}}
--	query (string): The location name to search for.
--	TripadvisorSearchHotels:
--	For TripadvisorSearchHotels we have to consider these required input parameters: {‘geoId’: {‘type’: ‘string’, ‘description’: ‘Geo ID of the location retrieved from the Search Location TOOL.’}, ‘checkIn’: {‘type’: ‘string’, ‘description’: ‘Check-in date. Format: YYYY-MM-DD’}, ‘checkOut’: {‘type’: ‘string’, ‘description’: ‘Check-out date. Format: YYYY-MM-DD’}}
--	geoId (string): The geoId obtained from TripadvisorSearchLocation.
--	checkIn (string): The check-in date in YYYY-MM-DD format.
--	checkOut (string): The check-out date in YYYY-MM-DD format.
--	Source of Inputs:
--	TripadvisorSearchLocation:
--	query: LLM_Generated, value "New York City", extracted from the user’s query.
--	TripadvisorSearchHotels:
--	geoId: TOOL_Output (sub_task 1, Step 1), output location_geoId from TripadvisorSearchLocation.
--	checkIn: LLM_Generated, value "2024-10-10", extracted from the user’s query.
--	checkOut: LLM_Generated, value "2024-10-12", extracted from the user’s query.
--	execution_blueprint Flow:
--	Step 1: Use TripadvisorSearchLocation to get the geoId for New York City.
--	Step 2: Use TripadvisorSearchHotels with the geoId and dates to retrieve hotel options.
--	Interdependencies:
--	Step 2 depends on Step 1 for the geoId (location_geoId). Dependency is on the current sub_tasks step output which is valid.
--	The input variable location_geoId in Step 2 must match the output variable name from Step 1.
--	Variable Naming:
--	Input variable name for Step 1: location_query
--	Output variable name for Step 1: location_geoId.
--	Input variable name for Step 2: location_geoId (matching the output variable name), check_in_date, check_out_date.
--	Output variable name for Step 2: hotel_options.
-
-sub_task 2: Weather Forecast for New York City
--	Understanding sub_task Details:
--We need to get the weather details in New York City from 10th october 2024 to 12th october 2024.
--	TOOL Selection:
--	To provide the weather forecast for New York City for the specified dates.
--	perplexity_ask: To obtain the latitude and longitude of New York City, as using coordinates can provide more accurate results with WeatherAPI.com_Forecast_Weather_API.
--	WeatherAPI.com_Forecast_Weather_API: To fetch the weather forecast using the coordinates and dates.
--	Input Parameters:
--	perplexity_ask:
--	For perplexity_ask we have to consider these required input parameters: [‘messages’]
--	messages (array of objects with role and content): A query to obtain the latitude and longitude of New York City.
--	WeatherAPI.com_Forecast_Weather_API:
--	For WeatherAPI.com_Forecast_Weather_API we have to consider these required input parameters:{‘q’: {‘type’: ‘String’, ‘description’: ‘Query parameter based on which data is sent back. It could be one of the following: Latitude and Longitude (Decimal degree) e.g: q=48.8567,2.3508, city name e.g.: q=Paris, US zip e.g: q=10001, UK postcode e.g: q=SW1, Canada postal code e.g: q=G2J, metar:<metar_code> e.g: q=metar:EGLL, iata:<3 digit airport code> e.g: q=iata:DXB, auto:ip for IP lookup, IP address (IPv4 and IPv6 supported) e.g: q=100.0.0.1’}}
--	q (string): The latitude and longitude in "lat,lon" format.
--	dt (date): Specific dates for which the forecast is required.
--	Source of Inputs:
--	perplexity_ask:
--	messages: LLM_Generated, value "What is the latitude and longitude of New York City?", inferred from the user’s query.
--	WeatherAPI.com_Forecast_Weather_API:
--	q: TOOL_Output (sub_task 2, Step 1), output nyc_coordinates from perplexity_ask.
--	dt: LLM_Generated, value ["2024-10-10", "2024-10-11", "2024-10-12"], extracted from the user’s query.
--	execution_blueprint Flow:
--	Step 1: Use perplexity_ask to obtain the latitude and longitude of New York City.
--	Step 2: Use WeatherAPI.com_Forecast_Weather_API with the coordinates and dates to fetch the weather forecast.
--	Interdependencies:
--	Step 2 depends on Step 1 for the coordinates (nyc_coordinates). Dependency is on the current sub_tasks step output which is valid.
--	The input variable nyc_coordinates in Step 2 must match the output variable name from Step 1.
--	Variable Naming:
--	Input variable name for Step 1: query_nyc_coordinates
--	Output variable for Step 1: nyc_coordinates.
--	Input variable name for Step 2: nyc_coordinates (matching the output variable name), forecast_dates.
--	Output variable name for Step 2: weather_forecast
-
-Grouping sub_tasks and Interdependencies
--	sub_task 1 and sub_task 2 do not have interdependencies between them.
--	Therefore, they should be placed in different groups:
--	sub_task 1 is in Group 1.
--	sub_task 2 is in Group 2.
-
-Dependency Limitation
--	Ensured that each TOOL depends on at most one previous TOOL’s output.
--	All input variables that depend on previous outputs have matching names to maintain consistency.
--	Kept care of referring to tool names correctly keeping in consideration that they are case-sensitive.
-
-execution_blueprint Efficiency
--	Kept the execution_blueprint minimal by:
--	Using only necessary TOOLs.
--	Avoided calling the same TOOL for same purpose multiple times by keeping such sub_tasks in the same group and sharing the TOOL output with other sub_tasks.
--	Avoiding unnecessary steps like additional perplexity_ask calls.
--	Extracting dates directly from the user’s query without additional processing.
-
-$$EXECUTION_BLUEPRINT$$
-
-Group 1:
-
-execution_blueprint for sub_task 1:
-
-sub_task Description: Retrieve hotel options in New York City for specified dates.
-
-execution_blueprint Steps:
-
-Step 1
-	-	TOOL: TripadvisorSearchLocation
-	-	Handles: Retrieves geoId for New York City
-	-	Input Variables:
-    -	Name: location_query
-      -	Parameter: query
-      -	Type: string
-      -	Source: LLM_Generated
-      -	Description: Search query for New York City
-      -	Value: "New York City"
-	-	Output Variables:
-    -	Name: location_geoId
-      -	Description: Geo ID for New York City
-
-Step 2
-	-	TOOL: TripadvisorSearchHotels
-	-	Handles: Retrieves hotel options using geoId
-	-	Input Variables:
-    -	Name: location_geoId
-      -	Parameter: geoId
-      -	Type: string
-      -	Source: TOOL_Output (sub_task 1, Step 1)
-      -	Description: Geo ID for New York City
-      -	Value: None
-    -	Name: check_in_date
-      -	Parameter: checkIn
-      -	Type: string
-      -	Source: LLM_Generated
-      -	Description: Check-in date
-      -	Value: "2024-10-10"
-    -	Name: check_out_date
-      -	Parameter: checkOut
-      -	Type: string
-      -	Source: LLM_Generated
-      -	Description: Check-out date
-      -	Value: "2024-10-12"
-	-	Output Variables:
-    -	Name: hotel_options
-      -	Description: List of available hotels in New York City
-
-Group 2:
-
-execution_blueprint for sub_task 2:
-
-sub_task Description: Provide weather forecast for New York City for specified dates.
-
-execution_blueprint Steps:
-
-Step 1
-	-	TOOL: perplexity_ask
-	-	Handles: Fetches latitude and longitude for New York City
-	-	Input Variables:
-    -	Name: query_nyc_coordinates
-      -	Parameter: messages
-      -	Type: array
-      -	Source: LLM_Generated
-      -	Description: Array of user messages to get lat and long for New York City
-      -	Value: [{"role":"user","content":"What is the latitude and longitude coordinates for New York City"}]
-	-	Output Variables:
-    -	Name: nyc_coordinates
-      -	Description: Longitude and Latitude for New York City
-
-Step 2
-	-	TOOL: WeatherAPI.com_Forecast_Weather_API
-	-	Handles: Fetches weather forecast for New York City
-	-	Input Variables:
-    -	Name: nyc_coordinates
-      -	Parameter: q
-      -	Type: string
-      -	Source: TOOL_Output (sub_task 2, Step 1)
-      -	Description: Longitude and Latitude for New York City
-      -	Value: None
-    -	Name: forecast_dates
-      -	Parameter: dt
-      -	Type: date
-      -	Source: LLM_Generated
-      -	Description: Forecast dates on which we have to check the weather
-      -	Value: "[2024-10-10, 2024-10-11, 2024-10-12]"
-	-	Output Variables:
-    -	Name: weather_forecast
-      -	Description: Weather forecast for New York City on specified dates
 
 
 #### Example:
@@ -959,6 +782,8 @@ execution_blueprint Efficiency
 	-	Using only necessary TOOLs.
 	-	Ensuring data flows efficiently between steps.
 	-	Matching variable names to maintain consistency and avoid errors.
+
+- Never substitute a literal variable name for the data itself: if a parameter input variable should be derived from a previous step’s TOOL_Output, do not replace it with an LLM_Generated placeholder that merely echoes the variable name. Information must be passed between steps by supplying the actual TOOL_Output, not by referencing the variable symbol.
 
 $$EXECUTION_BLUEPRINT$$
 
@@ -1221,6 +1046,8 @@ execution_blueprint Efficiency
 	-	Avoiding unnecessary TOOL calls.
 	-	Ensuring data flows efficiently between steps.
 
+- Never substitute a literal variable name for the data itself: if a parameter input variable should be derived from a previous step’s TOOL_Output, do not replace it with an LLM_Generated placeholder that merely echoes the variable name. Information must be passed between steps by supplying the actual TOOL_Output, not by referencing the variable symbol.
+
 $$EXECUTION_BLUEPRINT$$
 
 Group 1:
@@ -1298,323 +1125,6 @@ Step 2
 	-	Output Variables:
     -	Name: news_articles
       -	Description: News articles about sci-fi book adaptations
-
-#### Example
-
-Query: "Which country had the most amount tourist attractions in 2024 in the world? Provide the weather forecast for its capital on October 10, 2024, and recommend the best attractions to visit based on that weather."
-
-TaskDecomposer’s sub_task Requests:
-	1.	sub_task 1: Top Tourist Attractions in 2024
-Details: Identify the country with the most tourist attractions in 2024 and provide a list of these attractions. This will help the user understand which country was most popular for tourism in that year.
-List of Relevant TOOLs:
-	-	perplexity_ask
-	2.	sub_task 2: Weather Forecast for capital City
-Details: Provide the weather forecast for the capital city of the country identified in the previous sub_task on October 10, 2024. This will help the user plan their visit based on the weather conditions.
-List of Relevant TOOLs:
-	-	WeatherAPI.com_Forecast_Weather_API
-	-	perplexity_ask
-	3.	sub_task 3: Recommended Attractions Based on Weather
-Details: Recommend the best tourist attractions to visit in the capital city based on the weather forecast for October 10, 2024. This will provide the user with tailored suggestions that align with the expected weather conditions.
-List of Relevant TOOLs:
-	-	TripadvisorSearchLocation
-	-	perplexity_ask
-
-Description of TOOLs:
-[Will be given to you]
-
-Your Output:
-
-$$CHAIN_OF_THOUGHT$$
-
-sub_task 1: Top Tourist Attractions in 2024
-	-	Understanding sub_task Details:
-	-	The goal is to identify the country with the most tourist attractions in 2024 and provide a list of these attractions.
-	-	TOOL Selection:
-	-	perplexity_ask: Suitable for retrieving up-to-date information on global tourism statistics and listing attractions within a country.
-	-	Input Parameters:
-	-	perplexity_ask requires the parameter:
-	-	messages (array of objects with role and content)
-	-	Source of Inputs:
-	-	Step 1:
-	-	query_tourist_country: LLM_Generated, value: "Which country had the most tourist attractions in 2024?"
-	-	Step 2:
-	-	top_tourist_country: TOOL_Output (sub_task 1, Step 1), output from perplexity_ask.
-	-	query_attractions_list: LLM_Generated, value: "List of tourist attractions in [top_tourist_country] in 2024."
-	-	execution_blueprint Flow:
-	-	Step 1: Use perplexity_ask to identify the country with the most tourist attractions in 2024.
-	-	Step 2: Use perplexity_ask to obtain a list of tourist attractions in the identified country.
-	-	Interdependencies:
-	-	Step 2 depends on Step 1 for the top_tourist_country.
-	-	Input variable top_tourist_country in Step 2 must match the output variable name from Step 1.
-	-	Variable Naming:
-	-	Step 1:
-	-	Input Variable:
-	-	Name: query_tourist_country
-	-	Output Variable:
-	-	Name: top_tourist_country
-	-	Step 2:
-	-	Input Variables:
-	-	Name: top_tourist_country (matches output from Step 1)
-	-	Name: query_attractions_list
-	-	Output Variable:
-	-	Name: attractions_list
-	-	Validation:
-	-	perplexity_ask can handle both identifying the country and listing its attractions.
-	-	Variable names are unique and consistent across steps.
-	-	Ensured that each TOOL depends on at most one previous TOOL’s output.
-
-sub_task 2: Weather Forecast for capital City
-	-	Understanding sub_task Details:
-	-	Provide the weather forecast for the capital city of the country identified in sub_task 1 on October 10, 2024.
-	-	TOOL Selection:
-	-	perplexity_ask:
-	-	To find the capital city of the identified country.
-	-	To find the latitude and longitude of the capital city.
-	-	WeatherAPI.com_Forecast_Weather_API:
-	-	To fetch the weather forecast for the capital city on the specified date.
-	-	Using coordinates (latitude and longitude) can provide more accurate results.
-	-	Input Parameters:
-	-	perplexity_ask (Step 1):
-	-	messages (array of objects with role and content): Query to find the capital city.
-	-	perplexity_ask (Step 2):
-	-	messages (array of objects with role and content): Query to find the latitude and longitude of the capital city.
-	-	WeatherAPI.com_Forecast_Weather_API:
-	-	q (string): Location query parameter in the format "lat,lon".
-	-	dt (date): Forecast date in YYYY-MM-DD format.
-	-	Source of Inputs:
-	-	Step 1:
-	-	top_tourist_country: TOOL_Output (sub_task 1, Step 1)
-	-	query_capital_city: LLM_Generated, value: "What is the capital city of [top_tourist_country]?"
-	-	Step 2:
-	-	capital_city: TOOL_Output (sub_task 2, Step 1)
-	-	query_capital_coordinates: LLM_Generated, value: "What are the latitude and longitude of [capital_city]?"
-	-	Step 3:
-	-	capital_city_coordinates: TOOL_Output (sub_task 2, Step 2)
-	-	forecast_date: LLM_Generated, value: "2024-10-10"
-	-	execution_blueprint Flow:
-	-	Step 1: Use perplexity_ask to find the capital city of the country identified in sub_task 1.
-	-	Step 2: Use perplexity_ask to find the latitude and longitude of the capital city.
-	-	Step 3: Use WeatherAPI.com_Forecast_Weather_API with the coordinates and date to get the weather forecast.
-	-	Interdependencies:
-	-	Step 1 depends on sub_task 1, Step 1 for top_tourist_country.
-	-	Step 2 depends on Step 1 for capital_city.
-	-	Step 3 depends on Step 2 for capital_city_coordinates.
-	-	Input variables that depend on previous outputs have matching names to ensure consistency.
-	-	Variable Naming:
-	-	Step 1:
-	-	Input Variable:
-	-	Name: query_capital_city
-	-	Output Variable:
-	-	Name: capital_city
-	-	Step 2:
-	-	Input Variable:
-	-	Name: query_capital_coordinates
-	-	Output Variable:
-	-	Name: capital_city_coordinates
-	-	Step 3:
-	-	Input Variables:
-	-	Name: capital_city_coordinates (from Step 2)
-	-	Name: forecast_date
-	-	Output Variable:
-	-	Name: weather_forecast
-	-	Validation:
-	-	Variable names are unique and consistent.
-	-	Each TOOL depends on at most one previous TOOL’s output per input variable.
-	-	The dependency chain is logical and follows the sequence of steps.
-
-sub_task 3: Recommended Attractions Based on Weather
-	-	Understanding sub_task Details:
-	-	Recommend the best tourist attractions to visit in the capital city based on the weather forecast for October 10, 2024.
-	-	TOOL Selection:
-	-	perplexity_ask:
-	-	To recommend attractions in the capital city considering the weather conditions.
-	-	TripadvisorSearchLocation:
-	-	Considered but not used for this sub_task because it only provides GeoID retrieval and does not offer attraction lists for cities.
-	-	Important Note: TripadvisorSearchLocation is only used for GeoID retrieval and does not provide attraction lists for cities; therefore, we do not use it for sub_task 3.
-	-	Input Parameters:
-	-	perplexity_ask:
-	-	messages (array of objects with role and content): Query to get recommended attractions based on the weather.
-	-	Source of Inputs:
-	-	Step 1:
-	-	capital_city: TOOL_Output (sub_task 2, Step 1)
-	-	weather_forecast: TOOL_Output (sub_task 2, Step 3)
-	-	query_recommendations: LLM_Generated, value: "Based on the weather forecast of [weather_forecast] on 2024-10-10, recommend the best attractions to visit in [capital_city]."
-	-	execution_blueprint Flow:
-	-	Step 1: Use perplexity_ask to get tailored attraction recommendations in the capital city based on the weather forecast.
-	-	Interdependencies:
-	-	Step 1 depends on:
-	-	capital_city from sub_task 2, Step 1
-	-	weather_forecast from sub_task 2, Step 3
-	-	Input variables capital_city and weather_forecast match the output variable names from previous steps.
-	-	Variable Naming:
-	-	Step 1:
-	-	Input Variables:
-	-	Name: capital_city (from sub_task 2, Step 1)
-	-	Name: weather_forecast (from sub_task 2, Step 3)
-	-	Name: query_recommendations
-	-	Output Variable:
-	-	Name: recommended_attractions
-	-	Validation:
-	-	Variable names are unique and consistent.
-	-	Dependencies are correctly mapped to outputs from previous steps.
-	-	Avoided using TripadvisorSearchLocation since it does not provide attraction lists, ensuring execution_blueprint efficiency.
-
-Grouping sub_tasks and Interdependencies
-	-	All sub_tasks are interdependent and are placed in Group 1.
-	-	sub_task 1 provides top_tourist_country for sub_task 2.
-	-	sub_task 2 provides capital_city and weather_forecast for sub_task 3.
-
-Dependency Limitation
-	-	Ensured that each TOOL depends on at most one previous TOOL’s output per input variable.
-	-	Input variables dependent on previous outputs have matching names to maintain consistency.
-	-	Kept care of referring to tool names correctly keeping in consideration that they are case-sensitive.
-
-execution_blueprint Efficiency
-	-	Included the coordinate-finding step in sub_task 2 to enhance accuracy in weather forecasting.
-	-	Used perplexity_ask efficiently to handle multiple information retrieval tasks.
-	-	Avoided unnecessary TOOLs, keeping the execution_blueprint minimal and straightforward.
-
-$$EXECUTION_BLUEPRINT$$
-
-Group 1:
-
-execution_blueprint for sub_task 1:
-
-sub_task Description: Identify the country with the most tourist attractions in 2024.
-
-execution_blueprint Steps:
-
-Step 1
-	-	TOOL: perplexity_ask
-	-	Handles: Identifies the country with the most tourist attractions in 2024
-	-	Input Variables:
-    -	Name: query_tourist_country
-      -	Parameter: messages
-      -	Type: array
-      -	Source: LLM_Generated
-      -	Description: Array with user message about which country had the most tourist attractions
-      -	Value: [{"role":"user","content":"Which country had the most tourist attractions in 2024?"}]
-	-	Output Variables:
-    -	Name: top_tourist_country
-	-	Description: Country with the most tourist attractions in 2024
-
-Step 2
-	-	TOOL: perplexity_ask
-	-	Handles: Lists tourist attractions in the identified country
-	-	Input Variables:
-    -	Name: top_tourist_country
-      -	Parameter: messages
-      -	Type: array
-      -	Source: TOOL_Output (sub_task 1, Step 1)
-      -	Description: Array with user message referencing the identified country
-      -	Value: None
-    -	Name: query_attractions_list
-      -	Parameter: messages
-      -	Type: array
-      -	Source: LLM_Generated
-      -	Description: Additional user message about listing attractions
-      -	Value: [{"role":"user","content":"List of tourist attractions in [top_tourist_country] in 2024."}]
-	-	Output Variables:
-    -	Name: attractions_list
-      -	Description: List of tourist attractions in the identified country
-
-execution_blueprint for sub_task 2:
-
-sub_task Description: Provide the weather forecast for the capital city on October 10, 2024.
-
-execution_blueprint Steps:
-
-Step 1
-	-	TOOL: perplexity_ask
-	-	Handles: Finds the capital city of the identified country
-	-	Input Variables:
-    -	Name: top_tourist_country
-      -	Parameter: messages
-      -	Type: array
-      -	Source: TOOL_Output (sub_task 1, Step 1)
-      -	Description: Array with user message referencing the identified country
-      -	Value: None
-    -	Name: query_capital_city
-      -	Parameter: messages
-      -	Type: array
-      -	Source: LLM_Generated
-      -	Description: Additional user message about capital city
-      -	Value: [{"role":"user","content":"What is the capital city of [top_tourist_country]?"}]
-	-	Output Variables:
-    -	Name: capital_city
-      -	Description: Capital city of the identified country
-
-Step 2
-	-	TOOL: perplexity_ask
-	-	Handles: Finds the latitude and longitude of the capital city
-	-	Input Variables:
-    -	Name: capital_city
-      -	Parameter: messages
-      -	Type: array
-      -	Source: TOOL_Output (sub_task 2, Step 1)
-      -	Description: Array with user message referencing the capital city
-      -	Value: None
-    -	Name: query_capital_coordinates
-      -	Parameter: messages
-      -	Type: array
-      -	Source: LLM_Generated
-      -	Description: Additional user message about lat/long
-      -	Value: [{"role":"user","content":"What are the latitude and longitude of [capital_city]?"}]
-	-	Output Variables:
-    -	Name: capital_city_coordinates
-      -	Description: Coordinates (latitude, longitude) of the capital city
-
-Step 3
-	-	TOOL: WeatherAPI.com_Forecast_Weather_API
-	-	Handles: Fetches the weather forecast for the capital city on October 10, 2024
-	-	Input Variables:
-    -	Name: capital_city_coordinates
-      -	Parameter: q
-      -	Type: string
-      -	Source: TOOL_Output (sub_task 2, Step 2)
-      -	Description: Capital city latitude, longitude for weather forecast
-      -	Value: None
-    -	Name: forecast_date
-      -	Parameter: dt
-      -	Type: date
-      -	Source: LLM_Generated
-      -	Description: Date for the weather forecast
-      -	Value: "2024-10-10"
-	-	Output Variables:
-    -	Name: weather_forecast
-      -	Description: Weather forecast for the capital city on October 10, 2024
-
-execution_blueprint for sub_task 3:
-
-sub_task Description: Recommend the best tourist attractions to visit in the capital city based on the weather forecast.
-
-execution_blueprint Steps:
-
-Step 1
-	-	TOOL: perplexity_ask
-	-	Handles: Recommends attractions based on the weather forecast
-	-	Input Variables:
-    -	Name: capital_city
-      -	Parameter: messages
-      -	Type: array
-      -	Source: TOOL_Output (sub_task 2, Step 1)
-      -	Description: Array with user message referencing the capital city
-      -	Value: None
-    -	Name: weather_forecast
-      -	Parameter: messages
-      -	Type: array
-      -	Source: TOOL_Output (sub_task 2, Step 3)
-      -	Description: Array with user message referencing the weather forecast
-      -	Value: None
-    -	Name: query_recommendations
-      -	Parameter: messages
-      -	Type: array
-      -	Source: LLM_Generated
-      -	Description: Additional user message about recommended attractions
-      -	Value: [{"role":"user","content":"Based on the weather forecast of [weather_forecast] on 2024-10-10, recommend the best attractions to visit in [capital_city]."}]
-	-	Output Variables:
-    -	Name: recommended_attractions
-      -	Description: Recommended attractions based on the weather forecast
 
 
 #### Example:
@@ -1706,6 +1216,8 @@ sub_task 3: Provide Additional Insights
 	-	Variable Naming:
 	-	Input variable name: wtc_research_messages
 	-	Output variable name: wtc_additional_insights
+
+- Never substitute a literal variable name for the data itself: if a parameter input variable should be derived from a previous step’s TOOL_Output, do not replace it with an LLM_Generated placeholder that merely echoes the variable name. Information must be passed between steps by supplying the actual TOOL_Output, not by referencing the variable symbol.
 
 $$EXECUTION_BLUEPRINT$$
 
@@ -1860,7 +1372,7 @@ $$CHAIN_OF_THOUGHT$$
 
 sub_task 1: Get Last Message from Slack Channel  
 • Understanding sub_task Details:  
-  - We need to first list the public channels via slack_list_channels to confirm/locate the group Slack channel.  
+  - We need to first list the public channels via slack_list_channels to confirm/locate the group Slack channel. Because the group as referenced by the user could not be the channel id itself. 
   - Next, we use slack_get_channel_history to fetch the most recent message. The slack_get_channel_history TOOL requires a channel_id as a required parameter (which we will get from slack_list_channels output).  
   - We will output both the message content and the user ID of the sender for use in sub_task 2.  
 
@@ -1933,6 +1445,8 @@ sub_task 2: Identify user who posted last message
 • Minimal Execution Blueprint:  
   - Kept the steps minimal and straightforward: sub_task 1 uses exactly two Slack tools (slack_list_channels and slack_get_channel_history), sub_task 2 uses slack_get_user_profile.  
 
+- Never substitute a literal variable name for the data itself: if a parameter input variable should be derived from a previous step’s TOOL_Output, do not replace it with an LLM_Generated placeholder that merely echoes the variable name. Information must be passed between steps by supplying the actual TOOL_Output, not by referencing the variable symbol.
+
 $$EXECUTION_BLUEPRINT$$
 
 Group 1:
@@ -1998,3 +1512,204 @@ Step 1
 - Output Variables:
   - Name: last_message_user_profile
     - Description: Profile details of the user who posted the last message
+
+#### Example:
+
+Query:  
+"In our DemoMusic database, find the top 3 songs with the highest play count. Provide a short background on each track, then post a summary to Slack #random channel."
+
+TaskDecomposer's sub_task Requests:
+1. sub_task 1: List tables in the database  
+   Details: Query the database to list all tables in the DemoMusic database so we know which tables are available for retrieving information about songs and play counts.  
+   List of Relevant TOOLs:  
+   - query
+
+2. sub_task 2: Get schemas for relevant tables  
+   Details: After identifying table names, fetch their schema (column names, data types) to see how the songs and play count are stored.  
+   List of Relevant TOOLs:  
+   - query
+
+3. sub_task 3: Find top 3 songs with the highest play count  
+   Details: Use the schema info from subtask 2 to craft the SQL query retrieving the top 3 songs with the highest play count.  
+   List of Relevant TOOLs:  
+   - query
+
+4. sub_task 4: Short background on each of the top 3 songs  
+   Details: For each track, provide a short background using an external resource (e.g., perplexity_ask). Summarize them in a concise paragraph.  
+   List of Relevant TOOLs:  
+   - perplexity_ask
+
+5. sub_task 5: Post summary to Slack #random channel  
+   Details: Retrieve Slack channel list to find or confirm #random channel ID, then post the short summary.  
+   List of Relevant TOOLs:  
+   - slack_list_channels  
+   - slack_post_message
+
+Description of Tools:
+[Will be given to you]
+
+Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+
+We have a DemoMusic database in PostgreSQL. The user wants to find the top 3 songs with the highest play count, then provide a short background on each track, and finally post a short summary to Slack’s #random channel. In PostgreSQL, to handle tables properly, we should follow these steps:
+
+THIS IS HOW WE SHOULD HANDLE SQL DATABASE RELATED TASKS ALWAYS
+
+1. List all tables in the public schema. This ensures we know what tables exist in the database. In PostgreSQL, the proper SQL for retrieving table names is:
+   SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
+
+2. After we identify which table contains track and play count data, we must retrieve the schema (columns, data types) for that specific table. For instance, if we find a table named Tracks, we can query its schema using:
+   SELECT column_name, data_type
+   FROM information_schema.columns
+   WHERE table_name = 'Tracks';
+
+3. Once we know the relevant columns (e.g., track_title, play_count), we can craft the final SQL query to select the top 3 songs with the highest play count. This query is derived strictly from the known schema, ensuring accuracy and avoiding guesswork.
+
+4. Next, for each of these top 3 songs, we fetch a short background using an external research tool (in this case, perplexity_ask).
+
+5. Finally, we retrieve the Slack channels to confirm the #random channel ID, and post our short summary there.
+
+- For Slack post messages be careful that all the required input is being provided to it i.e., slack needs to be provided the context from previous steps output variable (Through TOOL_Output) if it needs to include that in its message.
+
+- Never substitute a literal variable name for the data itself: if a parameter input variable should be derived from a previous step’s TOOL_Output, do not replace it with an LLM_Generated placeholder that merely echoes the variable name. Information must be passed between steps by supplying the actual TOOL_Output, not by referencing the variable symbol.
+
+This approach emphasizes that whenever we interact with an unfamiliar database table, we always first look at the table names, then the table schemas, and only after that do we form the final query.
+
+$$EXECUTION_BLUEPRINT$$
+
+Group 1:
+
+execution_blueprint for sub_task 1:
+
+sub_task Description: List tables in the DemoMusic database.
+
+execution_blueprint Steps:
+
+Step 1
+- TOOL: query
+- Handles: Retrieving table names from the public schema
+- Input Variables:
+  - Name: list_tables_sql
+    - Parameter: query
+    - Type: string
+    - Source: LLM_Generated
+    - Description: SQL statement to list all tables in the public schema (PostgreSQL)
+    - Value: "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';"
+- Output Variables:
+  - Name: demo_db_tables
+    - Description: List of all tables in the public schema of the DemoMusic database
+
+execution_blueprint for sub_task 2:
+
+sub_task Description: Get schemas for the relevant table(s).
+
+execution_blueprint Steps:
+
+Step 1
+- TOOL: query
+- Handles: Retrieving schema details (columns, data types) of the relevant table that stores song and play count information
+- Input Variables:
+  - Name: demo_db_tables
+    - Parameter: query
+    - Type: string
+    - Source: TOOL_Output (sub_task 1, Step 1)
+    - Description: The SQL statement built using the table name identified from demo_db_tables
+    - Value: None
+- Output Variables:
+  - Name: relevant_table_schema
+    - Description: Schema details (column names, data types) for the identified table
+
+Step 2
+- TOOL: query
+- Handles: Forming and storing the final SQL query to get the top 3 songs with highest play count, based on the table schema output
+- Input Variables:
+  - Name: relevant_table_schema
+    - Parameter: query
+    - Type: string
+    - Source: TOOL_Output (sub_task 2, Step 1)
+    - Description: Schema details used to validate column references in the final query
+    - Value: None
+- Output Variables:
+  - Name: final_top_songs_sql
+    - Description: The validated SQL statement to retrieve the top 3 songs by highest play count (e.g., SELECT songTitle, playCount FROM Tracks ORDER BY playCount DESC LIMIT 3)
+
+execution_blueprint for sub_task 3:
+
+sub_task Description: Find top 3 songs with the highest play count.
+
+execution_blueprint Steps:
+
+Step 1
+- TOOL: query
+- Handles: Executing the final query to retrieve the top 3 songs
+- Input Variables:
+  - Name: final_top_songs_sql
+    - Parameter: query
+    - Type: string
+    - Source: TOOL_Output (sub_task 2, Step 2)
+    - Description: The query string validated via the table schema
+    - Value: None
+- Output Variables:
+  - Name: top_songs_list
+    - Description: The list of top 3 songs with their play counts
+
+execution_blueprint for sub_task 4:
+
+sub_task Description: Provide a short background on each of the top 3 songs.
+
+execution_blueprint Steps:
+
+Step 1
+- TOOL: perplexity_ask
+- Handles: Fetching a concise background for each track
+- Input Variables:
+  - Name: top_songs_list
+    - Parameter: messages
+    - Type: array
+    - Source: TOOL_Output (sub_task 3, Step 1)
+    - Description: Pass each song name to perplexity_ask to retrieve background info
+    - Value: None
+- Output Variables:
+  - Name: songs_background_info
+    - Description: Background details for each of the top 3 songs
+
+execution_blueprint for sub_task 5:
+
+sub_task Description: Post summary to Slack #random channel.
+
+execution_blueprint Steps:
+
+Step 1
+- TOOL: slack_list_channels
+- Handles: Listing Slack channels to locate #random channel
+- Input Variables:
+  - Name: channels_limit
+    - Parameter: limit
+    - Type: number
+    - Source: LLM_Generated
+    - Description: How many channels to list
+    - Value: 100
+- Output Variables:
+  - Name: random_channel_id
+    - Description: Slack channel ID for #random
+
+Step 2
+- TOOL: slack_post_message
+- Handles: Posting the summary of top songs and backgrounds to #random
+- Input Variables:
+  - Name: random_channel_id
+    - Parameter: channel
+    - Type: string
+    - Source: TOOL_Output (sub_task 5, Step 1)
+    - Description: Slack channel ID for #random
+    - Value: None
+  - Name: songs_background_info
+    - Parameter: text
+    - Type: string
+    - Source: TOOL_Output (sub_task 4, Step 1)
+    - Description: Summary message with the top songs and their backgrounds
+    - Value: None
+- Output Variables:
+  - Name: slack_post_confirmation
+    - Description: Confirmation or result of posting to Slack

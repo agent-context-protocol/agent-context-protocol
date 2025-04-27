@@ -1,119 +1,225 @@
 {
     "1": {
-        "subtask_description": "Retrieve the last message from the group Slack channel and store its content and sender user ID.",
+        "subtask_description": "List all calendars to identify which one to use.",
         "steps": {
             "1": {
-                "tool": "slack_list_channels",
-                "handles": "Listing public Slack channels to identify the group channel",
-                "input_vars": [
-                    {
-                        "name": "channel_list_limit",
-                        "parameter": [
-                            "limit"
-                        ],
-                        "type": "number",
-                        "source": "LLM_Generated",
-                        "description": "Maximum number of channels to return",
-                        "value": "100",
-                        "dependencies": []
-                    }
-                ],
+                "tool": "list-calendars",
+                "handles": "Fetches all available calendars",
+                "input_vars": [],
                 "output_vars": [
                     {
-                        "name": "group_channel_id",
-                        "description": "ID of the target Slack channel",
-                        "used_by": [
-                            {
-                                "sub_task": 1,
-                                "step": 2
-                            }
-                        ],
-                        "value": "\"C075CU6FVE0\""
-                    }
-                ]
-            },
-            "2": {
-                "tool": "slack_get_channel_history",
-                "handles": "Fetching the most recent message from the identified channel",
-                "input_vars": [
-                    {
-                        "name": "group_channel_id",
-                        "parameter": [
-                            "channel_id"
-                        ],
-                        "type": "string",
-                        "source": "TOOL_Output (sub_task 1, Step 1)",
-                        "description": "Slack channel ID for which to retrieve history",
-                        "value": "\"C075CU6FVE0\"",
-                        "dependencies": [
-                            {
-                                "sub_task": 1,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "history_limit",
-                        "parameter": [
-                            "limit"
-                        ],
-                        "type": "number",
-                        "source": "LLM_Generated",
-                        "description": "Number of messages to retrieve",
-                        "value": "1",
-                        "dependencies": []
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "last_message_content",
-                        "description": "The most recent message text from the channel",
+                        "name": "calendar_list",
+                        "description": "The list of calendar IDs and names",
                         "used_by": [],
-                        "value": "\"Tunisia\""
-                    },
-                    {
-                        "name": "last_message_user_id",
-                        "description": "The user ID of the sender of the most recent message",
-                        "used_by": [
-                            {
-                                "sub_task": 2,
-                                "step": 1
-                            }
-                        ],
-                        "value": "\"U075AE6E7NW\""
+                        "value": "```json\n    [\n      {\n        \"name\": \"ax2119@nyu.edu\",\n        \"id\": \"ax2119@nyu.edu\"\n      },\n      {\n        \"name\": \"Holidays in India\",\n        \"id\": \"en.indian#holiday@group.v.calendar.google.com\"\n      },\n      {\n        \"name\": \"Holidays in United States\",\n        \"id\": \"en.usa#holiday@group.v.calendar.google.com\"\n      }\n    ]\n    ```"
                     }
                 ]
             }
         }
     },
     "2": {
-        "subtask_description": "Identify the user who posted the last message and display both the last message and the user info.",
+        "subtask_description": "From the chosen calendar, list events for next week (2025-04-28 to 2025-05-04) and compute the number of events per day (Mon-Sun).",
         "steps": {
             "1": {
-                "tool": "slack_get_user_profile",
-                "handles": "Retrieving the user's profile with the last message user ID",
+                "tool": "list-events",
+                "handles": "Retrieving the user's events in the given date range",
                 "input_vars": [
                     {
-                        "name": "last_message_user_id",
+                        "name": "target_calendar_id",
                         "parameter": [
-                            "user_id"
+                            "calendarId"
                         ],
                         "type": "string",
-                        "source": "TOOL_Output (sub_task 1, Step 2)",
-                        "description": "ID of the user who posted the last message",
-                        "value": "\"U075AE6E7NW\"",
-                        "dependencies": [
-                            {
-                                "sub_task": 1,
-                                "step": 2
-                            }
-                        ]
+                        "source": "LLM_Generated",
+                        "description": "The selected calendar ID (e.g., \"primary\")",
+                        "value": "primary",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "time_start",
+                        "parameter": [
+                            "timeMin"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Start date/time in ISO with timezone for next Monday",
+                        "value": "2025-04-28T00:00:00Z",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "time_end",
+                        "parameter": [
+                            "timeMax"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "End date/time in ISO with timezone for next Sunday",
+                        "value": "2025-05-04T23:59:59Z",
+                        "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "last_message_user_profile",
-                        "description": "Profile details of the user who posted the last message",
+                        "name": "day_counts",
+                        "description": "The number of events for each day, Monday through Sunday",
+                        "used_by": [
+                            {
+                                "sub_task": 3,
+                                "step": 1
+                            }
+                        ],
+                        "value": "[0, 0, 1, 0, 1, 0, 0]"
+                    },
+                    {
+                        "name": "busiest_day",
+                        "description": "The day of the week with the highest event count",
+                        "used_by": [],
+                        "value": "\"Wednesday\""
+                    }
+                ]
+            }
+        }
+    },
+    "3": {
+        "subtask_description": "Generate a bar chart from the day-by-day event counts.",
+        "steps": {
+            "1": {
+                "tool": "generate_chart",
+                "handles": "Creating a bar chart showing the event counts for each day",
+                "input_vars": [
+                    {
+                        "name": "chart_type",
+                        "parameter": [
+                            "type"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "The type of chart to generate",
+                        "value": "bar",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "day_labels",
+                        "parameter": [
+                            "labels"
+                        ],
+                        "type": "array",
+                        "source": "LLM_Generated",
+                        "description": "Labels for the x-axis (Mon, Tue, Wed, Thu, Fri, Sat, Sun)",
+                        "value": "[\"Monday\", \"Tuesday\", \"Wednesday\", \"Thursday\", \"Friday\", \"Saturday\", \"Sunday\"]",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "day_counts",
+                        "parameter": [
+                            "datasets"
+                        ],
+                        "type": "array",
+                        "source": "TOOL_Output (sub_task 2, Step 1)",
+                        "description": "The dataset containing the counts for each day",
+                        "value": "[0, 0, 1, 0, 1, 0, 0]",
+                        "dependencies": [
+                            {
+                                "sub_task": 2,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "chart_title",
+                        "parameter": [
+                            "title"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Title of the bar chart",
+                        "value": "Events Count Next Week",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "chart_url",
+                        "description": "URL or link to the generated bar chart image",
+                        "used_by": []
+                    }
+                ]
+            }
+        }
+    },
+    "4": {
+        "subtask_description": "Retrieve the Slack channel list to find llm_agents_proj.",
+        "steps": {
+            "1": {
+                "tool": "slack_list_channels",
+                "handles": "Lists Slack channels to locate llm_agents_proj",
+                "input_vars": [
+                    {
+                        "name": "channels_limit",
+                        "parameter": [
+                            "limit"
+                        ],
+                        "type": "number",
+                        "source": "LLM_Generated",
+                        "description": "Max number of channels to list",
+                        "value": "100",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "llm_agents_proj_channel_id",
+                        "description": "The Slack channel ID for llm_agents_proj",
+                        "used_by": [
+                            {
+                                "sub_task": 5,
+                                "step": 1
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "5": {
+        "subtask_description": "Post the chart to Slack, mentioning the busiest day.",
+        "steps": {
+            "1": {
+                "tool": "slack_post_message",
+                "handles": "Posting the bar chart link and a note about which day is busiest",
+                "input_vars": [
+                    {
+                        "name": "llm_agents_proj_channel_id",
+                        "parameter": [
+                            "channel_id"
+                        ],
+                        "type": "string",
+                        "source": "TOOL_Output (sub_task 4, Step 1)",
+                        "description": "ID of the llm_agents_proj channel",
+                        "value": "None",
+                        "dependencies": [
+                            {
+                                "sub_task": 4,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "final_note",
+                        "parameter": [
+                            "text"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Brief note including the chart URL and the busiest day from day_counts",
+                        "value": "Here is the bar chart of next week's events. My busiest day is: ",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "slack_post_confirmation",
+                        "description": "Confirmation or result of posting to Slack",
                         "used_by": []
                     }
                 ]

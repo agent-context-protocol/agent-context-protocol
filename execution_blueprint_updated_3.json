@@ -1,288 +1,29 @@
 {
-    "1": {
-        "subtask_description": "Identify the country name mentioned in Slack general channel.",
-        "steps": {
-            "1": {
-                "tool": "slack_list_channels",
-                "handles": "Lists public channels to find general channel ID",
-                "input_vars": [
-                    {
-                        "name": "channel_listing_limit",
-                        "parameter": [
-                            "limit"
-                        ],
-                        "type": "number",
-                        "source": "LLM_Generated",
-                        "description": "Maximum number of channels to return",
-                        "value": "100",
-                        "dependencies": []
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "general_channel_id",
-                        "description": "ID of the general channel",
-                        "used_by": [
-                            {
-                                "sub_task": 1,
-                                "step": 2
-                            }
-                        ],
-                        "value": "\"C075CU6FVE0\""
-                    }
-                ]
-            },
-            "2": {
-                "tool": "slack_get_channel_history",
-                "handles": "Gets recent messages from general channel to find mention of a country",
-                "input_vars": [
-                    {
-                        "name": "general_channel_id",
-                        "parameter": [
-                            "channel_id"
-                        ],
-                        "type": "string",
-                        "source": "TOOL_Output (sub_task 1, Step 1)",
-                        "description": "The channel ID for general",
-                        "value": "\"C075CU6FVE0\"",
-                        "dependencies": [
-                            {
-                                "sub_task": 1,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "fetch_limit",
-                        "parameter": [
-                            "limit"
-                        ],
-                        "type": "number",
-                        "source": "LLM_Generated",
-                        "description": "Number of messages to retrieve",
-                        "value": "20",
-                        "dependencies": []
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "identified_country",
-                        "description": "The country name found in the channel messages",
-                        "used_by": [
-                            {
-                                "sub_task": 2,
-                                "step": 1
-                            },
-                            {
-                                "sub_task": 3,
-                                "step": 1
-                            }
-                        ],
-                        "value": "\"Tunisia\""
-                    }
-                ]
-            }
-        }
-    },
-    "2": {
-        "subtask_description": "Retrieve current weather for the identified country.",
-        "steps": {
-            "1": {
-                "tool": "perplexity_ask",
-                "handles": "Identifies a primary city (capital or major city) for the given country",
-                "input_vars": [
-                    {
-                        "name": "identified_country",
-                        "parameter": [
-                            "messages"
-                        ],
-                        "type": "array",
-                        "source": "TOOL_Output (sub_task 1, Step 2)",
-                        "description": "Holds the country name from sub_task 1",
-                        "value": "[\"Tunisia\"]",
-                        "dependencies": [
-                            {
-                                "sub_task": 1,
-                                "step": 2
-                            }
-                        ]
-                    },
-                    {
-                        "name": "city_search_query",
-                        "parameter": [
-                            "messages"
-                        ],
-                        "type": "array",
-                        "source": "LLM_Generated",
-                        "description": "Query for capital or major city",
-                        "value": "[{\"role\":\"user\",\"content\":\"What is a well-known major city or capital in [identified_country]?\"}]",
-                        "dependencies": []
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "target_city",
-                        "description": "City to use for weather lookup",
-                        "used_by": [
-                            {
-                                "sub_task": 2,
-                                "step": 2
-                            }
-                        ],
-                        "value": "\"Tunis\""
-                    }
-                ]
-            },
-            "2": {
-                "tool": "perplexity_ask",
-                "handles": "Retrieves current weather details for the identified city",
-                "input_vars": [
-                    {
-                        "name": "target_city",
-                        "parameter": [
-                            "messages"
-                        ],
-                        "type": "array",
-                        "source": "TOOL_Output (sub_task 2, Step 1)",
-                        "description": "City for which we want the weather",
-                        "value": "[\"Tunis\"]",
-                        "dependencies": [
-                            {
-                                "sub_task": 2,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "weather_query",
-                        "parameter": [
-                            "messages"
-                        ],
-                        "type": "array",
-                        "source": "LLM_Generated",
-                        "description": "Query to get current weather in target_city",
-                        "value": "[{\"role\":\"user\",\"content\":\"What is the current weather in [target_city]?\"}]",
-                        "dependencies": []
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "country_weather",
-                        "description": "Current weather information for the identified city",
-                        "used_by": [],
-                        "value": "\"Current Weather in Tunis (as of April 16, 2025, around 4:00 PM UTC):  \n    - Temperature: 16\u00b0C (feels like 16\u00b0C), highs up to 19\u00b0C today.  \n    - Conditions: A few clouds, thunderstorms and heavy rain reported earlier this afternoon.  \n    - Humidity: Around 85%.  \n    - Wind: Breezy, from the northwest, gusts up to 28 mph.  \n    - Precipitation: Brief showers and heavy thunderstorms this afternoon, more showers possible early evening before clearing.  \n    - Outlook for Tonight: A few showers early, then clearing up. Low expected around 12\u201313\u00b0C (54\u00b0F).  \n    - Summary Table:  \n      | Time    | Temperature | Weather                  | Humidity | Wind        | Precipitation              |  \n      |---------|-------------|--------------------------|----------|-------------|----------------------------|  \n      | 4:00 PM | 16\u00b0C        | Partly cloudy, t-storms  | 85%      | Breezy, NW  | Showers and t-storms       |  \n      | Evening | 12\u201313\u00b0C     | Clearing                 | \u2014        | \u2014           | Isolated showers early     |  \n    Heavy thunderstorms and rain have affected Tunis this afternoon, with breezy conditions continuing. The weather will gradually clear during the evening, leading to a cool and partly cloudy night.  \n    Sources:  \n    - https://www.accuweather.com/en/tn/tunis/321398/weather-forecast/321398  \n    - https://weather.metoffice.gov.uk/forecast/snx1rqvs4  \n    - https://www.accuweather.com/en/tn/tunis/321398/current-weather/321398  \n    - https://www.timeanddate.com/weather/tunisia/tunis/ext  \n    - https://www.theweathernetwork.com/en/city/tn/tunis/tunis/current  \n    - https://www.wunderground.com/forecast/tn/tunis\""
-                    }
-                ]
-            }
-        }
-    },
     "3": {
-        "subtask_description": "Calculate driving time between the two most populous cities in the identified country.",
+        "subtask_description": "Fetch short background on the top 5 artists.",
         "steps": {
             "1": {
                 "tool": "perplexity_ask",
-                "handles": "Finds the two most populous cities in the identified country",
+                "handles": "Retrieving short background info for each of the top 5 artists",
                 "input_vars": [
                     {
-                        "name": "identified_country",
-                        "parameter": [
-                            "messages"
-                        ],
-                        "type": "array",
-                        "source": "TOOL_Output (sub_task 1, Step 2)",
-                        "description": "The country name from sub_task 1",
-                        "value": "[\"Tunisia\"]",
-                        "dependencies": [
-                            {
-                                "sub_task": 1,
-                                "step": 2
-                            }
-                        ]
-                    },
-                    {
-                        "name": "populous_cities_query",
+                        "name": "background_query",
                         "parameter": [
                             "messages"
                         ],
                         "type": "array",
                         "source": "LLM_Generated",
-                        "description": "Query to find the two most populous cities",
-                        "value": "[{\"role\":\"user\",\"content\":\"Which are the two most populous cities in [identified_country]?\"}]",
+                        "description": "Message asking for short background on top 5 artists",
+                        "value": "[{\"role\":\"user\",\"content\":\"Please provide a short background for each of the top 5 artists from the Chinook DB.\"}]",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "populous_cities_list",
-                        "description": "The names of the two most populous cities",
-                        "used_by": [
-                            {
-                                "sub_task": 3,
-                                "step": 2
-                            },
-                            {
-                                "sub_task": 3,
-                                "step": 2
-                            }
-                        ],
-                        "value": "[\"Tunis\", \"Sfax\"]"
-                    }
-                ]
-            },
-            "2": {
-                "tool": "maps_distance_matrix",
-                "handles": "Calculates driving time between the two cities",
-                "input_vars": [
-                    {
-                        "name": "populous_cities_list",
-                        "parameter": [
-                            "origins"
-                        ],
-                        "type": "array",
-                        "source": "TOOL_Output (sub_task 3, Step 1)",
-                        "description": "The two most populous cities in that country",
-                        "value": "[\"Tunis\", \"Sfax\"]",
-                        "dependencies": [
-                            {
-                                "sub_task": 3,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "populous_cities_list",
-                        "parameter": [
-                            "destinations"
-                        ],
-                        "type": "array",
-                        "source": "TOOL_Output (sub_task 3, Step 1)",
-                        "description": "The two most populous cities in that country",
-                        "value": "[\"Tunis\", \"Sfax\"]",
-                        "dependencies": [
-                            {
-                                "sub_task": 3,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "driving_mode",
-                        "parameter": [
-                            "mode"
-                        ],
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Travel mode set to driving",
-                        "value": "driving",
-                        "dependencies": []
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "driving_time_between_cities",
-                        "description": "Driving time between the two most populous cities in that country",
+                        "name": "artist_backgrounds",
+                        "description": "Short background summaries for the top 5 artists",
                         "used_by": [],
-                        "value": "```json\n    [\n      {\n        \"from\": \"Tunis, Tunisia\",\n        \"to\": \"Sfax, Tunisia\",\n        \"duration_text\": \"2 hours 59 mins\",\n        \"duration_seconds\": 10760,\n        \"distance_text\": \"267 km\",\n        \"distance_meters\": 267348\n      },\n      {\n        \"from\": \"Sfax, Tunisia\",\n        \"to\": \"Tunis, Tunisia\",\n        \"duration_text\": \"2 hours 59 mins\",\n        \"duration_seconds\": 10744,\n        \"distance_text\": \"268 km\",\n        \"distance_meters\": 267633\n      }\n    ]\n    ```"
+                        "value": "\"## Backgrounds of the Top 5 Artists from the Chinook Database\n\nBased on revenue data from the Chinook Database, the top five artists are:\n\n1. Iron Maiden\n2. U2\n3. Metallica\n4. Led Zeppelin\n5. Lost\n\nBelow are brief backgrounds on each:\n\n**Iron Maiden**  \nIron Maiden is a legendary British heavy metal band formed in 1975 by bassist Steve Harris. Renowned for their energetic live performances and iconic mascot \\\"Eddie,\\\" Iron Maiden played a major role in the new wave of British heavy metal, influencing countless bands worldwide. Major albums include *The Number of the Beast*, *Powerslave*, and *Seventh Son of a Seventh Son*.\n\n**U2**  \nU2 is an Irish rock band formed in Dublin in 1976, consisting of Bono, The Edge, Adam Clayton, and Larry Mullen Jr. Known for their soaring sound and socially conscious lyrics, U2 achieved global stardom with albums like *The Joshua Tree* and *Achtung Baby*, and are celebrated for their activism and innovation in music.\n\n**Metallica**  \nMetallica is an American heavy metal band formed in Los Angeles in 1981. Founded by drummer Lars Ulrich and guitarist/vocalist James Hetfield, Metallica is one of the most influential metal bands, credited with pioneering thrash metal. Their best-known albums are *Master of Puppets*, *Ride the Lightning*, and the self-titled \\\"Black Album.\\\"\n\n**Led Zeppelin**  \nLed Zeppelin, formed in London in 1968, was composed of Robert Plant, Jimmy Page, John Paul Jones, and John Bonham. Often credited as one of the founders of hard rock and heavy metal, their signature blend included blues, psychedelia, and folk influences. Their most iconic songs include \\\"Stairway to Heaven,\\\" \\\"Whole Lotta Love,\\\" and \\\"Kashmir.\\\"\n\n**Lost**  \nLost is listed as one of the top artists by revenue in the Chinook Database, but unlike the other names here, \\\"Lost\\\" appears to be a placeholder or possibly a lesser-known or fictional artist included for database completeness. No major artist by this exact name is widely recognized in popular music history, indicating it may be a sample entry in Chinook's dataset rather than a real-world band or performer.\n\nThese artists reflect a mix of classic rock and metal staples, frequently featured in digital music store datasets such as Chinook's.\""
                     }
                 ]
             }

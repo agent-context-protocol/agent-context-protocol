@@ -476,10 +476,10 @@ HEADERS
 BODY
 
 {
-“messages”: [
+"messages": [
 {
-“role”: “user”,
-“content”: “What are the latitude and longitude coordinates for The Dolomites, Italy and Santorini, Greece?”
+"role": "user",
+"content": "What are the latitude and longitude coordinates for The Dolomites, Italy and Santorini, Greece?"
 }
 ]
 }
@@ -498,10 +498,10 @@ HEADERS
 BODY
 
 {
-“messages”: [
+"messages": [
 {
-“role”: “user”,
-“content”: “What are the latitude and longitude coordinates for Prague, Czech Republic and Cinque Terre, Italy?”
+"role": "user",
+"content": "What are the latitude and longitude coordinates for Prague, Czech Republic and Cinque Terre, Italy?"
 }
 ]
 }
@@ -520,10 +520,10 @@ HEADERS
 BODY
 
 {
-“messages”: [
+"messages": [
 {
-“role”: “user”,
-“content”: “What are the latitude and longitude coordinates for Barcelona, Spain and London, UK?”
+"role": "user",
+"content": "What are the latitude and longitude coordinates for Barcelona, Spain and London, UK?"
 }
 ]
 }
@@ -542,10 +542,10 @@ HEADERS
 BODY
 
 {
-“messages”: [
+"messages": [
 {
-“role”: “user”,
-“content”: “What are the latitude and longitude coordinates for Rome, Italy and Amsterdam, Netherlands?”
+"role": "user",
+"content": "What are the latitude and longitude coordinates for Rome, Italy and Amsterdam, Netherlands?"
 }
 ]
 }
@@ -564,10 +564,136 @@ HEADERS
 BODY
 
 {
-“messages”: [
+"messages": [
 {
-“role”: “user”,
-“content”: “What are the latitude and longitude coordinates for Munich, Germany and Dublin, Ireland?”
+"role": "user",
+"content": "What are the latitude and longitude coordinates for Munich, Germany and Dublin, Ireland?"
 }
 ]
+}
+
+#### Example:
+
+# Input:
+
+Step Details:
+
+- TOOL: query
+- Handles: Retrieves the list of tables from the database
+- Input Variables:
+  - Name: list_tables_sql
+    - Parameter: sql
+    - Type: string
+    - Source: LLM_Generated
+    - Description: SQL query to list all tables
+    - Value: "SELECT name FROM sqlite_master WHERE type='table';"
+- Output Variables:
+  - Name: table_list
+    - Description: List of tables in the database, if any
+
+TOOL Documentation:
+
+[You will be given the TOOL documentation]
+
+# Your Output:
+
+$$CHAIN_OF_THOUGHT$$
+	-	Input list_tables_sql is the sql string for the query tool.
+	-	Database is Postgres, so use the Postgres catalog query to list tables in public.
+	-	One FUNCTION call, no headers or extra parameters needed.
+
+$$AGENT_REQUEST$$
+
+TOOL_ENDPOINT
+
+Method: FUNCTION
+URL: query
+
+HEADERS
+
+{}
+
+BODY
+
+{
+"sql": "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';"
+}
+
+# Input:
+
+Step Details:
+
+- TOOL: slack_post_message
+- Handles: Posting the chart link and distances
+- Input Variables:
+  - Name: general_channel_id
+    - Parameter: channel_id
+    - Type: string
+    - Source: TOOL_Output (sub_task 3, Step 1)
+    - Description: Channel ID for #general
+    - Value: None
+  - Name: post_intro_text
+    - Parameter: text
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Introductory text about the road trip plan
+    - Value: "Here is our road trip distance chart and details for LA->Vegas->Chicago->NYC:"
+  - Name: chart_url
+    - Parameter: text
+    - Type: string
+    - Source: TOOL_Output (sub_task 2, Step 1)
+    - Description: The QuickChart URL to embed in the message
+    - Value: None
+  - Name: distances_array
+    - Parameter: text
+    - Type: string
+    - Source: TOOL_Output (sub_task 1, Step 3)
+    - Description: Distances array for each leg to include in the Slack message
+    - Value: None
+- Output Variables:
+  - Name: slack_post_confirmation
+    - Description: Confirmation of the posted Slack message
+
+TOOL Documentation:
+
+[You will be given the TOOL documentation]
+
+$$CHAIN_OF_THOUGHT$$
+
+- The tool is generate_chart, which is a FUNCTION call, not an HTTP request.
+- The required parameters per the schema are: type (string), datasets (array of objects with at least a data array), and optionally labels (array of strings).
+- Input variables:
+  - chart_type: "bar" (string), matches the 'type' parameter.
+  - chart_labels: ["LA->Vegas","Vegas->Chicago","Chicago->NYC"] (array of strings), matches the 'labels' parameter.
+  - chart_datasets_config: Value is "[" (incomplete/empty), so we ignore this and build the datasets from distances_array.
+  - distances_array: Provided as an array of objects, each with a 'leg' and a 'distance'. The last distance is an object with 'text' and 'value_meters'; the others are placeholders ("<distance_leg1>", "<distance_leg2>").
+- The 'datasets' parameter must be an array of objects, each with at least a 'data' array. For a bar chart, we typically use one dataset with the label (e.g., "Distance (mi)") and the data array as the distances for each segment.
+- Since two distances are placeholders, we will use the available value for "Chicago->NYC" (1272209 meters), and for the other two, we will use 0 as a placeholder (since the actual values are not provided).
+- The 'labels' array will be ["LA->Vegas","Vegas->Chicago","Chicago->NYC"].
+- The 'data' array will be [0, 0, 1272.209], converting 1272209 meters to miles (1 mile = 1609.344 meters).
+- No headers are needed for FUNCTION.
+- The body will include 'type', 'labels', and 'datasets' (with one dataset object).
+
+$$AGENT_REQUEST$$
+
+TOOL_ENDPOINT
+
+Method: FUNCTION  
+URL: generate_chart
+
+HEADERS
+
+{}
+
+BODY
+
+{
+  "type": "bar",
+  "labels": ["LA->Vegas", "Vegas->Chicago", "Chicago->NYC"],
+  "datasets": [
+    {
+      "label": "Distance (mi)",
+      "data": [0, 0, 1272.209]
+    }
+  ]
 }

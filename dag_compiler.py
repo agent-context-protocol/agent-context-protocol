@@ -52,6 +52,8 @@ class DAGCompilerNode(BaseNode):
         group_blocks = re.split(r"(Group \d+:)", execution_blueprint_text)
         execution_blueprints = {}
 
+        output_variables_name = []
+
         for i in range(1, len(group_blocks), 2):
             group_header = group_blocks[i]
             group_content = group_blocks[i + 1]
@@ -238,6 +240,9 @@ class DAGCompilerNode(BaseNode):
                                             line = group_lines[j].strip()
                                             if line.startswith("- Value:"):
                                                 input_var['value'] = input_var['value'] = line.split("Value:")[1].strip().strip('"')
+                                                for out_Var_name in output_variables_name:
+                                                    if out_Var_name in input_var['value']:
+                                                        raise ValueError(f"Value should not refer to previous steps output variable names, if the purpose is to derive the parameters input variable value from a previous steps output variable then source should be TOOL_Output with value as None in sub_task {subtasks_id}, Step {step_counter}")
                                                 # Check for the correct value based on Source
                                                 if input_var['source'] == "LLM_Generated" and input_var['value'] == "None":
                                                     raise ValueError(f"Value should not be 'None' for LLM_Generated source in sub_task {subtasks_id}, Step {step_counter}")
@@ -308,6 +313,7 @@ class DAGCompilerNode(BaseNode):
                                             output_var = {}
                                             # Name
                                             output_var['name'] = line.split("Name:")[1].strip()
+                                            output_variables_name.append(output_var['name'])
                                             j += 1
 
                                             # Skip empty lines
@@ -397,7 +403,8 @@ class DAGCompilerNode(BaseNode):
         Returns both a data structure and a formatted string.
         """
         # Initialize the formatted string
-        formatted_string = f"**Query:** \"{query}\"\n\n**TaskDecomposers's sub_task Requests:**\n"
+        note_string = "Never substitute a literal variable name for the data itself: if a parameter input variable should be derived from a previous step’s TOOL_Output, do not replace it with an LLM_Generated placeholder that merely echoes the variable name. Information must be passed between steps by supplying the actual TOOL_Output, not by referencing the variable symbol."
+        formatted_string = f"**Query:** \"{query}\"\n\n Important Note:{note_string}\n\n**TaskDecomposers's sub_task Requests:**\n"
 
         # Initialize a set to keep track of unique Tools
         unique_tools = {}

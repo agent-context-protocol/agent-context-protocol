@@ -30,21 +30,24 @@ servers:
     type: node 
 
   - name: Youtube-API
-    path: /Users/db/Desktop/workspace/acp/youtube-video-summarizer-mcp/dist/index.js
+    path: more_servers/youtube-video-summarizer-mcp/dist/index.js
     type: node
 
-  - name: everart
+  - name: Everart
     path: servers/src/everart/dist/index.js
     type: node
     env: 
       "EVERART_API_KEY": "everart-ZwWgd60GM5-WedRL2UQdRLZtThmE6UN2cVEU-PqkmNA"
 
-# Need to figure out
-  # - name: PostgresSQL
+  # - name: Postgres SQL
   #   path: servers/src/postgres/dist/index.js
   #   type: node
-  #   env: 
-      
+  #   args:
+  #   - "postgresql://aarjun1:@localhost:5432/chinook"
+
+  - name: GoogleCalendar
+    path: more_servers/google-calendar-mcp/build/index.js
+    type: node
 
 # BAD MCPs
   # - name: FinancialDataset_Ask

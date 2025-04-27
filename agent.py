@@ -685,9 +685,16 @@ class AgentNode(BaseNode):
                 elif step['tool'] in FUNCTION_TOOLS_DOCUMENTATION_DICT:
                     tool_documentation = FUNCTION_TOOLS_DOCUMENTATION_DICT[step['tool']]
                 elif step['tool'] in self.dag_compiler.MCP_PARAMS_DICT:
-                    tool_documentation = f"""Tool Name:{step['tool']}\nDescription: {self.dag_compiler.MCP_PARAMS_DICT[step['tool']]['documentation']}\nInput Schema: {self.dag_compiler.MCP_PARAMS_DICT[step['tool']]['parameters']}
+                    # To avoid repetetive error with postgres mcp "query" tool
+                    if step['tool'] == "query":
+                        tool_documentation = f"""Tool Name:{step['tool']}\nDescription: {self.dag_compiler.MCP_PARAMS_DICT[step['tool']]['documentation']}\nInput Schema: {self.dag_compiler.MCP_PARAMS_DICT[step['tool']]['parameters']}
                                              The method for this should always be FUNCTION, keep that in mind, and dont do some HTTP Method.
+                                             The SQL Database type is Postgres, so please write the SQL Statements Accordingly.
                                           """
+                    else:
+                        tool_documentation = f"""Tool Name:{step['tool']}\nDescription: {self.dag_compiler.MCP_PARAMS_DICT[step['tool']]['documentation']}\nInput Schema: {self.dag_compiler.MCP_PARAMS_DICT[step['tool']]['parameters']}
+                                                The method for this should always be FUNCTION, keep that in mind, and dont do some HTTP Method.
+                                            """
                 else:
                     raise ValueError("tool Documentation Not Found.")
                 input_data = self.prepare_input_for_tool_running_step(step, tool_documentation)
@@ -736,7 +743,10 @@ class AgentNode(BaseNode):
                                     print("tool_req_i in self.dag_compiler.MCP_PARAMS_DICT.keys()")
                                     _, mcp_output = await self.dag_compiler.mcp_tool_manager.call_tool(parsed_agent_request['agent_requests'][tool_req_i]['url'],parsed_agent_request['agent_requests'][tool_req_i]['body'])
                                     print(mcp_output)
-                                    tool_call_success_bool, tool_output = not(mcp_output.isError), mcp_output
+                                    try:
+                                        tool_call_success_bool, tool_output = not(mcp_output.isError), mcp_output
+                                    except:
+                                        tool_call_success_bool, tool_output = not(mcp_output['error']), mcp_output
                                 else:
                                     tool_call_success_bool, tool_output = self.function_call(step['tool'], parsed_agent_request['agent_requests'][tool_req_i]['body'])
                             else:

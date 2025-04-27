@@ -1,36 +1,122 @@
 {
     "1": {
         "1": {
-            "subtask_description": "Identify the 5 most populous cities in India with approximate population figures.",
+            "subtask_description": "Retrieve the route and distances for each leg (LA->Vegas, Vegas->Chicago, Chicago->NYC).",
             "steps": {
                 "1": {
-                    "tool": "perplexity_ask",
-                    "handles": "Retrieves the top 5 most populous cities in India with approximate populations",
+                    "tool": "maps_directions",
+                    "handles": "Retrieve driving directions LA->Vegas",
                     "input_vars": [
                         {
-                            "name": "query_populous_cities",
+                            "name": "la_origin",
                             "parameter": [
-                                "messages"
+                                "origin"
                             ],
-                            "type": "array",
+                            "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Single user message querying for the 5 most populous cities in India",
-                            "value": "[{\"role\":\"user\",\"content\":\"List the 5 most populous cities in India with approximate population figures.\"}]",
+                            "description": "Starting address (Los Angeles)",
+                            "value": "Los Angeles, CA",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "vegas_destination",
+                            "parameter": [
+                                "destination"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Destination address (Las Vegas)",
+                            "value": "Las Vegas, NV",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "populous_cities_list",
-                            "description": "List of the 5 most populous Indian cities along with approximate population",
+                            "name": "distance_leg1",
+                            "description": "Distance from LA to Vegas",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "2": {
+                    "tool": "maps_directions",
+                    "handles": "Retrieve driving directions Vegas->Chicago",
+                    "input_vars": [
+                        {
+                            "name": "vegas_origin",
+                            "parameter": [
+                                "origin"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Starting address (Las Vegas)",
+                            "value": "Las Vegas, NV",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "chicago_destination",
+                            "parameter": [
+                                "destination"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Destination address (Chicago)",
+                            "value": "Chicago, IL",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "distance_leg2",
+                            "description": "Distance from Vegas to Chicago",
+                            "used_by": []
+                        }
+                    ]
+                },
+                "3": {
+                    "tool": "maps_directions",
+                    "handles": "Retrieve driving directions Chicago->NYC",
+                    "input_vars": [
+                        {
+                            "name": "chicago_origin",
+                            "parameter": [
+                                "origin"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Starting address (Chicago)",
+                            "value": "Chicago, IL",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "nyc_destination",
+                            "parameter": [
+                                "destination"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Destination address (New York)",
+                            "value": "New York, NY",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "distance_leg3",
+                            "description": "Distance from Chicago to NYC",
+                            "used_by": []
+                        },
+                        {
+                            "name": "distances_array",
+                            "description": "Array of distances [distance_leg1, distance_leg2, distance_leg3] used in subsequent sub_tasks",
                             "used_by": [
                                 {
                                     "sub_task": 2,
                                     "step": 1
                                 },
                                 {
-                                    "sub_task": 2,
-                                    "step": 1
+                                    "sub_task": 3,
+                                    "step": 2
                                 }
                             ]
                         }
@@ -39,60 +125,177 @@
             }
         },
         "2": {
-            "subtask_description": "Compute the distances among the 5 identified cities.",
+            "subtask_description": "Generate a bar chart illustrating each leg\u2019s distance.",
             "steps": {
                 "1": {
-                    "tool": "maps_distance_matrix",
-                    "handles": "Generates a distance matrix among the identified cities",
+                    "tool": "generate_chart",
+                    "handles": "Create a bar chart showing distance per trip segment",
                     "input_vars": [
                         {
-                            "name": "populous_cities_list",
+                            "name": "chart_type",
                             "parameter": [
-                                "origins"
-                            ],
-                            "type": "array",
-                            "source": "TOOL_Output (sub_task 1, Step 1)",
-                            "description": "The 5 populous Indian cities used as origins",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "sub_task": 1,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "populous_cities_list",
-                            "parameter": [
-                                "destinations"
-                            ],
-                            "type": "array",
-                            "source": "TOOL_Output (sub_task 1, Step 1)",
-                            "description": "The 5 populous Indian cities used as destinations",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "sub_task": 1,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "travel_mode",
-                            "parameter": [
-                                "mode"
+                                "type"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Travel mode for distance calculation",
-                            "value": "driving",
+                            "description": "Chart type",
+                            "value": "bar",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "chart_labels",
+                            "parameter": [
+                                "labels"
+                            ],
+                            "type": "array",
+                            "source": "LLM_Generated",
+                            "description": "Labels for each trip segment",
+                            "value": "[\"LA->Vegas\",\"Vegas->Chicago\",\"Chicago->NYC\"]",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "chart_datasets_config",
+                            "parameter": [
+                                "datasets"
+                            ],
+                            "type": "array",
+                            "source": "LLM_Generated",
+                            "description": "Base configuration for the bar chart dataset",
+                            "value": "[",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "distances_array",
+                            "parameter": [
+                                "datasets"
+                            ],
+                            "type": "array",
+                            "source": "TOOL_Output (sub_task 1, Step 3)",
+                            "description": "Distances array for each leg",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 1,
+                                    "step": 3
+                                }
+                            ]
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "chart_url",
+                            "description": "URL or link to the generated bar chart image",
+                            "used_by": [
+                                {
+                                    "sub_task": 3,
+                                    "step": 2
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "3": {
+            "subtask_description": "Post the chart to Slack general, along with the distances.",
+            "steps": {
+                "1": {
+                    "tool": "slack_list_channels",
+                    "handles": "Retrieve Slack channel list to locate general",
+                    "input_vars": [
+                        {
+                            "name": "slack_channel_list_limit",
+                            "parameter": [
+                                "limit"
+                            ],
+                            "type": "number",
+                            "source": "LLM_Generated",
+                            "description": "Max number of channels to list",
+                            "value": "100",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "distance_matrix",
-                            "description": "Matrix of distances for each city pair",
+                            "name": "general_channel_id",
+                            "description": "The Slack channel ID corresponding to general",
+                            "used_by": [
+                                {
+                                    "sub_task": 3,
+                                    "step": 2
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "2": {
+                    "tool": "slack_post_message",
+                    "handles": "Posting the chart link and distances",
+                    "input_vars": [
+                        {
+                            "name": "general_channel_id",
+                            "parameter": [
+                                "channel_id"
+                            ],
+                            "type": "string",
+                            "source": "TOOL_Output (sub_task 3, Step 1)",
+                            "description": "Channel ID for general",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 3,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "post_intro_text",
+                            "parameter": [
+                                "text"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Introductory text about the road trip plan",
+                            "value": "Here is our road trip distance chart and details for LA->Vegas->Chicago->NYC:",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "chart_url",
+                            "parameter": [
+                                "text"
+                            ],
+                            "type": "string",
+                            "source": "TOOL_Output (sub_task 2, Step 1)",
+                            "description": "The QuickChart URL to embed in the message",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 2,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "distances_array",
+                            "parameter": [
+                                "text"
+                            ],
+                            "type": "string",
+                            "source": "TOOL_Output (sub_task 1, Step 3)",
+                            "description": "Distances array for each leg to include in the Slack message",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 1,
+                                    "step": 3
+                                }
+                            ]
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "slack_post_confirmation",
+                            "description": "Confirmation of the posted Slack message",
                             "used_by": []
                         }
                     ]
