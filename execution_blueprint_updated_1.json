@@ -1,91 +1,95 @@
 {
     "1": {
-        "subtask_description": "List all calendars to identify which one to use.",
+        "subtask_description": "Retrieve a list of all Google Calendars accessible to the user.",
         "steps": {
             "1": {
                 "tool": "list-calendars",
-                "handles": "Fetches all available calendars",
+                "handles": "Lists all available Google Calendars",
                 "input_vars": [],
                 "output_vars": [
                     {
-                        "name": "calendar_list",
-                        "description": "The list of calendar IDs and names",
-                        "used_by": [],
-                        "value": "```json\n    [\n      {\n        \"name\": \"ax2119@nyu.edu\",\n        \"id\": \"ax2119@nyu.edu\"\n      },\n      {\n        \"name\": \"Holidays in India\",\n        \"id\": \"en.indian#holiday@group.v.calendar.google.com\"\n      },\n      {\n        \"name\": \"Holidays in United States\",\n        \"id\": \"en.usa#holiday@group.v.calendar.google.com\"\n      }\n    ]\n    ```"
+                        "name": "main_calendar_id",
+                        "description": "The ID of the user's main Google Calendar",
+                        "used_by": [
+                            {
+                                "sub_task": 2,
+                                "step": 1
+                            }
+                        ],
+                        "value": "ax2119@nyu.edu"
                     }
                 ]
             }
         }
     },
     "2": {
-        "subtask_description": "From the chosen calendar, list events for next week (2025-04-28 to 2025-05-04) and compute the number of events per day (Mon-Sun).",
+        "subtask_description": "List all events scheduled on the user's main Google Calendar for the current week (Monday to Sunday).",
         "steps": {
             "1": {
                 "tool": "list-events",
-                "handles": "Retrieving the user's events in the given date range",
+                "handles": "Retrieves all events for the current week from the main calendar",
                 "input_vars": [
                     {
-                        "name": "target_calendar_id",
+                        "name": "main_calendar_id",
                         "parameter": [
                             "calendarId"
                         ],
                         "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "The selected calendar ID (e.g., \"primary\")",
-                        "value": "primary",
-                        "dependencies": []
+                        "source": "TOOL_Output (sub_task 1, Step 1)",
+                        "description": "The ID of the main Google Calendar",
+                        "value": "ax2119@nyu.edu",
+                        "dependencies": [
+                            {
+                                "sub_task": 1,
+                                "step": 1
+                            }
+                        ]
                     },
                     {
-                        "name": "time_start",
+                        "name": "week_start_time",
                         "parameter": [
                             "timeMin"
                         ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Start date/time in ISO with timezone for next Monday",
+                        "description": "Start of the current week in ISO format (Monday, Apr 28, 2025)",
                         "value": "2025-04-28T00:00:00Z",
                         "dependencies": []
                     },
                     {
-                        "name": "time_end",
+                        "name": "week_end_time",
                         "parameter": [
                             "timeMax"
                         ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "End date/time in ISO with timezone for next Sunday",
+                        "description": "End of the current week in ISO format (Sunday, May 4, 2025)",
                         "value": "2025-05-04T23:59:59Z",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "day_counts",
-                        "description": "The number of events for each day, Monday through Sunday",
+                        "name": "weekly_events",
+                        "description": "List of all events from the main calendar for the current week",
                         "used_by": [
                             {
                                 "sub_task": 3,
                                 "step": 1
                             }
                         ],
-                        "value": "[0, 0, 1, 0, 1, 0, 0]"
-                    },
-                    {
-                        "name": "busiest_day",
-                        "description": "The day of the week with the highest event count",
-                        "used_by": [],
-                        "value": "\"Wednesday\""
+                        "value": "```json\n    [\n      {\n        \"title\": \"Chopra Group Weekly Lab Mtg - Spring 2025\",\n        \"start_time\": \"2025-04-30T13:00:00-04:00\",\n        \"end_time\": \"2025-04-30T14:00:00-04:00\",\n        \"location\": \"60FA - Room 446 | Zoom as Backup\",\n        \"attendees\": [\n          \"rt2741@nyu.edu\", \"antonio.verdone@nyulangone.org\", \"us453@nyu.edu\", \"lais.peter.7@gmail.com\", \"asn9772@nyu.edu\", \"dm5182@nyu.edu\", \"tarun.dutt@nyulangone.org\", \"ax2119@nyu.edu\", \"hao.zhang@nyulangone.org\", \"rs4070@nyu.edu\", \"aa9774@nyu.edu\", \"ab10945@nyu.edu\", \"vm2781@nyu.edu\", \"yw7104@nyu.edu\", \"anton.becker@nyulangone.org\", \"divyansh.jha@nyulangone.org\", \"luoyao.chen@nyulangone.org\", \"muhang.tian@nyulangone.org\", \"sumit.chopra@nyulangone.org\", \"yiqiu.shen@nyulangone.org\", \"muhang.tian@cims.nyu.edu\"\n        ]\n      },\n      {\n        \"title\": \"Alex <> Arjun\",\n        \"start_time\": \"2025-05-02T14:00:00-04:00\",\n        \"end_time\": \"2025-05-02T15:00:00-04:00\",\n        \"location\": null,\n        \"attendees\": [\n          \"ax2119@nyu.edu\", \"anw2067@nyu.edu\"\n        ]\n      }\n    ]\n    ```"
                     }
                 ]
             }
         }
     },
     "3": {
-        "subtask_description": "Generate a bar chart from the day-by-day event counts.",
+        "subtask_description": "Aggregate total hours spent in meetings for each day of the current week and generate a bar chart visualizing this data.",
         "steps": {
             "1": {
                 "tool": "generate_chart",
-                "handles": "Creating a bar chart showing the event counts for each day",
+                "handles": "Generates a bar chart of daily meeting hours for the week",
                 "input_vars": [
                     {
                         "name": "chart_type",
@@ -94,30 +98,30 @@
                         ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "The type of chart to generate",
+                        "description": "The chart type",
                         "value": "bar",
                         "dependencies": []
                     },
                     {
-                        "name": "day_labels",
+                        "name": "chart_labels",
                         "parameter": [
                             "labels"
                         ],
                         "type": "array",
                         "source": "LLM_Generated",
-                        "description": "Labels for the x-axis (Mon, Tue, Wed, Thu, Fri, Sat, Sun)",
-                        "value": "[\"Monday\", \"Tuesday\", \"Wednesday\", \"Thursday\", \"Friday\", \"Saturday\", \"Sunday\"]",
+                        "description": "Labels for each day of the week",
+                        "value": "[\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\"]",
                         "dependencies": []
                     },
                     {
-                        "name": "day_counts",
+                        "name": "weekly_events",
                         "parameter": [
                             "datasets"
                         ],
                         "type": "array",
                         "source": "TOOL_Output (sub_task 2, Step 1)",
-                        "description": "The dataset containing the counts for each day",
-                        "value": "[0, 0, 1, 0, 1, 0, 0]",
+                        "description": "Array of objects representing total meeting hours per day, derived from weekly_events",
+                        "value": "```json\n    [\n      {\"day\": \"Mon\", \"hours\": 0},\n      {\"day\": \"Tue\", \"hours\": 0},\n      {\"day\": \"Wed\", \"hours\": 1},\n      {\"day\": \"Thu\", \"hours\": 0},\n      {\"day\": \"Fri\", \"hours\": 1},\n      {\"day\": \"Sat\", \"hours\": 0},\n      {\"day\": \"Sun\", \"hours\": 0}\n    ]\n    ```",
                         "dependencies": [
                             {
                                 "sub_task": 2,
@@ -132,95 +136,165 @@
                         ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Title of the bar chart",
-                        "value": "Events Count Next Week",
+                        "description": "Title of the chart",
+                        "value": "Weekly Meeting Hours",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
+                        "name": "chart_config",
+                        "description": "The chart configuration object for the generated bar chart",
+                        "used_by": [
+                            {
+                                "sub_task": 4,
+                                "step": 1
+                            }
+                        ],
+                        "value": "```json\n    {\n      \"type\": \"bar\",\n      \"data\": {\n        \"labels\": [\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\"],\n        \"datasets\": [\n          {\n            \"label\": \"Meeting Hours\",\n            \"data\": [0, 0, 1, 0, 1, 0, 0]\n          }\n        ]\n      },\n      \"options\": {\n        \"title\": {\n          \"display\": true,\n          \"text\": \"Weekly Meeting Hours\"\n        }\n      }\n    }\n    ```"
+                    },
+                    {
                         "name": "chart_url",
-                        "description": "URL or link to the generated bar chart image",
-                        "used_by": []
+                        "description": "The URL of the generated bar chart image",
+                        "used_by": [
+                            {
+                                "sub_task": 6,
+                                "step": 1
+                            }
+                        ],
+                        "value": "https://quickchart.io/chart?c=%7B%22type%22%3A%22bar%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22Mon%22%2C%22Tue%22%2C%22Wed%22%2C%22Thu%22%2C%22Fri%22%2C%22Sat%22%2C%22Sun%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22Meeting%20Hours%22%2C%22data%22%3A%5B0%2C0%2C1%2C0%2C1%2C0%2C0%5D%7D%5D%7D%2C%22options%22%3A%7B%22title%22%3A%7B%22display%22%3Atrue%2C%22text%22%3A%22Weekly%20Meeting%20Hours%22%7D%7D%7D"
                     }
                 ]
             }
         }
     },
     "4": {
-        "subtask_description": "Retrieve the Slack channel list to find llm_agents_proj.",
+        "subtask_description": "Download the bar chart image generated in Sub-task 3 to prepare it for posting in Slack.",
         "steps": {
             "1": {
-                "tool": "slack_list_channels",
-                "handles": "Lists Slack channels to locate llm_agents_proj",
+                "tool": "download_chart",
+                "handles": "Downloads the bar chart image to a local file",
                 "input_vars": [
                     {
-                        "name": "channels_limit",
+                        "name": "chart_config",
                         "parameter": [
-                            "limit"
+                            "config"
                         ],
-                        "type": "number",
-                        "source": "LLM_Generated",
-                        "description": "Max number of channels to list",
-                        "value": "100",
-                        "dependencies": []
+                        "type": "object",
+                        "source": "TOOL_Output (sub_task 3, Step 1)",
+                        "description": "The chart configuration object from generate_chart",
+                        "value": "```json\n    {\n      \"type\": \"bar\",\n      \"data\": {\n        \"labels\": [\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\"],\n        \"datasets\": [\n          {\n            \"label\": \"Meeting Hours\",\n            \"data\": [0, 0, 1, 0, 1, 0, 0]\n          }\n        ]\n      },\n      \"options\": {\n        \"title\": {\n          \"display\": true,\n          \"text\": \"Weekly Meeting Hours\"\n        }\n      }\n    }\n    ```",
+                        "dependencies": [
+                            {
+                                "sub_task": 3,
+                                "step": 1
+                            }
+                        ]
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "llm_agents_proj_channel_id",
-                        "description": "The Slack channel ID for llm_agents_proj",
-                        "used_by": [
-                            {
-                                "sub_task": 5,
-                                "step": 1
-                            }
-                        ]
+                        "name": "chart_image_path",
+                        "description": "The local file path to the downloaded chart image",
+                        "used_by": [],
+                        "value": "\"/Users/aarjun1/Desktop/bar_2025-04-28_08-02-50.png\""
                     }
                 ]
             }
         }
     },
     "5": {
-        "subtask_description": "Post the chart to Slack, mentioning the busiest day.",
+        "subtask_description": "List all public Slack channels to retrieve the channel ID for general.",
+        "steps": {
+            "1": {
+                "tool": "slack_list_channels",
+                "handles": "Lists public Slack channels to find general",
+                "input_vars": [
+                    {
+                        "name": "slack_channel_limit",
+                        "parameter": [
+                            "limit"
+                        ],
+                        "type": "number",
+                        "source": "LLM_Generated",
+                        "description": "Maximum number of channels to return",
+                        "value": "100",
+                        "dependencies": []
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "general_channel_id",
+                        "description": "The channel ID for general",
+                        "used_by": [
+                            {
+                                "sub_task": 6,
+                                "step": 1
+                            }
+                        ],
+                        "value": "\"C075CU6FVE0\""
+                    }
+                ]
+            }
+        }
+    },
+    "6": {
+        "subtask_description": "Post the downloaded bar chart image in the general Slack channel with a short explanation summarizing the weekly meeting hours.",
         "steps": {
             "1": {
                 "tool": "slack_post_message",
-                "handles": "Posting the bar chart link and a note about which day is busiest",
+                "handles": "Posts the chart image URL and a summary explanation in general",
                 "input_vars": [
                     {
-                        "name": "llm_agents_proj_channel_id",
+                        "name": "general_channel_id",
                         "parameter": [
                             "channel_id"
                         ],
                         "type": "string",
-                        "source": "TOOL_Output (sub_task 4, Step 1)",
-                        "description": "ID of the llm_agents_proj channel",
-                        "value": "None",
+                        "source": "TOOL_Output (sub_task 5, Step 1)",
+                        "description": "The channel ID for general",
+                        "value": "\"C075CU6FVE0\"",
                         "dependencies": [
                             {
-                                "sub_task": 4,
+                                "sub_task": 5,
                                 "step": 1
                             }
                         ]
                     },
                     {
-                        "name": "final_note",
+                        "name": "chart_url",
+                        "parameter": [
+                            "text"
+                        ],
+                        "type": "string",
+                        "source": "TOOL_Output (sub_task 3, Step 1)",
+                        "description": "The URL of the generated bar chart image to include in the message",
+                        "value": "https://quickchart.io/chart?c=%7B%22type%22%3A%22bar%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22Mon%22%2C%22Tue%22%2C%22Wed%22%2C%22Thu%22%2C%22Fri%22%2C%22Sat%22%2C%22Sun%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22Meeting%20Hours%22%2C%22data%22%3A%5B0%2C0%2C1%2C0%2C1%2C0%2C0%5D%7D%5D%7D%2C%22options%22%3A%7B%22title%22%3A%7B%22display%22%3Atrue%2C%22text%22%3A%22Weekly%20Meeting%20Hours%22%7D%7D%7D",
+                        "dependencies": [
+                            {
+                                "sub_task": 3,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "summary_text",
                         "parameter": [
                             "text"
                         ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Brief note including the chart URL and the busiest day from day_counts",
-                        "value": "Here is the bar chart of next week's events. My busiest day is: ",
+                        "description": "Short explanation summarizing the weekly meeting hours",
+                        "value": "Here is a bar chart showing my meeting hours for each day this week.",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
                         "name": "slack_post_confirmation",
-                        "description": "Confirmation or result of posting to Slack",
-                        "used_by": []
+                        "description": "Confirmation of the posted message in general channel",
+                        "used_by": [],
+                        "value": "{\n      \"ok\": true,\n      \"channel\": \"C075CU6FVE0\",\n      \"timestamp\": \"1745827400.351959\",\n      \"message_text\": \"Here is a bar chart showing my meeting hours for each day this week.\\n<https://quickchart.io/chart?c=%7B%22type%22%3A%22bar%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22Mon%22%2C%22Tue%22%2C%22Wed%22%2C%22Thu%22%2C%22Fri%22%2C%22Sat%22%2C%22Sun%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22Meeting%20Hours%22%2C%22data%22%3A%5B0%2C0%2C1%2C0%2C1%2C0%2C0%5D%7D%5D%7D%2C%22options%22%3A%7B%22title%22%3A%7B%22display%22%3Atrue%2C%22text%22%3A%22Weekly%20Meeting%20Hours%22%7D%7D%7D>\"\n    }"
                     }
                 ]
             }

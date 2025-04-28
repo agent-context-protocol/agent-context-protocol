@@ -41,7 +41,7 @@ class TaskDecompositionNode(BaseNode):
                     available_tool_string = self.create_available_tool_string()
                     print("available_tool_string : ",available_tool_string)
                     self.chat_history.append({"role": "user", "content": available_tool_string})
-                    output = self.generate(True)
+                    output = self.generate()
                     print(output)
                     output = self.modify_message(output)
                     return output

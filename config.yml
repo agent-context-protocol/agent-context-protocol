@@ -39,16 +39,24 @@ servers:
     env: 
       "EVERART_API_KEY": "everart-ZwWgd60GM5-WedRL2UQdRLZtThmE6UN2cVEU-PqkmNA"
 
-  # - name: Postgres SQL
-  #   path: servers/src/postgres/dist/index.js
-  #   type: node
-  #   args:
-  #   - "postgresql://aarjun1:@localhost:5432/chinook"
+  - name: Postgres SQL
+    path: servers/src/postgres/dist/index.js
+    type: node
+    args:
+    - "postgresql://aarjun1:@localhost:5432/chinook"
 
   - name: GoogleCalendar
     path: more_servers/google-calendar-mcp/build/index.js
     type: node
+  
+  # - name: CodeExecutor
+  #   path: more_servers/mcp_code_executor/build/index.js
+  #   type: node
+  #   env:
+  #     "CODE_STORAGE_DIR": "code_exc_storage"
+  #     "CONDA_ENV_NAME": "llmagents_310"
 
+  
 # BAD MCPs
   # - name: FinancialDataset_Ask
   #   path: more_servers/financial_mcp_server/mcp-server/server.py

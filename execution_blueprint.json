@@ -1,89 +1,94 @@
 {
     "1": {
         "1": {
-            "subtask_description": "List all calendars to identify which one to use.",
+            "subtask_description": "Retrieve a list of all Google Calendars accessible to the user.",
             "steps": {
                 "1": {
                     "tool": "list-calendars",
-                    "handles": "Fetches all available calendars",
+                    "handles": "Lists all available Google Calendars",
                     "input_vars": [],
                     "output_vars": [
                         {
-                            "name": "calendar_list",
-                            "description": "The list of calendar IDs and names",
-                            "used_by": []
+                            "name": "main_calendar_id",
+                            "description": "The ID of the user's main Google Calendar",
+                            "used_by": [
+                                {
+                                    "sub_task": 2,
+                                    "step": 1
+                                }
+                            ]
                         }
                     ]
                 }
             }
         },
         "2": {
-            "subtask_description": "From the chosen calendar, list events for next week (2025-04-28 to 2025-05-04) and compute the number of events per day (Mon-Sun).",
+            "subtask_description": "List all events scheduled on the user's main Google Calendar for the current week (Monday to Sunday).",
             "steps": {
                 "1": {
                     "tool": "list-events",
-                    "handles": "Retrieving the user's events in the given date range",
+                    "handles": "Retrieves all events for the current week from the main calendar",
                     "input_vars": [
                         {
-                            "name": "target_calendar_id",
+                            "name": "main_calendar_id",
                             "parameter": [
                                 "calendarId"
                             ],
                             "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "The selected calendar ID (e.g., \"primary\")",
-                            "value": "primary",
-                            "dependencies": []
+                            "source": "TOOL_Output (sub_task 1, Step 1)",
+                            "description": "The ID of the main Google Calendar",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 1,
+                                    "step": 1
+                                }
+                            ]
                         },
                         {
-                            "name": "time_start",
+                            "name": "week_start_time",
                             "parameter": [
                                 "timeMin"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Start date/time in ISO with timezone for next Monday",
+                            "description": "Start of the current week in ISO format (Monday, Apr 28, 2025)",
                             "value": "2025-04-28T00:00:00Z",
                             "dependencies": []
                         },
                         {
-                            "name": "time_end",
+                            "name": "week_end_time",
                             "parameter": [
                                 "timeMax"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "End date/time in ISO with timezone for next Sunday",
+                            "description": "End of the current week in ISO format (Sunday, May 4, 2025)",
                             "value": "2025-05-04T23:59:59Z",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "day_counts",
-                            "description": "The number of events for each day, Monday through Sunday",
+                            "name": "weekly_events",
+                            "description": "List of all events from the main calendar for the current week",
                             "used_by": [
                                 {
                                     "sub_task": 3,
                                     "step": 1
                                 }
                             ]
-                        },
-                        {
-                            "name": "busiest_day",
-                            "description": "The day of the week with the highest event count",
-                            "used_by": []
                         }
                     ]
                 }
             }
         },
         "3": {
-            "subtask_description": "Generate a bar chart from the day-by-day event counts.",
+            "subtask_description": "Aggregate total hours spent in meetings for each day of the current week and generate a bar chart visualizing this data.",
             "steps": {
                 "1": {
                     "tool": "generate_chart",
-                    "handles": "Creating a bar chart showing the event counts for each day",
+                    "handles": "Generates a bar chart of daily meeting hours for the week",
                     "input_vars": [
                         {
                             "name": "chart_type",
@@ -92,29 +97,29 @@
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "The type of chart to generate",
+                            "description": "The chart type",
                             "value": "bar",
                             "dependencies": []
                         },
                         {
-                            "name": "day_labels",
+                            "name": "chart_labels",
                             "parameter": [
                                 "labels"
                             ],
                             "type": "array",
                             "source": "LLM_Generated",
-                            "description": "Labels for the x-axis (Mon, Tue, Wed, Thu, Fri, Sat, Sun)",
-                            "value": "[\"Monday\", \"Tuesday\", \"Wednesday\", \"Thursday\", \"Friday\", \"Saturday\", \"Sunday\"]",
+                            "description": "Labels for each day of the week",
+                            "value": "[\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\"]",
                             "dependencies": []
                         },
                         {
-                            "name": "day_counts",
+                            "name": "weekly_events",
                             "parameter": [
                                 "datasets"
                             ],
                             "type": "array",
                             "source": "TOOL_Output (sub_task 2, Step 1)",
-                            "description": "The dataset containing the counts for each day",
+                            "description": "Array of objects representing total meeting hours per day, derived from weekly_events",
                             "value": "None",
                             "dependencies": [
                                 {
@@ -130,72 +135,16 @@
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Title of the bar chart",
-                            "value": "Events Count Next Week",
+                            "description": "Title of the chart",
+                            "value": "Weekly Meeting Hours",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "chart_url",
-                            "description": "URL or link to the generated bar chart image",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        },
-        "4": {
-            "subtask_description": "Retrieve the Slack channel list to find llm_agents_proj.",
-            "steps": {
-                "1": {
-                    "tool": "slack_list_channels",
-                    "handles": "Lists Slack channels to locate llm_agents_proj",
-                    "input_vars": [
-                        {
-                            "name": "channels_limit",
-                            "parameter": [
-                                "limit"
-                            ],
-                            "type": "number",
-                            "source": "LLM_Generated",
-                            "description": "Max number of channels to list",
-                            "value": "100",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "llm_agents_proj_channel_id",
-                            "description": "The Slack channel ID for llm_agents_proj",
+                            "name": "chart_config",
+                            "description": "The chart configuration object for the generated bar chart",
                             "used_by": [
-                                {
-                                    "sub_task": 5,
-                                    "step": 1
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        },
-        "5": {
-            "subtask_description": "Post the chart to Slack, mentioning the busiest day.",
-            "steps": {
-                "1": {
-                    "tool": "slack_post_message",
-                    "handles": "Posting the bar chart link and a note about which day is busiest",
-                    "input_vars": [
-                        {
-                            "name": "llm_agents_proj_channel_id",
-                            "parameter": [
-                                "channel_id"
-                            ],
-                            "type": "string",
-                            "source": "TOOL_Output (sub_task 4, Step 1)",
-                            "description": "ID of the llm_agents_proj channel",
-                            "value": "None",
-                            "dependencies": [
                                 {
                                     "sub_task": 4,
                                     "step": 1
@@ -203,21 +152,142 @@
                             ]
                         },
                         {
-                            "name": "final_note",
+                            "name": "chart_url",
+                            "description": "The URL of the generated bar chart image",
+                            "used_by": [
+                                {
+                                    "sub_task": 6,
+                                    "step": 1
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "4": {
+            "subtask_description": "Download the bar chart image generated in Sub-task 3 to prepare it for posting in Slack.",
+            "steps": {
+                "1": {
+                    "tool": "download_chart",
+                    "handles": "Downloads the bar chart image to a local file",
+                    "input_vars": [
+                        {
+                            "name": "chart_config",
+                            "parameter": [
+                                "config"
+                            ],
+                            "type": "object",
+                            "source": "TOOL_Output (sub_task 3, Step 1)",
+                            "description": "The chart configuration object from generate_chart",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 3,
+                                    "step": 1
+                                }
+                            ]
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "chart_image_path",
+                            "description": "The local file path to the downloaded chart image",
+                            "used_by": []
+                        }
+                    ]
+                }
+            }
+        },
+        "5": {
+            "subtask_description": "List all public Slack channels to retrieve the channel ID for general.",
+            "steps": {
+                "1": {
+                    "tool": "slack_list_channels",
+                    "handles": "Lists public Slack channels to find general",
+                    "input_vars": [
+                        {
+                            "name": "slack_channel_limit",
+                            "parameter": [
+                                "limit"
+                            ],
+                            "type": "number",
+                            "source": "LLM_Generated",
+                            "description": "Maximum number of channels to return",
+                            "value": "100",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "general_channel_id",
+                            "description": "The channel ID for general",
+                            "used_by": [
+                                {
+                                    "sub_task": 6,
+                                    "step": 1
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "6": {
+            "subtask_description": "Post the downloaded bar chart image in the general Slack channel with a short explanation summarizing the weekly meeting hours.",
+            "steps": {
+                "1": {
+                    "tool": "slack_post_message",
+                    "handles": "Posts the chart image URL and a summary explanation in general",
+                    "input_vars": [
+                        {
+                            "name": "general_channel_id",
+                            "parameter": [
+                                "channel_id"
+                            ],
+                            "type": "string",
+                            "source": "TOOL_Output (sub_task 5, Step 1)",
+                            "description": "The channel ID for general",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 5,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "chart_url",
+                            "parameter": [
+                                "text"
+                            ],
+                            "type": "string",
+                            "source": "TOOL_Output (sub_task 3, Step 1)",
+                            "description": "The URL of the generated bar chart image to include in the message",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 3,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "summary_text",
                             "parameter": [
                                 "text"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Brief note including the chart URL and the busiest day from day_counts",
-                            "value": "Here is the bar chart of next week's events. My busiest day is: ",
+                            "description": "Short explanation summarizing the weekly meeting hours",
+                            "value": "Here is a bar chart showing my meeting hours for each day this week.",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
                             "name": "slack_post_confirmation",
-                            "description": "Confirmation or result of posting to Slack",
+                            "description": "Confirmation of the posted message in general channel",
                             "used_by": []
                         }
                     ]

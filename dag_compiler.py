@@ -108,6 +108,7 @@ class DAGCompilerNode(BaseNode):
                         raise ValueError(f"Missing execution_blueprint Steps: section for sub_task {subtasks_id}")
 
                     # Parse Steps
+                    step_input_variables = []
                     while j < len(group_lines):
                         # Skip empty lines
                         j = skip_empty_lines(group_lines, j)
@@ -176,6 +177,7 @@ class DAGCompilerNode(BaseNode):
                                             input_var = {}
                                             # Name
                                             input_var['name'] = line.split("Name:")[1].strip()
+                                            step_input_variables.append(input_var['name'])
                                             j += 1
 
                                             # Parse Parameter
@@ -240,9 +242,11 @@ class DAGCompilerNode(BaseNode):
                                             line = group_lines[j].strip()
                                             if line.startswith("- Value:"):
                                                 input_var['value'] = input_var['value'] = line.split("Value:")[1].strip().strip('"')
-                                                for out_Var_name in output_variables_name:
-                                                    if out_Var_name in input_var['value']:
-                                                        raise ValueError(f"Value should not refer to previous steps output variable names, if the purpose is to derive the parameters input variable value from a previous steps output variable then source should be TOOL_Output with value as None in sub_task {subtasks_id}, Step {step_counter}")
+                                                if "TOOL_Output" in input_var['value'] or "sub_task" in input_var['value']:
+                                                    raise ValueError(f"Value should not refer to previous steps output variable names or TOOL_Output or sub_tasks directly, if the purpose is to derive the parameters input variable value from a previous steps output variable then parameter source field should be TOOL_Output with value as None in sub_task {subtasks_id}, Step {step_counter}")
+                                                for out_var_name in output_variables_name:
+                                                    if out_var_name in input_var['value'] and out_var_name not in step_input_variables:
+                                                        raise ValueError(f"Value should not refer to previous steps output variable names or TOOL_Output or sub_tasks directly, if the purpose is to derive the parameters input variable value from a previous steps output variable then parameter source field should be TOOL_Output with value as None in sub_task {subtasks_id}, Step {step_counter}")
                                                 # Check for the correct value based on Source
                                                 if input_var['source'] == "LLM_Generated" and input_var['value'] == "None":
                                                     raise ValueError(f"Value should not be 'None' for LLM_Generated source in sub_task {subtasks_id}, Step {step_counter}")
@@ -403,7 +407,11 @@ class DAGCompilerNode(BaseNode):
         Returns both a data structure and a formatted string.
         """
         # Initialize the formatted string
-        note_string = "Never substitute a literal variable name for the data itself: if a parameter input variable should be derived from a previous step’s TOOL_Output, do not replace it with an LLM_Generated placeholder that merely echoes the variable name. Information must be passed between steps by supplying the actual TOOL_Output, not by referencing the variable symbol."
+        note_string = """
+                        1. Never substitute a literal variable name for the data itself: if a parameter input variable should be derived from a previous step’s output variable, do not set the parameter Source field as LLM_Generated that merely echoes the variable name it the Value field (remember the wrong examples show in the - Source of Inputs:, do not repeat it). Information must be passed between steps by supplying the actual data stored in output variable by setting the Source field as TOOL_Output (sub_task X, Step Y). 
+                        2. Do not hallucinate or make up dummy data to fill in the values of input parameters, ground your data using relevant other tools (like perplexity, etc) and then pass on the information by setting the parameter source field as TOOL_Output (sub_task X, Step Y) of the future steps which will be dependent on the sub_task X, Step Y's output. 3. Use the method shown for handling caseswhere more than one previous step output dependencies are needed for a input parameter, instead of doing separate dummy (No tool, local merge step) like steps for cmobining data, instead you can simply use the method shown. 
+                        3. For any SQL task, first list the schema of all the public tables, and only afterwards carry out the required operations. Do not hallucinate the table names or schemas, first ground your knowledge by following this.
+                      """
         formatted_string = f"**Query:** \"{query}\"\n\n Important Note:{note_string}\n\n**TaskDecomposers's sub_task Requests:**\n"
 
         # Initialize a set to keep track of unique Tools
@@ -561,8 +569,23 @@ class DAGCompilerNode(BaseNode):
         counter = 0
         while not run_success and counter < 5:
             try:
-                llm_response_execution_blueprint = self.generate(True)
-                print("llm_response_execution_blueprint : \n",llm_response_execution_blueprint)
+                llm_response_execution_blueprint = self.generate()
+                print("llm_response_execution_blueprint before self reflection : \n",llm_response_execution_blueprint)
+                # Self Reflection Step
+                self.chat_history.append({"role": "user", "content": """
+                                          Do you think you generated the execution blueprint correctly by respecting all the details requested by the user. Mainly focus on:
+                                          1. Dataflow logic and interdependencies (sometimes you tend to not connect interdependent steps and let the dependent step dangling with no dependency data being provided via TOOL_Output, and either empty or incomplete information is provided)
+                                          2. If there are interdependencies between steps then the dependent step needs to strictly have a input variable with source field as TOOL_Output (sub_task X, Step Y), also make sure that there no wrong outputs where the previous steps output variable name has just been reffered in the dependent steps input variable value instead. Remember the wrong examples show in the - Source of Inputs:, do not repeat it.
+                                          3. Identifying issues where variable names between interdependent steps has not been kept same leading to parsing errors
+                                          4. Handling of more than one previous step output dependencies for a input parameter, is done in the manner shown.
+                                          5. For any SQL task, first list the schema of all the public tables, and only afterwards carry out the required operations. Do not hallucinate the table names or schemas, first ground your knowledge by following this.
+                                          
+                                          Lastly just make sure that each LLM_Generated source parameter values have been filled with utmost care and no hallucination, incomplete info or dummy data is used there, because in such cases grounded data needs to be provided through setting the source as TOOL_Output. If you think Everything is correct then just output NO_CHANGES_REQUIRED and nothing else at all, but if correction is required then mention the corrected output exactly in the expected format as mentioned earlier (With $$CHAIN_OF_THOUGHT$$ and $$EXECUTION_BLUEPRINT$$ blocks)."""})
+                llm_response_execution_blueprint_self_reflection = self.generate()
+                print("llm_response_execution_blueprint_self_reflection : \n",llm_response_execution_blueprint)
+                if "NO_CHANGES_REQUIRED" not in llm_response_execution_blueprint_self_reflection:
+                    llm_response_execution_blueprint = llm_response_execution_blueprint_self_reflection
+                print("llm_response_execution_blueprint after self reflection : \n",llm_response_execution_blueprint)
                 llm_response_execution_blueprint = llm_response_execution_blueprint.replace("**", "").replace("`", "").replace("#","")
                 _, execution_blueprint_dict = self.parse_dag_compiler_execution_blueprint(llm_response_execution_blueprint)
                 run_success = True

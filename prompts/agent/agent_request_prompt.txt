@@ -359,74 +359,6 @@ HEADERS
 
 Step Details:
 
-- TOOL: WeatherTOOL.com_Realtime_Weather_TOOL
-- Handles: Fetches real-time weather data
-- Input Variables:
-  - Name: longitude_data
-    - Parameter: q
-    - Type: string
-    - Source: TOOL_Output (sub_task 2, Step 1)
-    - Description: Longitutdes of the top cities
-    - Value: None
-- Output Variables:
-  - Name: realtime_weather
-    - Description: Real-time weather data for each city
-
-TOOL Documentation:
-
-[You will be given the TOOL documentation]
-
-# Your Output:
-
-$$CHAIN_OF_THOUGHT$$
-
-Input Variables:
-
-- Name: longitude_data
-  - Parameter: q
-  - Type: string
-  - Source: TOOL_Output (sub_task 2, Step 1)
-  - Description: Longitudes of the top cities
-  - Value: None
-
-Verification of Input Variables:
-
-- The WeatherTOOL.com_Realtime_Weather_TOOL requires the parameter q, which is a string representing the location.
-- The parameter q can accept:
-  - City name (e.g., "Paris")
-  - ZIP code (e.g., "10001")
-  - Latitude and longitude in the format "lat,lon" (e.g., "48.8567,2.3508")
-- Currently, we only have longitude_data without latitude_data.
-- The longitude_data depends on TOOL_Output (sub_task 2, Step 1), but its value is None, indicating missing data.
-- Without both latitude and longitude, we cannot construct the required q parameter in the format "lat,lon".
-
-Dependencies:
-
-- The input variable longitude_data lacks the corresponding latitude_data.
-- Since latitude_data is not provided, and longitude_data has no value, we cannot proceed.
-
-Conclusion:
-
-- The required parameter q is incomplete due to missing latitude_data.
-- We cannot fetch real-time weather data without both latitude and longitude.
-- Therefore, we must raise an 601 MISSING_REQUIRED_PARAMETERS error for missing required parameters.
-
-$$AGENT_REQUEST$$
-
-STATUS_CODE
-
-601 MISSING_REQUIRED_PARAMETERS
-
-ERROR_EXPLANATION
-
-The latitude of the location we want weather of is missing. We cannot get the weather from WeatherTOOL.com_Realtime_Weather_TOOL without both longitude and latitude of the location
-
-#### Example:
-
-# Input:
-
-Step Details:
-
 - TOOL: Perplexity
 - Handles: Fetches latitude and longitude for each vacation spot
 - Input Variables:
@@ -579,17 +511,18 @@ BODY
 Step Details:
 
 - TOOL: query
-- Handles: Retrieves the list of tables from the database
+- Handles: Listing all columns/tables in public schema
 - Input Variables:
-  - Name: list_tables_sql
+  - Name: schema_retrieval_sql
     - Parameter: sql
     - Type: string
     - Source: LLM_Generated
-    - Description: SQL query to list all tables
-    - Value: "SELECT name FROM sqlite_master WHERE type='table';"
+    - Description: SQL to list table_name, column_name, data_type in the public schema
+    - Value: "SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema='public';"
 - Output Variables:
-  - Name: table_list
-    - Description: List of tables in the database, if any
+  - Name: all_schema_info
+    - Description: Full schema details (table and column info)
+
 
 TOOL Documentation:
 
@@ -598,15 +531,21 @@ TOOL Documentation:
 # Your Output:
 
 $$CHAIN_OF_THOUGHT$$
-	-	Input list_tables_sql is the sql string for the query tool.
-	-	Database is Postgres, so use the Postgres catalog query to list tables in public.
-	-	One FUNCTION call, no headers or extra parameters needed.
+
+- The tool is named "query" and is invoked as a FUNCTION, not as an HTTP request.
+- The input variable schema_retrieval_sql is of type string, sourced from LLM_Generated, and its value is a SQL statement: "SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema='public';"
+- The parameter name in the tool schema is 'sql', which matches the input variable.
+- The SQL statement is appropriate for a Postgres database and will retrieve all table names, column names, and data types from the public schema.
+- There are no dependencies on previous tool outputs.
+- No headers are required for FUNCTION calls.
+- The body should be a JSON object with the 'sql' key and the SQL string as its value.
+- Only one Agent Request is needed since the query retrieves all required schema information in a single call.
 
 $$AGENT_REQUEST$$
 
 TOOL_ENDPOINT
 
-Method: FUNCTION
+Method: FUNCTION  
 URL: query
 
 HEADERS
@@ -616,8 +555,10 @@ HEADERS
 BODY
 
 {
-"sql": "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';"
+  "sql": "SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema='public';"
 }
+
+#### Example:
 
 # Input:
 
