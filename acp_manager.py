@@ -13,9 +13,28 @@ class ACPManager:
         self.groups = {}
         self.agents = {}
         self.thread_pool = ThreadPoolExecutor()
+        self.completed_agents = []
         
         for group_id, group_data in execution_blueprint.items():
             group_agents = []
+            execution_list = {}
+            max_depth = len(group_data.items())
+            for sub_id, sub in group_data.items():
+                execution_list[sub_id] = {
+                    'dependent_on' : [],
+                    'depth' : 0
+                }
+                for step in sub["steps"].values():
+                    for inp in step["input_vars"]:
+                        for dep in inp.get("dependencies", []):
+                            if dep['sub_task'] not in execution_list[sub_id]['dependent_on']:
+                                execution_list[sub_id]['dependent_on'].append(dep['sub_task'])
+            for sub_id, meta_info in execution_list.items():
+                
+                    # print(sub_id)
+                for parent_node in meta_info['dependent_on']:
+                    if meta_info['depth'] <= execution_list[str(parent_node)]['depth']:
+                        meta_info['depth'] = execution_list[str(parent_node)]['depth'] + 1
             for agent_id, agent_data in group_data.items():
                 agent = AgentNode(
                     int(agent_id),
@@ -27,8 +46,23 @@ class ACPManager:
                 agent.group_id = group_id
                 agent.sub_task_execution_blueprint = agent_data["steps"]
                 self.agents[agent_id] = agent
-                group_agents.append(agent)
-            self.groups[group_id] = group_agents
+            print("EXECUTION LIST: ", execution_list)
+            execution_sequence = []
+            depth = 0
+            for depth in range(max_depth):
+                temp = []
+                for sub_id, meta_info in execution_list.items():
+                    
+                    if meta_info['depth'] == depth:
+                        temp.append(self.agents[sub_id])
+                
+                if temp == []:
+                    break
+                else:
+                    execution_sequence.append(temp)
+            # group_agents.append(agent)
+            print(execution_sequence)
+            self.groups[group_id] = execution_sequence
 
     async def run(self):
         dag_compiler_task = asyncio.create_task(self.dag_compiler.process_queue())
@@ -39,8 +73,8 @@ class ACPManager:
             group_tasks.append(task)
 
         for completed_task in asyncio.as_completed(group_tasks):
-            group_id, group_results = await completed_task
-            yield group_id, group_results
+            group_id = await completed_task
+            yield group_id
 
         dag_compiler_task.cancel()
         try:
@@ -50,7 +84,26 @@ class ACPManager:
 
     async def modify_group(self, modified_execution_blueprint, group_id):
         for group_id, group_data in modified_execution_blueprint.items():
+            execution_list = {}
+            max_depth = len(group_data.items())
+            for sub_id, sub in group_data.items():
+                execution_list[sub_id] = {
+                    'dependent_on' : [],
+                    'depth' : 0
+                }
+                for step in sub["steps"].values():
+                    for inp in step["input_vars"]:
+                        for dep in inp.get("dependencies", []):
+                            if dep['sub_task'] not in execution_list[sub_id]['dependent_on']:
+                                execution_list[sub_id]['dependent_on'].append(dep['sub_task'])
+            for sub_id, meta_info in execution_list.items():
+                
+                    # print(sub_id)
+                for parent_node in meta_info['dependent_on']:
+                    if meta_info['depth'] <= execution_list[str(parent_node)]['depth']:
+                        meta_info['depth'] = execution_list[str(parent_node)]['depth'] + 1
             group_agents = []
+            
             for agent_id, agent_data in group_data.items():
                 agent = AgentNode(
                     int(agent_id),
@@ -62,12 +115,42 @@ class ACPManager:
                 agent.group_id = group_id
                 agent.sub_task_execution_blueprint = agent_data["steps"]
                 self.agents[agent_id] = agent
-                group_agents.append(agent)
-            self.groups[group_id] = group_agents
+            execution_sequence = []
+            depth = 0
+            for depth in range(max_depth):
+                temp = []
+                for sub_id, meta_info in execution_list.items():
+                    
+                    if meta_info['depth'] == depth and sub_id not in self.completed_agents:
+                        temp.append(self.agents[sub_id])
+                
+                if temp == []:
+                    break
+                else:
+                    execution_sequence.append(temp)
+            # group_agents.append(agent)
+            self.groups[group_id] = execution_sequence
+            print(execution_sequence)
 
         print('Successfully Modified This Groups execution_blueprint.')
 
         await asyncio.sleep(0.1)
+
+    async def run_agent(self, agent, group_id):
+        group_done = True
+        await agent.build_verify()
+        if agent.drop:
+            print('Dropping This execution_blueprint...')
+            agent.drop = False
+                    
+        if agent.modify:
+            print('Modifying This execution_blueprint...')
+            print("\nagent.group_execution_blueprint : ",agent.group_execution_blueprint)
+            group_done = False
+            await self.modify_group(agent.group_execution_blueprint, group_id)
+            agent.modify = False
+        res = agent.get_results() 
+        return group_done, agent.sub_task_no       
 
     async def run_group(self, group_id):
         group_results = {}
@@ -75,31 +158,44 @@ class ACPManager:
         counter = 0
         while True and counter < 5:
             group_done = True
+            # group_done = True
             print(f"\n#################\nTrial Attempt {counter}")
-            for agent in self.groups[group_id]:
-                # try:
-                await agent.build_verify()
-                if agent.drop:
-                    print('Dropping This execution_blueprint...')
-                    agent.drop = False
-                    
-                if agent.modify:
-                    print('Modifying This execution_blueprint...')
-                    print("\nagent.group_execution_blueprint : ",agent.group_execution_blueprint)
-                    group_done = False
-                    await self.modify_group(agent.group_execution_blueprint, group_id)
-                    agent.modify = False
+            for agents in self.groups[group_id]:
+                agent_tasks = []
+                for agent in agents:
+                    task = asyncio.create_task(self.run_agent(agent, group_id))
+                    agent_tasks.append(task)
+                for agent_task in asyncio.as_completed(agent_tasks):
+                    group_done, agent_id = await agent_task
+                    if group_done:
+                        self.completed_agents.append(agent_id)
+
+                if not group_done:
                     break
-                        # return None
-                group_results[agent.sub_task_no] = agent.get_results()
-                # except Exception as e:
-                #     print(f"Error in agent {agent.sub_task_no}: {str(e)}")
+            # for agent in self.groups[group_id]:
+            #     # try:
+            #     await agent.build_verify()
+            #     if agent.drop:
+            #         print('Dropping This execution_blueprint...')
+            #         agent.drop = False
+                    
+            #     if agent.modify:
+            #         print('Modifying This execution_blueprint...')
+            #         print("\nagent.group_execution_blueprint : ",agent.group_execution_blueprint)
+            #         group_done = False
+            #         await self.modify_group(agent.group_execution_blueprint, group_id)
+            #         agent.modify = False
+            #         break
+            #             # return None
+            #     group_results[agent.sub_task_no] = agent.get_results()
+            #     # except Exception as e:
+            #     #     print(f"Error in agent {agent.sub_task_no}: {str(e)}")
 
             counter += 1
             if group_done:
                 break 
 
-        return group_id, group_results
+        return group_id
 
     def __del__(self):
         self.thread_pool.shutdown(wait=True)
@@ -140,8 +236,8 @@ class ACP:
         
         # Modify the Manager to yield results as groups complete
         # await communication_manager.run()
-        async for group_id, group_results in communication_manager.run():
-            yield group_id, group_results
+        async for group_id in communication_manager.run():
+            yield group_id
 
 
 
@@ -154,7 +250,7 @@ async def main():
     # user_query = "what is the weather in seattle, usa? Tell time to go from starbucks roastery till Microsoft redmond office?"
     # # user_query = "Geocode the address '1600 Amphitheatre Parkway, Mountain View, CA"
     # execution_blueprint = await acp.initialise(user_query)
-    # async for group_id, group_results in acp.run(user_query, execution_blueprint):
+    # async for group_id in acp.run(user_query, execution_blueprint):
     #     print(f"\n\nGroupID: {group_id}:\n{group_results}")
 
 if __name__ == "__main__":

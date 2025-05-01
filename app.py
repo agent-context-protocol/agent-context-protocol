@@ -9,6 +9,45 @@ import streamlit.components.v1 as components
 import json
 from pathlib import Path
 from collections import defaultdict
+from ui_helpers import render_execution_dag
+
+def update_and_draw_dag(data: dict, completed: set[str] | set[int], container):
+    execution_list = {}
+    max_depth = len(data.items())
+    for sub_id, sub in data.items():
+        execution_list[sub_id] = {
+            'dependent_on' : [],
+            'depth' : 0
+        }
+        for step in sub["steps"].values():
+            for inp in step["input_vars"]:
+                for dep in inp.get("dependencies", []):
+                    if dep['sub_task'] not in execution_list[sub_id]['dependent_on']:
+                        execution_list[sub_id]['dependent_on'].append(dep['sub_task'])
+    for sub_id, meta_info in execution_list.items():
+        
+            # print(sub_id)
+        for parent_node in meta_info['dependent_on']:
+            if meta_info['depth'] <= execution_list[str(parent_node)]['depth']:
+                meta_info['depth'] = execution_list[str(parent_node)]['depth'] + 1
+
+    execution_sequence = []
+    depth = 0
+    for depth in range(max_depth):
+        temp = []
+        for sub_id, meta_info in execution_list.items():
+            
+            if meta_info['depth'] == depth:
+                temp.append(sub_id)
+        
+        if temp == []:
+            break
+        else:
+            execution_sequence.append(temp)
+
+    # 4. Draw
+    with container:
+        render_execution_dag(execution_list, completed)
 
 st.set_page_config(layout = "wide") 
 client = OpenAI()
@@ -116,9 +155,18 @@ class StreamlitACP:
         """
         For each group, create a full‐width container and render the stub panel.
         """
+
+        self.dag_placeholders = {} 
         for gid, gdata in execution_blueprint.items():
             container = st.container()
             self.group_containers[gid] = container
+            left_col, _ = container.columns([1, 3])  # 25% left, 75% right (blank)
+            with left_col:
+                update_and_draw_dag(
+                    gdata,
+                    completed=set(),
+                    container=left_col.empty()
+                )
 
             # with container:
             #     subtasks_html = "".join(
@@ -138,6 +186,7 @@ class StreamlitACP:
         # )
 
         # Load system prompt
+        
         with open(f"prompts/dashboard_prompt.txt", "r") as f:
             system_prompt = f.read()
         with open(f"execution_blueprint_updated_{group_id}.json", "r") as f:
@@ -191,6 +240,7 @@ class StreamlitACP:
                     ) 
         
         raw_html_snippet = completion.choices[0].message.content.split("### FORMATTED_OUTPUT")[-1].strip()
+        print("Raw HTML Snippet: ", raw_html_snippet)
         full_doc = f"""
         <!DOCTYPE html>
         <html lang="en">
@@ -207,14 +257,14 @@ class StreamlitACP:
         container = self.group_containers[group_id]
         with container:
             # st.subheader(f"Group {group_id} — Completed")
-            components.html(full_doc, height=600, scrolling=True)
+            components.html(full_doc, height=1200, scrolling=True)
     async def run_acp(self, user_query, execution_blueprint):
         # Display the group subtasks
         self.create_group_sections(execution_blueprint)
 
         # Iterate through the groups asynchronously
-        async for group_id, group_results in self.ACP.run(user_query, execution_blueprint):
-            self.output[group_id] = group_results
+        async for group_id in self.ACP.run(user_query, execution_blueprint):
+            self.output[group_id] = 'group_results'
             # Update the group as completed
             self.update_group_section(group_id, user_query)
 
