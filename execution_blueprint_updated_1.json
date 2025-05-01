@@ -1,95 +1,199 @@
 {
     "1": {
-        "subtask_description": "Retrieve a list of all Google Calendars accessible to the user.",
+        "subtask_description": "List the schema of all tables in the public schema of the database.",
         "steps": {
             "1": {
-                "tool": "list-calendars",
-                "handles": "Lists all available Google Calendars",
-                "input_vars": [],
+                "tool": "query",
+                "handles": "Retrieves all table and column information from the public schema for grounding further SQL queries.",
+                "input_vars": [
+                    {
+                        "name": "schema_sql",
+                        "parameter": [
+                            "sql"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "SQL to list table_name, column_name, and data_type for all public tables",
+                        "value": "SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema='public';",
+                        "dependencies": []
+                    }
+                ],
                 "output_vars": [
                     {
-                        "name": "main_calendar_id",
-                        "description": "The ID of the user's main Google Calendar",
+                        "name": "all_schema_info",
+                        "description": "Schema details for all tables and columns in the public schema",
                         "used_by": [
                             {
                                 "sub_task": 2,
                                 "step": 1
                             }
                         ],
-                        "value": "ax2119@nyu.edu"
+                        "value": "```json\n    [\n      {\"table_name\": \"invoice\", \"column_name\": \"customer_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"invoice_date\", \"data_type\": \"timestamp without time zone\"},\n      {\"table_name\": \"album\", \"column_name\": \"album_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"album\", \"column_name\": \"artist_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"customer\", \"column_name\": \"customer_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"employee\", \"column_name\": \"employee_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"artist\", \"column_name\": \"artist_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"total\", \"data_type\": \"numeric\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"invoice_line_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"invoice_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"track_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"unit_price\", \"data_type\": \"numeric\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"quantity\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"track_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"employee\", \"column_name\": \"reports_to\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"album_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"media_type_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"genre_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"employee\", \"column_name\": \"birth_date\", \"data_type\": \"timestamp without time zone\"},\n      {\"table_name\": \"track\", \"column_name\": \"milliseconds\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"bytes\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"unit_price\", \"data_type\": \"numeric\"},\n      {\"table_name\": \"playlist\", \"column_name\": \"playlist_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"employee\", \"column_name\": \"hire_date\", \"data_type\": \"timestamp without time zone\"},\n      {\"table_name\": \"playlist_track\", \"column_name\": \"playlist_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"playlist_track\", \"column_name\": \"track_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"genre\", \"column_name\": \"genre_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"customer\", \"column_name\": \"support_rep_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"media_type\", \"column_name\": \"media_type_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"invoice_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"composer\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"playlist\", \"column_name\": \"name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"genre\", \"column_name\": \"name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"media_type\", \"column_name\": \"name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_postal_code\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"artist\", \"column_name\": \"name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"album\", \"column_name\": \"title\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"last_name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"first_name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"title\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"address\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"city\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"state\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"country\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"postal_code\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"phone\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"fax\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"email\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"first_name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"last_name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"company\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"address\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"city\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"state\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"country\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"postal_code\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"phone\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"fax\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"email\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_address\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_city\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_state\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_country\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"track\", \"column_name\": \"name\", \"data_type\": \"character varying\"}\n    ]\n    ```"
                     }
                 ]
             }
         }
     },
     "2": {
-        "subtask_description": "List all events scheduled on the user's main Google Calendar for the current week (Monday to Sunday).",
+        "subtask_description": "Compute the total revenue generated by the customers each sales employee supports.",
         "steps": {
             "1": {
-                "tool": "list-events",
-                "handles": "Retrieves all events for the current week from the main calendar",
+                "tool": "perplexity_reason",
+                "handles": "Uses the schema info to generate the correct SQL query for total revenue per sales employee.",
                 "input_vars": [
                     {
-                        "name": "main_calendar_id",
+                        "name": "all_schema_info",
                         "parameter": [
-                            "calendarId"
+                            "messages"
                         ],
-                        "type": "string",
+                        "type": "array",
                         "source": "TOOL_Output (sub_task 1, Step 1)",
-                        "description": "The ID of the main Google Calendar",
-                        "value": "ax2119@nyu.edu",
+                        "description": "Schema details to be used for crafting the SQL query",
+                        "value": "```json\n    [\n      {\"table_name\": \"invoice\", \"column_name\": \"customer_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"invoice_date\", \"data_type\": \"timestamp without time zone\"},\n      {\"table_name\": \"album\", \"column_name\": \"album_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"album\", \"column_name\": \"artist_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"customer\", \"column_name\": \"customer_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"employee\", \"column_name\": \"employee_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"artist\", \"column_name\": \"artist_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"total\", \"data_type\": \"numeric\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"invoice_line_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"invoice_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"track_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"unit_price\", \"data_type\": \"numeric\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"quantity\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"track_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"employee\", \"column_name\": \"reports_to\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"album_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"media_type_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"genre_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"employee\", \"column_name\": \"birth_date\", \"data_type\": \"timestamp without time zone\"},\n      {\"table_name\": \"track\", \"column_name\": \"milliseconds\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"bytes\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"unit_price\", \"data_type\": \"numeric\"},\n      {\"table_name\": \"playlist\", \"column_name\": \"playlist_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"employee\", \"column_name\": \"hire_date\", \"data_type\": \"timestamp without time zone\"},\n      {\"table_name\": \"playlist_track\", \"column_name\": \"playlist_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"playlist_track\", \"column_name\": \"track_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"genre\", \"column_name\": \"genre_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"customer\", \"column_name\": \"support_rep_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"media_type\", \"column_name\": \"media_type_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"invoice_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"composer\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"playlist\", \"column_name\": \"name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"genre\", \"column_name\": \"name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"media_type\", \"column_name\": \"name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_postal_code\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"artist\", \"column_name\": \"name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"album\", \"column_name\": \"title\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"last_name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"first_name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"title\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"address\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"city\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"state\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"country\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"postal_code\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"phone\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"fax\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"email\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"first_name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"last_name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"company\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"address\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"city\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"state\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"country\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"postal_code\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"phone\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"fax\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"email\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_address\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_city\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_state\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_country\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"track\", \"column_name\": \"name\", \"data_type\": \"character varying\"}\n    ]\n    ```",
                         "dependencies": [
                             {
                                 "sub_task": 1,
                                 "step": 1
                             }
                         ]
-                    },
-                    {
-                        "name": "week_start_time",
-                        "parameter": [
-                            "timeMin"
-                        ],
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Start of the current week in ISO format (Monday, Apr 28, 2025)",
-                        "value": "2025-04-28T00:00:00Z",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "week_end_time",
-                        "parameter": [
-                            "timeMax"
-                        ],
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "End of the current week in ISO format (Sunday, May 4, 2025)",
-                        "value": "2025-05-04T23:59:59Z",
-                        "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "weekly_events",
-                        "description": "List of all events from the main calendar for the current week",
+                        "name": "employee_revenue_sql",
+                        "description": "SQL query to compute total revenue per sales employee",
+                        "used_by": [
+                            {
+                                "sub_task": 2,
+                                "step": 2
+                            }
+                        ],
+                        "value": "|\n      SELECT \n          e.employee_id,\n          e.first_name || ' ' || e.last_name AS sales_employee,\n          SUM(i.total) AS total_revenue\n      FROM \n          employee e\n      INNER JOIN \n          customer c ON e.employee_id = c.support_rep_id\n      INNER JOIN \n          invoice i ON c.customer_id = i.customer_id\n      GROUP BY \n          e.employee_id, e.first_name, e.last_name\n      ORDER BY \n          total_revenue DESC;"
+                    }
+                ]
+            },
+            "2": {
+                "tool": "query",
+                "handles": "Executes the SQL query to get employee revenue data.",
+                "input_vars": [
+                    {
+                        "name": "employee_revenue_sql",
+                        "parameter": [
+                            "sql"
+                        ],
+                        "type": "string",
+                        "source": "TOOL_Output (sub_task 2, Step 1)",
+                        "description": "SQL query for total revenue per sales employee",
+                        "value": "|\n      SELECT \n          e.employee_id,\n          e.first_name || ' ' || e.last_name AS sales_employee,\n          SUM(i.total) AS total_revenue\n      FROM \n          employee e\n      INNER JOIN \n          customer c ON e.employee_id = c.support_rep_id\n      INNER JOIN \n          invoice i ON c.customer_id = i.customer_id\n      GROUP BY \n          e.employee_id, e.first_name, e.last_name\n      ORDER BY \n          total_revenue DESC;",
+                        "dependencies": [
+                            {
+                                "sub_task": 2,
+                                "step": 1
+                            }
+                        ]
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "employee_revenue_table",
+                        "description": "Table with employee name/ID and their total revenue",
                         "used_by": [
                             {
                                 "sub_task": 3,
                                 "step": 1
                             }
                         ],
-                        "value": "```json\n    [\n      {\n        \"title\": \"Chopra Group Weekly Lab Mtg - Spring 2025\",\n        \"start_time\": \"2025-04-30T13:00:00-04:00\",\n        \"end_time\": \"2025-04-30T14:00:00-04:00\",\n        \"location\": \"60FA - Room 446 | Zoom as Backup\",\n        \"attendees\": [\n          \"rt2741@nyu.edu\", \"antonio.verdone@nyulangone.org\", \"us453@nyu.edu\", \"lais.peter.7@gmail.com\", \"asn9772@nyu.edu\", \"dm5182@nyu.edu\", \"tarun.dutt@nyulangone.org\", \"ax2119@nyu.edu\", \"hao.zhang@nyulangone.org\", \"rs4070@nyu.edu\", \"aa9774@nyu.edu\", \"ab10945@nyu.edu\", \"vm2781@nyu.edu\", \"yw7104@nyu.edu\", \"anton.becker@nyulangone.org\", \"divyansh.jha@nyulangone.org\", \"luoyao.chen@nyulangone.org\", \"muhang.tian@nyulangone.org\", \"sumit.chopra@nyulangone.org\", \"yiqiu.shen@nyulangone.org\", \"muhang.tian@cims.nyu.edu\"\n        ]\n      },\n      {\n        \"title\": \"Alex <> Arjun\",\n        \"start_time\": \"2025-05-02T14:00:00-04:00\",\n        \"end_time\": \"2025-05-02T15:00:00-04:00\",\n        \"location\": null,\n        \"attendees\": [\n          \"ax2119@nyu.edu\", \"anw2067@nyu.edu\"\n        ]\n      }\n    ]\n    ```"
+                        "value": "```json\n    [\n      {\n        \"employee_id\": 3,\n        \"sales_employee\": \"Jane Peacock\",\n        \"total_revenue\": \"833.04\"\n      },\n      {\n        \"employee_id\": 4,\n        \"sales_employee\": \"Margaret Park\",\n        \"total_revenue\": \"775.40\"\n      },\n      {\n        \"employee_id\": 5,\n        \"sales_employee\": \"Steve Johnson\",\n        \"total_revenue\": \"720.16\"\n      }\n    ]\n    ```"
                     }
                 ]
             }
         }
     },
     "3": {
-        "subtask_description": "Aggregate total hours spent in meetings for each day of the current week and generate a bar chart visualizing this data.",
+        "subtask_description": "Rank employees by total revenue and extract the top three performers.",
+        "steps": {
+            "1": {
+                "tool": "perplexity_reason",
+                "handles": "Ranks employees by revenue, extracts the top three, and identifies the top performer.",
+                "input_vars": [
+                    {
+                        "name": "employee_revenue_table",
+                        "parameter": [
+                            "messages"
+                        ],
+                        "type": "array",
+                        "source": "TOOL_Output (sub_task 2, Step 2)",
+                        "description": "Table of employees and their total revenue to be ranked",
+                        "value": "```json\n    [\n      {\n        \"employee_id\": 3,\n        \"sales_employee\": \"Jane Peacock\",\n        \"total_revenue\": \"833.04\"\n      },\n      {\n        \"employee_id\": 4,\n        \"sales_employee\": \"Margaret Park\",\n        \"total_revenue\": \"775.40\"\n      },\n      {\n        \"employee_id\": 5,\n        \"sales_employee\": \"Steve Johnson\",\n        \"total_revenue\": \"720.16\"\n      }\n    ]\n    ```",
+                        "dependencies": [
+                            {
+                                "sub_task": 2,
+                                "step": 2
+                            }
+                        ]
+                    }
+                ],
+                "output_vars": [
+                    {
+                        "name": "ranked_employees_table",
+                        "description": "Sorted list of employees by total revenue",
+                        "used_by": [
+                            {
+                                "sub_task": 7,
+                                "step": 1
+                            }
+                        ],
+                        "value": "[\n      {\"employee_id\": 3, \"sales_employee\": \"Jane Peacock\", \"total_revenue\": \"833.04\"},\n      {\"employee_id\": 4, \"sales_employee\": \"Margaret Park\", \"total_revenue\": \"775.40\"},\n      {\"employee_id\": 5, \"sales_employee\": \"Steve Johnson\", \"total_revenue\": \"720.16\"}\n    ]"
+                    },
+                    {
+                        "name": "top_three_employees",
+                        "description": "List of the top three employees with their revenues (array of objects with name/id and revenue)",
+                        "used_by": [],
+                        "value": "[\n      {\"employee_id\": 3, \"sales_employee\": \"Jane Peacock\", \"total_revenue\": 833.04},\n      {\"employee_id\": 4, \"sales_employee\": \"Margaret Park\", \"total_revenue\": 775.40},\n      {\"employee_id\": 5, \"sales_employee\": \"Steve Johnson\", \"total_revenue\": 720.16}\n    ]"
+                    },
+                    {
+                        "name": "top_three_labels",
+                        "description": "Array of names/IDs of the top three employees (for chart labels)",
+                        "used_by": [
+                            {
+                                "sub_task": 4,
+                                "step": 1
+                            }
+                        ],
+                        "value": "[\"Jane Peacock\", \"Margaret Park\", \"Steve Johnson\"]"
+                    },
+                    {
+                        "name": "top_three_revenues",
+                        "description": "Array of revenues of the top three employees (for chart data)",
+                        "used_by": [
+                            {
+                                "sub_task": 4,
+                                "step": 1
+                            }
+                        ],
+                        "value": "[833.04, 775.40, 720.16]"
+                    },
+                    {
+                        "name": "top_performer",
+                        "description": "Name/ID of the top-performing employee",
+                        "used_by": [
+                            {
+                                "sub_task": 5,
+                                "step": 1
+                            }
+                        ],
+                        "value": "\"Jane Peacock\""
+                    }
+                ]
+            }
+        }
+    },
+    "4": {
+        "subtask_description": "Create a column chart visualizing the top three employees and their total revenues.",
         "steps": {
             "1": {
                 "tool": "generate_chart",
-                "handles": "Generates a bar chart of daily meeting hours for the week",
+                "handles": "Generates a column chart for the top three employees and their revenues.",
                 "input_vars": [
                     {
                         "name": "chart_type",
@@ -98,33 +202,38 @@
                         ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "The chart type",
+                        "description": "Chart type",
                         "value": "bar",
                         "dependencies": []
                     },
                     {
-                        "name": "chart_labels",
+                        "name": "top_three_labels",
                         "parameter": [
                             "labels"
                         ],
                         "type": "array",
-                        "source": "LLM_Generated",
-                        "description": "Labels for each day of the week",
-                        "value": "[\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\"]",
-                        "dependencies": []
+                        "source": "TOOL_Output (sub_task 3, Step 1)",
+                        "description": "Employee names for the x-axis",
+                        "value": "[\"Jane Peacock\", \"Margaret Park\", \"Steve Johnson\"]",
+                        "dependencies": [
+                            {
+                                "sub_task": 3,
+                                "step": 1
+                            }
+                        ]
                     },
                     {
-                        "name": "weekly_events",
+                        "name": "top_three_revenues",
                         "parameter": [
                             "datasets"
                         ],
                         "type": "array",
-                        "source": "TOOL_Output (sub_task 2, Step 1)",
-                        "description": "Array of objects representing total meeting hours per day, derived from weekly_events",
-                        "value": "```json\n    [\n      {\"day\": \"Mon\", \"hours\": 0},\n      {\"day\": \"Tue\", \"hours\": 0},\n      {\"day\": \"Wed\", \"hours\": 1},\n      {\"day\": \"Thu\", \"hours\": 0},\n      {\"day\": \"Fri\", \"hours\": 1},\n      {\"day\": \"Sat\", \"hours\": 0},\n      {\"day\": \"Sun\", \"hours\": 0}\n    ]\n    ```",
+                        "source": "TOOL_Output (sub_task 3, Step 1)",
+                        "description": "Array of revenues for the top three employees",
+                        "value": "[833.04, 775.40, 720.16]",
                         "dependencies": [
                             {
-                                "sub_task": 2,
+                                "sub_task": 3,
                                 "step": 1
                             }
                         ]
@@ -136,54 +245,43 @@
                         ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Title of the chart",
-                        "value": "Weekly Meeting Hours",
+                        "description": "Title for the chart",
+                        "value": "Top 3 Sales Employees by Revenue",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "chart_config",
-                        "description": "The chart configuration object for the generated bar chart",
+                        "name": "top_three_chart_url",
+                        "description": "URL or reference to the generated column chart",
                         "used_by": [
                             {
-                                "sub_task": 4,
+                                "sub_task": 7,
                                 "step": 1
                             }
                         ],
-                        "value": "```json\n    {\n      \"type\": \"bar\",\n      \"data\": {\n        \"labels\": [\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\"],\n        \"datasets\": [\n          {\n            \"label\": \"Meeting Hours\",\n            \"data\": [0, 0, 1, 0, 1, 0, 0]\n          }\n        ]\n      },\n      \"options\": {\n        \"title\": {\n          \"display\": true,\n          \"text\": \"Weekly Meeting Hours\"\n        }\n      }\n    }\n    ```"
-                    },
-                    {
-                        "name": "chart_url",
-                        "description": "The URL of the generated bar chart image",
-                        "used_by": [
-                            {
-                                "sub_task": 6,
-                                "step": 1
-                            }
-                        ],
-                        "value": "https://quickchart.io/chart?c=%7B%22type%22%3A%22bar%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22Mon%22%2C%22Tue%22%2C%22Wed%22%2C%22Thu%22%2C%22Fri%22%2C%22Sat%22%2C%22Sun%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22Meeting%20Hours%22%2C%22data%22%3A%5B0%2C0%2C1%2C0%2C1%2C0%2C0%5D%7D%5D%7D%2C%22options%22%3A%7B%22title%22%3A%7B%22display%22%3Atrue%2C%22text%22%3A%22Weekly%20Meeting%20Hours%22%7D%7D%7D"
+                        "value": "\"https://quickchart.io/chart?c=%7B%22type%22%3A%22bar%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22Jane%20Peacock%22%2C%22Margaret%20Park%22%2C%22Steve%20Johnson%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22Revenue%22%2C%22data%22%3A%5B833.04%2C775.4%2C720.16%5D%7D%5D%7D%2C%22options%22%3A%7B%22title%22%3A%7B%22display%22%3Atrue%2C%22text%22%3A%22Top%203%20Sales%20Employees%20by%20Revenue%22%7D%7D%7D\""
                     }
                 ]
             }
         }
     },
-    "4": {
-        "subtask_description": "Download the bar chart image generated in Sub-task 3 to prepare it for posting in Slack.",
+    "5": {
+        "subtask_description": "Generate a brief, rhyming tagline praising the top-performing employee.",
         "steps": {
             "1": {
-                "tool": "download_chart",
-                "handles": "Downloads the bar chart image to a local file",
+                "tool": "perplexity_reason",
+                "handles": "Creates a rhyming, positive tagline for the top performer.",
                 "input_vars": [
                     {
-                        "name": "chart_config",
+                        "name": "top_performer",
                         "parameter": [
-                            "config"
+                            "messages"
                         ],
-                        "type": "object",
+                        "type": "array",
                         "source": "TOOL_Output (sub_task 3, Step 1)",
-                        "description": "The chart configuration object from generate_chart",
-                        "value": "```json\n    {\n      \"type\": \"bar\",\n      \"data\": {\n        \"labels\": [\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\"],\n        \"datasets\": [\n          {\n            \"label\": \"Meeting Hours\",\n            \"data\": [0, 0, 1, 0, 1, 0, 0]\n          }\n        ]\n      },\n      \"options\": {\n        \"title\": {\n          \"display\": true,\n          \"text\": \"Weekly Meeting Hours\"\n        }\n      }\n    }\n    ```",
+                        "description": "Name/ID of the top-performing employee to be praised in a rhyme",
+                        "value": "[\"Jane Peacock\"]",
                         "dependencies": [
                             {
                                 "sub_task": 3,
@@ -194,21 +292,26 @@
                 ],
                 "output_vars": [
                     {
-                        "name": "chart_image_path",
-                        "description": "The local file path to the downloaded chart image",
-                        "used_by": [],
-                        "value": "\"/Users/aarjun1/Desktop/bar_2025-04-28_08-02-50.png\""
+                        "name": "rhyming_tagline",
+                        "description": "Rhyming, positive tagline for the top performer",
+                        "used_by": [
+                            {
+                                "sub_task": 7,
+                                "step": 1
+                            }
+                        ],
+                        "value": "\"Jane Peacock shines bright, a creative force in flight\u2014  \n'Artist-in-residence, masterstroke, her brilliance takes the spotlight!'\""
                     }
                 ]
             }
         }
     },
-    "5": {
-        "subtask_description": "List all public Slack channels to retrieve the channel ID for general.",
+    "6": {
+        "subtask_description": "List all public Slack channels to obtain the channel ID for random.",
         "steps": {
             "1": {
                 "tool": "slack_list_channels",
-                "handles": "Lists public Slack channels to find general",
+                "handles": "Lists public Slack channels to find random",
                 "input_vars": [
                     {
                         "name": "slack_channel_limit",
@@ -224,52 +327,52 @@
                 ],
                 "output_vars": [
                     {
-                        "name": "general_channel_id",
-                        "description": "The channel ID for general",
+                        "name": "random_channel_id",
+                        "description": "Slack channel ID for random",
                         "used_by": [
                             {
-                                "sub_task": 6,
+                                "sub_task": 7,
                                 "step": 1
                             }
                         ],
-                        "value": "\"C075CU6FVE0\""
+                        "value": "\"C075AE6F3B4\""
                     }
                 ]
             }
         }
     },
-    "6": {
-        "subtask_description": "Post the downloaded bar chart image in the general Slack channel with a short explanation summarizing the weekly meeting hours.",
+    "7": {
+        "subtask_description": "Post a message in the random Slack channel containing the ranked table, chart, and tagline.",
         "steps": {
             "1": {
                 "tool": "slack_post_message",
-                "handles": "Posts the chart image URL and a summary explanation in general",
+                "handles": "Posts the ranked table, chart, and tagline to Slack random",
                 "input_vars": [
                     {
-                        "name": "general_channel_id",
+                        "name": "random_channel_id",
                         "parameter": [
                             "channel_id"
                         ],
                         "type": "string",
-                        "source": "TOOL_Output (sub_task 5, Step 1)",
-                        "description": "The channel ID for general",
-                        "value": "\"C075CU6FVE0\"",
+                        "source": "TOOL_Output (sub_task 6, Step 1)",
+                        "description": "Slack channel ID for random",
+                        "value": "\"C075AE6F3B4\"",
                         "dependencies": [
                             {
-                                "sub_task": 5,
+                                "sub_task": 6,
                                 "step": 1
                             }
                         ]
                     },
                     {
-                        "name": "chart_url",
+                        "name": "ranked_employees_table",
                         "parameter": [
                             "text"
                         ],
                         "type": "string",
                         "source": "TOOL_Output (sub_task 3, Step 1)",
-                        "description": "The URL of the generated bar chart image to include in the message",
-                        "value": "https://quickchart.io/chart?c=%7B%22type%22%3A%22bar%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22Mon%22%2C%22Tue%22%2C%22Wed%22%2C%22Thu%22%2C%22Fri%22%2C%22Sat%22%2C%22Sun%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22Meeting%20Hours%22%2C%22data%22%3A%5B0%2C0%2C1%2C0%2C1%2C0%2C0%5D%7D%5D%7D%2C%22options%22%3A%7B%22title%22%3A%7B%22display%22%3Atrue%2C%22text%22%3A%22Weekly%20Meeting%20Hours%22%7D%7D%7D",
+                        "description": "Ranked table of employees and their revenues",
+                        "value": "\"[{\\\"employee_id\\\": 3, \\\"sales_employee\\\": \\\"Jane Peacock\\\", \\\"total_revenue\\\": \\\"833.04\\\"}, {\\\"employee_id\\\": 4, \\\"sales_employee\\\": \\\"Margaret Park\\\", \\\"total_revenue\\\": \\\"775.40\\\"}, {\\\"employee_id\\\": 5, \\\"sales_employee\\\": \\\"Steve Johnson\\\", \\\"total_revenue\\\": \\\"720.16\\\"}]\"",
                         "dependencies": [
                             {
                                 "sub_task": 3,
@@ -278,23 +381,44 @@
                         ]
                     },
                     {
-                        "name": "summary_text",
+                        "name": "top_three_chart_url",
                         "parameter": [
                             "text"
                         ],
                         "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Short explanation summarizing the weekly meeting hours",
-                        "value": "Here is a bar chart showing my meeting hours for each day this week.",
-                        "dependencies": []
+                        "source": "TOOL_Output (sub_task 4, Step 1)",
+                        "description": "URL or reference to the generated column chart",
+                        "value": "\"https://quickchart.io/chart?c=%7B%22type%22%3A%22bar%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22Jane%20Peacock%22%2C%22Margaret%20Park%22%2C%22Steve%20Johnson%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22Revenue%22%2C%22data%22%3A%5B833.04%2C775.4%2C720.16%5D%7D%5D%7D%2C%22options%22%3A%7B%22title%22%3A%7B%22display%22%3Atrue%2C%22text%22%3A%22Top%203%20Sales%20Employees%20by%20Revenue%22%7D%7D%7D\"",
+                        "dependencies": [
+                            {
+                                "sub_task": 4,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "rhyming_tagline",
+                        "parameter": [
+                            "text"
+                        ],
+                        "type": "string",
+                        "source": "TOOL_Output (sub_task 5, Step 1)",
+                        "description": "Rhyming tagline for the top performer",
+                        "value": "\"Jane Peacock shines bright, a creative force in flight\u2014  \n'Artist-in-residence, masterstroke, her brilliance takes the spotlight!'\"",
+                        "dependencies": [
+                            {
+                                "sub_task": 5,
+                                "step": 1
+                            }
+                        ]
                     }
                 ],
                 "output_vars": [
                     {
                         "name": "slack_post_confirmation",
-                        "description": "Confirmation of the posted message in general channel",
+                        "description": "Confirmation or result of posting to Slack",
                         "used_by": [],
-                        "value": "{\n      \"ok\": true,\n      \"channel\": \"C075CU6FVE0\",\n      \"timestamp\": \"1745827400.351959\",\n      \"message_text\": \"Here is a bar chart showing my meeting hours for each day this week.\\n<https://quickchart.io/chart?c=%7B%22type%22%3A%22bar%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22Mon%22%2C%22Tue%22%2C%22Wed%22%2C%22Thu%22%2C%22Fri%22%2C%22Sat%22%2C%22Sun%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22Meeting%20Hours%22%2C%22data%22%3A%5B0%2C0%2C1%2C0%2C1%2C0%2C0%5D%7D%5D%7D%2C%22options%22%3A%7B%22title%22%3A%7B%22display%22%3Atrue%2C%22text%22%3A%22Weekly%20Meeting%20Hours%22%7D%7D%7D>\"\n    }"
+                        "value": "{\n      \"ok\": true,\n      \"channel\": \"C075AE6F3B4\",\n      \"ts\": \"1746081284.529569\",\n      \"message_snippet\": \"Jane Peacock shines bright, a creative force in flight\u2014  \\n'Artist-in-residence, masterstroke, her brilliance takes the spotlight!'\\n\\n*Top 3 Sales Employees by Revenue:*\\n\\n| Employee           | Revenue  |\\n|--------------------|----------|\\n| Jane Peacock       | $833.04  |\\n| Margaret Park      | $775.40  |\\n| Steve Johnson      | $720.16  |\\n\\nChart: https://quickchart.io/chart?c=%7B%22type%22%3A%22bar%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22Jane%20Peacock%22%2C%22Margaret%20Park%22%2C%22Steve%20Johnson%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22Revenue%22%2C%22data%22%3A%5B833.04%2C775.4%2C720.16%5D%7D%5D%7D%2C%22options%22%3A%7B%22title%22%3A%7B%22display%22%3Atrue%2C%22text%22%3A%22Top%203%20Sales%20Employees%20by%20Revenue%22%7D%7D%7D\"\n    }"
                     }
                 ]
             }
