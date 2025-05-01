@@ -1,214 +1,157 @@
 {
     "1": {
-        "subtask_description": "Retrieve a list of all Google Calendars accessible to the user.",
+        "subtask_description": "Create a Google Calendar event titled \"Client Meeting at ABC Corp\" for Wednesday, April 2, 2025, at 2:00 PM at 500 5th Avenue, New York, NY.",
         "steps": {
             "1": {
-                "tool": "list-calendars",
-                "handles": "Lists all available Google Calendars",
-                "input_vars": [],
-                "output_vars": [
-                    {
-                        "name": "main_calendar_id",
-                        "description": "The ID of the user's main Google Calendar",
-                        "used_by": [
-                            {
-                                "sub_task": 2,
-                                "step": 1
-                            }
-                        ],
-                        "value": "ax2119@nyu.edu"
-                    }
-                ]
-            }
-        }
-    },
-    "2": {
-        "subtask_description": "List all events scheduled on the user's main Google Calendar for the current week (Monday to Sunday).",
-        "steps": {
-            "1": {
-                "tool": "list-events",
-                "handles": "Retrieves all events for the current week from the main calendar",
+                "tool": "create-event",
+                "handles": "Creating the calendar event with all required details",
                 "input_vars": [
                     {
-                        "name": "main_calendar_id",
+                        "name": "calendar_id",
                         "parameter": [
                             "calendarId"
                         ],
                         "type": "string",
-                        "source": "TOOL_Output (sub_task 1, Step 1)",
-                        "description": "The ID of the main Google Calendar",
-                        "value": "ax2119@nyu.edu",
-                        "dependencies": [
-                            {
-                                "sub_task": 1,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "week_start_time",
-                        "parameter": [
-                            "timeMin"
-                        ],
-                        "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Start of the current week in ISO format (Monday, Apr 28, 2025)",
-                        "value": "2025-04-28T00:00:00Z",
+                        "description": "Use 'primary' for the main Google Calendar",
+                        "value": "primary",
                         "dependencies": []
                     },
                     {
-                        "name": "week_end_time",
+                        "name": "event_summary",
                         "parameter": [
-                            "timeMax"
+                            "summary"
                         ],
                         "type": "string",
                         "source": "LLM_Generated",
-                        "description": "End of the current week in ISO format (Sunday, May 4, 2025)",
-                        "value": "2025-05-04T23:59:59Z",
+                        "description": "Title of the event",
+                        "value": "Client Meeting at ABC Corp",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "event_start",
+                        "parameter": [
+                            "start"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Start time in ISO format with timezone (America/New_York, 2:00 PM on April 2, 2025)",
+                        "value": "2025-04-02T14:00:00-04:00",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "event_end",
+                        "parameter": [
+                            "end"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "End time in ISO format with timezone (1 hour meeting)",
+                        "value": "2025-04-02T15:00:00-04:00",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "event_timezone",
+                        "parameter": [
+                            "timeZone"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Timezone for the event",
+                        "value": "America/New_York",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "event_location",
+                        "parameter": [
+                            "location"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Location of the event",
+                        "value": "500 5th Avenue, New York, NY",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "weekly_events",
-                        "description": "List of all events from the main calendar for the current week",
-                        "used_by": [
-                            {
-                                "sub_task": 3,
-                                "step": 1
-                            }
-                        ],
-                        "value": "```json\n    [\n      {\n        \"title\": \"Chopra Group Weekly Lab Mtg - Spring 2025\",\n        \"start_time\": \"2025-04-30T13:00:00-04:00\",\n        \"end_time\": \"2025-04-30T14:00:00-04:00\",\n        \"location\": \"60FA - Room 446 | Zoom as Backup\",\n        \"attendees\": [\n          \"rt2741@nyu.edu\", \"antonio.verdone@nyulangone.org\", \"us453@nyu.edu\", \"lais.peter.7@gmail.com\", \"asn9772@nyu.edu\", \"dm5182@nyu.edu\", \"tarun.dutt@nyulangone.org\", \"ax2119@nyu.edu\", \"hao.zhang@nyulangone.org\", \"rs4070@nyu.edu\", \"aa9774@nyu.edu\", \"ab10945@nyu.edu\", \"vm2781@nyu.edu\", \"yw7104@nyu.edu\", \"anton.becker@nyulangone.org\", \"divyansh.jha@nyulangone.org\", \"luoyao.chen@nyulangone.org\", \"muhang.tian@nyulangone.org\", \"sumit.chopra@nyulangone.org\", \"yiqiu.shen@nyulangone.org\", \"muhang.tian@cims.nyu.edu\"\n        ]\n      },\n      {\n        \"title\": \"Alex <> Arjun\",\n        \"start_time\": \"2025-05-02T14:00:00-04:00\",\n        \"end_time\": \"2025-05-02T15:00:00-04:00\",\n        \"location\": null,\n        \"attendees\": [\n          \"ax2119@nyu.edu\", \"anw2067@nyu.edu\"\n        ]\n      }\n    ]\n    ```"
-                    }
-                ]
-            }
-        }
-    },
-    "3": {
-        "subtask_description": "Aggregate total hours spent in meetings for each day of the current week and generate a bar chart visualizing this data.",
-        "steps": {
-            "1": {
-                "tool": "generate_chart",
-                "handles": "Generates a bar chart of daily meeting hours for the week",
-                "input_vars": [
-                    {
-                        "name": "chart_type",
-                        "parameter": [
-                            "type"
-                        ],
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "The chart type",
-                        "value": "bar",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "chart_labels",
-                        "parameter": [
-                            "labels"
-                        ],
-                        "type": "array",
-                        "source": "LLM_Generated",
-                        "description": "Labels for each day of the week",
-                        "value": "[\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\"]",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "weekly_events",
-                        "parameter": [
-                            "datasets"
-                        ],
-                        "type": "array",
-                        "source": "TOOL_Output (sub_task 2, Step 1)",
-                        "description": "Array of objects representing total meeting hours per day, derived from weekly_events",
-                        "value": "```json\n    [\n      {\"day\": \"Mon\", \"hours\": 0},\n      {\"day\": \"Tue\", \"hours\": 0},\n      {\"day\": \"Wed\", \"hours\": 1},\n      {\"day\": \"Thu\", \"hours\": 0},\n      {\"day\": \"Fri\", \"hours\": 1},\n      {\"day\": \"Sat\", \"hours\": 0},\n      {\"day\": \"Sun\", \"hours\": 0}\n    ]\n    ```",
-                        "dependencies": [
-                            {
-                                "sub_task": 2,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "chart_title",
-                        "parameter": [
-                            "title"
-                        ],
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Title of the chart",
-                        "value": "Weekly Meeting Hours",
-                        "dependencies": []
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "chart_config",
-                        "description": "The chart configuration object for the generated bar chart",
+                        "name": "created_event_details",
+                        "description": "Details of the created Google Calendar event",
                         "used_by": [
                             {
                                 "sub_task": 4,
                                 "step": 1
                             }
                         ],
-                        "value": "```json\n    {\n      \"type\": \"bar\",\n      \"data\": {\n        \"labels\": [\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\"],\n        \"datasets\": [\n          {\n            \"label\": \"Meeting Hours\",\n            \"data\": [0, 0, 1, 0, 1, 0, 0]\n          }\n        ]\n      },\n      \"options\": {\n        \"title\": {\n          \"display\": true,\n          \"text\": \"Weekly Meeting Hours\"\n        }\n      }\n    }\n    ```"
-                    },
-                    {
-                        "name": "chart_url",
-                        "description": "The URL of the generated bar chart image",
-                        "used_by": [
-                            {
-                                "sub_task": 6,
-                                "step": 1
-                            }
-                        ],
-                        "value": "https://quickchart.io/chart?c=%7B%22type%22%3A%22bar%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22Mon%22%2C%22Tue%22%2C%22Wed%22%2C%22Thu%22%2C%22Fri%22%2C%22Sat%22%2C%22Sun%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22Meeting%20Hours%22%2C%22data%22%3A%5B0%2C0%2C1%2C0%2C1%2C0%2C0%5D%7D%5D%7D%2C%22options%22%3A%7B%22title%22%3A%7B%22display%22%3Atrue%2C%22text%22%3A%22Weekly%20Meeting%20Hours%22%7D%7D%7D"
+                        "value": "\"Event created: Client Meeting at ABC Corp (t58g07meajbu9bnmet4sl35qh4)\""
                     }
                 ]
             }
         }
     },
-    "4": {
-        "subtask_description": "Download the bar chart image generated in Sub-task 3 to prepare it for posting in Slack.",
+    "2": {
+        "subtask_description": "Calculate travel time from 123 Main St, Brooklyn, NY to 500 5th Avenue, New York, NY using Google Maps.",
         "steps": {
             "1": {
-                "tool": "download_chart",
-                "handles": "Downloads the bar chart image to a local file",
+                "tool": "maps_distance_matrix",
+                "handles": "Calculating travel time from office to meeting location",
                 "input_vars": [
                     {
-                        "name": "chart_config",
+                        "name": "office_origin",
                         "parameter": [
-                            "config"
+                            "origins"
                         ],
-                        "type": "object",
-                        "source": "TOOL_Output (sub_task 3, Step 1)",
-                        "description": "The chart configuration object from generate_chart",
-                        "value": "```json\n    {\n      \"type\": \"bar\",\n      \"data\": {\n        \"labels\": [\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\"],\n        \"datasets\": [\n          {\n            \"label\": \"Meeting Hours\",\n            \"data\": [0, 0, 1, 0, 1, 0, 0]\n          }\n        ]\n      },\n      \"options\": {\n        \"title\": {\n          \"display\": true,\n          \"text\": \"Weekly Meeting Hours\"\n        }\n      }\n    }\n    ```",
-                        "dependencies": [
-                            {
-                                "sub_task": 3,
-                                "step": 1
-                            }
-                        ]
+                        "type": "array",
+                        "source": "LLM_Generated",
+                        "description": "Array with the office address as origin",
+                        "value": "[\"123 Main St, Brooklyn, NY\"]",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "meeting_destination",
+                        "parameter": [
+                            "destinations"
+                        ],
+                        "type": "array",
+                        "source": "LLM_Generated",
+                        "description": "Array with the meeting address as destination",
+                        "value": "[\"500 5th Avenue, New York, NY\"]",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "travel_mode",
+                        "parameter": [
+                            "mode"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Travel mode for the route",
+                        "value": "driving",
+                        "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "chart_image_path",
-                        "description": "The local file path to the downloaded chart image",
-                        "used_by": [],
-                        "value": "\"/Users/aarjun1/Desktop/bar_2025-04-28_08-02-50.png\""
+                        "name": "travel_time_info",
+                        "description": "Estimated travel time and distance from office to meeting location",
+                        "used_by": [
+                            {
+                                "sub_task": 4,
+                                "step": 1
+                            }
+                        ],
+                        "value": "{\n      \"origin_address\": \"123 Main St, Brooklyn, NY 11217, USA\",\n      \"destination_address\": \"500 5th Ave, New York, NY 10110, USA\",\n      \"duration\": {\n        \"text\": \"21 mins\",\n        \"seconds\": 1245\n      },\n      \"distance\": {\n        \"text\": \"10.8 km\",\n        \"meters\": 10828\n      }\n    }"
                     }
                 ]
             }
         }
     },
-    "5": {
-        "subtask_description": "List all public Slack channels to retrieve the channel ID for general.",
+    "3": {
+        "subtask_description": "Retrieve the Slack channel ID for llm_agents_proj.",
         "steps": {
             "1": {
                 "tool": "slack_list_channels",
-                "handles": "Lists public Slack channels to find general",
+                "handles": "Listing public Slack channels to find llm_agents_proj",
                 "input_vars": [
                     {
                         "name": "slack_channel_limit",
@@ -224,52 +167,36 @@
                 ],
                 "output_vars": [
                     {
-                        "name": "general_channel_id",
-                        "description": "The channel ID for general",
+                        "name": "llm_agents_proj_channel_id",
+                        "description": "Channel ID for llm_agents_proj",
                         "used_by": [
                             {
-                                "sub_task": 6,
+                                "sub_task": 4,
                                 "step": 1
                             }
                         ],
-                        "value": "\"C075CU6FVE0\""
+                        "value": "\"C08QJ86ATDE\""
                     }
                 ]
             }
         }
     },
-    "6": {
-        "subtask_description": "Post the downloaded bar chart image in the general Slack channel with a short explanation summarizing the weekly meeting hours.",
+    "4": {
+        "subtask_description": "Post a message in the llm_agents_proj Slack channel with the event details and estimated travel time.",
         "steps": {
             "1": {
                 "tool": "slack_post_message",
-                "handles": "Posts the chart image URL and a summary explanation in general",
+                "handles": "Posting the event details and travel time to the Slack channel",
                 "input_vars": [
                     {
-                        "name": "general_channel_id",
+                        "name": "llm_agents_proj_channel_id",
                         "parameter": [
                             "channel_id"
                         ],
                         "type": "string",
-                        "source": "TOOL_Output (sub_task 5, Step 1)",
-                        "description": "The channel ID for general",
-                        "value": "\"C075CU6FVE0\"",
-                        "dependencies": [
-                            {
-                                "sub_task": 5,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "chart_url",
-                        "parameter": [
-                            "text"
-                        ],
-                        "type": "string",
                         "source": "TOOL_Output (sub_task 3, Step 1)",
-                        "description": "The URL of the generated bar chart image to include in the message",
-                        "value": "https://quickchart.io/chart?c=%7B%22type%22%3A%22bar%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22Mon%22%2C%22Tue%22%2C%22Wed%22%2C%22Thu%22%2C%22Fri%22%2C%22Sat%22%2C%22Sun%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22Meeting%20Hours%22%2C%22data%22%3A%5B0%2C0%2C1%2C0%2C1%2C0%2C0%5D%7D%5D%7D%2C%22options%22%3A%7B%22title%22%3A%7B%22display%22%3Atrue%2C%22text%22%3A%22Weekly%20Meeting%20Hours%22%7D%7D%7D",
+                        "description": "The Slack channel ID for llm_agents_proj",
+                        "value": "\"C08QJ86ATDE\"",
                         "dependencies": [
                             {
                                 "sub_task": 3,
@@ -278,23 +205,44 @@
                         ]
                     },
                     {
-                        "name": "summary_text",
+                        "name": "created_event_details",
                         "parameter": [
                             "text"
                         ],
                         "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Short explanation summarizing the weekly meeting hours",
-                        "value": "Here is a bar chart showing my meeting hours for each day this week.",
-                        "dependencies": []
+                        "source": "TOOL_Output (sub_task 1, Step 1)",
+                        "description": "Details of the created Google Calendar event",
+                        "value": "\"Event created: Client Meeting at ABC Corp (t58g07meajbu9bnmet4sl35qh4)\"",
+                        "dependencies": [
+                            {
+                                "sub_task": 1,
+                                "step": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "travel_time_info",
+                        "parameter": [
+                            "text"
+                        ],
+                        "type": "string",
+                        "source": "TOOL_Output (sub_task 2, Step 1)",
+                        "description": "Estimated travel time and distance from office to meeting location",
+                        "value": "\"Estimated travel time from 123 Main St, Brooklyn, NY 11217, USA to 500 5th Ave, New York, NY 10110, USA is 21 mins (10.8 km).\"",
+                        "dependencies": [
+                            {
+                                "sub_task": 2,
+                                "step": 1
+                            }
+                        ]
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "slack_post_confirmation",
-                        "description": "Confirmation of the posted message in general channel",
+                        "name": "slack_message_confirmation",
+                        "description": "Confirmation of the posted Slack message in llm_agents_proj",
                         "used_by": [],
-                        "value": "{\n      \"ok\": true,\n      \"channel\": \"C075CU6FVE0\",\n      \"timestamp\": \"1745827400.351959\",\n      \"message_text\": \"Here is a bar chart showing my meeting hours for each day this week.\\n<https://quickchart.io/chart?c=%7B%22type%22%3A%22bar%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22Mon%22%2C%22Tue%22%2C%22Wed%22%2C%22Thu%22%2C%22Fri%22%2C%22Sat%22%2C%22Sun%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22Meeting%20Hours%22%2C%22data%22%3A%5B0%2C0%2C1%2C0%2C1%2C0%2C0%5D%7D%5D%7D%2C%22options%22%3A%7B%22title%22%3A%7B%22display%22%3Atrue%2C%22text%22%3A%22Weekly%20Meeting%20Hours%22%7D%7D%7D>\"\n    }"
+                        "value": "\"Message successfully posted to Slack channel 'C08QJ86ATDE' (llm_agents_proj) at timestamp 1745865510.902599. Message text: Event created: Client Meeting at ABC Corp (t58g07meajbu9bnmet4sl35qh4)\\nEstimated travel time from 123 Main St, Brooklyn, NY 11217, USA to 500 5th Ave, New York, NY 10110, USA is 21 mins (10.8 km).\""
                     }
                 ]
             }

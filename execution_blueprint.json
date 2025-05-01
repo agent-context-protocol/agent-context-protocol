@@ -1,19 +1,86 @@
 {
     "1": {
         "1": {
-            "subtask_description": "Retrieve a list of all Google Calendars accessible to the user.",
+            "subtask_description": "Create a Google Calendar event titled \"Client Meeting at ABC Corp\" for Wednesday, April 2, 2025, at 2:00 PM at 500 5th Avenue, New York, NY.",
             "steps": {
                 "1": {
-                    "tool": "list-calendars",
-                    "handles": "Lists all available Google Calendars",
-                    "input_vars": [],
+                    "tool": "create-event",
+                    "handles": "Creating the calendar event with all required details",
+                    "input_vars": [
+                        {
+                            "name": "calendar_id",
+                            "parameter": [
+                                "calendarId"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Use 'primary' for the main Google Calendar",
+                            "value": "primary",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "event_summary",
+                            "parameter": [
+                                "summary"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Title of the event",
+                            "value": "Client Meeting at ABC Corp",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "event_start",
+                            "parameter": [
+                                "start"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Start time in ISO format with timezone (America/New_York, 2:00 PM on April 2, 2025)",
+                            "value": "2025-04-02T14:00:00-04:00",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "event_end",
+                            "parameter": [
+                                "end"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "End time in ISO format with timezone (1 hour meeting)",
+                            "value": "2025-04-02T15:00:00-04:00",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "event_timezone",
+                            "parameter": [
+                                "timeZone"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Timezone for the event",
+                            "value": "America/New_York",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "event_location",
+                            "parameter": [
+                                "location"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Location of the event",
+                            "value": "500 5th Avenue, New York, NY",
+                            "dependencies": []
+                        }
+                    ],
                     "output_vars": [
                         {
-                            "name": "main_calendar_id",
-                            "description": "The ID of the user's main Google Calendar",
+                            "name": "created_event_details",
+                            "description": "Details of the created Google Calendar event",
                             "used_by": [
                                 {
-                                    "sub_task": 2,
+                                    "sub_task": 4,
                                     "step": 1
                                 }
                             ]
@@ -23,58 +90,53 @@
             }
         },
         "2": {
-            "subtask_description": "List all events scheduled on the user's main Google Calendar for the current week (Monday to Sunday).",
+            "subtask_description": "Calculate travel time from 123 Main St, Brooklyn, NY to 500 5th Avenue, New York, NY using Google Maps.",
             "steps": {
                 "1": {
-                    "tool": "list-events",
-                    "handles": "Retrieves all events for the current week from the main calendar",
+                    "tool": "maps_distance_matrix",
+                    "handles": "Calculating travel time from office to meeting location",
                     "input_vars": [
                         {
-                            "name": "main_calendar_id",
+                            "name": "office_origin",
                             "parameter": [
-                                "calendarId"
+                                "origins"
                             ],
-                            "type": "string",
-                            "source": "TOOL_Output (sub_task 1, Step 1)",
-                            "description": "The ID of the main Google Calendar",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "sub_task": 1,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "week_start_time",
-                            "parameter": [
-                                "timeMin"
-                            ],
-                            "type": "string",
+                            "type": "array",
                             "source": "LLM_Generated",
-                            "description": "Start of the current week in ISO format (Monday, Apr 28, 2025)",
-                            "value": "2025-04-28T00:00:00Z",
+                            "description": "Array with the office address as origin",
+                            "value": "[\"123 Main St, Brooklyn, NY\"]",
                             "dependencies": []
                         },
                         {
-                            "name": "week_end_time",
+                            "name": "meeting_destination",
                             "parameter": [
-                                "timeMax"
+                                "destinations"
+                            ],
+                            "type": "array",
+                            "source": "LLM_Generated",
+                            "description": "Array with the meeting address as destination",
+                            "value": "[\"500 5th Avenue, New York, NY\"]",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "travel_mode",
+                            "parameter": [
+                                "mode"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "End of the current week in ISO format (Sunday, May 4, 2025)",
-                            "value": "2025-05-04T23:59:59Z",
+                            "description": "Travel mode for the route",
+                            "value": "driving",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "weekly_events",
-                            "description": "List of all events from the main calendar for the current week",
+                            "name": "travel_time_info",
+                            "description": "Estimated travel time and distance from office to meeting location",
                             "used_by": [
                                 {
-                                    "sub_task": 3,
+                                    "sub_task": 4,
                                     "step": 1
                                 }
                             ]
@@ -84,127 +146,11 @@
             }
         },
         "3": {
-            "subtask_description": "Aggregate total hours spent in meetings for each day of the current week and generate a bar chart visualizing this data.",
-            "steps": {
-                "1": {
-                    "tool": "generate_chart",
-                    "handles": "Generates a bar chart of daily meeting hours for the week",
-                    "input_vars": [
-                        {
-                            "name": "chart_type",
-                            "parameter": [
-                                "type"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "The chart type",
-                            "value": "bar",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "chart_labels",
-                            "parameter": [
-                                "labels"
-                            ],
-                            "type": "array",
-                            "source": "LLM_Generated",
-                            "description": "Labels for each day of the week",
-                            "value": "[\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\"]",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "weekly_events",
-                            "parameter": [
-                                "datasets"
-                            ],
-                            "type": "array",
-                            "source": "TOOL_Output (sub_task 2, Step 1)",
-                            "description": "Array of objects representing total meeting hours per day, derived from weekly_events",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "sub_task": 2,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "chart_title",
-                            "parameter": [
-                                "title"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Title of the chart",
-                            "value": "Weekly Meeting Hours",
-                            "dependencies": []
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "chart_config",
-                            "description": "The chart configuration object for the generated bar chart",
-                            "used_by": [
-                                {
-                                    "sub_task": 4,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "chart_url",
-                            "description": "The URL of the generated bar chart image",
-                            "used_by": [
-                                {
-                                    "sub_task": 6,
-                                    "step": 1
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        },
-        "4": {
-            "subtask_description": "Download the bar chart image generated in Sub-task 3 to prepare it for posting in Slack.",
-            "steps": {
-                "1": {
-                    "tool": "download_chart",
-                    "handles": "Downloads the bar chart image to a local file",
-                    "input_vars": [
-                        {
-                            "name": "chart_config",
-                            "parameter": [
-                                "config"
-                            ],
-                            "type": "object",
-                            "source": "TOOL_Output (sub_task 3, Step 1)",
-                            "description": "The chart configuration object from generate_chart",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "sub_task": 3,
-                                    "step": 1
-                                }
-                            ]
-                        }
-                    ],
-                    "output_vars": [
-                        {
-                            "name": "chart_image_path",
-                            "description": "The local file path to the downloaded chart image",
-                            "used_by": []
-                        }
-                    ]
-                }
-            }
-        },
-        "5": {
-            "subtask_description": "List all public Slack channels to retrieve the channel ID for general.",
+            "subtask_description": "Retrieve the Slack channel ID for llm_agents_proj.",
             "steps": {
                 "1": {
                     "tool": "slack_list_channels",
-                    "handles": "Lists public Slack channels to find general",
+                    "handles": "Listing public Slack channels to find llm_agents_proj",
                     "input_vars": [
                         {
                             "name": "slack_channel_limit",
@@ -220,11 +166,11 @@
                     ],
                     "output_vars": [
                         {
-                            "name": "general_channel_id",
-                            "description": "The channel ID for general",
+                            "name": "llm_agents_proj_channel_id",
+                            "description": "Channel ID for llm_agents_proj",
                             "used_by": [
                                 {
-                                    "sub_task": 6,
+                                    "sub_task": 4,
                                     "step": 1
                                 }
                             ]
@@ -233,37 +179,21 @@
                 }
             }
         },
-        "6": {
-            "subtask_description": "Post the downloaded bar chart image in the general Slack channel with a short explanation summarizing the weekly meeting hours.",
+        "4": {
+            "subtask_description": "Post a message in the llm_agents_proj Slack channel with the event details and estimated travel time.",
             "steps": {
                 "1": {
                     "tool": "slack_post_message",
-                    "handles": "Posts the chart image URL and a summary explanation in general",
+                    "handles": "Posting the event details and travel time to the Slack channel",
                     "input_vars": [
                         {
-                            "name": "general_channel_id",
+                            "name": "llm_agents_proj_channel_id",
                             "parameter": [
                                 "channel_id"
                             ],
                             "type": "string",
-                            "source": "TOOL_Output (sub_task 5, Step 1)",
-                            "description": "The channel ID for general",
-                            "value": "None",
-                            "dependencies": [
-                                {
-                                    "sub_task": 5,
-                                    "step": 1
-                                }
-                            ]
-                        },
-                        {
-                            "name": "chart_url",
-                            "parameter": [
-                                "text"
-                            ],
-                            "type": "string",
                             "source": "TOOL_Output (sub_task 3, Step 1)",
-                            "description": "The URL of the generated bar chart image to include in the message",
+                            "description": "The Slack channel ID for llm_agents_proj",
                             "value": "None",
                             "dependencies": [
                                 {
@@ -273,21 +203,42 @@
                             ]
                         },
                         {
-                            "name": "summary_text",
+                            "name": "created_event_details",
                             "parameter": [
                                 "text"
                             ],
                             "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Short explanation summarizing the weekly meeting hours",
-                            "value": "Here is a bar chart showing my meeting hours for each day this week.",
-                            "dependencies": []
+                            "source": "TOOL_Output (sub_task 1, Step 1)",
+                            "description": "Details of the created Google Calendar event",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 1,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "travel_time_info",
+                            "parameter": [
+                                "text"
+                            ],
+                            "type": "string",
+                            "source": "TOOL_Output (sub_task 2, Step 1)",
+                            "description": "Estimated travel time and distance from office to meeting location",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 2,
+                                    "step": 1
+                                }
+                            ]
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "slack_post_confirmation",
-                            "description": "Confirmation of the posted message in general channel",
+                            "name": "slack_message_confirmation",
+                            "description": "Confirmation of the posted Slack message in llm_agents_proj",
                             "used_by": []
                         }
                     ]

@@ -81,3 +81,4 @@ class TaskDecompositionNode(BaseNode):
             sub_tasks_list.append(self.update_task_decomposer_with_tools(sub_task))
 
         return sub_tasks_list 
+    
