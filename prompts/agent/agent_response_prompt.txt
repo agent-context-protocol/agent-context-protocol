@@ -62,6 +62,7 @@ TOOL Response:
    - Identify any dependent steps that rely on the output of the current step.
    - Determine if the TOOL response contains sufficient information to fulfill the Input Variables required by the dependent steps.
    - Extract and format the necessary data for each dependent step's Input Variables, matching the expected data types and formats.
+   - Include important information like units or additional context based on TOOL documentation, so that it is easy to understand.
 
 4. Handle Errors Appropriately:
    - 605 INCOMPLETE_INFORMATION: Raise this error if most or all of the information is missing, and the TOOL response is insufficient to fill in the Output_Variables or Dependent_Input_Variables.
@@ -97,6 +98,7 @@ TOOL Response:
   - Think about what information from the TOOL output should be extracted so that things are understandable and complete.
   - Utilize the TOOL documentation present in the chat history.
   - Incorporate considerations about error handling: only raise errors (605, 606, 607) in extreme cases when missing information is significant or when the TOOL response is entirely incorrect.
+  - Include important information like units or additional context based on TOOL documentation, so that it is easy to understand standalone.
 
 - Error Handling:
   - 605 INCOMPLETE_INFORMATION: Raise this error if most or all of the information is missing, and the TOOL response is insufficient for the current step.
@@ -232,6 +234,7 @@ $$CHAIN_OF_THOUGHT$$
 - The articles in the response are relevant and can be mapped to the Delhi news.
 - For the dependent step, "top_headlines" requires an array of top headlines for each location.
 - Extract the "title", "description", and "url" from each article to create the "news_articles" array.
+- I will make sure to include any units if relevant.
 
 $$AGENT_RESPONSE$$
 
@@ -313,6 +316,7 @@ $$CHAIN_OF_THOUGHT$$
 - The extracted vacation spots include a variety of destinations like Yellowstone National Park, Grand Canyon, Hawaii, and New York City, which are popular vacation spots in the USA. These spots can be structured as a list for the output variable.
 - For the dependent step (sub_task 2, Step 1), the Input Variable "vacation_spots_list_usa" requires a list of vacation spots to retrieve geographic coordinates for each location. The extracted list of vacation spots from the current step meets the requirement of the dependent input and is formatted as a string array, making it compatible for use in the subsequent TOOL call.
 - The data is structured appropriately for both the current step's output and the dependent step’s input. The list of vacation spots is formatted as an array of strings, ready to be passed as input to retrieve latitude and longitude.
+- I will make sure to include any units if relevant.
 
 $$AGENT_RESPONSE$$
 
@@ -413,6 +417,7 @@ $$CHAIN_OF_THOUGHT$$
 - The extracted latitudes for Denver and Delhi are 39.742043 and 28.679079, respectively, while the longitudes are -104.991531 for Denver and 77.069710 for Delhi.
 - For the dependent step (sub_task 1, Step 2), the input variables "latitudes_data" and "longitudes_data" need to be passed as floats to retrieve the current weather data for these locations. These extracted values meet the requirements for the dependent step.
 - Both the output variables for the current step and the dependent input variables for the future step are extracted correctly and formatted as floats, ensuring they can be used in the next TOOL call for weather data.
+- I will make sure to include any units if relevant.
 
 $$AGENT_RESPONSE$$
 
@@ -603,6 +608,8 @@ Step 5: Decide on Error Handling
 - As most of the information is available, and missing data is minimal, we will not raise an error.
 - Proceed to provide the extracted details for the available locations.
 
+- I will make sure to include any units if relevant.
+
 $$AGENT_RESPONSE$$
 
 Status_Code
@@ -727,6 +734,8 @@ Step 5: Decide on Error Handling
 - As per guidelines, when most or all information is missing, we should raise an error.
 - Therefore, we will raise 605 INCOMPLETE_INFORMATION.
 
+- I will make sure to include any units if relevant.
+
 $$AGENT_RESPONSE$$
 
 Status_Code
@@ -786,6 +795,7 @@ $$CHAIN_OF_THOUGHT$$
 - Each response includes the necessary weather details such as temperature, wind speed, wind direction, and weather code, along with units (which are mentioned in the TOOL output as well as the TOOL documentation previously).
 - The data is complete and matches the expected output for the current step, which is to retrieve current weather conditions for each area.
 - The extracted data will be formatted into a JSON structure for the output variable `current_weather_data`.
+- I will make sure to include any units if relevant.
 
 $$AGENT_RESPONSE$$
 
@@ -867,6 +877,7 @@ Step 3: Decide on Error Handling
 - Given that the issue is not a minor difference (like a wrong time or small temperature variance), but a country mismatch, it severely impacts the dependent steps’ ability to provide accurate results.
 - As per the guidelines, when the TOOL response contains entirely wrong information, we raise error code 607 WRONG_INFORMATION.
 - Therefore, in this case, we will raise the error because the response is unrelated to the intended input location, Washington, D.C., USA.
+- I will make sure to include any units if relevant.
 
 $$AGENT_RESPONSE$$
 

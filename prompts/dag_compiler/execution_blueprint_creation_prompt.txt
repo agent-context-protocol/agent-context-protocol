@@ -375,203 +375,92 @@ Step [Step Number, should be an integer and not of the form subtask_no.step_no]
 
 #### Example:
 
-Query: "What top 5 cities in usa? what is weather and news there? What does reddit say about them? What are some good restaurants there?"
+Query: "Plan a drive from London to Manchester; provide the driving time and walking time, render these times in a bar chart, and post the chart plus famous stops on the way in slack #random."
 
-TaskDecomposer's sub_task Requests:
-1. sub_task 1: Top 5 Cities in the USA
-Details: Display a list of the top 5 cities in the USA. Provide a brief overview of each city, including key attractions and general information.
-List of Relevant TOOLs:
-   - TripadvisorSearchLocation
+TaskDecomposers's sub_task Requests:
+1. sub_task 1: Get driving and walking times from London to Manchester
+Details: Obtain the estimated driving and walking times between London and Manchester. This information will be used for chart generation and Slack posting.
+List of Relevant TOOls:
+   - maps_directions
+
+2. sub_task 2: Render bar chart comparing driving and walking times
+Details: Create a bar chart visualizing the driving and walking times between London and Manchester. This sub_task depends on the results from sub_task 1.
+List of Relevant TOOls:
+   - generate_chart
+
+3. sub_task 3: Find famous stops on the route from London to Manchester
+Details: Identify and list famous or notable stops along the driving route from London to Manchester. This information will be included in the Slack post.
+List of Relevant TOOls:
    - perplexity_ask
 
-2. sub_task 2: Weather Information for Top 5 Cities
-Details: Show real-time weather information for the top 5 cities in the USA. Include temperature, weather conditions, and any relevant weather alerts.
-List of Relevant TOOLs:
-   - WeatherAPI.com_Realtime_Weather_TOOL
-   - WeatherAPI.com_Forecast_Weather_API
-   - perplexity_ask
+4. sub_task 4: Retrieve Slack channel IDs
+Details: List all public Slack channels to obtain the channel ID for #random. This is required before posting any message to Slack.
+List of Relevant TOOls:
+   - slack_list_channels
 
-3. sub_task 3: News in Top 5 Cities
-Details: Provide the latest news articles related to the top 5 cities in the USA. Include headlines, brief summaries, and links to full articles.
-List of Relevant TOOLs:
-   - NewsAPISearchByKeyWord
-   - perplexity_ask
+5. sub_task 5: Post chart and famous stops to Slack #random
+Details: Post the generated bar chart (from sub_task 2) and the list of famous stops (from sub_task 3) to the #random Slack channel. This sub_task depends on sub_tasks 2, 3, and 4 for the chart, stops, and channel ID respectively.
+List of Relevant TOOls:
+   - slack_post_message
 
-4. sub_task 4: Reddit Discussions on Top 5 Cities
-Details: Retrieve top Reddit posts discussing the top 5 cities in the USA. Include post titles, brief descriptions, and links to the discussions.
-List of Relevant TOOLs:
-   - RedditTopPostsBySubreddit
-   - perplexity_ask
-
-5. sub_task 5: Top Restaurants in Top 5 Cities
-Details: List the top-rated restaurants in the top 5 cities in the USA. Include restaurant names, ratings, reviews, and links to more details.
-List of Relevant TOOLs:
-   - TripadvisorSearchRestaurants
-   - perplexity_ask
-
-
-Description of TOOLs:
-
-[Will be given to you]
+Description of Tools:
+[Will be provided to you]
 
 Your Output:
 
 $$CHAIN_OF_THOUGHT$$
+	1.	Understanding the Overall Query and Breaking It Down:
 
-sub_task 1: Top 5 Cities in USA Overview
--	Understanding sub_task Details:
--We need to find what are the top 5 cities in the USA, the country.
--	TOOL Selection:
--	We need to identify the top 5 cities in the USA. perplexity_ask is suitable for retrieving this information by synthesizing data from multiple sources.
--	To get specific location details like geoId for each city, we’ll use TripadvisorSearchLocation.
--	Note: TripadvisorSearchLocation is only reliable for obtaining geoId and not longitude or latitude, and that too for well-known cities.
--	Input Parameters:
--	perplexity_ask:
--	For perplexity_ask we have to consider these required input parameters  [‘messages’]
--	messages (array of objects with role and content): We will pass a single user message with the content "What are the top 5 cities in the USA?".
--	TripadvisorSearchLocation:
--	For TripadvisorSearchLocation we have to consider these required input parameters  {‘query’: {‘type’: ‘string’, ‘description’: ‘Search query for location (e.g., city name)’}}
--	query (string): Requires city names. We’ll input the list of cities obtained from perplexity_ask.
--	Source of Inputs:
--	perplexity_ask:
--	messages: LLM_Generated based on the user’s query.
--	TripadvisorSearchLocation:
--	query: TOOL_Output (sub_task 1, Step 1), using top_cities_list from perplexity_ask’s output.
--	execution_blueprint Flow:
--	Step 1: Use perplexity_ask to get the list of the top 5 cities.
--	Step 2: Use TripadvisorSearchLocation to obtain geoId details for each city.
--	Acknowledging that this TOOL is only reliable for well-known cities.
--	Variable Naming:
--	Input variable name for Step 1: query_top_cities
--	Output variable name for Step 1: top_cities_list.
--	Input variable name for Step 2: top_cities_list (matches the output variable name).
--	Output variable name for Step 2: city_geoID_details
--	Validating if what i have thought till now is correct: Yes it is correct.
+	-	The user wants to plan a drive from London to Manchester. We need to provide both driving and walking times, create a bar chart comparing these two travel times, and then post that chart (along with a list of famous stops) into the Slack channel named #random.
+	-	To achieve this, we will rely on a series of sub_tasks that neatly split these responsibilities. Each sub_task has its own objective, tools, and dependencies.
 
-sub_task 2: Weather in Top 5 Cities
--	Understanding sub_task Details:
--We need to find what is the weather in the top 5 cities in the USA, which we found in the sub_task 1.
--	TOOL Selection:
--	WeatherAPI.com_Realtime_Weather_TOOL may not always return accurate results with city name queries.
--	Therefore, we’ll use perplexity_ask to find the latitude and longitude of each city.
--	We’ll then use WeatherAPI.com_Realtime_Weather_TOOL with these coordinates to fetch accurate weather data.
--	Input Parameters:
--	perplexity_ask:
--	For perplexity_ask we have to consider these required input parameters : [‘messages’]
--	messages (array of objects with role and content): Queries to find latitude and longitude for each city we got from sub_task 1, Step 1.
--	WeatherAPI.com_Realtime_Weather_TOOL:
--	For WeatherAPI.com_Realtime_Weather_TOOL we have to consider these required input parameters  {‘q’: {‘type’: ‘String’,‘description’: ‘Query parameter based on which data is sent back. It could be one of the following: Latitude and Longitude (Decimal degree) e.g: q=48.8567,2.3508, city name e.g.: q=Paris, US zip e.g: q=10001, UK postcode e.g: q=SW1, Canada postal code e.g: q=G2J, metar:<metar_code> e.g: q=metar:EGLL, iata:<3 digit airport code> e.g: q=iata:DXB, auto:ip for IP lookup, IP address (IPv4 and IPv6 supported) e.g: q=100.0.0.1’}}
--	q (string): Latitude and longitude in the format "lat,lon".
--	Source of Inputs:
--	perplexity_ask:
--	messages: TOOL_Output, (sub_task 1, Step 1), using top_cities_list
--	WeatherAPI.com_Realtime_Weather_TOOL:
--	q: TOOL_Output (sub_task 2, Step 1), using city_coordinates.
--	execution_blueprint Flow:
--	Step 1: Use perplexity_ask to find the latitude and longitude of each city.
--	Step 2: Use WeatherAPI.com_Realtime_Weather_TOOL with these coordinates to fetch real-time weather data.
--	Interdependencies:
--	Step 2 depends on Step 1 (city_coordinates) . Dependency is on the current sub_tasks step output.
--	Variable Naming:
--	Input variable name for Step 1: top_cities_list (matching the output variable name from sub_task 1, Step 1).
--	Output variable name for Step 1: latitude_data and longitude_data.
--	Input variable name for Step 2: latitude_data and longitude_data (matching the output variable name from sub_task 2, Step 1). For preparing the q parameter of WeatherAPI.com_Realtime_Weather_TOOL completely we had to use two input variables.
--	Out variable name for Step 2: realtime_weather
--	Validating if what i have thought till now is correct: Yes it is correct.
+	2.	Sub_task 1: Driving and Walking Times (maps_directions)
 
-sub_task 3: News in Top 5 Cities
--	Understanding sub_task Details:
--We need to find what is the news in the top 5 cities in the USA, which we found in the sub_task 1.
--	TOOL Selection:
--	To fetch news articles, we’ll use NewsAPISearchByKeyWord.
--	We can input city names directly; perplexity_ask is not necessary here.
--	Input Parameters:
--	NewsAPISearchByKeyWord:
--	For NewsAPISearchByKeyWord there are no required input parameters. But for our purpose we will give the following parameters.
--	query (string): City names.
--	language (string): We’ll set this to "en".
--	region (string): We’ll set this to "US".
--	Source of Inputs:
--	query: TOOL_Output (sub_task 1, Step 1), using top_cities_list.
--	language: LLM_Generated, value "en".
--	region: LLM_Generated, value "US".
--	execution_blueprint Flow:
--	Step 1: Use NewsAPI to retrieve news articles for each city.
--	Interdependencies:
--	Depends on sub_task 1, Step 1 for city names. Dependency is on the output from a previous sub_tasks step which is valid.
--	Variable Naming:
--	Input variable name for Step 1: top_cities_list, matching the output from sub_task 1, Step 1.
--	Output variable name for Step 1: news_articles
--	Validating if what i have thought till now is correct: Yes it is correct.
+	-	First, we must obtain two separate sets of directions: one for “driving” and one for “walking”.
+	-	We will call the maps_directions tool twice: once for driving mode, once for walking mode.
+	-	The outputs from these calls will be two numeric values or strings representing the estimated driving_time and walking_time.
+	-	These results will be used later in sub_task 2 for generating the bar chart.
 
-sub_task 4: Reddit Discussions on Top 5 Cities
--	Understanding sub_task Details:
--We need to find what is the top reddit discussions in the top 5 cities in the USA, which we found in the sub_task 1.
--	TOOL Selection:
--	To find relevant subreddits, we’ll use perplexity_ask.
--	To get top Reddit posts, we’ll use RedditTopPostsBySubreddit.
--	Input Parameters:
--	perplexity_ask:
--	For perplexity_ask we have to consider these required input parameters : [‘messages’]
--	messages (array of objects with role and content): Queries to find subreddits for each city.
--	RedditTopPostsBySubreddit:
--	For RedditTopPostsBySubreddit we have to consider these required input parameters: {‘subreddit’: {‘type’: ‘String’, ‘description’: "The subreddit name for which to fetch top posts. Only the subreddit name should be provided, ‘r/’ prefix is invalid."}, ‘time’: {‘type’: ‘String’, ‘description’: ‘The time period for which to fetch top posts.’}}
--	subreddit (string): Subreddit names.
--	time (string): We’ll set this to "day".
--	Source of Inputs:
--	perplexity_ask:
--	messages: TOOL_Output (sub_task 1, Step 1), using city names from top_cities_list
--	RedditTopPostsBySubreddit:
--	subreddit: TOOL_Output (sub_task 4, Step 1), using subreddits.
--	time: LLM_Generated, value "day".
--	execution_blueprint Flow:
--	Step 1: Use perplexity_ask to find subreddits related to each city.
--	Step 2: Use Reddit TOOL to fetch top posts from these subreddits.
--	Interdependencies:
--	Step 2 depends on Step 1 (subreddits).
--	perplexity_ask in Step 1 uses city names from sub_task 1, Step 1. Dependency is on the output from a previous sub_tasks step which is valid.
--	Variable Naming:
--	Input variable name for Step 1: top_cities_list
--	Output variable name for Step 1: subreddits.
--	Input variable name for Step 2: subreddits.
--	Output variable name for Step 2: reddit_posts
--	Validating if what i have thought till now is correct: Yes it is correct.
+	3.	Sub_task 2: Rendering the Bar Chart (generate_chart)
 
-sub_task 5: Top Restaurants in Top 5 Cities
--	Understanding sub_task Details:
--We need to find what are the top restaurants in the top 5 cities in the USA, which we found in the sub_task 1.
--	TOOL Selection:
--	We’ll use TripadvisorSearchRestaurants to find top restaurants using geoId.
--	Input Parameters:
--	TripadvisorSearchRestaurants:
--	For TripadvisorSearchRestaurants we have to consider these required input parameters: {‘locationId’: {‘type’: ‘string’, ‘description’: ‘location geoId of a place.’}}
--	locationId (string): geoId of each city.
--	Source of Inputs:
--	locationId: TOOL_Output (sub_task 1, Step 2), using city_geoID_details.
--	execution_blueprint Flow:
--	Step 1: Use the Tripadvisor TOOL to get top restaurants for each city.
--	Interdependencies:
--	Depends on sub_task 1, Step 2 for geoId. Dependency is on the output from a previous sub_tasks step which is valid.
--	Variable Naming:
--	Input variable name for Step 1: city_geoID_details, matching the output from sub_task 1, Step 2.
--	Output variable name for Step 1: top_restaurants
--	Validating if what i have thought till now is correct: Yes it is correct.
+	-	After we get the driving_time and walking_time from sub_task 1, we must create a bar chart visualizing both durations side by side.
+	-	We will set the chart type to “bar”, label the bars accordingly (e.g., “Driving” and “Walking”), and input the relevant data for each.
+	-	This tool will produce a chart_url (or link) that references the final rendered chart.
 
-Grouping sub_tasks and Interdependencies
--	All sub_tasks depend on outputs from sub_task 1. Therefore, we will place all sub_tasks in Group 1.
--	Ensured that each TOOL depends on at most one previous TOOL’s output.
--	Ensured that dependencies are on the output from a previous sub_tasks for all such sub_task steps.
--	Input variables that depend on previous outputs have matching names to maintain consistency.
--	Kept care of referring to tool names correctly keeping in consideration that they are case-sensitive.
+	4.	Sub_task 3: Listing Famous Stops on the Route (perplexity_ask)
 
-execution_blueprint Efficiency
--	Kept the execution_blueprint minimal by:
--	Avoiding unnecessary TOOLs (e.g., not using perplexity_ask where not essential, and ensuring that perplexity_research).
--	Avoided calling the same TOOL for the same purpose multiple times by keeping such sub_tasks in the same group and sharing the TOOL output with other sub_tasks.
--	Using city names directly when possible.
--	Limiting each sub_task to essential steps only.
+	-	The user also wants a list of notable stops along the driving route from London to Manchester.
+	-	We will call perplexity_ask with a query about famous stops along the route.
+	-	The tool will return a short curated list or explanation of interesting places to stop by.
+	-	We will store this list as famous_stops_list, which will be posted to Slack along with the chart link.
 
-- Never substitute a literal variable name for the data itself: if a parameter input variable should be derived from a previous step’s output variable, do not set the parameter Source field as LLM_Generated that merely echoes the variable name it the Value field. Information must be passed between steps by supplying the actual data stored in output variable by setting the Source field as TOOL_Output (sub_task X, Step Y).
+	5.	Sub_task 4: Retrieve Slack Channel IDs (slack_list_channels)
+
+	-	Before posting anything in Slack, we need the channel ID for #random.
+	-	We will call slack_list_channels with a specified limit on how many channels to retrieve. We then search in the results for #random and store its channel ID in random_channel_id.
+	-	This is needed to properly address our Slack message in the next sub_task.
+
+	6.	Sub_task 5: Posting to Slack (slack_post_message)
+
+	-	Finally, we must post the bar chart and the list of famous stops to Slack #random.
+	-	We already have random_channel_id from sub_task 4, chart_url from sub_task 2, and famous_stops_list from sub_task 3.
+	-	We pass these three pieces of data to slack_post_message to finalize the Slack post.
+	-	We then capture any confirmation or success message from Slack in slack_post_confirmation.
+
+	7.	Grouping and Dependencies:
+
+	-	All sub_tasks (1 through 5) share a logical flow:
+	-	sub_task 1 produces driving_time and walking_time.
+	-	sub_task 2 (the bar chart) depends on sub_task 1’s output.
+	-	sub_task 3 (famous stops) is independent of sub_task 2 in terms of data, but still part of the overall plan.
+	-	sub_task 4 (listing channels) is independent of sub_task 1, 2, 3 in terms of data flow.
+	-	sub_task 5 must have the chart URL from sub_task 2, the stops list from sub_task 3, and the #random channel ID from sub_task 4.
+	-	We ensure that each sub_task’s step references the correct outputs from the relevant sub_task steps and that variable naming is consistent.
+
+	8.	Conclusion:
+
+	-	This series of sub_tasks will effectively plan the user’s journey, produce the bar chart comparing driving vs. walking times, compile a list of interesting stops, and post everything into Slack #random.
+	-	We keep the dependencies clear so that each sub_task’s outputs are properly fed into the next sub_task’s inputs.
 
 $$EXECUTION_BLUEPRINT$$
 
@@ -579,159 +468,178 @@ Group 1:
 
 execution_blueprint for sub_task 1:
 
-sub_task Description: Identify and provide an overview of the top 5 cities in the USA.
+sub_task Description: Obtain the estimated driving and walking times between London and Manchester.
 
 execution_blueprint Steps:
 
 Step 1
--	TOOL: perplexity_ask
--	Handles: Retrieves the top 5 cities in the USA
--	Input Variables:
-  -	Name: query_top_cities
-    -	Parameter: messages
-    -	Type: array
-    -	Source: LLM_Generated
-    -	Description: Single user message with query about top 5 cities in the USA
-    -	Value: [{"role":"user","content":"What are the top 5 cities in the USA?"}]
--	Output Variables:
-  -	Name: top_cities_list
-    -	Description: List of the top 5 cities in the USA
+- TOOL: maps_directions
+- Handles: Retrieves driving directions and time from London to Manchester
+- Input Variables:
+  - Name: london_origin
+    - Parameter: origin
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Starting point address
+    - Value: "London"
+  - Name: manchester_destination
+    - Parameter: destination
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Ending point address
+    - Value: "Manchester"
+  - Name: driving_mode
+    - Parameter: mode
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Travel mode for driving
+    - Value: "driving"
+- Output Variables:
+  - Name: driving_time
+    - Description: Estimated driving time from London to Manchester in hours
 
 Step 2
--	TOOL: TripadvisorSearchLocation
--	Handles: Fetches geoID about each city
--	Input Variables:
-  -	Name: top_cities_list
-    -	Parameter: query
-    -	Type: string
-    -	Source: TOOL_Output (sub_task 1, Step 1)
-    -	Description: List of top cities from perplexity_ask
-    -	Value: None
--	Output Variables:
-  -	Name: city_geoID_details
-    -	Description: GeoID for each city
+- TOOL: maps_directions
+- Handles: Retrieves walking directions and time from London to Manchester
+- Input Variables:
+  - Name: london_origin
+    - Parameter: origin
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Starting point address
+    - Value: "London"
+  - Name: manchester_destination
+    - Parameter: destination
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Ending point address
+    - Value: "Manchester"
+  - Name: walking_mode
+    - Parameter: mode
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Travel mode for walking
+    - Value: "walking"
+- Output Variables:
+  - Name: walking_time
+    - Description: Estimated walking time from London to Manchester in hours
 
 execution_blueprint for sub_task 2:
 
-sub_task Description: Provide real-time weather information for the top 5 cities.
+sub_task Description: Create a bar chart visualizing the driving and walking times between London and Manchester.
 
 execution_blueprint Steps:
 
 Step 1
--	TOOL: perplexity_ask
--	Handles: Fetches latitude and longitude for each top city in USA
--	Input Variables:
-  -	Name: top_cities_list
-    -	Parameter: messages
-    -	Type: array
-    -	Source: TOOL_Output (sub_task 1, Step 1)
-    -	Description: The user message(s) to find lat/long for top cities
-    -	Value: None
--	Output Variables:
-  -	Name: latitude_data
-    -	Description: Latitude for each top city
-  -	Name: longitude_data
-    -	Description: Longitude for each top city
-
-Step 2
--	TOOL: WeatherAPI.com_Realtime_Weather_TOOL
--	Handles: Fetches real-time weather data
--	Input Variables:
-  -	Name: latitude_data
-    -	Parameter: q
-    -	Type: string
-    -	Source: TOOL_Output (sub_task 2, Step 1)
-    -	Description: Latitude of the top cities
-    -	Value: None
-  -	Name: longitude_data
-    -	Parameter: q
-    -	Type: string
-    -	Source: TOOL_Output (sub_task 2, Step 1)
-    -	Description: Longitudes of the top cities
-    -	Value: None
--	Output Variables:
-  -	Name: realtime_weather
-    -	Description: Real-time weather data for each city
+- TOOL: generate_chart
+- Handles: Generates a bar chart comparing driving and walking times
+- Input Variables:
+  - Name: chart_type
+    - Parameter: type
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Chart type
+    - Value: "bar"
+  - Name: chart_labels
+    - Parameter: labels
+    - Type: array
+    - Source: LLM_Generated
+    - Description: Labels for the chart bars
+    - Value: ["Driving", "Walking"]
+  - Name: driving_time
+    - Parameter: datasets
+    - Type: array
+    - Source: TOOL_Output (sub_task 1, Step 1)
+    - Description: Driving time data for the chart
+    - Value: None
+  - Name: walking_time
+    - Parameter: datasets
+    - Type: array
+    - Source: TOOL_Output (sub_task 1, Step 2)
+    - Description: Walking time data for the chart
+    - Value: None
+  - Name: chart_title
+    - Parameter: title
+    - Type: string
+    - Source: LLM_Generated
+    - Description: Title for the chart
+    - Value: "Travel Times from London to Manchester"
+- Output Variables:
+  - Name: chart_url
+    - Description: URL or reference to the generated bar chart
 
 execution_blueprint for sub_task 3:
 
-sub_task Description: Display recent news articles for the top 5 cities.
+sub_task Description: Identify and list famous or notable stops along the driving route from London to Manchester.
 
 execution_blueprint Steps:
 
 Step 1
--	TOOL: NewsAPISearchByKeyWord
--	Handles: Fetches detailed news articles
--	Input Variables:
-  -	Name: top_cities_list
-    -	Parameter: query
-    -	Type: string
-    -	Source: TOOL_Output (sub_task 1, Step 1)
-    -	Description: City names which can used as query keyword for searching news
-    -	Value: None
--	Output Variables:
-  -	Name: news_articles
-    -	Description: Detailed news articles for each city
+- TOOL: perplexity_ask
+- Handles: Finds famous stops along the route
+- Input Variables:
+  - Name: famous_stops_query
+    - Parameter: messages
+    - Type: array
+    - Source: LLM_Generated
+    - Description: User message to find famous stops
+    - Value: [{"role":"user","content":"What are famous or notable stops along the driving route from London to Manchester?"}]
+- Output Variables:
+  - Name: famous_stops_list
+    - Description: List of famous or notable stops along the route
 
 execution_blueprint for sub_task 4:
 
-sub_task Description: Display top Reddit discussions for the top 5 cities.
+sub_task Description: List all public Slack channels to obtain the channel ID for #random.
 
 execution_blueprint Steps:
 
 Step 1
--	TOOL: perplexity_ask
--	Handles: Identifies relevant subreddits for each city
--	Input Variables:
-  -	Name: top_cities_list
-    -	Parameter: messages
-    -	Type: array
-    -	Source: TOOL_Output (sub_task 1, Step 1)
-    -	Description: The user message(s) to find relevant subreddits for top cities
-    -	Value: None
--	Output Variables:
-  -	Name: subreddits
-    -	Description: Relevant subreddits for each city
-
-Step 2
--	TOOL: RedditTopPostsBySubreddit
--	Handles: Fetches top posts from relevant subreddits
--	Input Variables:
-  -	Name: subreddits
-    -	Parameter: subreddit
-    -	Type: string
-    -	Source: TOOL_Output (sub_task 4, Step 1)
-    -	Description: Subreddits identified by perplexity_ask
-    -	Value: None
-  -	Name: time_period
-    -	Parameter: time
-    -	Type: string
-    -	Source: LLM_Generated
-    -	Description: Time period for top posts
-    -	Value: "day"
--	Output Variables:
-  -	Name: reddit_posts
-    -	Description: Top Reddit posts for each city
+- TOOL: slack_list_channels
+- Handles: Lists public Slack channels to find #random
+- Input Variables:
+  - Name: slack_channel_limit
+    - Parameter: limit
+    - Type: number
+    - Source: LLM_Generated
+    - Description: Maximum number of channels to return
+    - Value: 100
+- Output Variables:
+  - Name: random_channel_id
+    - Description: Slack channel ID for #random
 
 execution_blueprint for sub_task 5:
 
-sub_task Description: Display top restaurants in the top 5 cities.
+sub_task Description: Post the generated bar chart and the list of famous stops to the #random Slack channel.
 
 execution_blueprint Steps:
 
 Step 1
--	TOOL: TripadvisorSearchRestaurants
--	Handles: Searches for top restaurants in each city
--	Input Variables:
-  -	Name: city_geoID_details
-    -	Parameter: locationId
-    -	Type: string
-    -	Source: TOOL_Output (sub_task 1, Step 2)
-    -	Description: geoId of each city
-    -	Value: None
--	Output Variables:
-  -	Name: top_restaurants
-    -	Description: List of top restaurants in each city
+- TOOL: slack_post_message
+- Handles: Posts the chart and famous stops to Slack #random
+- Input Variables:
+  - Name: random_channel_id
+    - Parameter: channel_id
+    - Type: string
+    - Source: TOOL_Output (sub_task 4, Step 1)
+    - Description: Slack channel ID for #random
+    - Value: None
+  - Name: chart_url
+    - Parameter: text
+    - Type: string
+    - Source: TOOL_Output (sub_task 2, Step 1)
+    - Description: URL or reference to the generated bar chart
+    - Value: None
+  - Name: famous_stops_list
+    - Parameter: text
+    - Type: string
+    - Source: TOOL_Output (sub_task 3, Step 1)
+    - Description: List of famous or notable stops along the route
+    - Value: None
+- Output Variables:
+  - Name: slack_post_confirmation
+    - Description: Confirmation or result of posting to Slack
+
 
 
 #### Example:
@@ -1501,16 +1409,16 @@ Your Output:
 $$CHAIN_OF_THOUGHT$$
 
 sub_task 1: Get Last Message from Slack Channel  
-• Understanding sub_task Details:  
+- Understanding sub_task Details:  
   - We need to first list the public channels via slack_list_channels to confirm/locate the group Slack channel. Because the group as referenced by the user could not be the channel id itself. 
   - Next, we use slack_get_channel_history to fetch the most recent message. The slack_get_channel_history TOOL requires a channel_id as a required parameter (which we will get from slack_list_channels output).  
   - We will output both the message content and the user ID of the sender for use in sub_task 2.  
 
-• TOOL Selection:  
+- TOOL Selection:  
   - slack_list_channels (Step 1): to list and identify the group Slack channel (or confirm the channel’s existence).  
   - slack_get_channel_history (Step 2): to retrieve the recent messages from that channel, focusing on the most recent one.  
 
-• Input Parameters (sub_task 1):  
+- Input Parameters (sub_task 1):  
   - slack_list_channels:  
     - limit (number): optional, defaults to 100.  
     - cursor (string): optional, used for pagination.  
@@ -1518,20 +1426,20 @@ sub_task 1: Get Last Message from Slack Channel
     - channel_id (string): required.  
     - limit (number): optional, defaults to 10.  
 
-• Source of Inputs:  
+- Source of Inputs:  
   - For sub_task 1, Step 1:  
     - We can rely on LLM_Generated inputs for limit if needed, or just use the defaults.  
   - For sub_task 1, Step 2:  
     - The channel_id is extracted from slack_list_channels’ output.  
 
-• execution_blueprint Flow (sub_task 1):  
+- execution_blueprint Flow (sub_task 1):  
   1) Use slack_list_channels to retrieve list of channels (potentially to confirm channel ID).  
   2) Use slack_get_channel_history with the identified channel_id to fetch the most recent message.  
 
-• Interdependencies:  
+- Interdependencies:  
   - Step 2 depends on Step 1 for the channel_id.  
 
-• Variable Naming:  
+- Variable Naming:  
   - Step 1 (slack_list_channels):  
     - Output: group_channel_id (ID of the relevant Slack channel).  
   - Step 2 (slack_get_channel_history):  
@@ -1539,40 +1447,40 @@ sub_task 1: Get Last Message from Slack Channel
     - Outputs: last_message_content, last_message_user_id.  
 
 sub_task 2: Identify user who posted last message  
-• Understanding sub_task Details:  
+- Understanding sub_task Details:  
   - We have a user ID from sub_task 1. We need to retrieve that user’s profile using slack_get_user_profile.  
   - Final display includes the last message content (from sub_task 1) and the user name or user info from sub_task 2.  
 
-• TOOL Selection:  
+- TOOL Selection:  
   - slack_get_user_profile: to fetch detailed profile information given a user_id.  
 
-• Input Parameters (sub_task 2):  
+- Input Parameters (sub_task 2):  
   - slack_get_user_profile:  
     - user_id (string): required.  
 
-• Source of Inputs:  
+- Source of Inputs:  
   - user_id for slack_get_user_profile is last_message_user_id from sub_task 1, Step 2.  
 
-• execution_blueprint Flow (sub_task 2):  
+- execution_blueprint Flow (sub_task 2):  
   1) Use slack_get_user_profile with the user_id from sub_task 1 to get the user’s profile details.  
 
-• Interdependencies:  
+- Interdependencies:  
   - sub_task 2, Step 1 depends on sub_task 1, Step 2 for the user ID.  
 
-• Variable Naming:  
+- Variable Naming:  
   - sub_task 2, Step 1 (slack_get_user_profile):  
     - Input variable name: last_message_user_id (matching sub_task 1, Step 2 output).  
     - Output variable name: last_message_user_profile.  
 
-• Grouping sub_tasks:  
+- Grouping sub_tasks:  
   - Both sub_task 1 and sub_task 2 are interdependent: sub_task 2 depends on sub_task 1’s output.  
   - Place them together in Group 1.  
 
-• Dependency Limitation Checks:  
+- Dependency Limitation Checks:  
   - Each TOOL in each step depends on at most one previous step’s output.  
   - Input and output variable names match correctly for consistent referencing.  
 
-• Minimal Execution Blueprint:  
+- Minimal Execution Blueprint:  
   - Kept the steps minimal and straightforward: sub_task 1 uses exactly two Slack tools (slack_list_channels and slack_get_channel_history), sub_task 2 uses slack_get_user_profile.  
 
 - Never substitute a literal variable name for the data itself: if a parameter input variable should be derived from a previous step’s output variable, do not set the parameter Source field as LLM_Generated that merely echoes the variable name it the Value field. Information must be passed between steps by supplying the actual data stored in output variable by setting the Source field as TOOL_Output (sub_task X, Step Y).

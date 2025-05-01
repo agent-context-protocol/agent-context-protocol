@@ -1,86 +1,31 @@
 {
     "1": {
         "1": {
-            "subtask_description": "Create a Google Calendar event titled \"Client Meeting at ABC Corp\" for Wednesday, April 2, 2025, at 2:00 PM at 500 5th Avenue, New York, NY.",
+            "subtask_description": "List the schema of all tables in the public schema of the database.",
             "steps": {
                 "1": {
-                    "tool": "create-event",
-                    "handles": "Creating the calendar event with all required details",
+                    "tool": "query",
+                    "handles": "Retrieves all table and column information from the public schema for grounding further SQL queries.",
                     "input_vars": [
                         {
-                            "name": "calendar_id",
+                            "name": "schema_sql",
                             "parameter": [
-                                "calendarId"
+                                "sql"
                             ],
                             "type": "string",
                             "source": "LLM_Generated",
-                            "description": "Use 'primary' for the main Google Calendar",
-                            "value": "primary",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "event_summary",
-                            "parameter": [
-                                "summary"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Title of the event",
-                            "value": "Client Meeting at ABC Corp",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "event_start",
-                            "parameter": [
-                                "start"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Start time in ISO format with timezone (America/New_York, 2:00 PM on April 2, 2025)",
-                            "value": "2025-04-02T14:00:00-04:00",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "event_end",
-                            "parameter": [
-                                "end"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "End time in ISO format with timezone (1 hour meeting)",
-                            "value": "2025-04-02T15:00:00-04:00",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "event_timezone",
-                            "parameter": [
-                                "timeZone"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Timezone for the event",
-                            "value": "America/New_York",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "event_location",
-                            "parameter": [
-                                "location"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Location of the event",
-                            "value": "500 5th Avenue, New York, NY",
+                            "description": "SQL to list table_name, column_name, and data_type for all public tables",
+                            "value": "SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema='public';",
                             "dependencies": []
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "created_event_details",
-                            "description": "Details of the created Google Calendar event",
+                            "name": "all_schema_info",
+                            "description": "Schema details for all tables and columns in the public schema",
                             "used_by": [
                                 {
-                                    "sub_task": 4,
+                                    "sub_task": 2,
                                     "step": 1
                                 }
                             ]
@@ -90,53 +35,70 @@
             }
         },
         "2": {
-            "subtask_description": "Calculate travel time from 123 Main St, Brooklyn, NY to 500 5th Avenue, New York, NY using Google Maps.",
+            "subtask_description": "Compute the total revenue generated by the customers each sales employee supports.",
             "steps": {
                 "1": {
-                    "tool": "maps_distance_matrix",
-                    "handles": "Calculating travel time from office to meeting location",
+                    "tool": "perplexity_reason",
+                    "handles": "Uses the schema info to generate the correct SQL query for total revenue per sales employee.",
                     "input_vars": [
                         {
-                            "name": "office_origin",
+                            "name": "all_schema_info",
                             "parameter": [
-                                "origins"
+                                "messages"
                             ],
                             "type": "array",
-                            "source": "LLM_Generated",
-                            "description": "Array with the office address as origin",
-                            "value": "[\"123 Main St, Brooklyn, NY\"]",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "meeting_destination",
-                            "parameter": [
-                                "destinations"
-                            ],
-                            "type": "array",
-                            "source": "LLM_Generated",
-                            "description": "Array with the meeting address as destination",
-                            "value": "[\"500 5th Avenue, New York, NY\"]",
-                            "dependencies": []
-                        },
-                        {
-                            "name": "travel_mode",
-                            "parameter": [
-                                "mode"
-                            ],
-                            "type": "string",
-                            "source": "LLM_Generated",
-                            "description": "Travel mode for the route",
-                            "value": "driving",
-                            "dependencies": []
+                            "source": "TOOL_Output (sub_task 1, Step 1)",
+                            "description": "Schema details to be used for crafting the SQL query",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 1,
+                                    "step": 1
+                                }
+                            ]
                         }
                     ],
                     "output_vars": [
                         {
-                            "name": "travel_time_info",
-                            "description": "Estimated travel time and distance from office to meeting location",
+                            "name": "employee_revenue_sql",
+                            "description": "SQL query to compute total revenue per sales employee",
                             "used_by": [
                                 {
-                                    "sub_task": 4,
+                                    "sub_task": 2,
+                                    "step": 2
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "2": {
+                    "tool": "query",
+                    "handles": "Executes the SQL query to get employee revenue data.",
+                    "input_vars": [
+                        {
+                            "name": "employee_revenue_sql",
+                            "parameter": [
+                                "sql"
+                            ],
+                            "type": "string",
+                            "source": "TOOL_Output (sub_task 2, Step 1)",
+                            "description": "SQL query for total revenue per sales employee",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 2,
+                                    "step": 1
+                                }
+                            ]
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "employee_revenue_table",
+                            "description": "Table with employee name/ID and their total revenue",
+                            "used_by": [
+                                {
+                                    "sub_task": 3,
                                     "step": 1
                                 }
                             ]
@@ -146,11 +108,201 @@
             }
         },
         "3": {
-            "subtask_description": "Retrieve the Slack channel ID for llm_agents_proj.",
+            "subtask_description": "Rank employees by total revenue and extract the top three performers.",
+            "steps": {
+                "1": {
+                    "tool": "perplexity_reason",
+                    "handles": "Ranks employees by revenue, extracts the top three, and identifies the top performer.",
+                    "input_vars": [
+                        {
+                            "name": "employee_revenue_table",
+                            "parameter": [
+                                "messages"
+                            ],
+                            "type": "array",
+                            "source": "TOOL_Output (sub_task 2, Step 2)",
+                            "description": "Table of employees and their total revenue to be ranked",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 2,
+                                    "step": 2
+                                }
+                            ]
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "ranked_employees_table",
+                            "description": "Sorted list of employees by total revenue",
+                            "used_by": [
+                                {
+                                    "sub_task": 7,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "top_three_employees",
+                            "description": "List of the top three employees with their revenues (array of objects with name/id and revenue)",
+                            "used_by": []
+                        },
+                        {
+                            "name": "top_three_labels",
+                            "description": "Array of names/IDs of the top three employees (for chart labels)",
+                            "used_by": [
+                                {
+                                    "sub_task": 4,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "top_three_revenues",
+                            "description": "Array of revenues of the top three employees (for chart data)",
+                            "used_by": [
+                                {
+                                    "sub_task": 4,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "top_performer",
+                            "description": "Name/ID of the top-performing employee",
+                            "used_by": [
+                                {
+                                    "sub_task": 5,
+                                    "step": 1
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "4": {
+            "subtask_description": "Create a column chart visualizing the top three employees and their total revenues.",
+            "steps": {
+                "1": {
+                    "tool": "generate_chart",
+                    "handles": "Generates a column chart for the top three employees and their revenues.",
+                    "input_vars": [
+                        {
+                            "name": "chart_type",
+                            "parameter": [
+                                "type"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Chart type",
+                            "value": "bar",
+                            "dependencies": []
+                        },
+                        {
+                            "name": "top_three_labels",
+                            "parameter": [
+                                "labels"
+                            ],
+                            "type": "array",
+                            "source": "TOOL_Output (sub_task 3, Step 1)",
+                            "description": "Employee names for the x-axis",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 3,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "top_three_revenues",
+                            "parameter": [
+                                "datasets"
+                            ],
+                            "type": "array",
+                            "source": "TOOL_Output (sub_task 3, Step 1)",
+                            "description": "Array of revenues for the top three employees",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 3,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "chart_title",
+                            "parameter": [
+                                "title"
+                            ],
+                            "type": "string",
+                            "source": "LLM_Generated",
+                            "description": "Title for the chart",
+                            "value": "Top 3 Sales Employees by Revenue",
+                            "dependencies": []
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "top_three_chart_url",
+                            "description": "URL or reference to the generated column chart",
+                            "used_by": [
+                                {
+                                    "sub_task": 7,
+                                    "step": 1
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "5": {
+            "subtask_description": "Generate a brief, rhyming tagline praising the top-performing employee.",
+            "steps": {
+                "1": {
+                    "tool": "perplexity_reason",
+                    "handles": "Creates a rhyming, positive tagline for the top performer.",
+                    "input_vars": [
+                        {
+                            "name": "top_performer",
+                            "parameter": [
+                                "messages"
+                            ],
+                            "type": "array",
+                            "source": "TOOL_Output (sub_task 3, Step 1)",
+                            "description": "Name/ID of the top-performing employee to be praised in a rhyme",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 3,
+                                    "step": 1
+                                }
+                            ]
+                        }
+                    ],
+                    "output_vars": [
+                        {
+                            "name": "rhyming_tagline",
+                            "description": "Rhyming, positive tagline for the top performer",
+                            "used_by": [
+                                {
+                                    "sub_task": 7,
+                                    "step": 1
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "6": {
+            "subtask_description": "List all public Slack channels to obtain the channel ID for random.",
             "steps": {
                 "1": {
                     "tool": "slack_list_channels",
-                    "handles": "Listing public Slack channels to find llm_agents_proj",
+                    "handles": "Lists public Slack channels to find random",
                     "input_vars": [
                         {
                             "name": "slack_channel_limit",
@@ -166,11 +318,11 @@
                     ],
                     "output_vars": [
                         {
-                            "name": "llm_agents_proj_channel_id",
-                            "description": "Channel ID for llm_agents_proj",
+                            "name": "random_channel_id",
+                            "description": "Slack channel ID for random",
                             "used_by": [
                                 {
-                                    "sub_task": 4,
+                                    "sub_task": 7,
                                     "step": 1
                                 }
                             ]
@@ -179,21 +331,37 @@
                 }
             }
         },
-        "4": {
-            "subtask_description": "Post a message in the llm_agents_proj Slack channel with the event details and estimated travel time.",
+        "7": {
+            "subtask_description": "Post a message in the random Slack channel containing the ranked table, chart, and tagline.",
             "steps": {
                 "1": {
                     "tool": "slack_post_message",
-                    "handles": "Posting the event details and travel time to the Slack channel",
+                    "handles": "Posts the ranked table, chart, and tagline to Slack random",
                     "input_vars": [
                         {
-                            "name": "llm_agents_proj_channel_id",
+                            "name": "random_channel_id",
                             "parameter": [
                                 "channel_id"
                             ],
                             "type": "string",
+                            "source": "TOOL_Output (sub_task 6, Step 1)",
+                            "description": "Slack channel ID for random",
+                            "value": "None",
+                            "dependencies": [
+                                {
+                                    "sub_task": 6,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "name": "ranked_employees_table",
+                            "parameter": [
+                                "text"
+                            ],
+                            "type": "string",
                             "source": "TOOL_Output (sub_task 3, Step 1)",
-                            "description": "The Slack channel ID for llm_agents_proj",
+                            "description": "Ranked table of employees and their revenues",
                             "value": "None",
                             "dependencies": [
                                 {
@@ -203,33 +371,33 @@
                             ]
                         },
                         {
-                            "name": "created_event_details",
+                            "name": "top_three_chart_url",
                             "parameter": [
                                 "text"
                             ],
                             "type": "string",
-                            "source": "TOOL_Output (sub_task 1, Step 1)",
-                            "description": "Details of the created Google Calendar event",
+                            "source": "TOOL_Output (sub_task 4, Step 1)",
+                            "description": "URL or reference to the generated column chart",
                             "value": "None",
                             "dependencies": [
                                 {
-                                    "sub_task": 1,
+                                    "sub_task": 4,
                                     "step": 1
                                 }
                             ]
                         },
                         {
-                            "name": "travel_time_info",
+                            "name": "rhyming_tagline",
                             "parameter": [
                                 "text"
                             ],
                             "type": "string",
-                            "source": "TOOL_Output (sub_task 2, Step 1)",
-                            "description": "Estimated travel time and distance from office to meeting location",
+                            "source": "TOOL_Output (sub_task 5, Step 1)",
+                            "description": "Rhyming tagline for the top performer",
                             "value": "None",
                             "dependencies": [
                                 {
-                                    "sub_task": 2,
+                                    "sub_task": 5,
                                     "step": 1
                                 }
                             ]
@@ -237,8 +405,8 @@
                     ],
                     "output_vars": [
                         {
-                            "name": "slack_message_confirmation",
-                            "description": "Confirmation of the posted Slack message in llm_agents_proj",
+                            "name": "slack_post_confirmation",
+                            "description": "Confirmation or result of posting to Slack",
                             "used_by": []
                         }
                     ]
