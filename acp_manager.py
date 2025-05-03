@@ -5,6 +5,7 @@ from dag_compiler import DAGCompilerNode
 from agent import AgentNode
 from concurrent.futures import ThreadPoolExecutor
 from mcp_node import MCPToolManager
+from ui_helpers import update_and_draw_dag
 
 class ACPManager:
     def __init__(self, execution_blueprint, dag_compiler, agent_system_prompt):
@@ -14,9 +15,11 @@ class ACPManager:
         self.agents = {}
         self.thread_pool = ThreadPoolExecutor()
         self.completed_agents = []
-        
+        self.dag_containers = {}
+        self.dag_placeholders = {}
         for group_id, group_data in execution_blueprint.items():
             group_agents = []
+            
             execution_list = {}
             max_depth = len(group_data.items())
             for sub_id, sub in group_data.items():
@@ -153,6 +156,7 @@ class ACPManager:
         return group_done, agent.sub_task_no       
 
     async def run_group(self, group_id):
+        
         group_results = {}
         group_done = False
         counter = 0
@@ -161,16 +165,31 @@ class ACPManager:
             # group_done = True
             print(f"\n#################\nTrial Attempt {counter}")
             for agents in self.groups[group_id]:
-                agent_tasks = []
-                for agent in agents:
-                    task = asyncio.create_task(self.run_agent(agent, group_id))
-                    agent_tasks.append(task)
-                for agent_task in asyncio.as_completed(agent_tasks):
-                    group_done, agent_id = await agent_task
-                    if group_done:
-                        self.completed_agents.append(agent_id)
+                agent_tasks = [
+                    asyncio.create_task(self.run_agent(agent, group_id))
+                    for agent in agents
+                ]
+                # wait for _all_ of them to finish
+                results = await asyncio.gather(*agent_tasks, return_exceptions=False)
 
-                if not group_done:
+                # process the batch’s results
+                batch_done = True
+                for group_done_flag, agent_id in results:
+                    if group_done_flag:
+                        self.completed_agents.append(agent_id)
+                        file_path = f'execution_blueprint_updated_{group_id}.json'
+                        with open(file_path) as f:
+                            data = json.load(f)
+                        update_and_draw_dag(
+                            data,
+                            completed=set(self.completed_agents),
+                            placeholder=self.dag_placeholders[group_id]
+                        )
+                    else:
+                        batch_done = False
+                        
+                if not batch_done:
+                    group_done = False
                     break
             # for agent in self.groups[group_id]:
             #     # try:
@@ -233,7 +252,7 @@ class ACP:
         print("execution_blueprint:", execution_blueprint)
 
         communication_manager = ACPManager(execution_blueprint, self.dag_compiler, self.agent_system_prompt)
-        
+        communication_manager.dag_placeholders = self.dag_placeholders
         # Modify the Manager to yield results as groups complete
         # await communication_manager.run()
         async for group_id in communication_manager.run():

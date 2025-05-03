@@ -9,45 +9,7 @@ import streamlit.components.v1 as components
 import json
 from pathlib import Path
 from collections import defaultdict
-from ui_helpers import render_execution_dag
-
-def update_and_draw_dag(data: dict, completed: set[str] | set[int], container):
-    execution_list = {}
-    max_depth = len(data.items())
-    for sub_id, sub in data.items():
-        execution_list[sub_id] = {
-            'dependent_on' : [],
-            'depth' : 0
-        }
-        for step in sub["steps"].values():
-            for inp in step["input_vars"]:
-                for dep in inp.get("dependencies", []):
-                    if dep['sub_task'] not in execution_list[sub_id]['dependent_on']:
-                        execution_list[sub_id]['dependent_on'].append(dep['sub_task'])
-    for sub_id, meta_info in execution_list.items():
-        
-            # print(sub_id)
-        for parent_node in meta_info['dependent_on']:
-            if meta_info['depth'] <= execution_list[str(parent_node)]['depth']:
-                meta_info['depth'] = execution_list[str(parent_node)]['depth'] + 1
-
-    execution_sequence = []
-    depth = 0
-    for depth in range(max_depth):
-        temp = []
-        for sub_id, meta_info in execution_list.items():
-            
-            if meta_info['depth'] == depth:
-                temp.append(sub_id)
-        
-        if temp == []:
-            break
-        else:
-            execution_sequence.append(temp)
-
-    # 4. Draw
-    with container:
-        render_execution_dag(execution_list, completed)
+from ui_helpers import update_and_draw_dag
 
 st.set_page_config(layout = "wide") 
 client = OpenAI()
@@ -155,17 +117,18 @@ class StreamlitACP:
         """
         For each group, create a full‐width container and render the stub panel.
         """
-
         self.dag_placeholders = {} 
         for gid, gdata in execution_blueprint.items():
             container = st.container()
             self.group_containers[gid] = container
-            left_col, _ = container.columns([1, 3])  # 25% left, 75% right (blank)
-            with left_col:
-                update_and_draw_dag(
+            # left_col, _ = container.columns([1, 3])  # 25% left, 75% right (blank)
+            self.dag_placeholders[gid] = st.sidebar.empty() 
+            self.dag_placeholders[gid].subheader("Execution DAG")
+            # with left_col:
+            update_and_draw_dag(
                     gdata,
                     completed=set(),
-                    container=left_col.empty()
+                    placeholder=self.dag_placeholders[gid]
                 )
 
             # with container:
@@ -179,6 +142,7 @@ class StreamlitACP:
             #             {subtasks_html}
             #         </div>
             #     """, unsafe_allow_html=True)
+        self.ACP.dag_placeholders = self.dag_placeholders
 
     def update_group_section(self, group_id, user_query):
         # gid, container = next(
@@ -196,37 +160,37 @@ class StreamlitACP:
         variables = defaultdict(list)        # input + output vars keyed by sub-task
         outputs   = defaultdict(list)        # output-only vars keyed by sub-task
 
-        for sub_id, sub in data.items():
-            queries.append(
-                {"subtask_id": sub_id,
-                "query": sub.get("subtask_description", "").strip()}
-            )
-            for step_id, step in sub.get("steps", {}).items():
+        # for sub_id, sub in data.items():
+        #     queries.append(
+        #         {"subtask_id": sub_id,
+        #         "query": sub.get("subtask_description", "").strip()}
+        #     )
+        #     for step_id, step in sub.get("steps", {}).items():
 
-                # input variables
-                for v in step.get("input_vars", []):
-                    variables[sub_id].append(
-                        {"step_id": step_id,
-                        "name": v["name"],
-                        "value": v.get("value"),
-                        "description": v.get("description"),
-                        "kind": "input"}
-                    ) 
+        #         # input variables
+        #         for v in step.get("input_vars", []):
+        #             variables[sub_id].append(
+        #                 {"step_id": step_id,
+        #                 "name": v["name"],
+        #                 "value": v.get("value"),
+        #                 "description": v.get("description"),
+        #                 "kind": "input"}
+        #             ) 
 
-                # output variables
-                for v in step.get("output_vars", []):
-                    rec = {"step_id": step_id,
-                        "name": v["name"],
-                        "value": v.get("value"),
-                        "description": v.get("description"),
-                        "kind": "output"}
-                    variables[sub_id].append(rec)
-                    outputs[sub_id].append(rec)
-        input_data = f"Query: {user_query}\n"
-        for sid, outlist in outputs.items():
-            input_data+=f"Sub-task {sid}:\n"
-            for v in outlist:
-                input_data+=f" {v}\n"
+        #         # output variables
+        #         for v in step.get("output_vars", []):
+        #             rec = {"step_id": step_id,
+        #                 "name": v["name"],
+        #                 "value": v.get("value"),
+        #                 "description": v.get("description"),
+        #                 "kind": "output"}
+        #             variables[sub_id].append(rec)
+        #             outputs[sub_id].append(rec)
+        # input_data = f"Query: {user_query}\n"
+        # for sid, outlist in outputs.items():
+        #     input_data+=f"Sub-task {sid}:\n"
+        #     for v in outlist:
+        #         input_data+=f" {v}\n"
         input_data = json.dumps(data, indent=2)
         # Prepare execution blueprint content
         # Prepare the prompt for the LLM
@@ -267,12 +231,14 @@ class StreamlitACP:
             self.output[group_id] = 'group_results'
             # Update the group as completed
             self.update_group_section(group_id, user_query)
+        # self.update_group_section(1, user_query)
 
 async def main():
     # Load custom CSS
+    
     load_css()
 
-    st.title("Execution Blueprint Executor")
+    st.title("Vibe Analyst")
     acp_app = StreamlitACP()
     await acp_app.async_init()
 
