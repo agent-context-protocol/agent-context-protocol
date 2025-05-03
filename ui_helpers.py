@@ -156,7 +156,7 @@ def render_execution_dag_pyvis(exec_list: dict,
     for nid, meta in exec_list.items():
         n = str(nid)
         desc = blueprint[n].get("subtask_description", "") if blueprint and n in blueprint else ""
-        icon = ICON_MAP.get(blueprint[n]["steps"]["1"]["tool"], "default.svg")
+        icon = ICON_MAP.get(blueprint[n]["steps"]["1"]["tool"], "default.jpeg")
         
         net.add_node(
             n,

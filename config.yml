@@ -25,8 +25,12 @@ servers:
       "SLACK_TEAM_ID": "T08PEF5LHUY"
       #"SLACK_CHANNEL_IDS": ""
 
-  - name: QuickChart
-    path: more_servers/node_modules/@gongrzhe/quickchart-mcp-server/build/index.js
+  # - name: QuickChart
+  #   path: more_servers/node_modules/@gongrzhe/quickchart-mcp-server/build/index.js
+  #   type: node 
+
+  - name: ChartMaker
+    path: more_servers/mcp-server-chart/build/index.js
     type: node 
 
   - name: Youtube-API

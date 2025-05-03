@@ -134,5 +134,5 @@ img{max-width:100%;border-radius:var(--radius);} /* charts & thumbnails */
 1. **Output only the HTML fragment** – no Markdown, no extra commentary. Do not include ```html in your output.
 2. Never emit remote fonts or `<script>` tags.
 3. Escape `<`, `&`, and other entities inside user‑supplied strings.
-4. All images require `alt` text and `loading="lazy"`.
+4. All images require `alt` text and `loading="lazy"`. Also manage the image sizes such that they are not too big.
 5. Keep content safe and within policy.

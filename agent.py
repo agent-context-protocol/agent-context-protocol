@@ -691,6 +691,11 @@ class AgentNode(BaseNode):
                                              The method for this should always be FUNCTION, keep that in mind, and dont do some HTTP Method.
                                              The SQL Database type is Postgres, so please write the SQL Statements Accordingly.
                                           """
+                    # elif "generate_" in step['tool']:
+                    #     tool_documentation = f"""Tool Name:{step['tool']}\nDescription: {self.dag_compiler.MCP_PARAMS_DICT[step['tool']]['documentation']}\nInput Schema: {self.dag_compiler.MCP_PARAMS_DICT[step['tool']]['parameters']}
+                    #                          The method for this should always be FUNCTION, keep that in mind, and dont do some HTTP Method.
+                    #                          If its a plotting related tool, then please keep the image sizes not too big, keep it around (400, 250).
+                    #                       """
                     else:
                         tool_documentation = f"""Tool Name:{step['tool']}\nDescription: {self.dag_compiler.MCP_PARAMS_DICT[step['tool']]['documentation']}\nInput Schema: {self.dag_compiler.MCP_PARAMS_DICT[step['tool']]['parameters']}
                                                 The method for this should always be FUNCTION, keep that in mind, and dont do some HTTP Method.
@@ -698,6 +703,7 @@ class AgentNode(BaseNode):
                 else:
                     raise ValueError("tool Documentation Not Found.")
                 input_data = self.prepare_input_for_tool_running_step(step, tool_documentation)
+                print("input_data: ",input_data)
 
                 # generating the Agent request from the LLM
                 self.chat_history.append({"role": "user", "content": self.agent_request_prompt})

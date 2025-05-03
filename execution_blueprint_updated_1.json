@@ -4,10 +4,10 @@
         "steps": {
             "1": {
                 "tool": "query",
-                "handles": "Retrieves all table and column information from the public schema for grounding further SQL queries.",
+                "handles": "Retrieves all table and column names/types in the public schema for grounding",
                 "input_vars": [
                     {
-                        "name": "schema_sql",
+                        "name": "get_schema_sql",
                         "parameter": [
                             "sql"
                         ],
@@ -21,14 +21,14 @@
                 "output_vars": [
                     {
                         "name": "all_schema_info",
-                        "description": "Schema details for all tables and columns in the public schema",
+                        "description": "Schema details for all tables in the public schema",
                         "used_by": [
                             {
                                 "sub_task": 2,
                                 "step": 1
                             }
                         ],
-                        "value": "```json\n    [\n      {\"table_name\": \"invoice\", \"column_name\": \"customer_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"invoice_date\", \"data_type\": \"timestamp without time zone\"},\n      {\"table_name\": \"album\", \"column_name\": \"album_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"album\", \"column_name\": \"artist_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"customer\", \"column_name\": \"customer_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"employee\", \"column_name\": \"employee_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"artist\", \"column_name\": \"artist_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"total\", \"data_type\": \"numeric\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"invoice_line_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"invoice_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"track_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"unit_price\", \"data_type\": \"numeric\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"quantity\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"track_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"employee\", \"column_name\": \"reports_to\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"album_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"media_type_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"genre_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"employee\", \"column_name\": \"birth_date\", \"data_type\": \"timestamp without time zone\"},\n      {\"table_name\": \"track\", \"column_name\": \"milliseconds\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"bytes\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"unit_price\", \"data_type\": \"numeric\"},\n      {\"table_name\": \"playlist\", \"column_name\": \"playlist_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"employee\", \"column_name\": \"hire_date\", \"data_type\": \"timestamp without time zone\"},\n      {\"table_name\": \"playlist_track\", \"column_name\": \"playlist_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"playlist_track\", \"column_name\": \"track_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"genre\", \"column_name\": \"genre_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"customer\", \"column_name\": \"support_rep_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"media_type\", \"column_name\": \"media_type_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"invoice_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"composer\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"playlist\", \"column_name\": \"name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"genre\", \"column_name\": \"name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"media_type\", \"column_name\": \"name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_postal_code\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"artist\", \"column_name\": \"name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"album\", \"column_name\": \"title\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"last_name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"first_name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"title\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"address\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"city\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"state\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"country\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"postal_code\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"phone\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"fax\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"email\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"first_name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"last_name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"company\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"address\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"city\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"state\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"country\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"postal_code\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"phone\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"fax\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"email\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_address\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_city\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_state\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_country\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"track\", \"column_name\": \"name\", \"data_type\": \"character varying\"}\n    ]\n    ```"
+                        "value": "[\n      {\"table_name\": \"invoice\", \"column_name\": \"customer_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"invoice_date\", \"data_type\": \"timestamp without time zone\"},\n      {\"table_name\": \"album\", \"column_name\": \"album_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"album\", \"column_name\": \"artist_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"customer\", \"column_name\": \"customer_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"employee\", \"column_name\": \"employee_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"artist\", \"column_name\": \"artist_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"total\", \"data_type\": \"numeric\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"invoice_line_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"invoice_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"track_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"unit_price\", \"data_type\": \"numeric\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"quantity\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"track_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"employee\", \"column_name\": \"reports_to\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"album_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"media_type_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"genre_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"employee\", \"column_name\": \"birth_date\", \"data_type\": \"timestamp without time zone\"},\n      {\"table_name\": \"track\", \"column_name\": \"milliseconds\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"bytes\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"unit_price\", \"data_type\": \"numeric\"},\n      {\"table_name\": \"playlist\", \"column_name\": \"playlist_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"employee\", \"column_name\": \"hire_date\", \"data_type\": \"timestamp without time zone\"},\n      {\"table_name\": \"playlist_track\", \"column_name\": \"playlist_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"playlist_track\", \"column_name\": \"track_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"genre\", \"column_name\": \"genre_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"customer\", \"column_name\": \"support_rep_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"media_type\", \"column_name\": \"media_type_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"invoice_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"composer\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"playlist\", \"column_name\": \"name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"genre\", \"column_name\": \"name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"media_type\", \"column_name\": \"name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_postal_code\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"artist\", \"column_name\": \"name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"album\", \"column_name\": \"title\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"last_name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"first_name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"title\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"address\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"city\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"state\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"country\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"postal_code\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"phone\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"fax\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"email\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"first_name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"last_name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"company\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"address\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"city\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"state\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"country\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"postal_code\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"phone\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"fax\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"email\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_address\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_city\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_state\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_country\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"track\", \"column_name\": \"name\", \"data_type\": \"character varying\"}\n    ]"
                     }
                 ]
             }
@@ -38,18 +38,18 @@
         "subtask_description": "Compute the total revenue generated by the customers each sales employee supports.",
         "steps": {
             "1": {
-                "tool": "perplexity_reason",
-                "handles": "Uses the schema info to generate the correct SQL query for total revenue per sales employee.",
+                "tool": "query",
+                "handles": "Using the schema, computes total revenue per sales employee",
                 "input_vars": [
                     {
                         "name": "all_schema_info",
                         "parameter": [
-                            "messages"
+                            "sql"
                         ],
-                        "type": "array",
+                        "type": "string",
                         "source": "TOOL_Output (sub_task 1, Step 1)",
-                        "description": "Schema details to be used for crafting the SQL query",
-                        "value": "```json\n    [\n      {\"table_name\": \"invoice\", \"column_name\": \"customer_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"invoice_date\", \"data_type\": \"timestamp without time zone\"},\n      {\"table_name\": \"album\", \"column_name\": \"album_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"album\", \"column_name\": \"artist_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"customer\", \"column_name\": \"customer_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"employee\", \"column_name\": \"employee_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"artist\", \"column_name\": \"artist_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"total\", \"data_type\": \"numeric\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"invoice_line_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"invoice_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"track_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"unit_price\", \"data_type\": \"numeric\"},\n      {\"table_name\": \"invoice_line\", \"column_name\": \"quantity\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"track_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"employee\", \"column_name\": \"reports_to\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"album_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"media_type_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"genre_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"employee\", \"column_name\": \"birth_date\", \"data_type\": \"timestamp without time zone\"},\n      {\"table_name\": \"track\", \"column_name\": \"milliseconds\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"bytes\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"unit_price\", \"data_type\": \"numeric\"},\n      {\"table_name\": \"playlist\", \"column_name\": \"playlist_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"employee\", \"column_name\": \"hire_date\", \"data_type\": \"timestamp without time zone\"},\n      {\"table_name\": \"playlist_track\", \"column_name\": \"playlist_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"playlist_track\", \"column_name\": \"track_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"genre\", \"column_name\": \"genre_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"customer\", \"column_name\": \"support_rep_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"media_type\", \"column_name\": \"media_type_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"invoice_id\", \"data_type\": \"integer\"},\n      {\"table_name\": \"track\", \"column_name\": \"composer\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"playlist\", \"column_name\": \"name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"genre\", \"column_name\": \"name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"media_type\", \"column_name\": \"name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_postal_code\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"artist\", \"column_name\": \"name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"album\", \"column_name\": \"title\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"last_name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"first_name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"title\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"address\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"city\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"state\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"country\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"postal_code\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"phone\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"fax\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"employee\", \"column_name\": \"email\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"first_name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"last_name\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"company\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"address\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"city\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"state\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"country\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"postal_code\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"phone\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"fax\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"customer\", \"column_name\": \"email\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_address\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_city\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_state\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"invoice\", \"column_name\": \"billing_country\", \"data_type\": \"character varying\"},\n      {\"table_name\": \"track\", \"column_name\": \"name\", \"data_type\": \"character varying\"}\n    ]\n    ```",
+                        "description": "Use schema info to form the correct SQL for total revenue per sales employee",
+                        "value": "\"[{\\\"table_name\\\": \\\"invoice\\\", \\\"column_name\\\": \\\"customer_id\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"invoice\\\", \\\"column_name\\\": \\\"invoice_date\\\", \\\"data_type\\\": \\\"timestamp without time zone\\\"}, {\\\"table_name\\\": \\\"album\\\", \\\"column_name\\\": \\\"album_id\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"album\\\", \\\"column_name\\\": \\\"artist_id\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"customer\\\", \\\"column_name\\\": \\\"customer_id\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"employee\\\", \\\"column_name\\\": \\\"employee_id\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"artist\\\", \\\"column_name\\\": \\\"artist_id\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"invoice\\\", \\\"column_name\\\": \\\"total\\\", \\\"data_type\\\": \\\"numeric\\\"}, {\\\"table_name\\\": \\\"invoice_line\\\", \\\"column_name\\\": \\\"invoice_line_id\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"invoice_line\\\", \\\"column_name\\\": \\\"invoice_id\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"invoice_line\\\", \\\"column_name\\\": \\\"track_id\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"invoice_line\\\", \\\"column_name\\\": \\\"unit_price\\\", \\\"data_type\\\": \\\"numeric\\\"}, {\\\"table_name\\\": \\\"invoice_line\\\", \\\"column_name\\\": \\\"quantity\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"track\\\", \\\"column_name\\\": \\\"track_id\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"employee\\\", \\\"column_name\\\": \\\"reports_to\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"track\\\", \\\"column_name\\\": \\\"album_id\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"track\\\", \\\"column_name\\\": \\\"media_type_id\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"track\\\", \\\"column_name\\\": \\\"genre_id\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"employee\\\", \\\"column_name\\\": \\\"birth_date\\\", \\\"data_type\\\": \\\"timestamp without time zone\\\"}, {\\\"table_name\\\": \\\"track\\\", \\\"column_name\\\": \\\"milliseconds\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"track\\\", \\\"column_name\\\": \\\"bytes\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"track\\\", \\\"column_name\\\": \\\"unit_price\\\", \\\"data_type\\\": \\\"numeric\\\"}, {\\\"table_name\\\": \\\"playlist\\\", \\\"column_name\\\": \\\"playlist_id\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"employee\\\", \\\"column_name\\\": \\\"hire_date\\\", \\\"data_type\\\": \\\"timestamp without time zone\\\"}, {\\\"table_name\\\": \\\"playlist_track\\\", \\\"column_name\\\": \\\"playlist_id\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"playlist_track\\\", \\\"column_name\\\": \\\"track_id\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"genre\\\", \\\"column_name\\\": \\\"genre_id\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"customer\\\", \\\"column_name\\\": \\\"support_rep_id\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"media_type\\\", \\\"column_name\\\": \\\"media_type_id\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"invoice\\\", \\\"column_name\\\": \\\"invoice_id\\\", \\\"data_type\\\": \\\"integer\\\"}, {\\\"table_name\\\": \\\"track\\\", \\\"column_name\\\": \\\"composer\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"playlist\\\", \\\"column_name\\\": \\\"name\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"genre\\\", \\\"column_name\\\": \\\"name\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"media_type\\\", \\\"column_name\\\": \\\"name\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"invoice\\\", \\\"column_name\\\": \\\"billing_postal_code\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"artist\\\", \\\"column_name\\\": \\\"name\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"album\\\", \\\"column_name\\\": \\\"title\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"employee\\\", \\\"column_name\\\": \\\"last_name\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"employee\\\", \\\"column_name\\\": \\\"first_name\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"employee\\\", \\\"column_name\\\": \\\"title\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"employee\\\", \\\"column_name\\\": \\\"address\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"employee\\\", \\\"column_name\\\": \\\"city\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"employee\\\", \\\"column_name\\\": \\\"state\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"employee\\\", \\\"column_name\\\": \\\"country\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"employee\\\", \\\"column_name\\\": \\\"postal_code\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"employee\\\", \\\"column_name\\\": \\\"phone\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"employee\\\", \\\"column_name\\\": \\\"fax\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"employee\\\", \\\"column_name\\\": \\\"email\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"customer\\\", \\\"column_name\\\": \\\"first_name\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"customer\\\", \\\"column_name\\\": \\\"last_name\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"customer\\\", \\\"column_name\\\": \\\"company\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"customer\\\", \\\"column_name\\\": \\\"address\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"customer\\\", \\\"column_name\\\": \\\"city\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"customer\\\", \\\"column_name\\\": \\\"state\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"customer\\\", \\\"column_name\\\": \\\"country\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"customer\\\", \\\"column_name\\\": \\\"postal_code\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"customer\\\", \\\"column_name\\\": \\\"phone\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"customer\\\", \\\"column_name\\\": \\\"fax\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"customer\\\", \\\"column_name\\\": \\\"email\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"invoice\\\", \\\"column_name\\\": \\\"billing_address\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"invoice\\\", \\\"column_name\\\": \\\"billing_city\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"invoice\\\", \\\"column_name\\\": \\\"billing_state\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"invoice\\\", \\\"column_name\\\": \\\"billing_country\\\", \\\"data_type\\\": \\\"character varying\\\"}, {\\\"table_name\\\": \\\"track\\\", \\\"column_name\\\": \\\"name\\\", \\\"data_type\\\": \\\"character varying\\\"}]\"",
                         "dependencies": [
                             {
                                 "sub_task": 1,
@@ -60,177 +60,84 @@
                 ],
                 "output_vars": [
                     {
-                        "name": "employee_revenue_sql",
-                        "description": "SQL query to compute total revenue per sales employee",
-                        "used_by": [
-                            {
-                                "sub_task": 2,
-                                "step": 2
-                            }
-                        ],
-                        "value": "|\n      SELECT \n          e.employee_id,\n          e.first_name || ' ' || e.last_name AS sales_employee,\n          SUM(i.total) AS total_revenue\n      FROM \n          employee e\n      INNER JOIN \n          customer c ON e.employee_id = c.support_rep_id\n      INNER JOIN \n          invoice i ON c.customer_id = i.customer_id\n      GROUP BY \n          e.employee_id, e.first_name, e.last_name\n      ORDER BY \n          total_revenue DESC;"
-                    }
-                ]
-            },
-            "2": {
-                "tool": "query",
-                "handles": "Executes the SQL query to get employee revenue data.",
-                "input_vars": [
-                    {
-                        "name": "employee_revenue_sql",
-                        "parameter": [
-                            "sql"
-                        ],
-                        "type": "string",
-                        "source": "TOOL_Output (sub_task 2, Step 1)",
-                        "description": "SQL query for total revenue per sales employee",
-                        "value": "|\n      SELECT \n          e.employee_id,\n          e.first_name || ' ' || e.last_name AS sales_employee,\n          SUM(i.total) AS total_revenue\n      FROM \n          employee e\n      INNER JOIN \n          customer c ON e.employee_id = c.support_rep_id\n      INNER JOIN \n          invoice i ON c.customer_id = i.customer_id\n      GROUP BY \n          e.employee_id, e.first_name, e.last_name\n      ORDER BY \n          total_revenue DESC;",
-                        "dependencies": [
-                            {
-                                "sub_task": 2,
-                                "step": 1
-                            }
-                        ]
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "employee_revenue_table",
-                        "description": "Table with employee name/ID and their total revenue",
+                        "name": "employee_revenue_list",
+                        "description": "List of sales employees with their total revenue",
                         "used_by": [
                             {
                                 "sub_task": 3,
                                 "step": 1
                             }
                         ],
-                        "value": "```json\n    [\n      {\n        \"employee_id\": 3,\n        \"sales_employee\": \"Jane Peacock\",\n        \"total_revenue\": \"833.04\"\n      },\n      {\n        \"employee_id\": 4,\n        \"sales_employee\": \"Margaret Park\",\n        \"total_revenue\": \"775.40\"\n      },\n      {\n        \"employee_id\": 5,\n        \"sales_employee\": \"Steve Johnson\",\n        \"total_revenue\": \"720.16\"\n      }\n    ]\n    ```"
+                        "value": "```json\n    [\n      {\n        \"employee_id\": 3,\n        \"first_name\": \"Jane\",\n        \"last_name\": \"Peacock\",\n        \"total_revenue\": \"833.04 USD\"\n      },\n      {\n        \"employee_id\": 4,\n        \"first_name\": \"Margaret\",\n        \"last_name\": \"Park\",\n        \"total_revenue\": \"775.40 USD\"\n      },\n      {\n        \"employee_id\": 5,\n        \"first_name\": \"Steve\",\n        \"last_name\": \"Johnson\",\n        \"total_revenue\": \"720.16 USD\"\n      }\n    ]\n    ```"
                     }
                 ]
             }
         }
     },
     "3": {
-        "subtask_description": "Rank employees by total revenue and extract the top three performers.",
+        "subtask_description": "Rank the sales employees by their total revenue and extract the top three performers.",
         "steps": {
             "1": {
                 "tool": "perplexity_reason",
-                "handles": "Ranks employees by revenue, extracts the top three, and identifies the top performer.",
+                "handles": "Ranks employees by revenue and extracts the top three",
                 "input_vars": [
                     {
-                        "name": "employee_revenue_table",
+                        "name": "employee_revenue_list",
                         "parameter": [
                             "messages"
                         ],
                         "type": "array",
-                        "source": "TOOL_Output (sub_task 2, Step 2)",
-                        "description": "Table of employees and their total revenue to be ranked",
-                        "value": "```json\n    [\n      {\n        \"employee_id\": 3,\n        \"sales_employee\": \"Jane Peacock\",\n        \"total_revenue\": \"833.04\"\n      },\n      {\n        \"employee_id\": 4,\n        \"sales_employee\": \"Margaret Park\",\n        \"total_revenue\": \"775.40\"\n      },\n      {\n        \"employee_id\": 5,\n        \"sales_employee\": \"Steve Johnson\",\n        \"total_revenue\": \"720.16\"\n      }\n    ]\n    ```",
+                        "source": "TOOL_Output (sub_task 2, Step 1)",
+                        "description": "List of employees and their revenue to be ranked",
+                        "value": "```json\n    [\n      {\n        \"employee_id\": 3,\n        \"first_name\": \"Jane\",\n        \"last_name\": \"Peacock\",\n        \"total_revenue\": \"833.04 USD\"\n      },\n      {\n        \"employee_id\": 4,\n        \"first_name\": \"Margaret\",\n        \"last_name\": \"Park\",\n        \"total_revenue\": \"775.40 USD\"\n      },\n      {\n        \"employee_id\": 5,\n        \"first_name\": \"Steve\",\n        \"last_name\": \"Johnson\",\n        \"total_revenue\": \"720.16 USD\"\n      }\n    ]\n    ```",
                         "dependencies": [
                             {
                                 "sub_task": 2,
-                                "step": 2
+                                "step": 1
                             }
                         ]
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "ranked_employees_table",
-                        "description": "Sorted list of employees by total revenue",
+                        "name": "top_three_employees",
+                        "description": "Top three sales employees by revenue",
                         "used_by": [
+                            {
+                                "sub_task": 4,
+                                "step": 1
+                            },
+                            {
+                                "sub_task": 5,
+                                "step": 1
+                            },
                             {
                                 "sub_task": 7,
                                 "step": 1
                             }
                         ],
-                        "value": "[\n      {\"employee_id\": 3, \"sales_employee\": \"Jane Peacock\", \"total_revenue\": \"833.04\"},\n      {\"employee_id\": 4, \"sales_employee\": \"Margaret Park\", \"total_revenue\": \"775.40\"},\n      {\"employee_id\": 5, \"sales_employee\": \"Steve Johnson\", \"total_revenue\": \"720.16\"}\n    ]"
-                    },
-                    {
-                        "name": "top_three_employees",
-                        "description": "List of the top three employees with their revenues (array of objects with name/id and revenue)",
-                        "used_by": [],
-                        "value": "[\n      {\"employee_id\": 3, \"sales_employee\": \"Jane Peacock\", \"total_revenue\": 833.04},\n      {\"employee_id\": 4, \"sales_employee\": \"Margaret Park\", \"total_revenue\": 775.40},\n      {\"employee_id\": 5, \"sales_employee\": \"Steve Johnson\", \"total_revenue\": 720.16}\n    ]"
-                    },
-                    {
-                        "name": "top_three_labels",
-                        "description": "Array of names/IDs of the top three employees (for chart labels)",
-                        "used_by": [
-                            {
-                                "sub_task": 4,
-                                "step": 1
-                            }
-                        ],
-                        "value": "[\"Jane Peacock\", \"Margaret Park\", \"Steve Johnson\"]"
-                    },
-                    {
-                        "name": "top_three_revenues",
-                        "description": "Array of revenues of the top three employees (for chart data)",
-                        "used_by": [
-                            {
-                                "sub_task": 4,
-                                "step": 1
-                            }
-                        ],
-                        "value": "[833.04, 775.40, 720.16]"
-                    },
-                    {
-                        "name": "top_performer",
-                        "description": "Name/ID of the top-performing employee",
-                        "used_by": [
-                            {
-                                "sub_task": 5,
-                                "step": 1
-                            }
-                        ],
-                        "value": "\"Jane Peacock\""
+                        "value": "```json\n    [\n      {\n        \"employee_id\": 3,\n        \"first_name\": \"Jane\",\n        \"last_name\": \"Peacock\",\n        \"total_revenue\": \"833.04 USD\"\n      },\n      {\n        \"employee_id\": 4,\n        \"first_name\": \"Margaret\",\n        \"last_name\": \"Park\",\n        \"total_revenue\": \"775.40 USD\"\n      },\n      {\n        \"employee_id\": 5,\n        \"first_name\": \"Steve\",\n        \"last_name\": \"Johnson\",\n        \"total_revenue\": \"720.16 USD\"\n      }\n    ]\n    ```"
                     }
                 ]
             }
         }
     },
     "4": {
-        "subtask_description": "Create a column chart visualizing the top three employees and their total revenues.",
+        "subtask_description": "Create a colorful column chart visualizing the top three sales employees and their total revenue.",
         "steps": {
             "1": {
-                "tool": "generate_chart",
-                "handles": "Generates a column chart for the top three employees and their revenues.",
+                "tool": "generate_column_chart",
+                "handles": "Generates a colorful column chart for the top three employees",
                 "input_vars": [
                     {
-                        "name": "chart_type",
+                        "name": "top_three_employees",
                         "parameter": [
-                            "type"
-                        ],
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Chart type",
-                        "value": "bar",
-                        "dependencies": []
-                    },
-                    {
-                        "name": "top_three_labels",
-                        "parameter": [
-                            "labels"
+                            "data"
                         ],
                         "type": "array",
                         "source": "TOOL_Output (sub_task 3, Step 1)",
-                        "description": "Employee names for the x-axis",
-                        "value": "[\"Jane Peacock\", \"Margaret Park\", \"Steve Johnson\"]",
-                        "dependencies": [
-                            {
-                                "sub_task": 3,
-                                "step": 1
-                            }
-                        ]
-                    },
-                    {
-                        "name": "top_three_revenues",
-                        "parameter": [
-                            "datasets"
-                        ],
-                        "type": "array",
-                        "source": "TOOL_Output (sub_task 3, Step 1)",
-                        "description": "Array of revenues for the top three employees",
-                        "value": "[833.04, 775.40, 720.16]",
+                        "description": "Data for the column chart (top three employees and their revenue)",
+                        "value": "```json\n    [\n      {\n        \"employee_id\": 3,\n        \"first_name\": \"Jane\",\n        \"last_name\": \"Peacock\",\n        \"total_revenue\": \"833.04 USD\"\n      },\n      {\n        \"employee_id\": 4,\n        \"first_name\": \"Margaret\",\n        \"last_name\": \"Park\",\n        \"total_revenue\": \"775.40 USD\"\n      },\n      {\n        \"employee_id\": 5,\n        \"first_name\": \"Steve\",\n        \"last_name\": \"Johnson\",\n        \"total_revenue\": \"720.16 USD\"\n      }\n    ]\n    ```",
                         "dependencies": [
                             {
                                 "sub_task": 3,
@@ -248,11 +155,33 @@
                         "description": "Title for the chart",
                         "value": "Top 3 Sales Employees by Revenue",
                         "dependencies": []
+                    },
+                    {
+                        "name": "axisXTitle",
+                        "parameter": [
+                            "axisXTitle"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "X-axis title",
+                        "value": "Employee",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "axisYTitle",
+                        "parameter": [
+                            "axisYTitle"
+                        ],
+                        "type": "string",
+                        "source": "LLM_Generated",
+                        "description": "Y-axis title",
+                        "value": "Total Revenue",
+                        "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "top_three_chart_url",
+                        "name": "column_chart_url",
                         "description": "URL or reference to the generated column chart",
                         "used_by": [
                             {
@@ -260,28 +189,28 @@
                                 "step": 1
                             }
                         ],
-                        "value": "\"https://quickchart.io/chart?c=%7B%22type%22%3A%22bar%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22Jane%20Peacock%22%2C%22Margaret%20Park%22%2C%22Steve%20Johnson%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22Revenue%22%2C%22data%22%3A%5B833.04%2C775.4%2C720.16%5D%7D%5D%7D%2C%22options%22%3A%7B%22title%22%3A%7B%22display%22%3Atrue%2C%22text%22%3A%22Top%203%20Sales%20Employees%20by%20Revenue%22%7D%7D%7D\""
+                        "value": "\"https://mdn.alipayobjects.com/one_clip/afts/img/HR9dQJb19AEAAAAAAAAAAAAAoEACAQFr/original\""
                     }
                 ]
             }
         }
     },
     "5": {
-        "subtask_description": "Generate a brief, rhyming tagline praising the top-performing employee.",
+        "subtask_description": "Generate a brief, rhyming tagline praising the top-performing sales employee.",
         "steps": {
             "1": {
                 "tool": "perplexity_reason",
-                "handles": "Creates a rhyming, positive tagline for the top performer.",
+                "handles": "Creates a rhyming tagline for the top performer",
                 "input_vars": [
                     {
-                        "name": "top_performer",
+                        "name": "top_three_employees",
                         "parameter": [
                             "messages"
                         ],
                         "type": "array",
                         "source": "TOOL_Output (sub_task 3, Step 1)",
-                        "description": "Name/ID of the top-performing employee to be praised in a rhyme",
-                        "value": "[\"Jane Peacock\"]",
+                        "description": "Data containing the top performer\u2019s name for tagline generation",
+                        "value": "```json\n    [\n      {\n        \"employee_id\": 3,\n        \"first_name\": \"Jane\",\n        \"last_name\": \"Peacock\",\n        \"total_revenue\": \"833.04 USD\"\n      },\n      {\n        \"employee_id\": 4,\n        \"first_name\": \"Margaret\",\n        \"last_name\": \"Park\",\n        \"total_revenue\": \"775.40 USD\"\n      },\n      {\n        \"employee_id\": 5,\n        \"first_name\": \"Steve\",\n        \"last_name\": \"Johnson\",\n        \"total_revenue\": \"720.16 USD\"\n      }\n    ]\n    ```",
                         "dependencies": [
                             {
                                 "sub_task": 3,
@@ -292,26 +221,26 @@
                 ],
                 "output_vars": [
                     {
-                        "name": "rhyming_tagline",
-                        "description": "Rhyming, positive tagline for the top performer",
+                        "name": "top_performer_tagline",
+                        "description": "Rhyming tagline praising the top performer",
                         "used_by": [
                             {
                                 "sub_task": 7,
                                 "step": 1
                             }
                         ],
-                        "value": "\"Jane Peacock shines bright, a creative force in flight\u2014  \n'Artist-in-residence, masterstroke, her brilliance takes the spotlight!'\""
+                        "value": "\"Jane Peacock\u2019s sales soar high,  \ntopping charts with a victory cry!  \nHer results shine bright, no one can block\u2014  \ncelebrate Jane, the peak of the flock!\""
                     }
                 ]
             }
         }
     },
     "6": {
-        "subtask_description": "List all public Slack channels to obtain the channel ID for random.",
+        "subtask_description": "List all public Slack channels to retrieve the channel ID for llm_agents_proj.",
         "steps": {
             "1": {
                 "tool": "slack_list_channels",
-                "handles": "Lists public Slack channels to find random",
+                "handles": "Lists public Slack channels to find llm_agents_proj",
                 "input_vars": [
                     {
                         "name": "slack_channel_limit",
@@ -327,36 +256,36 @@
                 ],
                 "output_vars": [
                     {
-                        "name": "random_channel_id",
-                        "description": "Slack channel ID for random",
+                        "name": "llm_agents_proj_channel_id",
+                        "description": "Slack channel ID for llm_agents_proj",
                         "used_by": [
                             {
                                 "sub_task": 7,
                                 "step": 1
                             }
                         ],
-                        "value": "\"C075AE6F3B4\""
+                        "value": "\"C08QJ86ATDE\""
                     }
                 ]
             }
         }
     },
     "7": {
-        "subtask_description": "Post a message in the random Slack channel containing the ranked table, chart, and tagline.",
+        "subtask_description": "Post a nicely formatted message to llm_agents_proj Slack channel, including the ranked list, chart, and tagline.",
         "steps": {
             "1": {
                 "tool": "slack_post_message",
-                "handles": "Posts the ranked table, chart, and tagline to Slack random",
+                "handles": "Posts the results to llm_agents_proj with all required info",
                 "input_vars": [
                     {
-                        "name": "random_channel_id",
+                        "name": "llm_agents_proj_channel_id",
                         "parameter": [
                             "channel_id"
                         ],
                         "type": "string",
                         "source": "TOOL_Output (sub_task 6, Step 1)",
-                        "description": "Slack channel ID for random",
-                        "value": "\"C075AE6F3B4\"",
+                        "description": "Slack channel ID for llm_agents_proj",
+                        "value": "\"C08QJ86ATDE\"",
                         "dependencies": [
                             {
                                 "sub_task": 6,
@@ -365,14 +294,14 @@
                         ]
                     },
                     {
-                        "name": "ranked_employees_table",
+                        "name": "top_three_employees",
                         "parameter": [
                             "text"
                         ],
                         "type": "string",
                         "source": "TOOL_Output (sub_task 3, Step 1)",
-                        "description": "Ranked table of employees and their revenues",
-                        "value": "\"[{\\\"employee_id\\\": 3, \\\"sales_employee\\\": \\\"Jane Peacock\\\", \\\"total_revenue\\\": \\\"833.04\\\"}, {\\\"employee_id\\\": 4, \\\"sales_employee\\\": \\\"Margaret Park\\\", \\\"total_revenue\\\": \\\"775.40\\\"}, {\\\"employee_id\\\": 5, \\\"sales_employee\\\": \\\"Steve Johnson\\\", \\\"total_revenue\\\": \\\"720.16\\\"}]\"",
+                        "description": "Ranked list of top three employees and their revenue",
+                        "value": "\"1. Jane Peacock: 833.04 USD\\n2. Margaret Park: 775.40 USD\\n3. Steve Johnson: 720.16 USD\"",
                         "dependencies": [
                             {
                                 "sub_task": 3,
@@ -381,14 +310,14 @@
                         ]
                     },
                     {
-                        "name": "top_three_chart_url",
+                        "name": "column_chart_url",
                         "parameter": [
                             "text"
                         ],
                         "type": "string",
                         "source": "TOOL_Output (sub_task 4, Step 1)",
-                        "description": "URL or reference to the generated column chart",
-                        "value": "\"https://quickchart.io/chart?c=%7B%22type%22%3A%22bar%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22Jane%20Peacock%22%2C%22Margaret%20Park%22%2C%22Steve%20Johnson%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22Revenue%22%2C%22data%22%3A%5B833.04%2C775.4%2C720.16%5D%7D%5D%7D%2C%22options%22%3A%7B%22title%22%3A%7B%22display%22%3Atrue%2C%22text%22%3A%22Top%203%20Sales%20Employees%20by%20Revenue%22%7D%7D%7D\"",
+                        "description": "URL or reference to the column chart",
+                        "value": "\"https://mdn.alipayobjects.com/one_clip/afts/img/HR9dQJb19AEAAAAAAAAAAAAAoEACAQFr/original\"",
                         "dependencies": [
                             {
                                 "sub_task": 4,
@@ -397,14 +326,14 @@
                         ]
                     },
                     {
-                        "name": "rhyming_tagline",
+                        "name": "top_performer_tagline",
                         "parameter": [
                             "text"
                         ],
                         "type": "string",
                         "source": "TOOL_Output (sub_task 5, Step 1)",
                         "description": "Rhyming tagline for the top performer",
-                        "value": "\"Jane Peacock shines bright, a creative force in flight\u2014  \n'Artist-in-residence, masterstroke, her brilliance takes the spotlight!'\"",
+                        "value": "\"Jane Peacock\u2019s sales soar high,  \ntopping charts with a victory cry!  \nHer results shine bright, no one can block\u2014  \ncelebrate Jane, the peak of the flock!\"",
                         "dependencies": [
                             {
                                 "sub_task": 5,
@@ -415,10 +344,10 @@
                 ],
                 "output_vars": [
                     {
-                        "name": "slack_post_confirmation",
+                        "name": "slack_message_confirmation",
                         "description": "Confirmation or result of posting to Slack",
                         "used_by": [],
-                        "value": "{\n      \"ok\": true,\n      \"channel\": \"C075AE6F3B4\",\n      \"ts\": \"1746081284.529569\",\n      \"message_snippet\": \"Jane Peacock shines bright, a creative force in flight\u2014  \\n'Artist-in-residence, masterstroke, her brilliance takes the spotlight!'\\n\\n*Top 3 Sales Employees by Revenue:*\\n\\n| Employee           | Revenue  |\\n|--------------------|----------|\\n| Jane Peacock       | $833.04  |\\n| Margaret Park      | $775.40  |\\n| Steve Johnson      | $720.16  |\\n\\nChart: https://quickchart.io/chart?c=%7B%22type%22%3A%22bar%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22Jane%20Peacock%22%2C%22Margaret%20Park%22%2C%22Steve%20Johnson%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22Revenue%22%2C%22data%22%3A%5B833.04%2C775.4%2C720.16%5D%7D%5D%7D%2C%22options%22%3A%7B%22title%22%3A%7B%22display%22%3Atrue%2C%22text%22%3A%22Top%203%20Sales%20Employees%20by%20Revenue%22%7D%7D%7D\"\n    }"
+                        "value": "{\n      \"ok\": true,\n      \"channel\": \"C08QJ86ATDE\",\n      \"timestamp\": \"1746306108.815619\",\n      \"message_text\": \":trophy: Top 3 Employees by Revenue (May 3, 2025):\\n1. Jane Peacock: 833.04 USD\\n2. Margaret Park: 775.40 USD\\n3. Steve Johnson: 720.16 USD\\n\\n:bar_chart: See the chart: <https://mdn.alipayobjects.com/one_clip/afts/img/HR9dQJb19AEAAAAAAAAAAAAAoEACAQFr/original>\\n\\n:tada: Tagline for our top performer:\\nJane Peacock\u2019s sales soar high,\\ntopping charts with a victory cry!\\nHer results shine bright, no one can block\u2014\\ncelebrate Jane, the peak of the flock!\"\n    }"
                     }
                 ]
             }
