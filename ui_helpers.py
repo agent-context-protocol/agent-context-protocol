@@ -1,6 +1,7 @@
 import streamlit as st
 from pyvis.network import Network
 import streamlit.components.v1 as components
+import json
 
 import base64
 import os
@@ -107,76 +108,88 @@ def _node_label(icon_filename: str, label_text: str) -> str:
 # print(ICON_DATA_URI)
 def render_execution_dag_pyvis(exec_list: dict,
                               completed: set[str] | set[int] = None,
-                              blueprint: dict[str, dict] = None):
+                              blueprint: dict[str, dict] = None, height = 600):
     completed = {str(x) for x in (completed or set())}
 
+    # 1) Create the PyVis network with white bg and extra tall height
     net = Network(
-        height="320px",
+        height=f"{height}px",
         width="100%",
         directed=True,
-        bgcolor="#1f1f2e",  # dark background
-        font_color="#e0e0e5"  # light font
+        bgcolor="#F7F7F7",
+        font_color="#10000000",
     )
 
-    net.set_options("""
-    var options = {
-      "layout": {
-        "hierarchical": {
-          "enabled": true,
-          "direction": "UD",
-          "sortMethod": "directed"
-        }
-      },
-      "nodes": {
-        "shape": "circle",
-        "size": 20,
-        "font": {
-          "size": 12,
-          "face": "monospace",
-          "color": "#e0e0e5"
+    # 2) Build options as Python dict, then dump to JSON
+    options = {
+        "interaction": {
+            "zoomView": True
         },
-        "borderWidth": 1
-      },
-      "edges": {
-        "arrows": {"to": {"enabled": true}},
-        "color": {
-          "color": "red",
-          "highlight": "red",
-          "inherit": false
+        "layout": {
+            "hierarchical": {
+            "enabled": True,
+            "direction": "UD",
+            "sortMethod": "directed",
+            "parentCentralization": True,
+            "blockShifting": True
+            }
         },
-        "width": 1.5
-      },
-      "physics": {
-        "enabled": false
-      }
+        "nodes": {
+            "shape": "circle",
+            "size": 30,
+            "font": {"size": 12, "face": "monospace", "color": "#000000"},
+            "borderWidth": 1
+        },
+        "edges": {
+            "arrows": {"to": {"enabled": True}},
+            "width": 5,
+            "inherit": False
+        },
+        "physics": {"enabled": False}
     }
-    """)
+    net.set_options(json.dumps(options))
 
-    # Add nodes
+    # 3) Add nodes with image icons
     for nid, meta in exec_list.items():
         n = str(nid)
-        desc = blueprint[n].get("subtask_description", "") if blueprint and n in blueprint else ""
-        icon = ICON_MAP.get(blueprint[n]["steps"]["1"]["tool"], "default.jpeg")
-        
+        desc = blueprint.get(n, {}).get("subtask_description", "")
+        # pick the first step's tool for icon lookup
+        tool = None
+        if blueprint and n in blueprint:
+            steps = blueprint[n].get("steps", {})
+            first = next(iter(steps.values()), {})
+            tool = first.get("tool")
+        icon_file = ICON_MAP.get(tool, "default.png")
+        icon_uri  = ICON_DATA_URI.get(icon_file, "")
+
         net.add_node(
             n,
-            # label='Label 1',  # or label_text if you want some text underneath
-            shape='image',
-            image=ICON_DATA_URI[icon],  # icon = e.g., 'github.svg'
+            shape="image",
+            label = "",
+            image=icon_uri,
             title=desc,
-            color="#32CD32" if n in completed else "#2b2b3a",
-            font={"color": "#e0e0e5"},
-            borderWidth=1.5
+            color="#32CD32" if n in completed else "#DDDDDD",
+            borderWidth=2
         )
 
-    # Add edges
+    # 4) Add edges, coloring based on source-completion
     for nid, meta in exec_list.items():
-        for parent in meta["dependent_on"]:
-            net.add_edge(str(parent), str(nid))
+        for parent in meta.get("dependent_on", []):
+            src, dst = str(parent), str(nid)
+            edge_color = "green" if src in completed else "#B22222"
+            net.add_edge(
+                src,
+                dst,
+                color={"color": edge_color, "highlight": edge_color},
+                arrows="to"
+            )
 
-    # Embed
-    html = net.generate_html()
-    components.html(html, height=340, scrolling=True)
+    # 5) Render and embed in Streamlit with matching height
+    # net.fit(html=True)
+    html = "<style>.edgeLabel{display:none!important;}</style>" + net.generate_html()
+    html = html.replace("<hr>", "").replace("<hr/>", "")
+    html = "<style>hr{display:none;}</style>" + html
+    components.html(html, height=height, scrolling=True)
 
 
 def update_and_draw_dag(data: dict,
@@ -184,26 +197,31 @@ def update_and_draw_dag(data: dict,
                         placeholder: st.delta_generator.DeltaGenerator):
     placeholder.empty()
     with placeholder.container():
-        execution_list: dict[str, dict] = {}
+        execution_list: dict[str, dict] = {
+            sub_id: {"dependent_on": [], "depth": 0}
+            for sub_id in data
+        }
 
+        # build dependency list
         for sub_id, sub in data.items():
-            execution_list[sub_id] = {"dependent_on": [], "depth": 0}
-
-        for sub_id, sub in data.items():
-            for step in sub["steps"].values():
-                for inp in step["input_vars"]:
+            for step in sub.get("steps", {}).values():
+                for inp in step.get("input_vars", []):
                     for dep in inp.get("dependencies", []):
-                        if dep["sub_task"] not in execution_list[sub_id]["dependent_on"]:
-                            execution_list[sub_id]["dependent_on"].append(dep["sub_task"])
+                        task = dep.get("sub_task")
+                        if task and task not in execution_list[sub_id]["dependent_on"]:
+                            execution_list[sub_id]["dependent_on"].append(task)
 
+        # compute depths (unused visually but kept for potential layout tweaks)
         changed = True
         while changed:
             changed = False
-            for sub_id, meta in execution_list.items():
+            for sid, meta in execution_list.items():
                 for p in meta["dependent_on"]:
                     pd = execution_list[str(p)]["depth"] + 1
                     if pd > meta["depth"]:
                         meta["depth"] = pd
                         changed = True
-
-        render_execution_dag_pyvis(execution_list, completed, data)
+        max_depth = max(meta["depth"] for meta in execution_list.values())  # 0-based
+        # e.g. 150px per level, plus 100px padding:
+        computed_height = 100 + (max_depth + 1) * 150
+        render_execution_dag_pyvis(execution_list, completed, data, height = computed_height)

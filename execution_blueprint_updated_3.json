@@ -1,29 +1,52 @@
 {
-    "3": {
-        "subtask_description": "Fetch short background on the top 5 artists.",
+    "4": {
+        "subtask_description": "Calculate the travel time using Google Maps from the office address (123 Main St, Brooklyn, NY) to the meeting location (500 5th Avenue, New York, NY).",
         "steps": {
             "1": {
-                "tool": "perplexity_ask",
-                "handles": "Retrieving short background info for each of the top 5 artists",
+                "tool": "maps_distance_matrix",
+                "handles": "Calculates travel time and distance from the office to the meeting location",
                 "input_vars": [
                     {
-                        "name": "background_query",
+                        "name": "office_origin",
                         "parameter": [
-                            "messages"
+                            "origins"
                         ],
                         "type": "array",
                         "source": "LLM_Generated",
-                        "description": "Message asking for short background on top 5 artists",
-                        "value": "[{\"role\":\"user\",\"content\":\"Please provide a short background for each of the top 5 artists from the Chinook DB.\"}]",
+                        "description": "Array containing the office address as the origin",
+                        "value": "[\"123 Main St, Brooklyn, NY\"]",
+                        "dependencies": []
+                    },
+                    {
+                        "name": "meeting_destination",
+                        "parameter": [
+                            "destinations"
+                        ],
+                        "type": "array",
+                        "source": "LLM_Generated",
+                        "description": "Array containing the meeting address as the destination",
+                        "value": "[\"500 5th Avenue, New York, NY\"]",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "artist_backgrounds",
-                        "description": "Short background summaries for the top 5 artists",
+                        "name": "travel_time",
+                        "description": "Estimated travel time from office to meeting location",
                         "used_by": [],
-                        "value": "\"## Backgrounds of the Top 5 Artists from the Chinook Database\n\nBased on revenue data from the Chinook Database, the top five artists are:\n\n1. Iron Maiden\n2. U2\n3. Metallica\n4. Led Zeppelin\n5. Lost\n\nBelow are brief backgrounds on each:\n\n**Iron Maiden**  \nIron Maiden is a legendary British heavy metal band formed in 1975 by bassist Steve Harris. Renowned for their energetic live performances and iconic mascot \\\"Eddie,\\\" Iron Maiden played a major role in the new wave of British heavy metal, influencing countless bands worldwide. Major albums include *The Number of the Beast*, *Powerslave*, and *Seventh Son of a Seventh Son*.\n\n**U2**  \nU2 is an Irish rock band formed in Dublin in 1976, consisting of Bono, The Edge, Adam Clayton, and Larry Mullen Jr. Known for their soaring sound and socially conscious lyrics, U2 achieved global stardom with albums like *The Joshua Tree* and *Achtung Baby*, and are celebrated for their activism and innovation in music.\n\n**Metallica**  \nMetallica is an American heavy metal band formed in Los Angeles in 1981. Founded by drummer Lars Ulrich and guitarist/vocalist James Hetfield, Metallica is one of the most influential metal bands, credited with pioneering thrash metal. Their best-known albums are *Master of Puppets*, *Ride the Lightning*, and the self-titled \\\"Black Album.\\\"\n\n**Led Zeppelin**  \nLed Zeppelin, formed in London in 1968, was composed of Robert Plant, Jimmy Page, John Paul Jones, and John Bonham. Often credited as one of the founders of hard rock and heavy metal, their signature blend included blues, psychedelia, and folk influences. Their most iconic songs include \\\"Stairway to Heaven,\\\" \\\"Whole Lotta Love,\\\" and \\\"Kashmir.\\\"\n\n**Lost**  \nLost is listed as one of the top artists by revenue in the Chinook Database, but unlike the other names here, \\\"Lost\\\" appears to be a placeholder or possibly a lesser-known or fictional artist included for database completeness. No major artist by this exact name is widely recognized in popular music history, indicating it may be a sample entry in Chinook's dataset rather than a real-world band or performer.\n\nThese artists reflect a mix of classic rock and metal staples, frequently featured in digital music store datasets such as Chinook's.\""
+                        "value": "{\n      \"text\": \"21 mins\",\n      \"value_seconds\": 1245\n    }"
+                    },
+                    {
+                        "name": "travel_distance",
+                        "description": "Estimated travel distance from office to meeting location",
+                        "used_by": [],
+                        "value": "{\n      \"text\": \"10.8 km\",\n      \"value_meters\": 10823\n    }"
+                    },
+                    {
+                        "name": "travel_route_details",
+                        "description": "Route details from office to meeting location",
+                        "used_by": [],
+                        "value": "{\n      \"origin_address\": \"123 Main St, Brooklyn, NY 11217, USA\",\n      \"destination_address\": \"500 5th Ave, New York, NY 10110, USA\",\n      \"status\": \"OK\",\n      \"duration\": {\n        \"text\": \"21 mins\",\n        \"value_seconds\": 1245\n      },\n      \"distance\": {\n        \"text\": \"10.8 km\",\n        \"value_meters\": 10823\n      }\n    }"
                     }
                 ]
             }

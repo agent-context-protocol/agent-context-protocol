@@ -14,7 +14,7 @@ from ui_helpers import update_and_draw_dag
 st.set_page_config(layout = "wide") 
 client = OpenAI()
 client_async = AsyncOpenAI()
-model_name = "gpt-4o-2024-08-06"
+model_name = "gpt-4.1-2025-04-14"
 # Load custom CSS for minimal styling (removing extra background colors and padding)
 def load_css():
     st.markdown("""
@@ -231,10 +231,11 @@ class StreamlitACP:
             self.output[group_id] = 'group_results'
             # Update the group as completed
             self.update_group_section(group_id, user_query)
-        # self.update_group_section(1, user_query)
+        # self.update_group_section('1', user_query)
 
 async def main():
     # Load custom CSS
+    
     
     load_css()
 
@@ -249,9 +250,9 @@ async def main():
         if st.button("Example Query"):
             user_query = "Example query"
 
-    if st.button("Run Workflow"):
-        with st.spinner("Running execution_blueprint... please wait"):
-            st.write("Running execution_blueprint...")
+    if st.button("Analyze Vibes"):
+        with st.spinner("Agent Context Protocol (ACPs) at work ..."):
+            # st.write("Running execution_blueprint...")
             progress_bar = st.progress(0)
             status_text = st.empty()
 
@@ -259,13 +260,13 @@ async def main():
             execution_blueprint = await acp_app.ACP.initialise(user_query)
 
             async def update_progress():
-                total_groups = len(acp_app.ACP.dag_compiler.execution_blueprint)
+                total = len(acp_app.ACP.communication_manager.agents)
                 while True:
-                    completed_groups = len(acp_app.output)
-                    progress = completed_groups / total_groups
-                    progress_bar.progress(progress)
-                    status_text.text(f"Completed {completed_groups} out of {total_groups} groups")
-                    if progress >= 1.0:
+                    done = len(acp_app.ACP.communication_manager.completed_agents)
+                    pct = done / total * 100
+                    progress_bar.progress(done/total)
+                    status_text.text(f"{pct:.0f}%")
+                    if done >= total:
                         break
                     await asyncio.sleep(0.1)
 

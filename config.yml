@@ -47,7 +47,7 @@ servers:
     path: servers/src/postgres/dist/index.js
     type: node
     args:
-    - "postgresql://aarjun1:@localhost:5432/chinook"
+    - "postgresql://db:@localhost:5432/chinook"
 
   - name: GoogleCalendar
     path: more_servers/google-calendar-mcp/build/index.js

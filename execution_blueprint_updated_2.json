@@ -1,75 +1,47 @@
 {
-    "2": {
-        "subtask_description": "If travel time exceeds 10 minutes, post a Slack message in general channel.",
+    "1": {
+        "subtask_description": "Retrieve and summarize the title, description, duration, and captions (if available) for the YouTube video at https://www.youtube.com/watch?v=IWqq7X6Jxvo.",
         "steps": {
             "1": {
-                "tool": "slack_list_channels",
-                "handles": "Listing Slack channels to find general channel",
+                "tool": "get-video-info-for-summary-from-url",
+                "handles": "Retrieves title, description, duration, and captions for the specified YouTube video",
                 "input_vars": [
                     {
-                        "name": "channel_limit",
+                        "name": "youtube_video_url",
                         "parameter": [
-                            "limit"
+                            "videoUrl"
                         ],
-                        "type": "number",
+                        "type": "string",
                         "source": "LLM_Generated",
-                        "description": "Number of channels to retrieve",
-                        "value": "100",
+                        "description": "The URL of the YouTube video to summarize",
+                        "value": "https://www.youtube.com/watch?v=IWqq7X6Jxvo",
                         "dependencies": []
                     }
                 ],
                 "output_vars": [
                     {
-                        "name": "general_channel_id",
-                        "description": "Slack channel ID for general",
-                        "used_by": [
-                            {
-                                "sub_task": 2,
-                                "step": 2
-                            }
-                        ],
-                        "value": "\"C075CU6FVE0\""
-                    }
-                ]
-            },
-            "2": {
-                "tool": "slack_post_message",
-                "handles": "Posting message about being late if travel time is more than 10 minutes",
-                "input_vars": [
-                    {
-                        "name": "general_channel_id",
-                        "parameter": [
-                            "channel_id"
-                        ],
-                        "type": "string",
-                        "source": "TOOL_Output (sub_task 2, Step 1)",
-                        "description": "The ID for general Slack channel",
-                        "value": "\"C075CU6FVE0\"",
-                        "dependencies": [
-                            {
-                                "sub_task": 2,
-                                "step": 1
-                            }
-                        ]
+                        "name": "video_title",
+                        "description": "Title of the YouTube video",
+                        "used_by": [],
+                        "value": "\"Bilawal\u2019s Indus Meltdown & Munir\u2019s Bluster: Who\u2019s Fooling Who? | Vantage with Palki Sharma | N18G\""
                     },
                     {
-                        "name": "late_message_text",
-                        "parameter": [
-                            "text"
-                        ],
-                        "type": "string",
-                        "source": "LLM_Generated",
-                        "description": "Slack message if I am more than 10 minutes late",
-                        "value": "I will be more than 10 minutes late.",
-                        "dependencies": []
-                    }
-                ],
-                "output_vars": [
-                    {
-                        "name": "slack_post_result",
-                        "description": "Confirmation or result of posting the Slack message",
+                        "name": "video_description",
+                        "description": "Description of the YouTube video",
                         "used_by": [],
-                        "value": "{\n      \"ok\": true,\n      \"channel\": \"C075CU6FVE0\",\n      \"ts\": \"1745738373.480479\",\n      \"message\": {\n        \"user\": \"U08NAEN21GC\",\n        \"type\": \"message\",\n        \"ts\": \"1745738373.480479\",\n        \"bot_id\": \"B08NAEN1VFW\",\n        \"app_id\": \"A08NAJBKTFD\",\n        \"text\": \"I will be more than 10 minutes late.\",\n        \"team\": \"T074VT6EBN3\",\n        \"bot_profile\": {\n          \"id\": \"B08NAEN1VFW\",\n          \"app_id\": \"A08NAJBKTFD\",\n          \"user_id\": \"U08NAEN21GC\",\n          \"name\": \"llm_agents\",\n          \"icons\": {\n            \"image_36\": \"https://a.slack-edge.com/80588/img/plugins/app/bot_36.png\",\n            \"image_48\": \"https://a.slack-edge.com/80588/img/plugins/app/bot_48.png\",\n            \"image_72\": \"https://a.slack-edge.com/80588/img/plugins/app/service_72.png\"\n          },\n          \"deleted\": false,\n          \"updated\": 1744698064,\n          \"team_id\": \"T074VT6EBN3\"\n        },\n        \"blocks\": [\n          {\n            \"type\": \"rich_text\",\n            \"block_id\": \"OBmc\",\n            \"elements\": [\n              {\n                \"type\": \"rich_text_section\",\n                \"elements\": [\n                  {\n                    \"type\": \"text\",\n                    \"text\": \"I will be more than 10 minutes late.\"\n                  }\n                ]\n              }\n            ]\n          }\n        ]\n      },\n      \"warning\": \"missing_charset\",\n      \"response_metadata\": {\n        \"warnings\": [\n          \"missing_charset\"\n        ]\n      }\n    }"
+                        "value": "\"Bilawal\u2019s Indus Meltdown & Munir\u2019s Bluster: Who\u2019s Fooling Who? | Vantage with Palki Sharma | N18GEvery time terror strikes India, Pakistan plays the same old...\""
+                    },
+                    {
+                        "name": "video_duration",
+                        "description": "Duration of the YouTube video",
+                        "used_by": [],
+                        "value": "\"Not available\""
+                    },
+                    {
+                        "name": "video_captions",
+                        "description": "Captions of the YouTube video (if available)",
+                        "used_by": [],
+                        "value": "\"[Music]. I'm on a. funny horn. on. [Music]. behavior. If you've covered South Asia. long enough, you begin to recognize the. pattern. Terror strikes India, civilians. die, and suddenly Pakistan becomes the. victim.. Its generals thunder, its politicians. beat their chests, its proxies and. partners parried the same old. lines. And this time was no different.. In fact, this time the circus had more. performers than usual. First up is. Pakistan's army chief, General Asim. Munir. On Thursday, he was in jail with. boots on the ground. The optics were. classic choreographed war games and. carefully curated photo ops standing on. military. tanks. But that wasn't enough. Aimony. needed some headlines. So he reached for. the script. He said, and I'm quoting,. \\\"Any misadventure by India would be met. with a notched up response.\\\" These were. his. words. Basically, if India hits back,. Pakistan hits harder. That's what he. said. It's textbook bravado and nothing. new for Asimir. After all, he's the same. man who called Kashmir Pakistan's. jugular vein.. So, this is right up his alley. But Aim. Munir seems to have tough competition. from another man and that is Bilaval. Bhau Zardari, the OG Nepo baby of. Pakistani politics. At one point, he was. the country's foreign minister, but now. he cannot seem to make up his mind. Is. Pakistan the villain or is Pakistan the. victim? Bilaval Bharddari is confused.. Look at his latest statements. First,. Bilawal threatened India over the. suspension of the Indis waters. treaty. He said the indis belongs to. Pakistan. Either the Indis water will. flow or it will be the blood of Indians.. [Applause]. A few days later, BHO was beating the. war drums again again over the Indis. waters treaty. He invoked the Indis. Valley civilization. He painted himself. as its heir and he warned India against. touching the rivers.. [Music]. [Music]. But then in an interview today, he. changed tac. Bilaval Bhut Zardari was. speaking to Sky News and he admitted. what Pakistan has long tried to bury the. country's longtime links to terrorists.. Bilaval says Pakistan has suffered. because of its own choices and that. Pakistan needed reforms. Well, is it an. honest statement? Maybe. But it also. raises a question. Which Bilaval is the. real one? Is it the one who wants. reforms? Or is it the one who thinks. that rivers and rhetoric will rewrite. geography? And while Bilaval was. changing his stance, there's one man who. knows what he wants. Molana Fuzl Rahman,. the chief of Jamaat Islam. He had a. surprisingly different take. First, he. hit out at the Pakistan army for the. tensions. Then he said, \\\"Fight with. India all you want, but do not open a. second front with Afghanistan.\\\" Why?. Because the nation won't support. it. Well, he's not wrong. Technically,. Pakistan is not equipped to handle one. burning border, let alone two. So, the. cleric is asking Islamabad to not tempt. fate. But not all his namesakes are of. the same opinion. We're talking. about General Fuzl Rahman. He is a. retired Bangladeshi general and he went. rogue on Facebook. He suggested that if. India ever attacks Pakistan, Bangladesh. should occupy the. northeast. India's northeast. He's. saying Bangladesh should occupy it. He. also floated the idea of forming a joint. axis with China. Now, it's hard to tell. what this is. Is it delusion, fantasy,. or just plain. madness? But it does tell us something. about the whole situation. The poison. Pakistan spreads is contagious. It is. now poisoning the subcontinent. Also,. just when you thought that things could. not get worse, there was Guratwan Singh. Panu, part-time Kalistthani, full-time. viral video creator. Panu too had a. warning for India. If it attacked. Pakistan, Punjab would be. liberated. Now, let's pause here for a. second. Panu is cheering for Pakistan,. the same Pakistan that forced thousands. of Sikhs into exile during partition.. Why is he speaking for them? You see,. Panu is Pakistan's favorite house plant.. They water him occasionally to make sure. that he's always available to play the. separatist card. And that is exactly. what he's doing, making some noise. The. problem here is that all these people. mistake noise for. power. This isn't just about one general. or one politician. It's about a whole. ecosystem. Pakistan is in a rot. And. when states fail to fix themselves, they. hunt for demons.. India is the easiest one to conjure. At. the end of the day, this show of power. is just a performance and Pakistan. should know that sooner or later even. the biggest run and the bestr run circus. runs out of applause.\""
                     }
                 ]
             }

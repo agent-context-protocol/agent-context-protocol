@@ -225,7 +225,7 @@ class ACP:
         self.get_system_prompts()
         self.task_decomposer = TaskDecompositionNode('task_decomposer', system_prompt=self.task_decomposer_system_prompt, mcp_tool_manager=self.mcp_tool_manager)
         self.dag_compiler = DAGCompilerNode('dag_compiler', self.dag_compiler_system_prompt, mcp_tool_manager=self.mcp_tool_manager)
-
+        self.communication_manager = None
     def get_system_prompts(self):
         with open('prompts/task_decomposer_system_prompt.txt', 'r') as file:
             self.task_decomposer_system_prompt = file.read()
@@ -251,11 +251,11 @@ class ACP:
 
         print("execution_blueprint:", execution_blueprint)
 
-        communication_manager = ACPManager(execution_blueprint, self.dag_compiler, self.agent_system_prompt)
-        communication_manager.dag_placeholders = self.dag_placeholders
+        self.communication_manager = ACPManager(execution_blueprint, self.dag_compiler, self.agent_system_prompt)
+        self.communication_manager.dag_placeholders = self.dag_placeholders
         # Modify the Manager to yield results as groups complete
         # await communication_manager.run()
-        async for group_id in communication_manager.run():
+        async for group_id in self.communication_manager.run():
             yield group_id
 
 
