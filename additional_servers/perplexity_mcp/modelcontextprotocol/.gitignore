@@ -1,0 +1,52 @@
+# Ignore macOS system files
+.DS_Store
+
+# Ignore Python compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore virtual environments
+venv/
+.env/
+*.env
+
+# Ignore log files
+*.log
+*.out
+*.err
+
+# Ignore database and cache files
+*.sqlite3
+*.db
+*.cache
+
+# Ignore IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Ignore dependency and build artifacts
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Ignore coverage and test reports
+.coverage
+coverage.xml
+*.cover
+*.pyc
+
+# Ignore system-specific files
+Thumbs.db
+Desktop.ini
+
+# Ignore CSV and large data files
+*.csv
+*.tsv
+*.jsonl
+:

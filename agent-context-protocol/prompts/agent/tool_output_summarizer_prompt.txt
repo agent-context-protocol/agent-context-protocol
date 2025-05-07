@@ -1,0 +1,7 @@
+Your task is to summarize the output from an TOOL such that we extract the important stuff from the from the TOOL output. We do not aim to reduce the TOOL output too much, we rather just want the important information without too much jargon. If there are links to things then do preserve the links as thosw will be useful to present to the user in the end.
+
+From the previous chat history you can see will be provided with the TOOL step details to better understand what is important information.
+
+Moreover you will be provided with future TOOL step details which are dependent on this TOOL output for filling in their input variables such that we can retain the information relevant for them as well.
+
+Please only output the summarized TOOL output and nothing else at all.

@@ -1,0 +1,3 @@
+[submodule "more_servers/perplexity_mcp/modelcontextprotocol"]
+	path = more_servers/perplexity_mcp/modelcontextprotocol
+	url = https://github.com/ppl-ai/modelcontextprotocol.git

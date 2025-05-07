@@ -1,11 +1,20 @@
 import streamlit as st
+from dotenv import load_dotenv
+load_dotenv()
 import asyncio
-from orchestrator import MainOrchestrator
+from acpkit.acp_manager import ACP
+from acpkit import MCPToolManager
+import asyncio
+import json
+from openai import OpenAI, AsyncOpenAI
+import streamlit.components.v1 as components
+import json
+from ui_helpers import update_and_draw_dag
 
 st.set_page_config(layout = "wide") 
-
-
-# Load custom CSS for minimal styling (removing extra background colors and padding)
+client = OpenAI()
+client_async = AsyncOpenAI()
+model_name = "gpt-4.1-2025-04-14"
 def load_css():
     st.markdown("""
         <style>
@@ -69,7 +78,7 @@ def load_css():
             background: #555;
         }
 
-        /* Panel max height with scrollable content */
+        /* SubTask max height with scrollable content */
         .scrollable-panel {
             width: 100%;  /* Take up 100% of the column width */
             max-height: 500px;  /* Set maximum height */
@@ -90,109 +99,86 @@ def load_css():
     """, unsafe_allow_html=True)
 
 
-class StreamlitOrchestrator:
+class StreamlitACP:
     def __init__(self):
-        self.orchestrator = MainOrchestrator()
+        self.mcp_manager = None
+        self.ACP = None
         self.output = {}
-        self.group_placeholders = {}
-        self.panels = []
+        self.group_containers = {}
+        self.subtasks = []
 
-    def create_group_sections(self, workflow):
-        panels = []
+    async def async_init(self):
+        self.mcp_manager = MCPToolManager()
+        await self.mcp_manager.load_from_config("config.yml")
+        self.ACP = ACP(mcp_tool_manager=self.mcp_manager)
 
-        for group_id in workflow.keys():
-            for translator_id in workflow[group_id].keys():
-                panels.append({
-                    'group_id' : group_id,
-                    'panel_id' : translator_id,
-                    'panel_description' : workflow[group_id][translator_id]['panel_description']}
+    def create_group_sections(self, execution_blueprint):
+        """
+        For each group, create a full‐width container and render the stub panel.
+        """
+        self.dag_placeholders = {} 
+        for gid, gdata in execution_blueprint.items():
+            container = st.container()
+            self.group_containers[gid] = container
+            # left_col, _ = container.columns([1, 3])  # 25% left, 75% right (blank)
+            self.dag_placeholders[gid] = st.sidebar.empty() 
+            self.dag_placeholders[gid].subheader("Execution DAG")
+            # with left_col:
+            update_and_draw_dag(
+                    gdata,
+                    completed=set(),
+                    placeholder=self.dag_placeholders[gid]
                 )
 
-        grid = []
-        for i in range(len(panels)//2 + 1):
-            cols = st.columns(2)  # Fixed 2 columns per row
-            grid_row = []
-            
-            for j in range(2):
-                container = cols[j].empty()  # Create an empty container for each column
-                grid_row.append(container)
-            grid.append(grid_row)
+    def update_group_section(self, group_id, user_query):
+        
+        with open(f"dashboard_prompt.txt", "r") as f:
+            system_prompt = f.read()
+        with open(f"execution_blueprint_updated_{group_id}.json", "r") as f:
+            data = json.load(f)
 
-        self.group_placeholders = grid
-        self.panels = panels
+        input_data = json.dumps(data, indent=2)
+        completion = client.chat.completions.create(
+                        model=model_name,
+                        messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": input_data}
+            ],
+                        temperature = 0
+                    ) 
+        
+        raw_html_snippet = completion.choices[0].message.content.split("### FORMATTED_OUTPUT")[-1].strip()
+        print("Raw HTML Snippet: ", raw_html_snippet)
+        full_doc = f"""
+        <!DOCTYPE html>
+        <html lang="en">
+          <head>
+            <meta charset="UTF-8"/>
+          </head>
+          <body style="margin:0; padding:1rem;">
+            {raw_html_snippet}
+          </body>
+        </html>
+        """
+        container = self.group_containers[group_id]
+        with container:
+            components.html(full_doc, height=1200, scrolling=True)
+    async def run_acp(self, user_query, execution_blueprint):
+        self.create_group_sections(execution_blueprint)
 
-        # Apply the custom CSS for scrollable panels
-        st.markdown("""
-            <style>
-            .scrollable-panel {
-                width: 100%;
-                max-height: 300px; /* Set max height */
-                padding: 20px;
-                border: 2px solid white;
-                border-radius: 10px;
-                background-color: black;
-                color: white;
-                box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
-                overflow-y: auto;  /* Enable vertical scrolling */
-            }
-
-            .scrollable-panel h3, .scrollable-panel h4, .scrollable-panel p {
-                color: white;
-            }
-            </style>
-        """, unsafe_allow_html=True)
-
-        # Populate the grid with panels
-        for panel in panels:
-            i = (int(panel['panel_id']) - 1)//2  # Determine the row index
-            j = (int(panel['panel_id']) - 1)%2   # Determine the column index
-            
-            # Populate the markdown with scrollable sections
-            grid[i][j].markdown(
-                f'''
-                <div class="scrollable-panel">
-                    <h3>Group {panel['group_id']}</h3>
-                    <h4>Panel {panel['panel_id']}</h4>
-                    <p>{panel['panel_description']}</p>
-                </div>
-                ''', 
-                unsafe_allow_html=True
-            )
-
-    def update_group_section(self, group_id, group_results):
-        for panel_id, panel_result in group_results.items():
-            i = (int(panel_id) - 1)//2  # Determine the row index
-            j = (int(panel_id) - 1)%2   # Determine the column index
-            
-            # Populate the markdown with scrollable content when updating
-            self.group_placeholders[i][j].markdown(
-                f'''
-                <div class="scrollable-panel">
-                    <h3>Group {group_id}</h3>
-                    <h4>Panel {panel_id}</h4>
-                    <p>{self.panels[int(panel_id)-1]['panel_description']}</p>
-                    <p>{panel_result['output']}</p>
-                </div>
-                ''', 
-                unsafe_allow_html=True
-            )
-
-    async def run_orchestrator(self, user_query, workflow):
-        # Display the group panels
-        self.create_group_sections(workflow)
-
-        # Iterate through the groups asynchronously
-        async for group_id, group_results in self.orchestrator.run(user_query, workflow):
-            self.output[group_id] = group_results
-            # Update the group as completed
-            self.update_group_section(group_id, group_results)
+        async for group_id in self.ACP.run(user_query, execution_blueprint):
+            self.output[group_id] = 'group_results'
+            self.update_group_section(group_id, user_query)
 
 async def main():
     # Load custom CSS
+    
+    
     load_css()
 
-    st.title("Workflow Orchestrator")
-    orchestrator = StreamlitOrchestrator()
+    st.title("Vibe Analyst")
+    acp_app = StreamlitACP()
+    await acp_app.async_init()
 
     # Sidebar for user input
     with st.sidebar:
@@ -201,33 +187,50 @@ async def main():
         if st.button("Example Query"):
             user_query = "Example query"
 
-    if st.button("Run Workflow"):
-        with st.spinner("Running workflow... please wait"):
-            st.write("Running workflow...")
+    if st.button("Analyze Vibes"):
+        with st.spinner("Agent Context Protocol (ACPs) at work ..."):
+            # st.write("Running execution_blueprint...")
             progress_bar = st.progress(0)
             status_text = st.empty()
 
-            # Initialize the workflow
-            workflow = await orchestrator.orchestrator.initialise(user_query)
+            # Initialize the execution_blueprint
+            execution_blueprint = await acp_app.ACP.initialise(user_query)
 
             async def update_progress():
-                total_groups = len(orchestrator.orchestrator.main_translator.workflow)
+                total = len(acp_app.ACP.communication_manager.agents)
                 while True:
-                    completed_groups = len(orchestrator.output)
-                    progress = completed_groups / total_groups
-                    progress_bar.progress(progress)
-                    status_text.text(f"Completed {completed_groups} out of {total_groups} groups")
-                    if progress >= 1.0:
+                    done = len(acp_app.ACP.communication_manager.completed_agents)
+                    pct = done / total * 100
+                    progress_bar.progress(done/total)
+                    status_text.text(f"{pct:.0f}%")
+                    if done >= total:
                         break
                     await asyncio.sleep(0.1)
 
-            # Run the orchestrator and update progress simultaneously
+            async def refresh_dags():
+                cm = acp_app.ACP.communication_manager
+                prev = 0                                   
+                while True:
+                    cur = len(cm.completed_agents)
+                    if cur > prev:                        
+                        completed = set(map(str, cm.completed_agents))
+                        for gid, ph in acp_app.dag_placeholders.items():
+                            fp = f"execution_blueprint_updated_{gid}.json"
+                            with open(fp) as f:
+                                data = json.load(f)
+                            update_and_draw_dag(data, completed, ph)
+                        prev = cur
+                    if cur >= len(cm.agents):               
+                        break
+                    await asyncio.sleep(0.1)
+
             await asyncio.gather(
-                orchestrator.run_orchestrator(user_query, workflow),
-                update_progress()
+                acp_app.run_acp(user_query, execution_blueprint),
+                update_progress(),
+                refresh_dags()
             )
 
-            st.success("Workflow completed!")
+            st.success("ACP completed!")
 
 if __name__ == "__main__":
     asyncio.run(main())
