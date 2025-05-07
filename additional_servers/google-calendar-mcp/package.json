@@ -1,0 +1,36 @@
+{
+  "name": "google-calendar-mcp",
+  "version": "1.1.0",
+  "description": "Google Calendar MCP Server",
+  "type": "module",
+  "bin": {
+    "google-calendar-mcp": "./build/index.js"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "npm run typecheck && node scripts/build.js",
+    "start": "node build/index.js",
+    "auth": "node build/auth-server.js",
+    "postinstall": "scripts/build.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@google-cloud/local-auth": "^3.0.1",
+    "@modelcontextprotocol/sdk": "^1.0.3",
+    "@types/express": "^4.17.21",
+    "esbuild": "^0.25.0",
+    "express": "^4.18.2",
+    "google-auth-library": "^9.15.0",
+    "googleapis": "^144.0.0",
+    "open": "^7.4.2",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.4",
+    "@vitest/coverage-v8": "^3.1.1",
+    "typescript": "^5.3.3",
+    "vitest": "^3.1.1"
+  }
+}
