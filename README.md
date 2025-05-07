@@ -63,7 +63,7 @@ Then open your browser at [http://localhost:8501](http://localhost:8501) to star
 
 ---
 
-## 🌟 `app.py`—Interactive Dashboard Overview
+## `app.py`—Interactive Dashboard Overview
 
 Vibe Analyst (`app.py`) provides an elegant Streamlit-based dashboard featuring:
 
