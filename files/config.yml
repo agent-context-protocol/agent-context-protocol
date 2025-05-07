@@ -25,19 +25,29 @@ servers:
       "SLACK_TEAM_ID": ""
       #"SLACK_CHANNEL_IDS": ""
 
-  - name: QuickChart
-    path: more_servers/node_modules/@gongrzhe/quickchart-mcp-server/build/index.js
+  - name: ChartMaker
+    path: more_servers/mcp-server-chart/build/index.js
     type: node 
 
   - name: Youtube-API
     path: more_servers/youtube-video-summarizer-mcp/dist/index.js
     type: node
 
-  - name: everart
+  - name: Everart
     path: servers/src/everart/dist/index.js
     type: node
     env: 
       "EVERART_API_KEY": ""
+
+  - name: Postgres SQL
+    path: servers/src/postgres/dist/index.js
+    type: node
+    args:
+    - "database_url"
+
+  - name: GoogleCalendar
+    path: more_servers/google-calendar-mcp/build/index.js
+    type: node
 
 defaults:
   python_env_path: 
