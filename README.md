@@ -1,80 +1,59 @@
-# Vibe Analyst
+# Agent Context Protocols
 
-**Visualize, orchestrate, and monitor complex multi-agent workflows in real-time—powered by Agent Context Protocols (ACP).**
-
-Vibe Analyst provides an intuitive, interactive dashboard (`app.py`) that elegantly showcases the capabilities of ACP. By leveraging ACP, users can effortlessly orchestrate and visualize task execution across multiple agents, making complex automation tasks simple and visually intuitive.
-
-## Setup Guide
-
-### Installation
-
-```bash
-git clone https://github.com/acp/vibe-analyst.git
-cd vibe-analyst
-
-# Install dependencies
-pip install -e .
-```
-
-### Setting up MCP Servers
-
-Vibe Analyst integrates seamlessly with Multiple Context Protocol (MCP) servers, enabling ACP to manage complex tasks effectively. By default, the following MCP servers are included:
-
-1. **`github`**: Manage GitHub repositories, issues, pull requests, and commits.
-2. **`perplexity-ask`**: Perform AI-driven searches and obtain detailed research summaries.
-3. **`google-maps`**: Geocode locations, route planning, and place searches.
-4. **`slack`**: Integrate Slack messaging directly into workflows.
-5. **`mcp-server-chart`**: Create dynamic visualizations and charts.
-6. **`youtube-video-summarizer-mcp`**: Automatically summarize YouTube videos.
-7. **`everart`**: Generate visuals and creative artwork using generative AI.
-8. **`postgres`**: Execute queries and interact seamlessly with PostgreSQL databases.
-9. **`google-calendar-mcp`**: Programmatically manage events on Google Calendar.
-
-To add a new server:
-
-* **Python-based servers**: Specify the path to the server's `server.py` file and its virtual environment, along with required environment variables or arguments (refer to the included `config.yml`).
-* **Node-based servers**: Provide the path to the built `index.js` after running `npm install`, along with required environment variables or arguments (see examples in `config.yml`).
-
-An example `config.yml` file is provided. To integrate a new MCP server, simply install it and update the `config.yml` accordingly.
-
-### Required Environment Variables
-
-Set up these variables according to each server’s documentation:
-
-* `GITHUB_PERSONAL_ACCESS_TOKEN`
-* `PERPLEXITY_API_KEY`
-* `GOOGLE_MAPS_API_KEY`
-* `SLACK_BOT_TOKEN`
-* `SLACK_TEAM_ID`
-* `EVERART_API_KEY`
-* `database_url` (for PostgreSQL)
-
-**Optional:**
-
-* `SLACK_CHANNEL_IDS`
-
-Finally, run:
-
-```bash
-streamlit run app.py
-```
-
-Then open your browser at [http://localhost:8501](http://localhost:8501) to start using Vibe Analyst.
+ACPs (Agent Context Protocols) are a **domain-agnostic, structured standard** for agent–agent messaging, coordination, and fault-tolerant error recovery. They centre on a persistent **Execution Blueprint**—a DAG whose nodes are individual tool invocations and whose edges capture data dependencies. 
 
 ---
 
-## `app.py`—Interactive Dashboard Overview
+## Why ACP?
 
-Vibe Analyst (`app.py`) provides an elegant Streamlit-based dashboard featuring:
-
-* **Natural Task Input:** Easily input prompts in plain language or structured JSON.
-* **Real-Time DAG Visualization:** Interactive, live-updating Directed Acyclic Graphs (DAGs) clearly show subtasks, dependencies, and execution flow.
-* **User-Friendly Outputs:** Dark-themed, responsive UI, ensuring clarity and aesthetic appeal.
-
-You can also customize the dashboard's appearance and functionality by modifying the dashboard prompt. The dashboard prompt defines how tasks, statuses, and agent outputs are presented, allowing you to tailor the visual and interactive aspects of the Vibe Analyst to suit your preferences or requirements.
+| Capability | What it means |
+|------------|---------------|
+| **Execution Blueprint engine** | Persistently tracks all agent steps, inputs, and outputs inside a DAG; enables live visualisation and restart-from-failure |
+| **Structured messaging** | Enforces `AGENT_REQUEST`, `AGENT_RESPONSE`, and `ASSISTANCE_REQUEST` schemas so agents stay interoperable with rigid tools |
+| **Robust error handling** | Standard status codes 601-607 stop cascade failures and trigger automatic recovery |
+| **Plug-and-play tools** | Drop in new domain APIs without retraining the core system—paper shows SOTA by merely adding a handful of extra tools |
+| **Proven at scale** | Achieves **28.3 % accuracy on AssistantBench**—best overall among 16 baselines—plus top-rated multimodal reports and dashboards |
 
 ---
 
-### Future Directions
+## Install
 
-Currently, Vibe Analyst and ACP provide a streamlined approach to integrating MCP servers. Beyond MCP servers, ACP inherently supports integration with any "tool," including those available within the existing `available_tools` directory. In future updates, we aim to further simplify and generalize this integration process, allowing seamless addition and orchestration of diverse tools with minimal effort.
+```bash
+pip install agent_context_protocol           # PyPI (coming soon)
+# or
+pip install git+https://github.com/agent-context-protocol/agent-context-protocol.git
+```
+
+When any step fails, an **ASSISTANCE\_REQUEST** with a descriptive status code (e.g. `604 TOOL_CALL_FAILURE`) lets a fault-tolerance agent re-plan or retry, so unrelated branches keep running.&#x20;
+
+---
+
+## Status-code cheat-sheet
+
+| Code | Meaning (pipeline stage)              |   |
+| ---- | ------------------------------------- | - |
+| 601  | Missing required parameters (request) |   |
+| 602  | Wrong step details                    |   |
+| 603  | Invalid parameter usage               |   |
+| 604  | Tool-call failure                     |   |
+| 605  | Incomplete information (response)     |   |
+| 606  | Dependency incomplete information     |   |
+| 607  | Wrong / irrelevant information        |   |
+
+---
+
+## Modules at a glance
+
+```plaintext
+agent-context-protocol/
+├── available_tools/          # Plug-and-play wrappers for external tools (GitHub, Maps, Slack, etc.)
+├── external_env_details/     # API keys, endpoint configs, and other environment-specific settings
+├── prompts/                  # System, agent, and assistance prompt templates
+├── __init__.py               # Package marker; re-exports top-level helpers for easy import
+├── acp_manager.py            # Orchestrates agents: schedules DAG groups, tracks progress, handles fault-tolerance
+├── agent.py                  # Agent class that executes blueprint steps and enforces ACP message schema
+├── base.py                   # Shared base classes, constants, and utility functions
+├── dag_compiler.py           # Converts JSON task specs into an Execution Blueprint (DAG)
+├── mcp_node.py               # Seamless adapter layer for calling Model Context Protocol (MCP) servers
+└── task_decomposer.py        # Splits high-level tasks into atomic subtasks/groups before scheduling
+```
