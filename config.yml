@@ -1,0 +1,54 @@
+servers:
+  - name: Github
+    path: servers/src/github/dist/index.js 
+    type: node
+    env:
+      GITHUB_PERSONAL_ACCESS_TOKEN: ""
+
+  - name: Perplexity_Ask
+    path: more_servers/perplexity_mcp/modelcontextprotocol/perplexity-ask/dist/index.js
+    type: node
+    env: 
+      PERPLEXITY_API_KEY: ""
+
+  - name: GoogleMaps
+    path: servers/src/google-maps/dist/index.js
+    type: node
+    env: 
+      GOOGLE_MAPS_API_KEY: ""
+
+  - name: Slack
+    path: servers/src/slack/dist/index.js
+    type: node
+    env: 
+      "SLACK_BOT_TOKEN": ""
+      "SLACK_TEAM_ID": ""
+      #"SLACK_CHANNEL_IDS": ""
+
+  - name: ChartMaker
+    path: more_servers/mcp-server-chart/build/index.js
+    type: node 
+
+  - name: Youtube-API
+    path: more_servers/youtube-video-summarizer-mcp/dist/index.js
+    type: node
+
+  - name: Everart
+    path: servers/src/everart/dist/index.js
+    type: node
+    env: 
+      "EVERART_API_KEY": ""
+
+  - name: Postgres SQL
+    path: servers/src/postgres/dist/index.js
+    type: node
+    args:
+    - "database_url"
+
+  - name: GoogleCalendar
+    path: more_servers/google-calendar-mcp/build/index.js
+    type: node
+
+defaults:
+  python_env_path: 
+  node_command: node
