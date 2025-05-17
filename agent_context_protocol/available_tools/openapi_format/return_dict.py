@@ -1,6 +1,6 @@
 import yaml
 from importlib import resources
-from acpkit import external_env_details  # adjust if your module path differs
+from agent_context_protocol import external_env_details  # adjust if your module path differs
 
 def convert_yml_to_string_fully(file_name):
     with resources.open_text(external_env_details, file_name) as file:
