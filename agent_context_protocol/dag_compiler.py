@@ -496,21 +496,6 @@ class DAGCompilerNode(BaseNode):
             try:
                 llm_response_execution_blueprint = self.generate()
                 print("llm_response_execution_blueprint before self reflection : \n",llm_response_execution_blueprint)
-                self.chat_history.append({"role": "user", "content": """
-                                          Do you think you generated the execution blueprint correctly by respecting all the details requested by the user. Mainly focus on:
-                                          1. Dataflow logic and interdependencies (sometimes you tend to not connect interdependent steps and let the dependent step dangling with no dependency data being provided via TOOL_Output, and either empty or incomplete information is provided, so very very carefully check if each step has been provided all the data it needs in the appropriate manner (using input variables with source as TOOL_Output for sharing information from previous step to current step))
-                                          2. If there are interdependencies between steps then the dependent step needs to strictly have a input variable with source field as TOOL_Output (sub_task X, Step Y), also make sure that there no wrong outputs where the previous steps output variable name has just been reffered in the dependent steps input variable value instead. Remember the wrong examples show in the - Source of Inputs:, do not repeat it.
-                                          3. Identifying issues where variable names between interdependent steps has not been kept same leading to parsing errors
-                                          4. Handling of more than one previous step output dependencies for a input parameter, is done in the manner shown.
-                                          5. For any SQL task, first list the schema of all the public tables, and only afterwards carry out the required operations. Do not hallucinate the table names or schemas, first ground your knowledge by following this.
-                                          6. The numbering of the steps for each sub task starts from 1 always.
-                                          
-                                          Lastly just make sure that each LLM_Generated source parameter values have been filled with utmost care and no hallucination, incomplete info or dummy data is used there, because in such cases grounded data needs to be provided through setting the source as TOOL_Output. If you think Everything is correct then just output NO_CHANGES_REQUIRED and nothing else at all, but if correction is required then mention the corrected output exactly in the expected format as mentioned earlier (With $$CHAIN_OF_THOUGHT$$ and $$EXECUTION_BLUEPRINT$$ blocks)."""})
-                llm_response_execution_blueprint_self_reflection = self.generate()
-                print("llm_response_execution_blueprint_self_reflection : \n",llm_response_execution_blueprint)
-                if "NO_CHANGES_REQUIRED" not in llm_response_execution_blueprint_self_reflection:
-                    llm_response_execution_blueprint = llm_response_execution_blueprint_self_reflection
-                print("llm_response_execution_blueprint after self reflection : \n",llm_response_execution_blueprint)
                 llm_response_execution_blueprint = llm_response_execution_blueprint.replace("**", "").replace("`", "").replace("#","")
                 _, execution_blueprint_dict = self.parse_dag_compiler_execution_blueprint(llm_response_execution_blueprint)
                 run_success = True
