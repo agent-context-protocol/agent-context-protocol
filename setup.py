@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="agent_context_protocol",
-    version="0.1.0",
+    version="0.2",
     description="A multi agent communication toolkit.",
     packages=find_packages(exclude=["tests*"]),
     install_requires=[

@@ -1,6 +1,6 @@
 import json
 from importlib import resources
-from acpkit import external_env_details
+from agent_context_protocol import external_env_details
 
 def get_api_details(api_name, data):
     if api_name in data:
